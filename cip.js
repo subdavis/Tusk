@@ -235,7 +235,7 @@ cipPassword.createDialog = function() {
 	$dialog.hide();
 	cIPJQ("body").append($dialog);
 	$dialog.dialog({
-		closeText: "×",
+		closeText: "Ã—",
 		autoOpen: false,
 		modal: true,
 		resizable: false,

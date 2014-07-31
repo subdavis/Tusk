@@ -11,7 +11,7 @@
 
 	"browser_action": {
 		"default_icon": {
-		  "19": "icons/19x19/icon_normal_blue_19x19.png",
+		  "19": "icons/keepass_19x19.png",
 		  "38": "icons/keepass_38x38.png"
 		},
 		"default_title": "Keepass",
@@ -21,14 +21,14 @@
 	"options_page": "options/options.html",
 	"background": {
 		"scripts": [
-			"background/background.js",
+			"background/background.js"
 			]
 		},
 	"content_scripts": [
 		{
 			"matches": ["http://*/*", "https://*/*"],
-			"js": ["jquery-1.9.1.min.js", "jquery-ui-1.10.2.custom.min.js", "chromeipass.js"],
-			"css": ["jquery-ui-1.10.2.custom.min.css", "bootstrap-btn.css", "chromeipass.css"],
+			"js": ["cip.js", "keepass.js"],
+			"css": [],
 			"run_at": "document_idle",
 			"all_frames": true
 		}
@@ -56,7 +56,7 @@
 		"webRequestBlocking",
 	*/
 		"https://*/*",
-		"http://*/*",
+		"http://*/*"
 	/*
 		"http://localhost:19455/",
 		"http://localhost/",
