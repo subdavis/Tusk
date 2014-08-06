@@ -18,8 +18,8 @@
 	
 	"page_action": {
           "default_icon": {                    // optional
-            "19": "images/keepass_19x19.png",           // optional
-            "38": "images/keepass_38x38.png"            // optional
+            "19": "icons/keepass_19x19.png",           // optional
+            "38": "icons/keepass_38x38.png"            // optional
           },
           "default_title": "Keepass",      // optional; shown in tooltip
           "default_popup": "popups/popup.html"        // optional

@@ -43,7 +43,9 @@ function handleTabLoaded() {
     }
 
 	function showOptionToFillPasswords(pair) {
-		chrome.runtime.sendMessage(undefined, any message, object options, function responseCallback)
+		pair.id = pair.u[0].id;
+		var message = {'m': "passwordFieldFound", 'pairId': pair.id};
+		chrome.runtime.sendMessage(message);  //send message to background script
 	}
 	
     /** 
@@ -61,4 +63,4 @@ function handleTabLoaded() {
         rect.top >= 0 && rect.left >= 0 && rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) && /*or $(window).height() */
         rect.right <= (window.innerWidth || document.documentElement.clientWidth) /*or $(window).width() */ );
     }
-});
+}
