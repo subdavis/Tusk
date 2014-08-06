@@ -9,6 +9,23 @@
 		"128": "icons/keepass_128x128.png"
 	},
 
+	"oauth2": {
+	    "client_id": "38107774587-8ean570q24rbtf32v4m7hqcn2lb4fk9f.apps.googleusercontent.com",
+	    "scopes": [
+	      "https://www.googleapis.com/auth/drive.readonly"
+	    ]
+	  },
+	
+	"page_action": {
+          "default_icon": {                    // optional
+            "19": "images/keepass_19x19.png",           // optional
+            "38": "images/keepass_38x38.png"            // optional
+          },
+          "default_title": "Keepass",      // optional; shown in tooltip
+          "default_popup": "popups/popup.html"        // optional
+        },
+        
+	/*
 	"browser_action": {
 		"default_icon": {
 		  "19": "icons/keepass_19x19.png",
@@ -17,17 +34,19 @@
 		"default_title": "Keepass",
 		"default_popup": "popups/popup.html"
 	},
+	*/
 
 	"options_page": "options/options.html",
 	"background": {
 		"scripts": [
-			"background/background.js"
+			"background/background.js", 
+			"lib/jquery-2.1.1.min.js"
 			]
 		},
 	"content_scripts": [
 		{
 			"matches": ["http://*/*", "https://*/*"],
-			"js": ["cip.js", "keepass.js"],
+			"js": ["keepass.js", "lib/jquery-2.1.1.min.js", "lib/angular.min.js"],
 			"css": [],
 			"run_at": "document_idle",
 			"all_frames": true
@@ -49,6 +68,12 @@
 	],
 	"permissions": [
 		"contextMenus",
+		
+	    "https://docs.google.com/feeds/",
+	    "https://docs.googleusercontent.com/",
+	    "https://spreadsheets.google.com/feeds/",
+	    "https://ssl.gstatic.com/",
+	    "https://www.googleapis.com/",
 	/*
 		"clipboardWrite",
 		"tabs",

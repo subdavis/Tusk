@@ -1,84 +1,64 @@
-// contains already called method names
-var _called = {};
+chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
+	if (message == "tabLoaded") {
+		//the tab has loaded.  
+		handleTabLoaded();
+	}
+})
 
-chrome.extension.onMessage.addListener(function(req, sender, callback) {
-	if ('action' in req) {
-		if(req.action == "fill_user_pass_with_specific_login") {
-			if(cip.credentials[req.id]) {
-				var combination = null;
-				if (cip.u) {
-					cip.u.val(cip.credentials[req.id].Login);
-					combination = cipFields.getCombination("username", cip.u);
-					cip.u.focus();
-				}
-				if (cip.p) {
-					cip.p.val(cip.credentials[req.id].Password);
-					combination = cipFields.getCombination("password", cip.p);
-				}
+function handleTabLoaded() {
 
-                var list = {};
-				if(cip.fillInStringFields(combination.fields, cip.credentials[req.id].StringFields, list)) {
-                    cipForm.destroy(false, {"password": list.list[0], "username": list.list[1]});
+    //identify user/password pairs
+    var inputPattern = "input[type='text'], input[type='email'], input[type='password'], input:not([type])";
+    var possibleUserName;
+    var userPasswordPairs = [];
+    $(inputPattern).each(function() {
+        var field = $(this);
+        if (field.attr('type') && field.attr('type').toLowerCase() == 'password') {
+            if (possibleUserName) {
+                userPasswordPairs.push({
+                    'u': possibleUserName,
+                    'p': field
+                });
+                possibleUserName = null;
+            }
+        }
+        else {
+            possibleUserName = field;
+        }
+    })
+
+    if (userPasswordPairs.length > 0) {
+        //we have found some possible username/passwords.  Monitor them to see if any
+        //of them become visible:
+        setInterval(function() {
+            for (var i = 0; i < userPasswordPairs.length; i++) {
+                var pair = userPasswordPairs[i];
+                if (isElementInViewport(pair.u) && isElementInViewport(pair.p)) {
+                    pair.visible = true;
+                    showOptionToFillPasswords(pair);
                 }
-			}
-			// wish I could clear out _logins and _u, but a subsequent
-			// selection may be requested.
-		}
-		else if (req.action == "fill_user_pass") {
-			cip.fillInFromActiveElement(false);
-		}
-		else if (req.action == "fill_pass_only") {
-			cip.fillInFromActiveElementPassOnly(false);
-		}
-		else if (req.action == "activate_password_generator") {
-			cip.initPasswordGenerator(cipFields.getAllFields());
-		}
-		else if(req.action == "remember_credentials") {
-			cip.contextMenuRememberCredentials();
-		}
-		else if (req.action == "choose_credential_fields") {
-			cipDefine.init();
-		}
-		else if (req.action == "clear_credentials") {
-			cipEvents.clearCredentials();
-		}
-		else if (req.action == "activated_tab") {
-			cipEvents.triggerActivatedTab();
-		}
-		else if (req.action == "redetect_fields") {
-			chrome.extension.sendMessage({
-				"action": "get_settings",
-			}, function(response) {
-				cip.settings = response.data;
-				cip.initCredentialFields(true);
-			});
-		}
+                else pair.visible = false;
+            }
+        }, 1000)
+    }
+
+	function showOptionToFillPasswords(pair) {
+		chrome.runtime.sendMessage(undefined, any message, object options, function responseCallback)
 	}
+	
+    /** 
+        function to determine if element is visible
+    */
+    function isElementInViewport(el) {
+        //special bonus for those using jQuery
+        if (el instanceof jQuery) {
+            el = el[0];
+        }
+
+        var rect = el.getBoundingClientRect();
+
+        return (
+        rect.top >= 0 && rect.left >= 0 && rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) && /*or $(window).height() */
+        rect.right <= (window.innerWidth || document.documentElement.clientWidth) /*or $(window).width() */ );
+    }
 });
-
-// Hotkeys for every page
-// ctrl + shift + p = fill only password
-// ctrl + shift + u = fill username + password
-window.addEventListener("keydown", function(e) {
-	if (e.ctrlKey && e.shiftKey) {
-		if (e.keyCode == 80) { // P
-			e.preventDefault();
-			cip.fillInFromActiveElementPassOnly(false);
-		} else if (e.keyCode == 85) { // U
-			e.preventDefault();
-			cip.fillInFromActiveElement(false);
-		}
-	}
-}, false);
-
-function _f(fieldId) {
-	var field = (fieldId) ? cIPJQ("input[data-cip-id='"+fieldId+"']:first") : [];
-	return (field.length > 0) ? field : null;
-}
-
-function _fs(fieldId) {
-	var field = (fieldId) ? cIPJQ("input[data-cip-id='"+fieldId+"']:first,select[data-cip-id='"+fieldId+"']:first").first() : [];
-	return (field.length > 0) ? field : null;
-}
-
-
