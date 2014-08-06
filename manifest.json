@@ -2,7 +2,7 @@
 	"name": "chrome-keepass",
 	"version": "0.0.1",
 	"manifest_version": 2,
-	"description": "KeePass integration for browser Chrome",
+	"description": "Read-only KeePass integration",
 	"icons": {
 		"16": "icons/keepass_16x16.png",
 		"48": "icons/keepass_48x48.png",
@@ -21,8 +21,8 @@
             "19": "icons/keepass_19x19.png",           // optional
             "38": "icons/keepass_38x38.png"            // optional
           },
-          "default_title": "Keepass",      // optional; shown in tooltip
-          "default_popup": "popups/popup.html"        // optional
+          "default_title": "Keepass found a password field",      // optional; shown in tooltip
+		  "default_popup": "popups/popup.html"
         },
         
 	/*
@@ -41,15 +41,14 @@
 		"scripts": [
 			"background/background.js", 
 			"lib/jquery-2.1.1.min.js"
-			]
+			],
+		"persistent": false
 		},
 	"content_scripts": [
 		{
 			"matches": ["http://*/*", "https://*/*"],
 			"js": ["keepass.js", "lib/jquery-2.1.1.min.js", "lib/angular.min.js"],
-			"css": [],
-			"run_at": "document_idle",
-			"all_frames": true
+			"css": []
 		}
 	],
 	"web_accessible_resources": [
@@ -67,21 +66,22 @@
 		"images/ui-bg_highlight-soft_75_cccccc_1x100.png"
 	],
 	"permissions": [
-		"contextMenus",
-		
+		"storage",  //needed to use local/sync storage
+		"tabs",   //needed to read the url of the tab, which is the match to the password file
+
+		//following urls are needed for google docs access
 	    "https://docs.google.com/feeds/",
 	    "https://docs.googleusercontent.com/",
 	    "https://spreadsheets.google.com/feeds/",
 	    "https://ssl.gstatic.com/",
-	    "https://www.googleapis.com/",
+	    "https://www.googleapis.com/"
 	/*
 		"clipboardWrite",
 		"tabs",
 		"webRequest",
 		"webRequestBlocking",
 	*/
-		"https://*/*",
-		"http://*/*"
+
 	/*
 		"http://localhost:19455/",
 		"http://localhost/",

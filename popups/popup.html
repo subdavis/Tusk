@@ -1,13 +1,20 @@
-<html>
+<html ng-app="keepassApp">
 	<head>
-		<title>KeePass - Popup</title>
+		<title>KeePass - Choose password file</title>
 		<link rel="stylesheet" href="popup.css" />
+		<script type="text/javascript" src="/lib/util.js"></script>
+		<script type="text/javascript" src="/lib/angular.min.js"></script>
+		<script type="text/javascript" src="/lib/gdocs.js"></script>
 		<script type="text/javascript" src="popup.js"></script>
 	</head>
-	<body>
+	<body ng-controller="DocsController">
 		<div id="choosefile">
-			
+			Choose a file:
+			<ul>
+				<li ng-repeat="doc in docs">
+					<span ng-id="{{doc.id}}">{{doc.name}}</span>
+				</li>
+			</ul>
 		</div>
-		
 	</body>
 </html>
