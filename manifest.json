@@ -10,7 +10,7 @@
 	},
 
 	"oauth2": {
-	    "client_id": "38107774587-8ean570q24rbtf32v4m7hqcn2lb4fk9f.apps.googleusercontent.com",
+	    "client_id": "38107774587-8tttlo318g83eg9if6i1850eer28nk2s.apps.googleusercontent.com",
 	    "scopes": [
 	      "https://www.googleapis.com/auth/drive.readonly"
 	    ]
@@ -40,7 +40,9 @@
 	"background": {
 		"scripts": [
 			"background/background.js", 
-			"lib/jquery-2.1.1.min.js"
+			"lib/jquery-2.1.1.min.js",
+			"lib/jbinary.js",
+			"lib/forge.min.js"
 			],
 		"persistent": false
 		},
@@ -51,23 +53,15 @@
 			"css": []
 		}
 	],
+	"content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
 	"web_accessible_resources": [
-		"jquery.min.map",
-		"icons/key_16x16.png",
-		"icons/key_24x24.png",
-		"images/ui-bg_flat_0_aaaaaa_40x100.png",
-		"images/ui-bg_flat_0_aaaaaa_40x100.png",
-		"images/ui-bg_flat_75_ffffff_40x100.png",
-		"images/ui-bg_glass_55_fbf9ee_1x400.png",
-		"images/ui-bg_glass_65_ffffff_1x400.png",
-		"images/ui-bg_glass_75_dadada_1x400.png",
-		"images/ui-bg_glass_75_e6e6e6_1x400.png",
-		"images/ui-bg_glass_95_fef1ec_1x400.png",
-		"images/ui-bg_highlight-soft_75_cccccc_1x100.png"
+		"/icons/key_16x16.png",
+		"/icons/key_24x24.png"
 	],
 	"permissions": [
 		"storage",  //needed to use local/sync storage
 		"tabs",   //needed to read the url of the tab, which is the match to the password file
+		"identity",
 
 		//following urls are needed for google docs access
 	    "https://docs.google.com/feeds/",

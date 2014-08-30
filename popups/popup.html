@@ -1,20 +1,42 @@
-<html ng-app="keepassApp">
+<html ng-app="keepassApp" ng-csp>
 	<head>
 		<title>KeePass - Choose password file</title>
+		<link rel="stylesheet" href="bootstrap.min.css" />
 		<link rel="stylesheet" href="popup.css" />
+		<link rel="stylesheet" href="angular-csp.css" />
 		<script type="text/javascript" src="/lib/util.js"></script>
 		<script type="text/javascript" src="/lib/angular.min.js"></script>
 		<script type="text/javascript" src="/lib/gdocs.js"></script>
 		<script type="text/javascript" src="popup.js"></script>
 	</head>
 	<body ng-controller="DocsController">
-		<div id="choosefile">
-			Choose a file:
+		<div ng-hide="fileKnown">
+			<nav>
+				<h2>Password Files</h2>
+				<button id="authorize-button" class="btn" data-ng-click="toggleAuth(true)">
+					{{authButtonLabel()}}
+				</button>
+				<button class="btn" data-ng-click="fetchDocs(false)">
+					Refresh
+				</button>
+			</nav>
 			<ul>
-				<li ng-repeat="doc in docs">
-					<span ng-id="{{doc.id}}">{{doc.name}}</span>
+				<li data-ng-repeat="doc in docs">
+					<!-- crbug.com/120693. Anchors need target="_blank", but <base> is taking care of this for us :) -->
+					<a href="" ng-click="choosePasswordFile(doc.url)">{{doc.title}}</a>
 				</li>
 			</ul>
+		</div>
+		<div ng-hide="fileOpen || !fileKnown">
+			<nav>
+				<h2>Enter master password</h2>
+				<fieldset>
+					<input type="password" ng-model="masterPassword">
+					<button id="submitPassword" class="btn" ng-click="enterMasterPassword()">
+						Enter
+					</button>
+				</fieldset>
+			</nav>
 		</div>
 	</body>
 </html>

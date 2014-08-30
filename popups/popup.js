@@ -1,121 +1,138 @@
+/*
+ Copyright 2012 Google Inc.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+ http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+
+ Author: Eric Bidelman (ericbidelman@chromium.org)
+ */
+
+// -----------------------------------------------------------------------------
+
 var keepassApp = angular.module('keepassApp', []);
 
 keepassApp.factory('gdocs', function() {
-  var gdocs = new GDocs();
-  return gdocs;
-});
+	var gdocs = new GDocs();
 
-//gDriveApp.service('gdocs', GDocs);
-//gDriveApp.controller('DocsController', ['$scope', '$http', DocsController]);
+	return gdocs;
+});
+//keepassApp.service('gdocs', GDocs);
+//keepassApp.controller('DocsController', ['$scope', '$http', DocsController]);
 
 // Main Angular controller for app.
 function DocsController($scope, $http, gdocs) {
-  $scope.docs = [];
+	$scope.docs = [];
+	$scope.fileKnown = false;
+	$scope.fileOpen = false;
+	
+	// Response handler that caches file icons in the filesystem API.
+	function successCallbackWithFsCaching(resp, status, headers, config) {
+		var totalEntries = resp.items.length;
 
-  // Response handler that caches file icons in the filesystem API.
-  function successCallbackWithFsCaching(resp, status, headers, config) {
-    var docs = [];
+		resp.items.forEach(function(entry, i) {
+			var doc = {
+				title : entry.title,
+				updatedDate : Util.formatDate(entry.modifiedDate),
+				updatedDateFull : entry.modifiedDate,
+				icon : entry.iconLink,
+				url : entry.selfLink,
+				size : entry.fileSize ? '( ' + entry.fileSize + ' bytes)' : null
+			};
 
-    var totalEntries = resp.items.length;
+			$scope.docs.push(doc);
 
-    resp.items.forEach(function(entry, i) {
-      var doc = {
-        title: entry.title,
-        updatedDate: Util.formatDate(entry.modifiedDate),
-        updatedDateFull: entry.modifiedDate,
-        icon: entry.iconLink,
-        alternateLink: entry.alternateLink,
-        size: entry.fileSize ? '( ' + entry.fileSize + ' bytes)' : null
-      };
+			// Only want to sort and call $apply() when we have all entries.
+			if (totalEntries - 1 == i) {
+				$scope.docs.sort(Util.sortByDate);
+			}
+		});
+	}
 
-      // 'http://gstatic.google.com/doc_icon_128.png' -> 'doc_icon_128.png'
-      doc.iconFilename = doc.icon.substring(doc.icon.lastIndexOf('/') + 1);
+	function openPasswordFile(url) {
+		$scope.fileKnown = true;
+		//var message = {'m': "openPasswordFile", 'url': url};
+		//chrome.runtime.sendMessage(message);  //send message to background script
+	}
+	
+	$scope.enterMasterPassword = function() {
+		var typeset = {
+			
+		};
+	};
+	
+	$scope.choosePasswordFile = function(url) {
+		chrome.storage.sync.set({'passwordFileName': url}, function() {
+			openPasswordFile(url);
+		});
+	};
+	
+	$scope.clearDocs = function() {
+		$scope.docs = [];
+		// Clear out old results.
+	};
 
-      // If file exists, it we'll get back a FileEntry for the filesystem URL.
-      // Otherwise, the error callback will fire and we need to XHR it in and
-      // write it to the FS.
-      var fsURL = fs.root.toURL() + FOLDERNAME + '/' + doc.iconFilename;
-      window.webkitResolveLocalFileSystemURL(fsURL, function(entry) {
-        console.log('Fetched icon from the FS cache');
+	$scope.fetchDocs = function(retry) {
+		this.clearDocs();
 
-        doc.icon = entry.toURL(); // should be === to fsURL, but whatevs.
+		if (gdocs.accessToken) {
+			var config = {
+				params : {
+					'alt' : 'json'
+				},
+				headers : {
+					'Authorization' : 'Bearer ' + gdocs.accessToken
+				}
+			};
 
-        $scope.docs.push(doc);
+			$http.get(gdocs.DOCLIST_FEED + "?q=fileExtension='kdbx'", config)
+			.success(successCallbackWithFsCaching)
+			.error(function(data, status, headers, config) {
+				if (status == 401 && retry) {
+					gdocs.removeCachedAuthToken(gdocs.auth.bind(gdocs, true, $scope.fetchDocs.bind($scope, false)));
+				}
+			});
+		}
+	};
 
-        // Only want to sort and call $apply() when we have all entries.
-        if (totalEntries - 1 == i) {
-          $scope.docs.sort(Util.sortByDate);
-          $scope.$apply(function($scope) {}); // Inform angular we made changes.
-        }
-      }, function(e) {
+	// Toggles the authorization state.
+	$scope.toggleAuth = function(interactive) {
+		if (!gdocs.accessToken) {
+			gdocs.auth(interactive, function() {
+				$scope.fetchDocs(false);
+			});
+		} else {
+			gdocs.revokeAuthToken(function() {
+			});
+			this.clearDocs();
+		}
+	};
+	
+	// Controls the label of the authorize/deauthorize button.
+	$scope.authButtonLabel = function() {
+		if (gdocs.accessToken)
+			return 'Deauthorize';
+		else
+			return 'Authorize';
+	};
 
-        $http.get(doc.icon, {responseType: 'blob'}).success(function(blob) {
-          console.log('Fetched icon via XHR');
-
-          blob.name = doc.iconFilename; // Add icon filename to blob.
-
-          writeFile(blob); // Write is async, but that's ok.
-
-          doc.icon = window.URL.createObjectURL(blob);
-
-          $scope.docs.push(doc);
-          if (totalEntries - 1 == i) {
-            $scope.docs.sort(Util.sortByDate);
-          }
-        });
-
-      });
-    });
-  }
-
-  $scope.clearDocs = function() {
-    $scope.docs = []; // Clear out old results.
-  };
-
-  $scope.fetchDocs = function(retry) {
-    this.clearDocs();
-
-    if (gdocs.accessToken) {
-      var config = {
-        params: {'alt': 'json'},
-        headers: {
-          'Authorization': 'Bearer ' + gdocs.accessToken
-        }
-      };
-
-      $http.get(gdocs.DOCLIST_FEED, config).
-        success(successCallbackWithFsCaching).
-        error(function(data, status, headers, config) {
-          if (status == 401 && retry) {
-            gdocs.removeCachedAuthToken(
-                gdocs.auth.bind(gdocs, true, 
-                    $scope.fetchDocs.bind($scope, false)));
-          }
-        });
-    }
-  };
-
-  // Toggles the authorization state.
-  $scope.toggleAuth = function(interactive) {
-    if (!gdocs.accessToken) {
-      gdocs.auth(interactive, function() {
-        $scope.fetchDocs(false);
-      });
-    } else {
-      gdocs.revokeAuthToken(function() {});
-      this.clearDocs();
-    }
-  }
-
-  // Controls the label of the authorize/deauthorize button.
-  $scope.authButtonLabel = function() {
-    if (gdocs.accessToken)
-      return 'Deauthorize';
-    else
-      return 'Authorize';
-  };
-
-  $scope.toggleAuth(false);
+	$scope.toggleAuth(false);
+	chrome.storage.sync.get('passwordFileName', function(items) {
+		if (items.passwordFileName) {
+			$scope.fileKnown = true;
+			$scope.fileName = items.passwordFileName;
+		} 
+	});		
 }
 
-//DocsController.$inject = ['$scope', '$http', 'gdocs']; // For code minifiers.
+DocsController.$inject = ['$scope', '$http', 'gdocs'];
+// For code minifiers.
+

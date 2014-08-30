@@ -44,7 +44,7 @@ function handleTabLoaded() {
             possibleUserName = field;
 			lastFieldWasPassword = false;
         }
-    })
+    });
 
     if (userPasswordPairs.length > 0) {
         //we have found some possible username/passwords.  Monitor them to see if any
