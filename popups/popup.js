@@ -33,6 +33,7 @@ function DocsController($scope, $http, gdocs) {
 	$scope.docs = [];
 	$scope.fileKnown = false;
 	$scope.fileOpen = false;
+	$scope.masterPassword = "";
 	
 	// Response handler that caches file icons in the filesystem API.
 	function successCallbackWithFsCaching(resp, status, headers, config) {
@@ -64,10 +65,19 @@ function DocsController($scope, $http, gdocs) {
 	}
 	
 	$scope.enterMasterPassword = function() {
-		var typeset = {
-			
-		};
+		chrome.storage.sync.get('passwordFileName', function(items) {
+			if (items.passwordFileName) {
+				gdocs.sendXhr('GET', items.passwordFileName, processKeyFile, 'arraybuffer');
+			} else {
+				//no password file
+			}
+		});	
 	};
+	
+	function processKeyFile() {
+		var file = new KeyFileParser(this.response).parse($scope.masterPassword);
+		console.log(file);
+	}
 	
 	$scope.choosePasswordFile = function(url) {
 		chrome.storage.sync.set({'passwordFileName': url}, function() {
