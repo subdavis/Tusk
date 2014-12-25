@@ -1,8 +1,8 @@
 chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 	if (!message || !message.m) return;  //unrecognized message format
-	
+
 	if (message.m == "tabLoaded") {
-		//the tab has loaded.  
+		//the tab has loaded.
 		handleTabLoaded();
 	} else if (message.m == "fillPassword") {
 		//user has selected to fill the password
@@ -23,7 +23,7 @@ function handleTabLoaded() {
     //identify user/password pairs
     var inputPattern = "input[type='text'], input[type='email'], input[type='password'], input:not([type])";
     var possibleUserName;
-	var lastFieldWasPassword = false;  //used to detect registration forms which have 2 password fields, one after the other
+	  var lastFieldWasPassword = false;  //used to detect registration forms which have 2 password fields, one after the other
     $(inputPattern).each(function() {
         var field = $(this);
         if (field.attr('type') && field.attr('type').toLowerCase() == 'password') {
@@ -53,7 +53,7 @@ function handleTabLoaded() {
         setInterval(function() {
 			poll();
         }, 1000);
-		
+
 		function poll() {
             for (var i = 0; i < userPasswordPairs.length; i++) {
                 var pair = userPasswordPairs[i];
@@ -66,20 +66,20 @@ function handleTabLoaded() {
 
 	function showOptionToFillPasswords(pair) {
 		if (pair.known) return;  //already done for this one
-		
+
 		pair.id = pair.u[0].id;
 		var message = {'m': "passwordFieldFound", 'pairId': pair.id, 'url': window.location.pathname};
 		chrome.runtime.sendMessage(message);  //send message to background script
 		pair.known = true;
-		
+
 		/*
 		//for debugging
 		pair.u.css('background-color', 'yellow');
 		pair.p.css('background-color', 'yellow');
 		*/
 	}
-	
-    /** 
+
+    /**
         function to determine if element is visible
     */
     function isElementInViewport(el) {

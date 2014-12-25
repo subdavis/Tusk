@@ -7,7 +7,10 @@
 		<script type="text/javascript" src="/lib/util.js"></script>
 		<script type="text/javascript" src="/lib/angular.min.js"></script>
 		<script type="text/javascript" src="/lib/gdocs.js"></script>
+		<script type="text/javascript" src="keepassService.js"></script>
 		<script type="text/javascript" src="popup.js"></script>
+		<script type="text/javascript" src="docsController.js"></script>
+		<script type="text/javascript" src="masterPasswordController.js"></script>
 	</head>
 	<body ng-controller="DocsController">
 		<div ng-hide="fileKnown">
@@ -28,7 +31,7 @@
 			</ul>
 		</div>
 		<div ng-hide="fileOpen || !fileKnown">
-			<nav>
+			<nav ng-controller="MasterPasswordController">
 				<h2>Enter master password</h2>
 				<fieldset>
 					<input type="password" ng-model="masterPassword">
