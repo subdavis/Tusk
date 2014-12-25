@@ -15,31 +15,20 @@
 	      "https://www.googleapis.com/auth/drive.readonly"
 	    ]
 	  },
-	
+
 	"page_action": {
-          "default_icon": {                    // optional
-            "19": "icons/keepass_19x19.png",           // optional
-            "38": "icons/keepass_38x38.png"            // optional
+          "default_icon": {
+            "19": "icons/keepass_19x19.png",
+            "38": "icons/keepass_38x38.png"
           },
-          "default_title": "Keepass found a password field",      // optional; shown in tooltip
-		  "default_popup": "popups/popup.html"
+          "default_title": "Keepass found a password field",
+		      "default_popup": "popups/popup.html"
         },
-        
-	/*
-	"browser_action": {
-		"default_icon": {
-		  "19": "icons/keepass_19x19.png",
-		  "38": "icons/keepass_38x38.png"
-		},
-		"default_title": "Keepass",
-		"default_popup": "popups/popup.html"
-	},
-	*/
 
 	"options_page": "options/options.html",
 	"background": {
 		"scripts": [
-			"background/background.js", 
+			"background/background.js",
 			"lib/jquery-2.1.1.min.js",
 			"lib/jbinary.js",
 			"lib/forge.min.js"
@@ -59,27 +48,14 @@
 		"/icons/key_24x24.png"
 	],
 	"permissions": [
-		"storage",  //needed to use local/sync storage
-		"tabs",   //needed to read the url of the tab, which is the match to the password file
+		"storage",
+		"tabs",
 		"identity",
 
-		//following urls are needed for google docs access
 	    "https://docs.google.com/feeds/",
 	    "https://docs.googleusercontent.com/",
 	    "https://spreadsheets.google.com/feeds/",
 	    "https://ssl.gstatic.com/",
 	    "https://www.googleapis.com/"
-	/*
-		"clipboardWrite",
-		"tabs",
-		"webRequest",
-		"webRequestBlocking",
-	*/
-
-	/*
-		"http://localhost:19455/",
-		"http://localhost/",
-		"https://raw.github.com/"
-	*/
 	]
 }
