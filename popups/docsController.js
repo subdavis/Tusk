@@ -89,6 +89,7 @@ function DocsController($scope, $http, gdocs, keepass) {
 		if (items.passwordFileName) {
 			$scope.fileKnown = true;
 			$scope.fileName = items.passwordFileName;
+			keepass.setFile(items.passwordFileName);
 		}
 	});
 }
