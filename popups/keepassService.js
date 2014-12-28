@@ -54,112 +54,88 @@ function Keepass(gdocs) {
   }
 
   function readHeader(buf) {
-    var done = false;
     var position = 12;  //after initial db signature + version
-    var h = {};
+    var sigHeader = new DataView(buf, 0, position)
+    var h = {
+      sig1 : sigHeader.getUint32(0, internals.littleEndian),
+      sig2 : sigHeader.getUint32(4, internals.littleEndian),
+      version : sigHeader.getUint32(8, internals.littleEndian)
+    };
+
+    var DBSIG_1 = 0x9AA2D903;
+    var DBSIG_2 = 0xB54BFB67;
+    var FILE_VERSION = 0x00030001;
+    if (h.sig1 != DBSIG_1 || h.sig2 != DBSIG_2) {
+      //fail
+      console.log("Signature fail.  sig 1:" + h.sig1.toString(16) + ", sig2:" + h.sig2.toString(16) + ", version:" + h.version.toString(16));
+      return;
+    }
+
     /*
-    public static final byte EndOfHeader = 0;
-		public static final byte Comment = 1;
-        public static final byte CipherID = 2;
-        public static final byte CompressionFlags = 3;
-        public static final byte MasterSeed = 4;
-        public static final byte TransformSeed = 5;
-        public static final byte TransformRounds = 6;
-        public static final byte EncryptionIV = 7;
-        public static final byte ProtectedStreamKey = 8;
-        public static final byte StreamStartBytes = 9;
-        public static final byte InnerRandomStreamID = 10;
+        AES_CIPHER_UUID = 0x31c1f2e6bf714350be5805216afc5aff;
     */
+    var done = false;
     while (!done) {
       var descriptor = new DataView(buf, position, 3);
       var fieldId = descriptor.getUint8(0, internals.littleEndian);
-      var len = descriptor.getUint8(1, internals.littleEndian);
+      var len = descriptor.getUint16(1, internals.littleEndian);
 
-      console.log("field id: " + fieldId + ", len: " + len);
-      var dv = new DataView(buf, position + 2, len);
-      position += 2;
+      var dv = new DataView(buf, position + 3, len);
+      //console.log("fieldid " + fieldId + " found at " + position);
+      position += 3;
       switch (fieldId) {
         case 0: //end of header
           done = true;
           break;
         case 2: //cipherid, 16 bytes
-          h.cipher = buf.slice(position, len);
+          h.cipher = new Uint8Array(buf, position, len);
           break;
         case 3: //compression flags, 4 bytes
           h.compressionFlags = dv.getUint32(0, internals.littleEndian);
           break;
         case 4: //master seed
-          h.masterSeed = buf.slice(position, len);
+          h.masterSeed = new Uint8Array(buf, position, len);
           break;
         case 5: //transform seed
-          h.transformSeed = buf.slice(position, len);
+          h.transformSeed = new Uint8Array(buf, position, len);
           break;
         case 6: //transform rounds, 8 bytes
-          h.transformRounds1 = dv.getUint32(0, internals.littleEndian);
-          h.transformRounds2 = dv.getUint32(4, internals.littleEndian);
+          h.keyRounds = dv.getUint32(0, internals.littleEndian);
+          h.keyRounds2 = dv.getUint32(4, internals.littleEndian);
           break;
         case 7: //iv
-          h.iv = buf.slice(position, len);
+          h.iv = new Uint8Array(buf, position, len);
           break;
         case 8: //protected stream key
-          h.protectedStreamKey = buf.slice(position, len);
+          h.protectedStreamKey = new Uint8Array(buf, position, len);
           break;
         case 9:
-          h.streamStartBytes = buf.slice(position, len);
+          h.streamStartBytes = new Uint8Array(buf, position, len);
           break;
         case 10:
-          h.innerRandomStreamId = buf.slice(position, len);
+          h.innerRandomStreamId = new Uint8Array(buf, position, len);
           break;
         default:
           break;
       }
 
-      if (!done) {
-        position += len + 1;  //extra zero-byte between each field?
-      }
+      position += len;
     }
 
+    h.dataStart = position;
     console.log(h);
+    //console.log("version: " + h.version.toString(16) + ", keyRounds: " + h.keyRounds);
     return h;
   }
 
   my.getPassword = function(siteKey, callback) {
     getPasswordFile(function(buf, length) {
-      var DBSIG_1 = 0x9AA2D903;
-      var DBSIG_2 = 0xB54BFB67;
-      var FILE_VERSION_CRITICAL_MASK = 0xFFFF0000;
-      var FILE_VERSION_32 = 0x00030001;
+      var h = readHeader(buf);
+      if (!h) return;
 
-      var h4 = readHeader(buf);
-      return;
-
-      var header = new DataView(buf, 0, 124);
-      var h = {
-        sig1 : header.getUint32(0, internals.littleEndian),
-        sig2 : header.getUint32(4, internals.littleEndian),
-        flags : header.getUint32(8, internals.littleEndian),
-        version : header.getUint32(12, internals.littleEndian),
-        masterSeed : buf.slice(16, 16),
-        iv : buf.slice(32, 16),
-        groupsLen : header.getUint32(48, internals.littleEndian),
-        entriesLen : header.getUint32(52, internals.littleEndian),
-        contentsHash : buf.slice(56, 32),
-        masterSeedExtra : buf.slice(88, 32),
-        keyRounds : header.getUint32(120, internals.littleEndian)
-      };
-
-      console.log("flags: " + h.flags.toString(16));
-      console.log("groups: " + h.groupsLen.toString(16) + ", entries: " + h.entriesLen.toString(16));
-      console.log("version: " + h.version.toString(16) + ", keyRounds: " + h.keyRounds.toString(16));
-
-      if (h.sig1 != DBSIG_1 || h.sig2 != DBSIG_2) {
-        //fail
-        console.log("Signature fail.  sig 1:" + h.sig1.toString(16) + ", sig2:" + h.sig2.toString(16) + ", flags:" + h.flags.toString(16));
-        return;
-      }
-
-      var encData = new DataView(buf, 124, length-124)
-      var SHAdigest = {
+      var encData = new Uint8Array(buf, h.dataStart);
+      console.log("read file header ok.  encrypted data starts at byte " + h.dataStart);
+      var SHA = {
         name: "SHA-256"
       };
       var AES = {
@@ -167,14 +143,107 @@ function Keepass(gdocs) {
         iv: h.iv
       };
 
+      console.log('password is ' + internals.masterPassword);
       var encoder = new TextEncoder();
-      var pwBytes = encoder.encode(internals.masterPassword);
-      window.crypto.subtle.digest(SHAdigest, pwBytes)
-        .then(function(result) {
-          //result is the hash as ArrayBuffer //console.log(result);
-          var pwHash = result;
+      var masterKey = encoder.encode(internals.masterPassword);
 
+      //console.log(masterKey);
+      window.crypto.subtle.digest(SHA, masterKey).then(function(masterKey) {
+        //console.log(new Uint8Array(masterKey));
+        encryptMasterKey(h.transformSeed, masterKey, h.keyRounds).then(function(encMasterKey) {
+          var finalKeySource = new Uint8Array(64);
+          finalKeySource.set(h.masterSeed);
+          finalKeySource.set(new Uint8Array(encMasterKey), 32);
+          //console.log(finalKeySource);
+          window.crypto.subtle.digest(SHA, finalKeySource).then(function(finalKeyBeforeImport) {
+            window.crypto.subtle.importKey("raw", finalKeyBeforeImport, AES, false, ["decrypt"]).then(function(finalKey) {
+              window.crypto.subtle.decrypt(AES, finalKey, encData).then(function(decryptedData) {
+                console.log("decrypt of data may have succeeded");
+              }).catch(function(err) {
+                console.log("decrypt of data failed:");
+                console.log(err);
+              });
+            }).catch(function(err) {
+              console.log("import of final-key failed: " + err.message);
+            });
+          }).catch(function(err) {
+            console.log("digest of final-key-source failed: " + err.message);
+          });
+        }).catch(function(err) {
+          console.log("encryptmasterkey failed: " + err.message);
         });
+      }).catch(function(err) {
+        console.log("digest of masterkey failed: " + err.message);
+      });
+    });
+  }
+
+  /**
+   * encrypts the master key the specified times
+   **/
+  function encryptMasterKey(rawTransformKey, rawMasterKey, rounds) {
+    return new Promise(function(resolve, reject){
+      if (rounds == 0) {
+        resolve(rawMasterKey);
+      } else {
+        aes_ecb_encyrpt(rawTransformKey, rawMasterKey).then(function(encMasterKey) {
+          resolve(encryptMasterKey(rawTransformKey, encMasterKey, rounds - 1));
+        })
+      }
+    });
+  }
+
+  /**
+   * Simulate ECB encryption by breaking the data into 16byte blocks and
+   * calling CBC on each block individually.
+   **/
+  function aes_ecb_encyrpt(raw_key, data) {
+    return new Promise(function(resolve, reject) {
+      data = new Uint8Array(data);
+      var blockCount = data.byteLength / 16;
+
+      var blockPromises = [];
+      for (var i = 0; i<blockCount; i++) {
+        var block = data.subarray(i * 16, i * 16 + 15);
+        blockPromises.push(aes_ecb_encrypt_block(raw_key, block));
+      }
+
+      Promise.all(blockPromises).then(function(blocks) {
+        //we now have the blocks, so chain them back together
+        var result = new Uint8Array(data.byteLength);
+        for (var i=0; i<blockCount; i++) {
+          result.set(blocks[i], i * 16);
+        }
+
+        resolve(result);
+      }).catch(function(err) {
+        reject(err);
+      });
+    });
+  }
+
+  /**
+   * Simulate ECB encryption by using IV of 0 and only one block.  AES block size is
+   * 16 bytes = 128 bits.  Data size must be 16 bytes, i.e. 1 blocks
+   **/
+  function aes_ecb_encrypt_block(raw_key, data16) {
+    return new Promise(function(resolve, reject) {
+      var AES = {
+        name: "AES-CBC",
+          iv: new Uint8Array(16)
+      };  //iv is intentionally 0, to simulate the ECB
+
+      window.crypto.subtle.importKey("raw", raw_key, AES, false, ["encrypt"]).then(function(secureKey) {
+        window.crypto.subtle.encrypt(AES, secureKey, data16).then(function(encBlockWithPadding) {
+          //trim the padding
+          var encBlock = new Uint8Array(encBlockWithPadding, 0, 16);
+          resolve(encBlock);
+        }).catch(function(err) {
+          reject(err);
+        })
+      }).catch(function(err) {
+        reject(err);
+      });
     });
   }
 

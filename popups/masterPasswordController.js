@@ -5,7 +5,7 @@ function MasterPasswordController($scope, $http, gdocs, keepass) {
 
 	$scope.enterMasterPassword = function() {
 	  keepass.setMasterPassword($scope.masterPassword);
-	  keepass.getPassword("xxxx", function() {
+	  keepass.getPassword("someurl", function() {
 
 	  });
 	  /*
