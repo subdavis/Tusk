@@ -181,7 +181,7 @@ function Keepass(gdocs) {
   }
 
   /**
-   * encrypts the master key the specified times
+   * encrypts the master key the specified times and hashes the result
    **/
   function encryptMasterKey(rawTransformKey, rawMasterKey, rounds) {
     var arr = new Array(rounds - 1);

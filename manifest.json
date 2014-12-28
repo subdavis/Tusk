@@ -30,9 +30,7 @@
 	"background": {
 		"scripts": [
 			"background/background.js",
-			"lib/jquery-2.1.1.min.js",
-			"lib/jbinary.js",
-			"lib/forge.min.js"
+			"lib/jquery-2.1.1.min.js"
 			],
 		"persistent": false
 		},
