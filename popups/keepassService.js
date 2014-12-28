@@ -149,31 +149,33 @@ function Keepass(gdocs) {
 
       //console.log(masterKey);
       window.crypto.subtle.digest(SHA, masterKey).then(function(masterKey) {
-        //console.log(new Uint8Array(masterKey));
-        encryptMasterKey(h.transformSeed, masterKey, h.keyRounds).then(function(encMasterKey) {
-          var finalKeySource = new Uint8Array(64);
-          finalKeySource.set(h.masterSeed);
-          finalKeySource.set(new Uint8Array(encMasterKey), 32);
-          //console.log(finalKeySource);
-          window.crypto.subtle.digest(SHA, finalKeySource).then(function(finalKeyBeforeImport) {
-            window.crypto.subtle.importKey("raw", finalKeyBeforeImport, AES, false, ["decrypt"]).then(function(finalKey) {
-              window.crypto.subtle.decrypt(AES, finalKey, encData).then(function(decryptedData) {
-                console.log("decrypt of data may have succeeded");
+        window.crypto.subtle.digest(SHA, masterKey).then(function(masterKey) {
+          //console.log(new Uint8Array(masterKey));
+          encryptMasterKey(h.transformSeed, masterKey, h.keyRounds).then(function(encMasterKey) {
+            var finalKeySource = new Uint8Array(64);
+            finalKeySource.set(h.masterSeed);
+            finalKeySource.set(new Uint8Array(encMasterKey), 32);
+            //console.log(finalKeySource);
+            window.crypto.subtle.digest(SHA, finalKeySource).then(function(finalKeyBeforeImport) {
+              window.crypto.subtle.importKey("raw", finalKeyBeforeImport, AES, false, ["decrypt"]).then(function(finalKey) {
+                window.crypto.subtle.decrypt(AES, finalKey, encData).then(function(decryptedData) {
+                  console.log("decrypt of data may have succeeded");
+                }).catch(function(err) {
+                  console.log("decrypt of data failed:");
+                  console.log(err);
+                });
               }).catch(function(err) {
-                console.log("decrypt of data failed:");
-                console.log(err);
+                console.log("import of final-key failed: " + err.message);
               });
             }).catch(function(err) {
-              console.log("import of final-key failed: " + err.message);
+              console.log("digest of final-key-source failed: " + err.message);
             });
           }).catch(function(err) {
-            console.log("digest of final-key-source failed: " + err.message);
+            console.log("encryptmasterkey failed: " + err.message);
           });
         }).catch(function(err) {
-          console.log("encryptmasterkey failed: " + err.message);
+          console.log("digest of masterkey failed: " + err.message);
         });
-      }).catch(function(err) {
-        console.log("digest of masterkey failed: " + err.message);
       });
     });
   }
@@ -182,14 +184,17 @@ function Keepass(gdocs) {
    * encrypts the master key the specified times
    **/
   function encryptMasterKey(rawTransformKey, rawMasterKey, rounds) {
-    return new Promise(function(resolve, reject){
-      if (rounds == 0) {
-        resolve(rawMasterKey);
-      } else {
-        aes_ecb_encyrpt(rawTransformKey, rawMasterKey).then(function(encMasterKey) {
-          resolve(encryptMasterKey(rawTransformKey, encMasterKey, rounds - 1));
-        })
-      }
+    var arr = new Array(rounds - 1);
+    for(var i=0; i<rounds - 1; i++)
+      arr[i] = i;  //reduce ignores holes in the array, so we have to specify each
+
+    return arr.reduce(function(prev, curr) {
+      return prev.then(function(newKey) {
+        return aes_ecb_encyrpt(rawTransformKey, newKey);
+      });
+    }, aes_ecb_encyrpt(rawTransformKey, rawMasterKey)).then(function(finalVal) {
+      //do a final SHA-256 on the result
+      return window.crypto.subtle.digest({name: "SHA-256"}, finalVal);
     });
   }
 
@@ -204,7 +209,7 @@ function Keepass(gdocs) {
 
       var blockPromises = [];
       for (var i = 0; i<blockCount; i++) {
-        var block = data.subarray(i * 16, i * 16 + 15);
+        var block = data.subarray(i * 16, i * 16 + 16);
         blockPromises.push(aes_ecb_encrypt_block(raw_key, block));
       }
 
