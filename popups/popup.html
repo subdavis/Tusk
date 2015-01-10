@@ -7,6 +7,7 @@
 		<script type="text/javascript" src="/lib/util.js"></script>
 		<script type="text/javascript" src="/lib/angular.min.js"></script>
 		<script type="text/javascript" src="/lib/gdocs.js"></script>
+		<script type="text/javascript" src="/lib/pako.min.js"></script>
 		<script type="text/javascript" src="keepassService.js"></script>
 		<script type="text/javascript" src="popup.js"></script>
 		<script type="text/javascript" src="docsController.js"></script>
@@ -14,32 +15,32 @@
 	</head>
 	<body ng-controller="DocsController">
 		<div>
-			<nav>
-				<h2>Password Files</h2>
-				<button id="authorize-button" class="btn" data-ng-click="toggleAuth(true)">
-					{{authButtonLabel()}}
-				</button>
-				<button class="btn" data-ng-click="fetchDocs(false)">
-					Refresh
-				</button>
-			</nav>
-			<ul>
-				<li data-ng-repeat="doc in docs">
-					<!-- crbug.com/120693. Anchors need target="_blank", but <base> is taking care of this for us :) -->
-					<a href="" ng-click="choosePasswordFile(doc.url)">{{doc.title}}</a>
-				</li>
-			</ul>
+		  Google Docs:
+			<button id="authorize-button" class="btn" data-ng-click="toggleAuth(true)">
+				{{authButtonLabel()}}
+			</button>
+			<button class="btn" data-ng-click="fetchDocs(false)">
+				Refresh
+			</button>
+			<h4>Password Files</h4>
+			<filelist>
+  			<ul>
+  				<li data-ng-repeat="doc in docs" class="{{selectedPasswordFile(doc.url)}}">
+  					<a href="" ng-click="choosePasswordFile(doc.url)">{{doc.title}}</a>
+  				</li>
+  			</ul>
+			</filelist>
 		</div>
 		<div ng-hide="fileOpen || !fileKnown">
-			<nav ng-controller="MasterPasswordController">
-				<h2>Enter master password</h2>
+			<div ng-controller="MasterPasswordController">
+				<h4>Enter master password</h4>
 				<fieldset>
 					<input type="password" ng-model="masterPassword">
 					<button id="submitPassword" class="btn" ng-click="enterMasterPassword()">
 						Enter
 					</button>
 				</fieldset>
-			</nav>
+			</div>
 		</div>
 	</body>
 </html>

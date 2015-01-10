@@ -1,7 +1,7 @@
 
 "use strict";
 
-function Keepass(gdocs) {
+function Keepass(gdocs, pako) {
   var my = {
     passwordSet: false,
     fileSet: false
@@ -159,7 +159,28 @@ function Keepass(gdocs) {
             window.crypto.subtle.digest(SHA, finalKeySource).then(function(finalKeyBeforeImport) {
               window.crypto.subtle.importKey("raw", finalKeyBeforeImport, AES, false, ["decrypt"]).then(function(finalKey) {
                 window.crypto.subtle.decrypt(AES, finalKey, encData).then(function(decryptedData) {
-                  console.log("decrypt of data may have succeeded");
+                  var storedStartBytes = new Uint8Array(decryptedData, 0, 32);
+                  for (var i=0; i<32; i++) {
+                    if (storedStartBytes[i] != h.streamStartBytes[i]) {
+                      console.log('Incorrect password');
+                      return;
+                    }
+                  }
+                  console.log("decrypt of data succeeded");
+                  var blockHeader = new DataView(decryptedData, 32, 40);
+                  var blockId = blockHeader.getUint32(0, internals.littleEndian);
+                  var blockSize = blockHeader.getUint32(36, internals.littleEndian);
+                  console.log(blockId, blockSize, decryptedData.byteLength);
+                  var blockHash = new Uint8Array(decryptedData, 36, 32);
+                  var block = new Uint8Array(decryptedData, 72, blockSize);
+                  if (h.compressionFlags == 1) {
+                    block = pako.inflate(block);
+                    console.log("unzip of data succeeded");
+                  }
+
+                  var decoder = new TextDecoder();
+                  var xml = decoder.decode(block);
+                  console.log(xml);
                 }).catch(function(err) {
                   console.log("decrypt of data failed:");
                   console.log(err);
@@ -207,10 +228,10 @@ function Keepass(gdocs) {
       data = new Uint8Array(data);
       var blockCount = data.byteLength / 16;
 
-      var blockPromises = [];
+      var blockPromises = new Array(blockCount);
       for (var i = 0; i<blockCount; i++) {
         var block = data.subarray(i * 16, i * 16 + 16);
-        blockPromises.push(aes_ecb_encrypt_block(raw_key, block));
+        blockPromises[i] = aes_ecb_encrypt_block(raw_key, block);
       }
 
       Promise.all(blockPromises).then(function(blocks) {

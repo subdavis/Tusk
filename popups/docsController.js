@@ -35,6 +35,10 @@ function DocsController($scope, $http, gdocs, keepass) {
 		});
 	};
 
+  $scope.selectedPasswordFile = function(url) {
+    return (url == $scope.fileName) ? "selected" : "";
+  }
+
 	$scope.clearDocs = function() {
 		$scope.docs = [];
 		// Clear out old results.

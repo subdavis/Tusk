@@ -7,8 +7,12 @@ keepassApp.factory('gdocs', function() {
 	return gdocs;
 });
 
-keepassApp.factory('keepass', ['gdocs', function(gdocs) {
-	var kp = new Keepass(gdocs);
+keepassApp.factory('pako', function() {
+  return pako;
+});
+
+keepassApp.factory('keepass', ['gdocs', 'pako', function(gdocs) {
+	var kp = new Keepass(gdocs, pako);
 
 	return kp;
 }]);
