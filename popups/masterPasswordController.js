@@ -5,9 +5,17 @@ function MasterPasswordController($scope, $http, gdocs, keepass) {
 
 	$scope.enterMasterPassword = function() {
 	  keepass.setMasterPassword($scope.masterPassword);
-	  keepass.getPassword("someurl", function() {
 
+	  $scope.errorMessage = "";
+	  $scope.successMessage = "";
+	  keepass.getPassword().then(function(entries) {
+	    $scope.successMessage = entries.length + " found";
+	    $scope.$apply();
+	  }).catch(function(err) {
+	    $scope.errorMessage = err;
+	    $scope.$apply();
 	  });
+
 	  /*
 		chrome.storage.sync.get('passwordFileName', function(items) {
 			if (items.passwordFileName) {

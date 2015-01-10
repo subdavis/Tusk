@@ -39,6 +39,8 @@
 					<button id="submitPassword" class="btn" ng-click="enterMasterPassword()">
 						Enter
 					</button>
+					<errorMessage data-ng-show="errorMessage">{{errorMessage}}</errorMessage>
+					<successMessage data-ng-show="successMessage">{{successMessage}}</successMessage>
 				</fieldset>
 			</div>
 		</div>

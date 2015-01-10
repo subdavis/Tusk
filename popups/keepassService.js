@@ -123,82 +123,124 @@ function Keepass(gdocs, pako) {
     }
 
     h.dataStart = position;
-    console.log(h);
+    //console.log(h);
     //console.log("version: " + h.version.toString(16) + ", keyRounds: " + h.keyRounds);
     return h;
   }
 
-  my.getPassword = function(siteKey, callback) {
-    getPasswordFile(function(buf, length) {
-      var h = readHeader(buf);
-      if (!h) return;
+  my.getPassword = function() {
+    return new Promise(function(resolve, reject) {
+      getPasswordFile(function(buf, length) {
+        var h = readHeader(buf);
+        if (!h) return;
 
-      var encData = new Uint8Array(buf, h.dataStart);
-      console.log("read file header ok.  encrypted data starts at byte " + h.dataStart);
-      var SHA = {
-        name: "SHA-256"
-      };
-      var AES = {
-        name: "AES-CBC",
-        iv: h.iv
-      };
+        var encData = new Uint8Array(buf, h.dataStart);
+        //console.log("read file header ok.  encrypted data starts at byte " + h.dataStart);
+        var SHA = {
+          name: "SHA-256"
+        };
+        var AES = {
+          name: "AES-CBC",
+          iv: h.iv
+        };
 
-      console.log('password is ' + internals.masterPassword);
-      var encoder = new TextEncoder();
-      var masterKey = encoder.encode(internals.masterPassword);
+        //console.log('password is ' + internals.masterPassword);
+        var encoder = new TextEncoder();
+        var masterKey = encoder.encode(internals.masterPassword);
 
-      //console.log(masterKey);
-      window.crypto.subtle.digest(SHA, masterKey).then(function(masterKey) {
+        //console.log(masterKey);
         window.crypto.subtle.digest(SHA, masterKey).then(function(masterKey) {
-          //console.log(new Uint8Array(masterKey));
-          encryptMasterKey(h.transformSeed, masterKey, h.keyRounds).then(function(encMasterKey) {
-            var finalKeySource = new Uint8Array(64);
-            finalKeySource.set(h.masterSeed);
-            finalKeySource.set(new Uint8Array(encMasterKey), 32);
-            //console.log(finalKeySource);
-            window.crypto.subtle.digest(SHA, finalKeySource).then(function(finalKeyBeforeImport) {
-              window.crypto.subtle.importKey("raw", finalKeyBeforeImport, AES, false, ["decrypt"]).then(function(finalKey) {
-                window.crypto.subtle.decrypt(AES, finalKey, encData).then(function(decryptedData) {
-                  var storedStartBytes = new Uint8Array(decryptedData, 0, 32);
-                  for (var i=0; i<32; i++) {
-                    if (storedStartBytes[i] != h.streamStartBytes[i]) {
-                      console.log('Incorrect password');
-                      return;
+          return window.crypto.subtle.digest(SHA, masterKey);
+        }).then(function(masterKey) {
+            //console.log(new Uint8Array(masterKey));
+            encryptMasterKey(h.transformSeed, masterKey, h.keyRounds).then(function(encMasterKey) {
+              var finalKeySource = new Uint8Array(64);
+              finalKeySource.set(h.masterSeed);
+              finalKeySource.set(new Uint8Array(encMasterKey), 32);
+              //console.log(finalKeySource);
+              window.crypto.subtle.digest(SHA, finalKeySource).then(function(finalKeyBeforeImport) {
+                window.crypto.subtle.importKey("raw", finalKeyBeforeImport, AES, false, ["decrypt"]).then(function(finalKey) {
+                  window.crypto.subtle.decrypt(AES, finalKey, encData).then(function(decryptedData) {
+                    var storedStartBytes = new Uint8Array(decryptedData, 0, 32);
+                    for (var i=0; i<32; i++) {
+                      if (storedStartBytes[i] != h.streamStartBytes[i]) {
+                        reject('Incorrect password');
+                        return;
+                      }
                     }
-                  }
-                  console.log("decrypt of data succeeded");
-                  var blockHeader = new DataView(decryptedData, 32, 40);
-                  var blockId = blockHeader.getUint32(0, internals.littleEndian);
-                  var blockSize = blockHeader.getUint32(36, internals.littleEndian);
-                  console.log(blockId, blockSize, decryptedData.byteLength);
-                  var blockHash = new Uint8Array(decryptedData, 36, 32);
-                  var block = new Uint8Array(decryptedData, 72, blockSize);
-                  if (h.compressionFlags == 1) {
-                    block = pako.inflate(block);
-                    console.log("unzip of data succeeded");
-                  }
+                    //console.log("decrypt of data succeeded");
+                    var blockHeader = new DataView(decryptedData, 32, 40);
+                    var blockId = blockHeader.getUint32(0, internals.littleEndian);
+                    var blockSize = blockHeader.getUint32(36, internals.littleEndian);
+                    console.log(blockId, blockSize, decryptedData.byteLength);
+                    var blockHash = new Uint8Array(decryptedData, 36, 32);
+                    var block = new Uint8Array(decryptedData, 72, blockSize);
+                    if (h.compressionFlags == 1) {
+                      block = pako.inflate(block);
+                      //console.log("unzip of data succeeded");
+                    }
 
-                  var decoder = new TextDecoder();
-                  var xml = decoder.decode(block);
-                  console.log(xml);
+                    var decoder = new TextDecoder();
+                    var xml = decoder.decode(block);
+
+                    var entries = parseXml(xml);
+                    //console.log(entries);
+                    resolve(entries);
+                  }).catch(function(err) {
+                    reject("decrypt of data failed");
+                    //console.log(err);
+                  });
                 }).catch(function(err) {
-                  console.log("decrypt of data failed:");
-                  console.log(err);
+                  reject("import of final-key failed: " + err.message);
                 });
               }).catch(function(err) {
-                console.log("import of final-key failed: " + err.message);
+                reject("digest of final-key-source failed: " + err.message);
               });
             }).catch(function(err) {
-              console.log("digest of final-key-source failed: " + err.message);
+              reject("encryptmasterkey failed: " + err.message);
             });
           }).catch(function(err) {
-            console.log("encryptmasterkey failed: " + err.message);
+            reject("digest of masterkey failed: " + err.message);
           });
-        }).catch(function(err) {
-          console.log("digest of masterkey failed: " + err.message);
         });
       });
     });
+  }
+
+  /**
+   * Parses the entries xml into an object format
+   **/
+  function parseXml(xml) {
+    var parser = new DOMParser();
+    var doc = parser.parseFromString(xml, "text/xml");
+    console.log(doc);
+
+    var results = [];
+    var entryNodes = doc.evaluate('//Entry', doc, null, XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);
+    for (var i=0 ; i < entryNodes.snapshotLength; i++) {
+      var entryNode = entryNodes.snapshotItem(i);
+      //console.log(entryNode);
+      var entry = {};
+      results.push(entry);
+      for (var j=0; j < entryNode.children.length; j++) {
+        var childNode = entryNode.children[j];
+
+        if (childNode.nodeName == "String") {
+          var key = childNode.getElementsByTagName('Key')[0].textContent;
+          var valNode = childNode.getElementsByTagName('Value')[0];
+          var val = valNode.textContent;
+          var protectedVal = valNode.hasAttribute('Protected');
+
+          entry[key] = {
+            value: val
+          };
+          if (protectedVal)
+            entry[key].encrypted = true;
+        }
+      }
+    }
+
+    return results;
   }
 
   /**
