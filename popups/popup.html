@@ -8,6 +8,8 @@
 		<script type="text/javascript" src="/lib/angular.min.js"></script>
 		<script type="text/javascript" src="/lib/gdocs.js"></script>
 		<script type="text/javascript" src="/lib/pako.min.js"></script>
+		<script type="text/javascript" src="/lib/salsa20.js"></script>
+		<script type="text/javascript" src="/lib/stringview.js"></script>
 		<script type="text/javascript" src="keepassService.js"></script>
 		<script type="text/javascript" src="popup.js"></script>
 		<script type="text/javascript" src="docsController.js"></script>
@@ -49,7 +51,7 @@
   			<passwordMatches ng-show="entries">
   			  <ul>
   			    <li ng-repeat="entry in entries">
-  			      {{entry.Title.value}} - {{entry.UserName.value}}
+  			      {{entry.Title}} - {{entry.UserName}} ++{{entry.Password}}
   			    </li>
   			  </ul>
   			</passwordMatches>
