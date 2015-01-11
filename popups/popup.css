@@ -26,3 +26,16 @@ filelist li.selected {
   background: #ccc;
 }
 
+successMessage {
+  background: rgba(100, 255, 100, 0.5);
+  display: block;
+  padding: 4px;
+  border: solid 2px rgba(100, 255, 100, 0.8);;
+}
+
+errorMessage {
+  background: rgba(255, 100, 100, 0.5);
+  display: block;
+  padding: 4px;
+  border: solid 2px rgba(255, 100, 100, 0.5);
+}

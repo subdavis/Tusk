@@ -12,7 +12,7 @@ function MasterPasswordController($scope, $http, gdocs, keepass) {
 	    $scope.successMessage = entries.length + " found";
 	    $scope.$apply();
 	  }).catch(function(err) {
-	    $scope.errorMessage = err;
+	    $scope.errorMessage = "Incorrect password";
 	    $scope.$apply();
 	  });
 

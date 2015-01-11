@@ -42,14 +42,16 @@ function Keepass(gdocs, pako) {
     my.fileSet = true;
   }
 
-  function getPasswordFile(callback) {
-    gdocs.sendXhr('GET', internals.url, function(e) {
-      //this gets the file details
-      var details = JSON.parse(this.responseText);
-      var url = details.downloadUrl;
-      gdocs.sendXhr('GET', url, function(e) {
-        callback(this.response, e.total);
-      }, 'arraybuffer');
+  function getPasswordFile() {
+    return new Promise(function(resolve, reject) {
+      gdocs.sendXhr('GET', internals.url, function(e) {
+        //this gets the file details
+        var details = JSON.parse(this.responseText);
+        var url = details.downloadUrl;
+        gdocs.sendXhr('GET', url, function(e) {
+          resolve(this.response, e.total);
+        }, 'arraybuffer');
+      });
     });
   }
 
@@ -129,80 +131,65 @@ function Keepass(gdocs, pako) {
   }
 
   my.getPassword = function() {
-    return new Promise(function(resolve, reject) {
-      getPasswordFile(function(buf, length) {
-        var h = readHeader(buf);
-        if (!h) return;
+    return getPasswordFile().then(function(buf, length) {
+      var h = readHeader(buf);
+      if (!h) return;
 
-        var encData = new Uint8Array(buf, h.dataStart);
-        //console.log("read file header ok.  encrypted data starts at byte " + h.dataStart);
-        var SHA = {
-          name: "SHA-256"
-        };
-        var AES = {
-          name: "AES-CBC",
-          iv: h.iv
-        };
+      var encData = new Uint8Array(buf, h.dataStart);
+      //console.log("read file header ok.  encrypted data starts at byte " + h.dataStart);
+      var SHA = {
+        name: "SHA-256"
+      };
+      var AES = {
+        name: "AES-CBC",
+        iv: h.iv
+      };
 
-        //console.log('password is ' + internals.masterPassword);
-        var encoder = new TextEncoder();
-        var masterKey = encoder.encode(internals.masterPassword);
+      //console.log('password is ' + internals.masterPassword);
+      var encoder = new TextEncoder();
+      var masterKey = encoder.encode(internals.masterPassword);
 
-        //console.log(masterKey);
-        window.crypto.subtle.digest(SHA, masterKey).then(function(masterKey) {
-          return window.crypto.subtle.digest(SHA, masterKey);
-        }).then(function(masterKey) {
-            //console.log(new Uint8Array(masterKey));
-            encryptMasterKey(h.transformSeed, masterKey, h.keyRounds).then(function(encMasterKey) {
-              var finalKeySource = new Uint8Array(64);
-              finalKeySource.set(h.masterSeed);
-              finalKeySource.set(new Uint8Array(encMasterKey), 32);
-              //console.log(finalKeySource);
-              window.crypto.subtle.digest(SHA, finalKeySource).then(function(finalKeyBeforeImport) {
-                window.crypto.subtle.importKey("raw", finalKeyBeforeImport, AES, false, ["decrypt"]).then(function(finalKey) {
-                  window.crypto.subtle.decrypt(AES, finalKey, encData).then(function(decryptedData) {
-                    var storedStartBytes = new Uint8Array(decryptedData, 0, 32);
-                    for (var i=0; i<32; i++) {
-                      if (storedStartBytes[i] != h.streamStartBytes[i]) {
-                        reject('Incorrect password');
-                        return;
-                      }
-                    }
-                    //console.log("decrypt of data succeeded");
-                    var blockHeader = new DataView(decryptedData, 32, 40);
-                    var blockId = blockHeader.getUint32(0, internals.littleEndian);
-                    var blockSize = blockHeader.getUint32(36, internals.littleEndian);
-                    console.log(blockId, blockSize, decryptedData.byteLength);
-                    var blockHash = new Uint8Array(decryptedData, 36, 32);
-                    var block = new Uint8Array(decryptedData, 72, blockSize);
-                    if (h.compressionFlags == 1) {
-                      block = pako.inflate(block);
-                      //console.log("unzip of data succeeded");
-                    }
+      //console.log(masterKey);
+      return window.crypto.subtle.digest(SHA, masterKey).then(function(masterKey) {
+        return window.crypto.subtle.digest(SHA, masterKey);
+      }).then(function(masterKey) {
+        return encryptMasterKey(h.transformSeed, masterKey, h.keyRounds);
+      }).then(function(encMasterKey) {
+        var finalKeySource = new Uint8Array(64);
+        finalKeySource.set(h.masterSeed);
+        finalKeySource.set(new Uint8Array(encMasterKey), 32);
 
-                    var decoder = new TextDecoder();
-                    var xml = decoder.decode(block);
+        return window.crypto.subtle.digest(SHA, finalKeySource);
+      }).then(function(finalKeyBeforeImport) {
+        return window.crypto.subtle.importKey("raw", finalKeyBeforeImport, AES, false, ["decrypt"]);
+      }).then(function(finalKey) {
+        return window.crypto.subtle.decrypt(AES, finalKey, encData);
+      }).then(function(decryptedData) {
+        //at this point we probably have successfully decrypted data, just need to double-check:
+        var storedStartBytes = new Uint8Array(decryptedData, 0, 32);
+        for (var i=0; i<32; i++) {
+          if (storedStartBytes[i] != h.streamStartBytes[i]) {
+            throw new Error('Decryption succeeded but payload corrupt');
+            return;
+          }
+        }
 
-                    var entries = parseXml(xml);
-                    //console.log(entries);
-                    resolve(entries);
-                  }).catch(function(err) {
-                    reject("decrypt of data failed");
-                    //console.log(err);
-                  });
-                }).catch(function(err) {
-                  reject("import of final-key failed: " + err.message);
-                });
-              }).catch(function(err) {
-                reject("digest of final-key-source failed: " + err.message);
-              });
-            }).catch(function(err) {
-              reject("encryptmasterkey failed: " + err.message);
-            });
-          }).catch(function(err) {
-            reject("digest of masterkey failed: " + err.message);
-          });
-        });
+        //ok, data decrypted, lets start parsing:
+        var blockHeader = new DataView(decryptedData, 32, 40);
+        var blockId = blockHeader.getUint32(0, internals.littleEndian);
+        var blockSize = blockHeader.getUint32(36, internals.littleEndian);
+        var blockHash = new Uint8Array(decryptedData, 36, 32);
+
+        var block = new Uint8Array(decryptedData, 72, blockSize);
+        if (h.compressionFlags == 1) {
+          block = pako.inflate(block);
+        }
+
+        var decoder = new TextDecoder();
+        var xml = decoder.decode(block);
+
+        var entries = parseXml(xml);
+        return entries;
       });
     });
   }
