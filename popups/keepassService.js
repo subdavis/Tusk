@@ -94,7 +94,7 @@ function Keepass(gdocs, pako) {
           h.streamStartBytes = new Uint8Array(buf, position, len);
           break;
         case 10:
-          h.innerRandomStreamId = new Uint8Array(buf, position, len);
+          h.innerRandomStreamId = dv.getUint32(0, internals.littleEndian);
           break;
         default:
           break;
@@ -112,7 +112,8 @@ function Keepass(gdocs, pako) {
   my.getPasswords = function(masterPassword) {
     return getPasswordFile().then(function(buf, length) {
       var h = readHeader(buf);
-      if (!h) return;
+      if (!h) throw new Error('Failed to read file header');
+      if (h.innerRandomStreamId != 2) throw new Error('Invalid Stream Key - Salsa20 is supported by this implementation, Arc4 and others not implemented.')
 
       var encData = new Uint8Array(buf, h.dataStart);
       //console.log("read file header ok.  encrypted data starts at byte " + h.dataStart);
@@ -167,7 +168,7 @@ function Keepass(gdocs, pako) {
         var decoder = new TextDecoder();
         var xml = decoder.decode(block);
 
-        var entries = parseXml(xml);
+        var entries = parseXml(xml, h.protectedStreamKey);
         return entries;
       });
     });
@@ -176,37 +177,55 @@ function Keepass(gdocs, pako) {
   /**
    * Parses the entries xml into an object format
    **/
-  function parseXml(xml) {
-    var parser = new DOMParser();
-    var doc = parser.parseFromString(xml, "text/xml");
-    //console.log(doc);
+  function parseXml(xml, protectedStreamKey) {
+    return window.crypto.subtle.digest({name: "SHA-256"}, protectedStreamKey).then(function(streamKey) {
+      var iv = [0xE8, 0x30, 0x09, 0x4B, 0x97, 0x20, 0x5D, 0x2A];
+      var salsa = new Salsa20(new Uint8Array(streamKey), iv);
+      var decoder = new TextDecoder();
+      var parser = new DOMParser();
+      var doc = parser.parseFromString(xml, "text/xml");
+      //console.log(doc);
 
-    var results = [];
-    var entryNodes = doc.evaluate('//Entry', doc, null, XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);
-    for (var i=0 ; i < entryNodes.snapshotLength; i++) {
-      var entryNode = entryNodes.snapshotItem(i);
-      //console.log(entryNode);
-      var entry = {};
-      results.push(entry);
-      for (var j=0; j < entryNode.children.length; j++) {
-        var childNode = entryNode.children[j];
+/*
 
-        if (childNode.nodeName == "String") {
-          var key = childNode.getElementsByTagName('Key')[0].textContent;
-          var valNode = childNode.getElementsByTagName('Value')[0];
-          var val = valNode.textContent;
-          var protectedVal = valNode.hasAttribute('Protected');
+      var protectedNodes = doc.evaluate("//Value[@Protected='True']", doc, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+      for (var i=0 ; i < protectedNodes.snapshotLength; i++) {
+        var protectedNode = protectedNodes.snapshotItem(i);
+        var val = protectedNode.textContent;
+        var encBytes = StringView.base64ToBytes(val);
+        var base64val = StringView.bytesToBase64(salsa.decrypt(encBytes));
+        var finalVal = atob(base64val);
+      }
+*/
 
-          entry[key] = {
-            value: val
-          };
-          if (protectedVal)
-            entry[key].encrypted = true;
+      var results = [];
+      var entryNodes = doc.evaluate('//Entry', doc, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+      for (var i=0 ; i < entryNodes.snapshotLength; i++) {
+        var entryNode = entryNodes.snapshotItem(i);
+        //console.log(entryNode);
+        var entry = {};
+        results.push(entry);
+        for (var j=0; j < entryNode.children.length; j++) {
+          var childNode = entryNode.children[j];
+
+          if (childNode.nodeName == "String") {
+            var key = childNode.getElementsByTagName('Key')[0].textContent;
+            var valNode = childNode.getElementsByTagName('Value')[0];
+            var val = valNode.textContent;
+            var protectedVal = valNode.hasAttribute('Protected');
+
+            if (protectedVal) {
+              var encBytes = StringView.base64ToBytes(val);
+              val = atob(StringView.bytesToBase64(salsa.decrypt(encBytes)));
+            }
+            entry[key] = val;
+          }
         }
       }
-    }
 
-    return results;
+      console.log(results);
+      return results;
+    });
   }
 
   /**

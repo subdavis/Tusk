@@ -31,13 +31,13 @@ function handleTabLoaded() {
                   'u': possibleUserName,
                   'p': field
               });
-            possibleUserName = null;
-				lastFieldWasPassword = true;
+              possibleUserName = null;
+				      lastFieldWasPassword = true;
             } else if (lastFieldWasPassword) {
-				//special case - two passwords in a row means it is a registration form, so remove last-added pair
-				userPasswordPairs.pop();
-				lastFieldWasPassword = false;
-			}
+      				//special case - two passwords in a row means it is a registration form, so remove last-added pair
+      				userPasswordPairs.pop();
+      				lastFieldWasPassword = false;
+      			}
         }
         else {
             possibleUserName = field;
