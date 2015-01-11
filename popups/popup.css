@@ -54,6 +54,7 @@ button .icon {
 .pure-table {
   font-size: small;
   margin-top: 8px;
+  width: 100%;
 }
 
 td .icon {

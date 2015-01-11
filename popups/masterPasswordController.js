@@ -19,10 +19,10 @@ function MasterPasswordController($scope, $http, gdocs, keepass) {
 	  keepass.getPasswords($scope.masterPassword).then(function(entries) {
 	    var url = parseUrl($scope.url);
 	    $scope.entries = entries.filter(function(entry) {
-	      return (entry.Url == url.hostname
+	      return (entry.URL == url.hostname
 	        || entry.Title == $scope.title
 	        || entry.Title == url.hostname
-	        || (entry.Url && url.hostname.indexOf(entry.Url) > -1)
+	        || (entry.URL && url.hostname.indexOf(entry.URL) > -1)
 	        || (entry.Title && url.hostname.indexOf(entry.Title) > -1)
 	       );
 	    });

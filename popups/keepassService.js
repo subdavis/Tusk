@@ -201,7 +201,18 @@ function Keepass(gdocs, pako) {
         var entryNode = entryNodes.snapshotItem(i);
         //console.log(entryNode);
         var entry = {};
-        results.push(entry);
+
+        //exclude histories and recycle bin:
+        if (entryNode.parentNode.nodeName != "History") {
+          for (var m=0; m < entryNode.parentNode.children.length; m++) {
+            var groupNode = entryNode.parentNode.children[m];
+            if (groupNode.nodeName == 'Name')
+              entry.groupName = groupNode.textContent;
+          }
+
+          if (entry.groupName != "Recycle Bin")
+            results.push(entry);
+        }
         for (var j=0; j < entryNode.children.length; j++) {
           var childNode = entryNode.children[j];
 
