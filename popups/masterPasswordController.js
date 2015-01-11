@@ -20,10 +20,10 @@ function MasterPasswordController($scope, $http, gdocs, keepass) {
 	    var url = parseUrl($scope.url);
 	    $scope.entries = entries.filter(function(entry) {
 	      return (entry.URL == url.hostname
-	        || entry.Title == $scope.title
+	        || (entry.Title && $scope.title && entry.Title.toLowerCase() == $scope.title.toLowerCase())
 	        || entry.Title == url.hostname
-	        || (entry.URL && url.hostname.indexOf(entry.URL) > -1)
-	        || (entry.Title && url.hostname.indexOf(entry.Title) > -1)
+	        || (entry.URL && url.hostname.indexOf(entry.URL.toLowerCase()) > -1)
+	        || (entry.Title && url.hostname.indexOf(entry.Title.toLowerCase()) > -1)
 	       );
 	    });
 	    $scope.successMessage = $scope.entries.length + " matches found";
