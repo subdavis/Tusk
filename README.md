@@ -1,5 +1,5 @@
 # chrome-keepass
-Chrome extension for interacting with keepass password file
+Chrome extension for interacting with keepass password file.  Still in beta.  Web Store url is https://chrome.google.com/webstore/detail/lnfepbjehgokldcaljagbmchhnaaogpc
 
 ## Motivation
 Keepass password files work well enough for me on Windows, but on my Chromebook there was simply no secure way to access them.  
