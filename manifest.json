@@ -3,11 +3,10 @@
 	"version": "0.9",
 	"manifest_version": 2,
 	"minimum_chrome_version": "37",
-	"description": "Read-only KeePass integration",
+	"description": "Read-only KeePass integration via Google Docs",
 	"icons": {
-		"16": "icons/keepass_16x16.png",
-		"48": "icons/keepass_48x48.png",
-		"128": "icons/keepass_128x128.png"
+		"16": "icons/lock2_16.png",
+		"48": "icons/lock2_48.png"
 	},
 
 	"oauth2": {
@@ -19,8 +18,8 @@
 
 	"page_action": {
           "default_icon": {
-            "19": "icons/keepass_19x19.png",
-            "38": "icons/keepass_38x38.png"
+            "19": "icons/lock2_19.png",
+            "38": "icons/lock2_38.png"
           },
           "default_title": "Password field detected.  Click here to access your password file.",
 		      "default_popup": "popups/popup.html"
@@ -35,10 +34,6 @@
 		"persistent": false
 		},
 	"content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
-	"web_accessible_resources": [
-		"/icons/key_16x16.png",
-		"/icons/key_24x24.png"
-	],
 	"permissions": [
 	  "activeTab",
 	  "storage",

@@ -23,7 +23,7 @@ function MasterPasswordController($scope, $http, gdocs, keepass) {
 	    $scope.busy = false;
 	    $scope.$apply();
 	  }).catch(function(err) {
-	    $scope.errorMessage = "Incorrect password";
+	    $scope.errorMessage = err.message;
 	    $scope.busy = false;
 	    $scope.$apply();
 	  });

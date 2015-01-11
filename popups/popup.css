@@ -8,8 +8,16 @@ body {
   overflow: hidden;
 }
 
-filelist ul, passwordMatches ul {
+ul {
   margin: 0;
+  padding: 0;
+}
+
+li {
+  list-style-type: none;
+}
+
+filelist ul, passwordMatches ul {
   overflow: auto;
 }
 
@@ -28,6 +36,19 @@ filelist li, passwordMatches li {
 
 filelist li.selected {
   background: #ccc;
+}
+
+.icon {
+	display: inline-block;
+	color: #444444;
+	fill: currentColor;
+}
+
+button .icon {
+  width: 19px;
+  height: 19px;
+  vertical-align: text-top;
+  padding-right: 4px;
 }
 
 pageInfo {
@@ -51,11 +72,12 @@ successMessage {
   border: solid 2px rgba(100, 255, 100, 0.8);
 }
 
-busyMessage {
-  background: rgba(255, 255, 100, 0.5);
+busyMessage, infoMessage {
+  background: rgba(255, 255, 100, 0.1);
   display: block;
   padding: 4px;
-  border: solid 2px rgba(255, 255, 100, 0.8);
+  margin: 4px 0;
+  border: solid 2px rgba(255, 255, 200, 0.5);
 }
 
 errorMessage {
