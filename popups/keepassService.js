@@ -220,7 +220,7 @@ function Keepass(gdocs, pako) {
         }
       }
 
-      console.log(results);
+      //console.log(results);
       return results;
     });
   }

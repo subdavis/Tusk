@@ -17,31 +17,61 @@ function MasterPasswordController($scope, $http, gdocs, keepass) {
 	  $scope.clearMessages();
 	  $scope.busy = true;
 	  keepass.getPasswords($scope.masterPassword).then(function(entries) {
-	    $scope.entries = entries;
-	    console.log(entries);
-	    $scope.successMessage = entries.length + " passwords found";
+	    var url = parseUrl($scope.url);
+	    $scope.entries = entries.filter(function(entry) {
+	      return (entry.Url == url.hostname
+	        || entry.Title == $scope.title
+	        || entry.Title == url.hostname
+	        || (entry.Url && url.hostname.indexOf(entry.Url) > -1)
+	        || (entry.Title && url.hostname.indexOf(entry.Title) > -1)
+	       );
+	    });
+	    $scope.successMessage = $scope.entries.length + " matches found";
 	    $scope.busy = false;
 	    $scope.$apply();
 	  }).catch(function(err) {
-	    $scope.errorMessage = err.message;
+	    $scope.errorMessage = err.message || "Incorrect password";
 	    $scope.busy = false;
 	    $scope.$apply();
 	  });
-
-	  /*
-		chrome.storage.sync.get('passwordFileName', function(items) {
-			if (items.passwordFileName) {
-
-			} else {
-				//no password file
-			}
-		});
-		*/
 	};
 
   $scope.clearMessages = function() {
 	  $scope.errorMessage = "";
 	  $scope.successMessage = "";
+  }
+
+  $scope.copyPassword = function(entry) {
+    $scope.copyEntry = entry;
+    document.execCommand('copy');
+  }
+
+  document.addEventListener('copy', function(e) {
+    var textToPutOnClipboard = $scope.copyEntry.Password;
+    e.clipboardData.setData('text/plain', textToPutOnClipboard);
+    e.preventDefault();
+
+    chrome.alarms.create("clearClipboard", {
+      delayInMinutes: 1
+    });
+  });
+
+  function parseUrl(url) {
+    //from https://gist.github.com/jlong/2428561
+    var parser = document.createElement('a');
+    parser.href = url;
+
+    /*
+    parser.protocol; // => "http:"
+    parser.hostname; // => "example.com"
+    parser.port;     // => "3000"
+    parser.pathname; // => "/pathname/"
+    parser.search;   // => "?search=test"
+    parser.hash;     // => "#hash"
+    parser.host;     // => "example.com:3000"
+    */
+
+    return parser;
   }
 }
 

@@ -51,6 +51,22 @@ button .icon {
   padding-right: 4px;
 }
 
+.pure-table {
+  font-size: small;
+  margin-top: 8px;
+}
+
+td .icon {
+  width: 19px;
+  height: 19px;
+}
+
+statusMessage {
+  display: block;
+  padding: 4px 0;
+  font-weight: 600;
+}
+
 pageInfo {
   background: #EEE;
   display: block;

@@ -40,6 +40,7 @@
 	  "clipboardWrite",
 	  "identity",
 	  "declarativeContent",
+	  "alarms",
 
     "https://docs.google.com/feeds/",
     "https://docs.googleusercontent.com/",

@@ -37,9 +37,9 @@
 			<errorMessage ng-show="!refreshing && authorized() && (docs == null || docs.length == 0)">Chrome-keepass has accessed your drive but could not find any password files.  Ensure your .kdbx file is in the root folder of your google drive.</errorMessage>
 		</div>
 		<div ng-show="fileName">
-		  <h4>Using "{{fileName}}"
-		    <br /><a href="" ng-click="chooseAnotherDoc()">Choose another File</a>
-		  </h4>
+		  <statusMessage>{{fileName}}
+		    <a href="" ng-click="chooseAnotherDoc()" style="float: right;">Choose a different File</a>
+		  </statusMessage>
 			<div ng-controller="MasterPasswordController">
 			  <form action="#" name="pwd" class="pure-form" ng-show="!entries">
     			<fieldset>
@@ -54,13 +54,20 @@
     			</fieldset>
 				</form>
   			<pageInfo ng-show="entries && (url || title)">{{title}} - {{url}}</pageInfo>
-  			<passwordMatches ng-show="entries">
-  			  <ul>
-  			    <li ng-repeat="entry in entries" title="{{entry.Notes}}">
-  			      {{entry.Title}} - {{entry.UserName}} ++{{entry.Password}}
-  			    </li>
-  			  </ul>
-  			</passwordMatches>
+  			<table ng-show="entries" class="pure-table pure-table-horizontal">
+  			  <thead><tr>
+  			    <th>Entry</th>
+  			    <th>Username</th>
+  			    <th>Password</th>
+  			  </tr></thead>
+  			  <tbody>
+  			    <tr ng-repeat="entry in entries" title="{{entry.Notes}}">
+  			      <td>{{entry.Title || entry.Url}}</td>
+  			      <td>{{entry.UserName}}</td>
+  			      <td><a href="" ng-click="copyPassword(entry)" title="Copy password to clipboard"><svg class="icon icon-copy"><use xlink:href="#icon-copy"></use></svg></a></td>
+  			    </tr>
+			    </tbody>
+  			</table>
 			</div>
 		</div>
 <svg display="none" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
