@@ -19,7 +19,6 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 var userPasswordPairs = [];
 
 function handleTabLoaded() {
-
     //identify user/password pairs
     var inputPattern = "input[type='text'], input[type='email'], input[type='password'], input:not([type])";
     var possibleUserName;
@@ -28,11 +27,11 @@ function handleTabLoaded() {
         var field = $(this);
         if (field.attr('type') && field.attr('type').toLowerCase() == 'password') {
             if (possibleUserName) {
-                userPasswordPairs.push({
-                    'u': possibleUserName,
-                    'p': field
-                });
-                possibleUserName = null;
+              userPasswordPairs.push({
+                  'u': possibleUserName,
+                  'p': field
+              });
+            possibleUserName = null;
 				lastFieldWasPassword = true;
             } else if (lastFieldWasPassword) {
 				//special case - two passwords in a row means it is a registration form, so remove last-added pair

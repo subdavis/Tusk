@@ -20,24 +20,39 @@ filelist li {
   background: #eee;
   color: #666666;
   display: block;
+  cursor: pointer;
 }
 
 filelist li.selected {
   background: #ccc;
 }
 
+pageInfo {
+  background: #EEE;
+  display: block;
+  padding: 4px;
+  border: solid 2px #CCC;
+  font-weight: 600;
+}
+
+passwordMatches {
+  display: block;
+  max-height: 150px;
+  overflow-y: scroll;
+}
+
 successMessage {
   background: rgba(100, 255, 100, 0.5);
   display: block;
   padding: 4px;
-  border: solid 2px rgba(100, 255, 100, 0.8);;
+  border: solid 2px rgba(100, 255, 100, 0.8);
 }
 
 busyMessage {
   background: rgba(255, 255, 100, 0.5);
   display: block;
   padding: 4px;
-  border: solid 2px rgba(255, 255, 100, 0.8);;
+  border: solid 2px rgba(255, 255, 100, 0.8);
 }
 
 errorMessage {

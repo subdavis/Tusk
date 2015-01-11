@@ -2,8 +2,6 @@
 
 function DocsController($scope, $http, gdocs, keepass) {
 	$scope.docs = [];
-	$scope.fileKnown = false;
-	$scope.fileOpen = false;
 
 	// Response handler that caches file icons in the filesystem API.
 	function successCallbackWithFsCaching(resp, status, headers, config) {
@@ -16,7 +14,8 @@ function DocsController($scope, $http, gdocs, keepass) {
 				updatedDateFull : entry.modifiedDate,
 				icon : entry.iconLink,
 				url : entry.selfLink,
-				size : entry.fileSize ? '( ' + entry.fileSize + ' bytes)' : null
+				size : entry.fileSize ? '( ' + entry.fileSize + ' bytes)' : null,
+				selected : function() { return (entry.selfLink == $scope.fileName); }
 			};
 
 			$scope.docs.push(doc);
@@ -30,17 +29,15 @@ function DocsController($scope, $http, gdocs, keepass) {
 
 	$scope.choosePasswordFile = function(url) {
 		chrome.storage.sync.set({'passwordFileName': url}, function() {
-  		$scope.fileKnown = true;
   		keepass.setFile(url);
+  		$scope.fileName = url;
+  		$scope.$apply();
 		});
 	};
 
-  $scope.selectedPasswordFile = function(url) {
-    return (url == $scope.fileName) ? "selected" : "";
-  }
-
 	$scope.clearDocs = function() {
 		$scope.docs = [];
+		$scope.fileName = "";
 		// Clear out old results.
 	};
 
@@ -91,9 +88,9 @@ function DocsController($scope, $http, gdocs, keepass) {
 	$scope.toggleAuth(false);
 	chrome.storage.sync.get('passwordFileName', function(items) {
 		if (items.passwordFileName) {
-			$scope.fileKnown = true;
 			$scope.fileName = items.passwordFileName;
 			keepass.setFile(items.passwordFileName);
+			$scope.$apply();
 		}
 	});
 }

@@ -179,7 +179,7 @@ function Keepass(gdocs, pako) {
   function parseXml(xml) {
     var parser = new DOMParser();
     var doc = parser.parseFromString(xml, "text/xml");
-    console.log(doc);
+    //console.log(doc);
 
     var results = [];
     var entryNodes = doc.evaluate('//Entry', doc, null, XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);

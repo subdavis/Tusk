@@ -25,14 +25,15 @@
 			<h4>Password Files</h4>
 			<filelist>
   			<ul>
-  				<li data-ng-repeat="doc in docs" class="{{selectedPasswordFile(doc.url)}}">
-  					<a href="" ng-click="choosePasswordFile(doc.url)">{{doc.title}}</a>
+  				<li data-ng-repeat="doc in docs" ng-class="{selected: doc.selected()}" ng-click="choosePasswordFile(doc.url)">
+  					{{doc.title}}
   				</li>
   			</ul>
 			</filelist>
 		</div>
-		<div ng-hide="fileOpen || !fileKnown">
+		<div ng-show="fileName">
 			<div ng-controller="MasterPasswordController">
+  			<pageInfo ng-show="url || title">{{title}} - {{url}}</pageInfo>
 			  <form action="#" name="pwd">
     			<h4>Enter master password</h4>
     			<fieldset>
@@ -45,6 +46,13 @@
     				<successMessage data-ng-show="successMessage">{{successMessage}}</successMessage>
     			</fieldset>
 				</form>
+  			<passwordMatches ng-show="entries">
+  			  <ul>
+  			    <li ng-repeat="entry in entries">
+  			      {{entry.Title.value}} - {{entry.UserName.value}}
+  			    </li>
+  			  </ul>
+  			</passwordMatches>
 			</div>
 		</div>
 	</body>
