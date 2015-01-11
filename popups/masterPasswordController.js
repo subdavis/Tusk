@@ -2,17 +2,18 @@
 
 function MasterPasswordController($scope, $http, gdocs, keepass) {
 	$scope.masterPassword = "";
+	$scope.busy = false;
 
 	$scope.enterMasterPassword = function() {
-	  keepass.setMasterPassword($scope.masterPassword);
-
-	  $scope.errorMessage = "";
-	  $scope.successMessage = "";
-	  keepass.getPassword().then(function(entries) {
-	    $scope.successMessage = entries.length + " found";
+	  $scope.clearMessages();
+	  $scope.busy = true;
+	  keepass.getPasswords($scope.masterPassword).then(function(entries) {
+	    $scope.successMessage = entries.length + " passwords found";
+	    $scope.busy = false;
 	    $scope.$apply();
 	  }).catch(function(err) {
 	    $scope.errorMessage = "Incorrect password";
+	    $scope.busy = false;
 	    $scope.$apply();
 	  });
 
@@ -27,6 +28,10 @@ function MasterPasswordController($scope, $http, gdocs, keepass) {
 		*/
 	};
 
+  $scope.clearMessages = function() {
+	  $scope.errorMessage = "";
+	  $scope.successMessage = "";
+  }
 }
 
 MasterPasswordController.$inject = ['$scope', '$http', 'gdocs', 'keepass'];

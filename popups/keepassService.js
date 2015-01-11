@@ -3,39 +3,18 @@
 
 function Keepass(gdocs, pako) {
   var my = {
-    passwordSet: false,
     fileSet: false
   };
 
   var internals = {
-    masterPassword: "",
     url: ""
   }
-
-/*
-  uint32_t flags;
-	uint32_t version;
-	uint8_t  master_seed[16]; //FinalKey = SHA-256(aMasterSeed, TransformedUserMasterKey)
-	uint8_t  encryption_init_vector[16]; //  Init vector for AES/Twofish
-	uint32_t groups_len;
-	uint32_t entries_len;
-	uint8_t  contents_hash[32]; //  Hash of decrypted data
-	uint8_t  master_seed_extra[32]; //  Used for extra AES transformations
-	uint32_t key_rounds;
-
-	4, 4, 16, 16, 4, 4, 32, 32, 4
-*/
 
   internals.littleEndian = (function() {
     var buffer = new ArrayBuffer(2);
     new DataView(buffer).setInt16(0, 256, true);
     return new Int16Array(buffer)[0] === 256;
   })();
-
-  my.setMasterPassword = function(pwd) {
-    internals.masterPassword = pwd;
-    my.passwordSet = true;
-  }
 
   my.setFile = function(url) {
     internals.url = url;
@@ -130,7 +109,7 @@ function Keepass(gdocs, pako) {
     return h;
   }
 
-  my.getPassword = function() {
+  my.getPasswords = function(masterPassword) {
     return getPasswordFile().then(function(buf, length) {
       var h = readHeader(buf);
       if (!h) return;
@@ -145,9 +124,9 @@ function Keepass(gdocs, pako) {
         iv: h.iv
       };
 
-      //console.log('password is ' + internals.masterPassword);
+      //console.log('password is ' + masterPassword);
       var encoder = new TextEncoder();
-      var masterKey = encoder.encode(internals.masterPassword);
+      var masterKey = encoder.encode(masterPassword);
 
       //console.log(masterKey);
       return window.crypto.subtle.digest(SHA, masterKey).then(function(masterKey) {

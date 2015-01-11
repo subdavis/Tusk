@@ -33,15 +33,18 @@
 		</div>
 		<div ng-hide="fileOpen || !fileKnown">
 			<div ng-controller="MasterPasswordController">
-				<h4>Enter master password</h4>
-				<fieldset>
-					<input type="password" ng-model="masterPassword">
-					<button id="submitPassword" class="btn" ng-click="enterMasterPassword()">
-						Enter
-					</button>
-					<errorMessage data-ng-show="errorMessage">{{errorMessage}}</errorMessage>
-					<successMessage data-ng-show="successMessage">{{successMessage}}</successMessage>
-				</fieldset>
+			  <form action="#" name="pwd">
+    			<h4>Enter master password</h4>
+    			<fieldset>
+    				<input type="password" ng-model="masterPassword" ng-keyup="clearMessages()" ng-readonly="busy">
+    				<button type="submit" id="submitPassword" class="btn" ng-click="enterMasterPassword()" ng-disabled="busy">
+    					Enter
+    				</button>
+    				<busyMessage data-ng-show="busy">Decrypting...</busyMessage>
+    				<errorMessage data-ng-show="errorMessage">{{errorMessage}}</errorMessage>
+    				<successMessage data-ng-show="successMessage">{{successMessage}}</successMessage>
+    			</fieldset>
+				</form>
 			</div>
 		</div>
 	</body>

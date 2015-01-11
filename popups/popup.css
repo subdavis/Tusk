@@ -33,6 +33,13 @@ successMessage {
   border: solid 2px rgba(100, 255, 100, 0.8);;
 }
 
+busyMessage {
+  background: rgba(255, 255, 100, 0.5);
+  display: block;
+  padding: 4px;
+  border: solid 2px rgba(255, 255, 100, 0.8);;
+}
+
 errorMessage {
   background: rgba(255, 100, 100, 0.5);
   display: block;
