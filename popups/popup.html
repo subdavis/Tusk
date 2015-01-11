@@ -1,7 +1,7 @@
 <html ng-app="keepassApp" ng-csp>
 	<head>
 		<title>KeePass - Choose password file</title>
-		<link rel="stylesheet" href="bootstrap.min.css" />
+		<link rel="stylesheet" href="pure.min.css" />
 		<link rel="stylesheet" href="popup.css" />
 		<link rel="stylesheet" href="angular-csp.css" />
 		<script type="text/javascript" src="/lib/util.js"></script>
@@ -16,7 +16,7 @@
 		<script type="text/javascript" src="masterPasswordController.js"></script>
 	</head>
 	<body ng-controller="DocsController">
-		<div>
+		<div ng-hide="fileName">
 		  Google Docs:
 			<button id="authorize-button" class="btn" data-ng-click="toggleAuth(true)">
 				{{authButtonLabel()}}
@@ -27,20 +27,23 @@
 			<h4>Password Files</h4>
 			<filelist>
   			<ul>
-  				<li data-ng-repeat="doc in docs" ng-class="{selected: doc.selected()}" ng-click="choosePasswordFile(doc.url)">
+  				<li data-ng-repeat="doc in docs" ng-class="{selected: doc.selected()}" ng-click="choosePasswordFile(doc)">
   					{{doc.title}}
   				</li>
   			</ul>
 			</filelist>
 		</div>
 		<div ng-show="fileName">
+		  <h4>Using "{{fileName}}"
+		    <br /><a href="" data-ng-click="chooseAnotherDoc()">Choose another File</a>
+		  </h4>
 			<div ng-controller="MasterPasswordController">
   			<pageInfo ng-show="url || title">{{title}} - {{url}}</pageInfo>
-			  <form action="#" name="pwd">
-    			<h4>Enter master password</h4>
+			  <form action="#" name="pwd" class="pure-form">
     			<fieldset>
-    				<input type="password" ng-model="masterPassword" ng-keyup="clearMessages()" ng-readonly="busy">
-    				<button type="submit" id="submitPassword" class="btn" ng-click="enterMasterPassword()" ng-disabled="busy">
+    			 <legend>Enter master password</legend>
+    				<input type="password" placeholder="Master Password" ng-model="masterPassword" ng-keyup="clearMessages()" ng-readonly="busy">
+    				<button type="submit" id="submitPassword" class="pure-button pure-button-primary" ng-click="enterMasterPassword()" ng-disabled="busy">
     					Enter
     				</button>
     				<busyMessage data-ng-show="busy">Unlocking password file...</busyMessage>
@@ -50,7 +53,7 @@
 				</form>
   			<passwordMatches ng-show="entries">
   			  <ul>
-  			    <li ng-repeat="entry in entries">
+  			    <li ng-repeat="entry in entries" title="{{entry.Notes}}">
   			      {{entry.Title}} - {{entry.UserName}} ++{{entry.Password}}
   			    </li>
   			  </ul>

@@ -15,7 +15,7 @@ function DocsController($scope, $http, gdocs, keepass) {
 				icon : entry.iconLink,
 				url : entry.selfLink,
 				size : entry.fileSize ? '( ' + entry.fileSize + ' bytes)' : null,
-				selected : function() { return (entry.selfLink == $scope.fileName); }
+				selected : function() { return (entry.title == $scope.fileName); }
 			};
 
 			$scope.docs.push(doc);
@@ -27,13 +27,17 @@ function DocsController($scope, $http, gdocs, keepass) {
 		});
 	}
 
-	$scope.choosePasswordFile = function(url) {
-		chrome.storage.sync.set({'passwordFileName': url}, function() {
-  		keepass.setFile(url);
-  		$scope.fileName = url;
+	$scope.choosePasswordFile = function(doc) {
+		chrome.storage.sync.set({'passwordFile': doc}, function() {
+  		keepass.setFile(doc.url);
+  		$scope.fileName = doc.title;
   		$scope.$apply();
 		});
 	};
+
+  $scope.chooseAnotherDoc = function() {
+    $scope.fetchDocs();
+  }
 
 	$scope.clearDocs = function() {
 		$scope.docs = [];
@@ -71,8 +75,7 @@ function DocsController($scope, $http, gdocs, keepass) {
 				$scope.fetchDocs(false);
 			});
 		} else {
-			gdocs.revokeAuthToken(function() {
-			});
+			gdocs.revokeAuthToken(function() {});
 			this.clearDocs();
 		}
 	};
@@ -86,10 +89,10 @@ function DocsController($scope, $http, gdocs, keepass) {
 	};
 
 	$scope.toggleAuth(false);
-	chrome.storage.sync.get('passwordFileName', function(items) {
-		if (items.passwordFileName) {
-			$scope.fileName = items.passwordFileName;
-			keepass.setFile(items.passwordFileName);
+	chrome.storage.sync.get('passwordFile', function(items) {
+		if (items.passwordFile) {
+			$scope.fileName = items.passwordFile.title;
+			keepass.setFile(items.passwordFile.url);
 			$scope.$apply();
 		}
 	});

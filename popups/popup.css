@@ -8,12 +8,12 @@ body {
   overflow: hidden;
 }
 
-filelist ul {
+filelist ul, passwordMatches ul {
   margin: 0;
   overflow: auto;
 }
 
-filelist li {
+filelist li, passwordMatches li {
   border: 1px solid #ccc;
   padding: 4px;
   margin: 4px 0;
@@ -21,6 +21,9 @@ filelist li {
   color: #666666;
   display: block;
   cursor: pointer;
+  list-style-type: none;
+  text-align: center;
+  /* -webkit-padding-start: 0; */
 }
 
 filelist li.selected {
