@@ -12,18 +12,14 @@ function DocsController($scope, $http, gdocs, keepass) {
 	};
 
   $scope.chooseAnotherDoc = function() {
+    $scope.fileName = "";
     $scope.fetchDocs();
   }
 
-	$scope.clearDocs = function() {
-		$scope.docs = [];
-		$scope.fileName = "";
-	};
-
 	$scope.fetchDocs = function() {
-		this.clearDocs();
-
+		$scope.docs = [];
     $scope.refreshing = true;
+
     gdocs.getPasswordFiles(true).then(function(docs) {
       $scope.docs = docs.map(function(doc) {
         doc.selected = function() { return (entry.title == $scope.fileName); }
@@ -48,7 +44,7 @@ function DocsController($scope, $http, gdocs, keepass) {
   			});
   		} else {
   			gdocs.revokeAuthToken();
-  			this.clearDocs();
+  			$scope.docs = [];
   		}
 	  }).catch(function(err) {
 	    $scope.errorMessage = "Unable to continue unless you grant permissions";
@@ -59,16 +55,6 @@ function DocsController($scope, $http, gdocs, keepass) {
 	$scope.authorized = function() {
 	  return (gdocs.accessToken) ? true : false;
 	}
-
-	$scope.toggleAuth(false);
-
-	chrome.storage.sync.get('passwordFile', function(items) {
-		if (items.passwordFile) {
-			$scope.fileName = items.passwordFile.title;
-			keepass.setFile(items.passwordFile.url);
-			$scope.$apply();
-		}
-	});
 
 	function requestGoogleUrlPermissions(interactive) {
 	  if (!interactive) {
@@ -100,6 +86,18 @@ function DocsController($scope, $http, gdocs, keepass) {
 
     return p;
 	}
+
+	$scope.toggleAuth(false);
+
+	chrome.storage.sync.get('passwordFile', function(items) {
+	  console.log(items);
+		if (items.passwordFile) {
+			$scope.fileName = items.passwordFile.title;
+			keepass.setFile(items.passwordFile.url);
+			$scope.$apply();
+		}
+	});
+
 }
 
 DocsController.$inject = ['$scope', '$http', 'gdocs', 'keepass'];
