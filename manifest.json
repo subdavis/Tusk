@@ -9,9 +9,8 @@
 		"16": "icons/lock2_16.png",
 		"48": "icons/lock2_48.png"
 	},
-  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAg6mZuGtDqhMc9rJSd1EUxjGfOvYpGnOt2pGszrKPpJKWrjUiNh8bA1r+VMcarovr0DulASrZ/ifCpr0qgkloD0hKfJZzegLmsMzl8NMJKJy5p6+CFyuXaRsOPY1fCKb4Ia0pbjObqhnuUsuB9KOn+hKfzxqlL/qiRhelrQLr95zneCTAvAgL0jQX9pwRIjwEhR1tuW07rdJNpSOgJreYEJm+xMBgWxIwZn7+OG+M8PyBW2tbuOPLrfEP2XYzj0pzvKnL5IGEzMG8bdtSbzNOQLK7V5gs9AXV4MdzVV81xhw3H6KVvoa+fVTFuJXIS58oL1VdAZpSayqElLJislXTZwIDAQAB",
   "oauth2": {
-	    "client_id": "38107774587-ormlfo8t9bdd3f3lf49auam7qj9467u6.apps.googleusercontent.com",
+	    "client_id": "xxx.apps.googleusercontent.com",
 	    "scopes": [
 	      "https://www.googleapis.com/auth/drive.readonly"
 	    ]
