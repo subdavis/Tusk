@@ -1,6 +1,6 @@
 {
 	"name": "chrome-keepass",
-	"version": "2015.1.11",
+	"version": "2015.1.12",
 	"manifest_version": 2,
 	"minimum_chrome_version": "37",
 	"key": "lnfepbjehgokldcaljagbmchhnaaogpc",
