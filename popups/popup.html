@@ -50,11 +50,11 @@
     					Enter
     				</button>
     				<busyMessage ng-show="busy">Unlocking password file...</busyMessage>
-    				<errorMessage ng-show="errorMessage">{{errorMessage}}</errorMessage>
-    				<successMessage ng-show="successMessage">{{successMessage}}</successMessage>
     			</fieldset>
 				</form>
   			<pageInfo ng-show="entries && (url || title)">{{title}} - {{url}}</pageInfo>
+				<errorMessage ng-show="errorMessage">{{errorMessage}}</errorMessage>
+				<successMessage ng-show="successMessage">{{successMessage}}</successMessage>
   			<table ng-show="entries" class="pure-table pure-table-horizontal">
   			  <thead><tr>
   			    <th>Entry</th>
