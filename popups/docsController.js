@@ -35,27 +35,27 @@ function DocsController($scope, $http, gdocs, keepass) {
     });
 	};
 
-	// Toggles the authorization state.
-	$scope.toggleAuth = function(interactive) {
-	  requestGoogleUrlPermissions(interactive).then(function() {
-  		if (!gdocs.accessToken) {
-  			gdocs.auth(interactive).then(function() {
-  				$scope.fetchDocs(false);
-  			});
-  		} else {
-  			gdocs.revokeAuthToken();
-  			$scope.docs = [];
-  		}
+  //authorizes and fetches the docs
+  $scope.authorize = function() {
+	  requestGoogleUrlPermissions(true).then(function() {
+  	  return gdocs.auth(true);
+	  }).then(function() {
+	    $scope.fetchDocs();
 	  }).catch(function(err) {
-	    $scope.errorMessage = "Unable to continue unless you grant permissions";
-	    $scope.$apply();
+	    $scope.errorMessage = err.message || "Error authorizing"
 	  });
-	};
+  };
 
+  $scope.logout = function() {
+		gdocs.revokeAuthToken();
+  };
+
+  //returns true if user is authenticated to google docs
 	$scope.authorized = function() {
 	  return (gdocs.accessToken) ? true : false;
 	}
 
+  //requests permissions to google urls
 	function requestGoogleUrlPermissions(interactive) {
 	  if (!interactive) {
 	    return Promise.resolve();   //can only request permission if it is interactive
@@ -87,10 +87,9 @@ function DocsController($scope, $http, gdocs, keepass) {
     return p;
 	}
 
-	$scope.toggleAuth(false);
+	$scope.fetchDocs();
 
 	chrome.storage.sync.get('passwordFile', function(items) {
-	  console.log(items);
 		if (items.passwordFile) {
 			$scope.fileName = items.passwordFile.title;
 			keepass.setFile(items.passwordFile.url);
