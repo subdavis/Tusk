@@ -1,6 +1,6 @@
 
 
-function MasterPasswordController($scope, $http, gdocs, keepass) {
+function MasterPasswordController($scope, $interval, $http, gdocs, keepass) {
 	$scope.masterPassword = "";
 	$scope.busy = false;
 
@@ -20,6 +20,7 @@ function MasterPasswordController($scope, $http, gdocs, keepass) {
 	    var url = parseUrl($scope.url);
 	    var siteTokens = (url.hostname + "." + $scope.title).toLowerCase().split(/\.|\s|\//);
 	    entries.forEach(function(entry) {
+	      //apply a ranking algorithm to find the best matches
 	      entry.matchRank = 0;
 	      entry.matchRank += (entry.URL == url.hostname) ? 1 : 0;
 	      entry.matchRank += (entry.Title && $scope.title && entry.Title.toLowerCase() == $scope.title.toLowerCase()) ? 1 : 0;
@@ -41,7 +42,7 @@ function MasterPasswordController($scope, $http, gdocs, keepass) {
 	    $scope.entries = entries.filter(function(entry) {
 	      return (entry.matchRank > 0.8)
 	    });
-      $scope.successMessage = $scope.entries.length + " matches found";
+      $scope.successMessage = "" //$scope.entries.length == 1 ? "1 match found" : $scope.entries.length + " matches found";
 	    if ($scope.entries.length == 0) {
   	    $scope.entries = entries.filter(function(entry) {
   	      return (entry.matchRank > 0.4);
@@ -68,17 +69,33 @@ function MasterPasswordController($scope, $http, gdocs, keepass) {
 
   $scope.copyPassword = function(entry) {
     $scope.copyEntry = entry;
+    entry.copied = true;
     document.execCommand('copy');
   }
 
+  //listens for the copy event and does the copy
   document.addEventListener('copy', function(e) {
     var textToPutOnClipboard = $scope.copyEntry.Password;
+    $scope.copyEntry = null;
     e.clipboardData.setData('text/plain', textToPutOnClipboard);
     e.preventDefault();
 
     chrome.alarms.create("clearClipboard", {
       delayInMinutes: 1
     });
+
+    //actual clipboard clearing occurs on the background task via alarm, this is just for user feedback:
+    $scope.successMessage = "Copied to clipboard.  Clipboard will clear in 60 seconds."
+    var seconds = 60;
+    var instance = $interval(function() {
+      seconds -= 1;
+      if (seconds <= 0) {
+        $scope.successMessage = "Clipboard cleared"
+        $interval.cancel(instance);
+      } else {
+        $scope.successMessage = "Copied to clipboard.  Clipboard will clear in " + seconds+ " seconds."
+      }
+    }, 1000);
   });
 
   function parseUrl(url) {
@@ -100,6 +117,6 @@ function MasterPasswordController($scope, $http, gdocs, keepass) {
   }
 }
 
-MasterPasswordController.$inject = ['$scope', '$http', 'gdocs', 'keepass'];
+MasterPasswordController.$inject = ['$scope', '$interval', '$http', 'gdocs', 'keepass'];
 // For code minifiers.
 

@@ -1,11 +1,13 @@
 <html ng-app="keepassApp" ng-csp>
 	<head>
 		<title>KeePass - Choose password file</title>
+		<link rel="stylesheet" href="animate.css" />
 		<link rel="stylesheet" href="pure.min.css" />
 		<link rel="stylesheet" href="popup.css" />
 		<link rel="stylesheet" href="angular-csp.css" />
 		<script type="text/javascript" src="/lib/util.js"></script>
 		<script type="text/javascript" src="/lib/angular.min.js"></script>
+		<script type="text/javascript" src="/lib/angular-animate.min.js"></script>
 		<script type="text/javascript" src="/lib/gdocs.js"></script>
 		<script type="text/javascript" src="/lib/pako.min.js"></script>
 		<script type="text/javascript" src="/lib/salsa20.js"></script>
@@ -16,7 +18,7 @@
 		<script type="text/javascript" src="masterPasswordController.js"></script>
 	</head>
 	<body ng-controller="DocsController">
-		<div ng-hide="fileName" class="pure-form">
+		<docs ng-hide="fileName" class="pure-form">
 			<infoMessage ng-hide="authorized()"><p>This extension works with your already-existing Keepass (.kdbx) files stored in your google drive.  Click the button below to login to your drive.</p>
 			<p>Chrome will ask you to allow this extension to access the Google Drive websites, and Google Drive will ask you to allow this extension to read your files.</p></infoMessage>
 			<button class="pure-button" ng-hide="authorized()" ng-click="authorize()"><svg class="icon icon-google"><use xlink:href="#icon-google"></use></svg>Authorize</button>
@@ -36,8 +38,8 @@
   			</filelist>
 			</fieldset>
 			<errorMessage ng-show="!refreshing && authorized() && (docs == null || docs.length == 0)">Chrome-keepass has accessed your drive but could not find any password files.  Ensure your .kdbx file is in the root folder of your google drive.</errorMessage>
-		</div>
-		<div ng-show="fileName">
+		</docs>
+		<passwords ng-show="fileName">
 		  <statusMessage>{{fileName}}
 		    <a href="" ng-click="chooseAnotherDoc()" style="float: right;">Choose a different File</a>
 		  </statusMessage>
@@ -54,7 +56,6 @@
 				</form>
   			<pageInfo ng-show="entries && (url || title)">{{title}} - {{url}}</pageInfo>
 				<errorMessage ng-show="errorMessage">{{errorMessage}}</errorMessage>
-				<successMessage ng-show="successMessage">{{successMessage}}</successMessage>
   			<table ng-show="entries" class="pure-table pure-table-horizontal">
   			  <thead><tr>
   			    <th>Entry</th>
@@ -65,12 +66,16 @@
   			    <tr ng-repeat="entry in entries" title="{{entry.Notes}}">
   			      <td>{{entry.Title || entry.Url}}</td>
   			      <td>{{entry.UserName}}</td>
-  			      <td><a href="" ng-click="copyPassword(entry)" title="Copy password to clipboard"><svg class="icon icon-copy"><use xlink:href="#icon-copy"></use></svg></a></td>
+  			      <td>
+  			         <a href="" ng-click="copyPassword(entry)" title="Copy password to clipboard" ng-hide="entry.copied"><svg class="icon icon-copy"><use xlink:href="#icon-copy"></use></svg></a>
+  			         <span ng-show="entry.copied">Copied</span>
+  			      </td>
   			    </tr>
 			    </tbody>
   			</table>
+				<successMessage ng-show="successMessage">{{successMessage}}</successMessage>
 			</div>
-		</div>
+		</passwords>
 <svg display="none" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <defs>
 <symbol id="icon-lock" viewBox="0 0 658 1024">

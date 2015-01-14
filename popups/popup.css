@@ -42,6 +42,7 @@ filelist li.selected {
 	display: inline-block;
 	color: #444444;
 	fill: currentColor;
+  transition: all 0.3s ease 0s;
 }
 
 button .icon {
@@ -60,6 +61,10 @@ button .icon {
 td .icon {
   width: 19px;
   height: 19px;
+}
+
+td .icon:hover {
+  opacity: 0.5;
 }
 
 statusMessage {
@@ -83,6 +88,7 @@ passwordMatches {
 }
 
 successMessage {
+  margin-top: 8px;
   background: rgba(100, 255, 100, 0.5);
   display: block;
   padding: 4px;
@@ -103,3 +109,19 @@ errorMessage {
   padding: 4px;
   border: solid 2px rgba(255, 100, 100, 0.5);
 }
+
+errorMessage.ng-hide-remove {
+  -webkit-animation: fadeIn 1s;
+  animation: fadeIn 1s;
+}
+
+docs.ng-hide-remove {
+  -webkit-animation: fadeInDown 0.3s;
+  animation: fadeInDown 0.3s;
+}
+
+passwords.ng-hide-remove {
+  -webkit-animation: fadeInDown 0.3s;
+  animation: fadeInDown 0.3s;
+}
+

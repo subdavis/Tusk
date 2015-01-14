@@ -1,5 +1,5 @@
 
-var keepassApp = angular.module('keepassApp', []);
+var keepassApp = angular.module('keepassApp', ['ngAnimate']);
 
 keepassApp.factory('gdocs', function() {
 	var gdocs = new GDocs();

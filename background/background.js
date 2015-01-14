@@ -16,9 +16,9 @@ function addRules() {
 
 //addRules();
 chrome.runtime.onInstalled.addListener(function(details) {
-  //chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
+  chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
     addRules();
-  //});
+  });
 });
 
 chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
