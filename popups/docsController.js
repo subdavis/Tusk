@@ -43,6 +43,7 @@ function DocsController($scope, $http, gdocs, keepass) {
 	    $scope.fetchDocs();
 	  }).catch(function(err) {
 	    $scope.errorMessage = err.message || "Error authorizing"
+	    $scope.$apply();
 	  });
   };
 
@@ -87,15 +88,18 @@ function DocsController($scope, $http, gdocs, keepass) {
     return p;
 	}
 
-	$scope.fetchDocs();
-
-	chrome.storage.sync.get('passwordFile', function(items) {
-		if (items.passwordFile) {
-			$scope.fileName = items.passwordFile.title;
-			keepass.setFile(items.passwordFile.url);
-			$scope.$apply();
-		}
-	});
+  gdocs.auth(false).then(function() {
+    $scope.fetchDocs();
+  	chrome.storage.sync.get('passwordFile', function(items) {
+  		if (items.passwordFile) {
+  			$scope.fileName = items.passwordFile.title;
+  			keepass.setFile(items.passwordFile.url);
+  			$scope.$apply();
+  		}
+  	});
+  }).catch(function(err) {
+    errorMessage = "";  //clear the message because we don't want to show errors on startup
+  })
 
 }
 
