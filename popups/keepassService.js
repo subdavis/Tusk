@@ -259,27 +259,33 @@ function Keepass(gdocs, pako) {
    * calling CBC on each block individually.
    **/
   function aes_ecb_encyrpt(raw_key, data) {
-    return new Promise(function(resolve, reject) {
+    var AES = {
+      name: "AES-CBC",
+        iv: new Uint8Array(16)
+    };  //iv is intentionally 0, to simulate the ECB
+
+    return window.crypto.subtle.importKey("raw", raw_key, AES, false, ["encrypt"]).then(function(secureKey) {
       data = new Uint8Array(data);
       var blockCount = data.byteLength / 16;
 
       var blockPromises = new Array(blockCount);
       for (var i = 0; i<blockCount; i++) {
         var block = data.subarray(i * 16, i * 16 + 16);
-        blockPromises[i] = aes_ecb_encrypt_block(raw_key, block);
+        blockPromises[i] = aes_ecb_encrypt_block(AES, secureKey, block);
       }
 
-      Promise.all(blockPromises).then(function(blocks) {
+      return Promise.all(blockPromises).then(function(blocks) {
         //we now have the blocks, so chain them back together
         var result = new Uint8Array(data.byteLength);
         for (var i=0; i<blockCount; i++) {
           result.set(blocks[i], i * 16);
         }
 
-        resolve(result);
-      }).catch(function(err) {
-        reject(err);
+        return result;
       });
+    });
+
+    return new Promise(function(resolve, reject) {
     });
   }
 
@@ -287,24 +293,11 @@ function Keepass(gdocs, pako) {
    * Simulate ECB encryption by using IV of 0 and only one block.  AES block size is
    * 16 bytes = 128 bits.  Data size must be 16 bytes, i.e. 1 blocks
    **/
-  function aes_ecb_encrypt_block(raw_key, data16) {
-    return new Promise(function(resolve, reject) {
-      var AES = {
-        name: "AES-CBC",
-          iv: new Uint8Array(16)
-      };  //iv is intentionally 0, to simulate the ECB
-
-      window.crypto.subtle.importKey("raw", raw_key, AES, false, ["encrypt"]).then(function(secureKey) {
-        window.crypto.subtle.encrypt(AES, secureKey, data16).then(function(encBlockWithPadding) {
-          //trim the padding
-          var encBlock = new Uint8Array(encBlockWithPadding, 0, 16);
-          resolve(encBlock);
-        }).catch(function(err) {
-          reject(err);
-        })
-      }).catch(function(err) {
-        reject(err);
-      });
+  function aes_ecb_encrypt_block(AES, secureKey, data16) {
+    return window.crypto.subtle.encrypt(AES, secureKey, data16).then(function(encBlockWithPadding) {
+      //trim the padding
+      var encBlock = new Uint8Array(encBlockWithPadding, 0, 16);
+      return encBlock;
     });
   }
 
