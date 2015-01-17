@@ -151,6 +151,17 @@ errorMessage.ng-hide-remove {
   animation: fadeIn 1s;
 }
 
+drop-target {
+  display: block;
+  height: 60px;
+  padding: 8px;
+  margin: 8px;
+  border: dashed 3px rgba(0,0,0,0.5);
+  cursor: copy;
+  text-align: center;
+  color: rgba(0,0,0,0.3);
+}
+
 ng-view.ng-enter {
   -webkit-animation: fadeInDown 0.3s;
   animation: fadeInDown 0.3s;

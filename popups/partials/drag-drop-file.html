@@ -1,1 +1,16 @@
-todo
+
+<infoMessage>Drag a KeePass file from your file-system onto the target below:</infoMessage>
+<drop-target droppable drop="handleDrop">
+Drop files here
+</drop-target>
+{{success}}
+<fieldset ng-show="files.length">
+  <legend>Choose a password file:</legend>
+	<filelist>
+		<ul>
+			<li ng-repeat="file in files" ng-click="choosePasswordFile(file)">
+				{{file.name}}
+			</li>
+		</ul>
+	</filelist>
+</fieldset>
