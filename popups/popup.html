@@ -1,6 +1,6 @@
 <html ng-app="keepassApp" ng-csp>
 	<head>
-		<title>KeePass - Choose password file</title>
+		<title>ChromeKeePass - Choose password file</title>
 		<link rel="stylesheet" href="animate.css" />
 		<link rel="stylesheet" href="pure.min.css" />
 		<link rel="stylesheet" href="popup.css" />
@@ -19,7 +19,7 @@
 	</head>
 	<body ng-controller="DocsController">
 		<docs ng-hide="fileName" class="pure-form">
-			<infoMessage ng-hide="authorized()"><p>This extension works with your already-existing Keepass (.kdbx) files stored in your google drive.  Click the button below to login to your drive.</p>
+			<infoMessage ng-hide="authorized()"><p>This extension works with your already-existing KeePass (.kdbx) files stored in your google drive.  Click the button below to login to your drive.</p>
 			<p>Chrome will ask you to allow this extension to access the Google Drive websites, and Google Drive will ask you to allow this extension to read your files.</p></infoMessage>
 			<button class="pure-button" ng-hide="authorized()" ng-click="authorize()"><svg class="icon icon-google"><use xlink:href="#icon-google"></use></svg>Authorize</button>
 			<button class="pure-button" ng-click="fetchDocs(false)" ng-show="authorized()"><svg class="icon icon-google"><use xlink:href="#icon-google"></use></svg>Refresh</button>
@@ -37,7 +37,7 @@
     			</ul>
   			</filelist>
 			</fieldset>
-			<errorMessage ng-show="!refreshing && authorized() && (docs == null || docs.length == 0)">Chrome-keepass has accessed your drive but could not find any password files.  Ensure your .kdbx file is in the root folder of your google drive.</errorMessage>
+			<errorMessage ng-show="!refreshing && authorized() && (docs == null || docs.length == 0)">ChromeKeePass has accessed your drive but could not find any password files.  Ensure your .kdbx file is in the root folder of your google drive.</errorMessage>
 		</docs>
 		<passwords ng-show="fileName">
 		  <statusMessage>{{fileName}}
