@@ -13,20 +13,27 @@
 		<script type="text/javascript" src="/lib/pako.min.js"></script>
 		<script type="text/javascript" src="/lib/salsa20.js"></script>
 		<script type="text/javascript" src="/lib/stringview.js"></script>
+		<script type="text/javascript" src="/lib/passwordFileProviders.js"></script>
 		<script type="text/javascript" src="keepassService.js"></script>
-		<script type="text/javascript" src="docsController.js"></script>
-		<script type="text/javascript" src="masterPasswordController.js"></script>
-		<script type="text/javascript" src="startupController.js"></script>
+		<script type="text/javascript" src="controllers/docsController.js"></script>
+		<script type="text/javascript" src="controllers/masterPasswordController.js"></script>
+		<script type="text/javascript" src="controllers/startupController.js"></script>
+		<script type="text/javascript" src="controllers/fileTypeController.js"></script>
+		<script type="text/javascript" src="controllers/dragDropController.js"></script>
 		<script type="text/javascript" src="popup.js"></script>
 	</head>
 	<body>
 	  <ng-view></ng-view>
 
-<svg display="none" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg display="none" width="0" height="0" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <defs>
 <symbol id="icon-lock" viewBox="0 0 658 1024">
 	<title>lock</title>
 	<path class="path1" d="M182.857 438.857h292.571v-109.714q0-60.571-42.857-103.429t-103.429-42.857-103.429 42.857-42.857 103.429v109.714zM658.286 493.714v329.143q0 22.857-16 38.857t-38.857 16h-548.571q-22.857 0-38.857-16t-16-38.857v-329.143q0-22.857 16-38.857t38.857-16h18.286v-109.714q0-105.143 75.429-180.571t180.571-75.429 180.571 75.429 75.429 180.571v109.714h18.286q22.857 0 38.857 16t16 38.857z"></path>
+</symbol>
+<symbol id="icon-arrows" viewBox="0 0 1024 1024">
+	<title>arrows</title>
+	<path class="path1" d="M1024 512q0 14.857-10.857 25.714l-146.286 146.286q-10.857 10.857-25.714 10.857t-25.714-10.857-10.857-25.714v-73.143h-219.429v219.429h73.143q14.857 0 25.714 10.857t10.857 25.714-10.857 25.714l-146.286 146.286q-10.857 10.857-25.714 10.857t-25.714-10.857l-146.286-146.286q-10.857-10.857-10.857-25.714t10.857-25.714 25.714-10.857h73.143v-219.429h-219.429v73.143q0 14.857-10.857 25.714t-25.714 10.857-25.714-10.857l-146.286-146.286q-10.857-10.857-10.857-25.714t10.857-25.714l146.286-146.286q10.857-10.857 25.714-10.857t25.714 10.857 10.857 25.714v73.143h219.429v-219.429h-73.143q-14.857 0-25.714-10.857t-10.857-25.714 10.857-25.714l146.286-146.286q10.857-10.857 25.714-10.857t25.714 10.857l146.286 146.286q10.857 10.857 10.857 25.714t-10.857 25.714-25.714 10.857h-73.143v219.429h219.429v-73.143q0-14.857 10.857-25.714t25.714-10.857 25.714 10.857l146.286 146.286q10.857 10.857 10.857 25.714z"></path>
 </symbol>
 <symbol id="icon-times-circle" viewBox="0 0 1024 1024">
 	<title>times-circle</title>
@@ -52,6 +59,10 @@
 	<title>unlock</title>
 	<path class="path1" d="M950.857 329.143v146.286q0 14.857-10.857 25.714t-25.714 10.857h-36.571q-14.857 0-25.714-10.857t-10.857-25.714v-146.286q0-60.571-42.857-103.429t-103.429-42.857-103.429 42.857-42.857 103.429v109.714h54.857q22.857 0 38.857 16t16 38.857v329.143q0 22.857-16 38.857t-38.857 16h-548.571q-22.857 0-38.857-16t-16-38.857v-329.143q0-22.857 16-38.857t38.857-16h384v-109.714q0-105.714 75.143-180.857t180.857-75.143 180.857 75.143 75.143 180.857z"></path>
 </symbol>
+<symbol id="icon-flask" viewBox="0 0 951 1024">
+	<title>flask</title>
+	<path class="path1" d="M872.571 827.429q32 50.857 12.286 87.143t-80.286 36.286h-658.286q-60.571 0-80.286-36.286t12.286-87.143l287.429-453.143v-228h-36.571q-14.857 0-25.714-10.857t-10.857-25.714 10.857-25.714 25.714-10.857h292.571q14.857 0 25.714 10.857t10.857 25.714-10.857 25.714-25.714 10.857h-36.571v228zM427.429 413.143l-155.429 245.143h406.857l-155.429-245.143-11.429-17.714v-249.143h-73.143v249.143z"></path>
+</symbol>
 <symbol id="icon-copy" viewBox="0 0 1024 1024">
 	<title>copy</title>
 	<path class="path1" d="M969.143 219.429q22.857 0 38.857 16t16 38.857v694.857q0 22.857-16 38.857t-38.857 16h-548.571q-22.857 0-38.857-16t-16-38.857v-164.571h-310.857q-22.857 0-38.857-16t-16-38.857v-384q0-22.857 11.429-50.286t27.429-43.429l233.143-233.143q16-16 43.429-27.429t50.286-11.429h237.714q22.857 0 38.857 16t16 38.857v187.429q38.857-22.857 73.143-22.857h237.714zM658.286 341.143l-170.857 170.857h170.857v-170.857zM292.571 121.714l-170.857 170.857h170.857v-170.857zM404.571 491.429l180.571-180.571v-237.714h-219.429v237.714q0 22.857-16 38.857t-38.857 16h-237.714v365.714h292.571v-146.286q0-22.857 11.429-50.286t27.429-43.429zM950.857 950.857v-658.286h-219.429v237.714q0 22.857-16 38.857t-38.857 16h-237.714v365.714h512z"></path>
@@ -74,6 +85,7 @@
 </symbol>
 </defs>
 </svg>
+
 
 	</body>
 </html>

@@ -6,6 +6,7 @@ body {
   width: 400px;
   padding: 16px;
   overflow: hidden;
+  text-rendering: optimizeLegibility;
 }
 
 ul {
@@ -100,7 +101,9 @@ busyMessage, infoMessage {
   display: block;
   padding: 4px;
   margin: 4px 0;
-  border: solid 2px rgba(255, 255, 200, 0.5);
+  border: solid 1px rgba(100, 100, 0, 0.5);
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
 }
 
 errorMessage {
@@ -108,6 +111,39 @@ errorMessage {
   display: block;
   padding: 4px;
   border: solid 2px rgba(255, 100, 100, 0.5);
+}
+
+fileTypes {
+  display: block;
+  margin-bottom: 60px;
+}
+fileTypes fileType {
+  display: block;
+  height: 70px;
+  margin: 8px;
+  padding: 8px;
+  cursor: pointer;
+  border: solid 1px rgba(0,0,0,0.3);
+  background: rgba(0,0,0,0.05);
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  transition: all 250ms;
+}
+fileTypes fileType:hover {
+  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+  background: rgba(0,128,255,0.2);
+}
+fileTypes fileType:hover .icon {
+  -webkit-animation: tada 1s;
+  animation: tada 1s;
+  color: rgba(0,128,255,0.5);
+}
+fileTypes fileType .icon {
+  display: block;
+  margin: auto;
+  width: 30px;
+  height: 30px;
+  padding-bottom: 8px;
 }
 
 errorMessage.ng-hide-remove {

@@ -1,6 +1,6 @@
 
 
-function MasterPasswordController($scope, $interval, $http, $routeParams, $location, gdocs, keepass) {
+function MasterPasswordController($scope, $interval, $http, $routeParams, $location, keepass) {
 	$scope.masterPassword = "";
 	$scope.busy = false;
 	$scope.fileName = $routeParams.fileTitle;
@@ -16,7 +16,7 @@ function MasterPasswordController($scope, $interval, $http, $routeParams, $locat
   });
 
   $scope.chooseAnotherFile = function() {
-    $location.path('/choose-file');
+    $location.path('/choose-file-type');
   }
 
 	$scope.enterMasterPassword = function() {
@@ -122,7 +122,3 @@ function MasterPasswordController($scope, $interval, $http, $routeParams, $locat
     return parser;
   }
 }
-
-//MasterPasswordController.$inject = ['$scope', '$interval', '$http', 'gdocs', 'keepass'];
-// For code minifiers.
-

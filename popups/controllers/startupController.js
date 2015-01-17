@@ -8,12 +8,12 @@ function StartupController($scope, $http, $location, gdocs, keepass) {
   			keepass.setFile(items.passwordFile.url);
   		  $location.path('/enter-password/' + items.passwordFile.title);
   		} else {
-  		  $location.path('/choose-file');
+  		  $location.path('/choose-file-type');
   		}
   		$scope.$apply();
   	});
   }).catch(function(err) {
-	  $location.path('/choose-file');
+	  $location.path('/choose-file-type');
 		$scope.$apply();
   })
 

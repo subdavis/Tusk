@@ -1,7 +1,7 @@
 
 "use strict";
 
-function Keepass(gdocs, pako) {
+function Keepass(passFileProvider, pako) {
   var my = {
     fileSet: false
   };
@@ -20,15 +20,6 @@ function Keepass(gdocs, pako) {
   my.setFile = function(url) {
     internals.url = url;
     my.fileSet = true;
-  }
-
-  function getPasswordFile() {
-    return gdocs.sendXhr('GET', internals.url).then(function(e) {
-      //this gets the file details
-      var details = JSON.parse(e.currentTarget.responseText);
-      var url = details.downloadUrl;
-      return gdocs.sendXhr('GET', url, 'arraybuffer');
-    });
   }
 
   function readHeader(buf) {
@@ -107,8 +98,7 @@ function Keepass(gdocs, pako) {
   }
 
   my.getPasswords = function(masterPassword) {
-    return getPasswordFile().then(function(e) {
-      var buf = e.currentTarget.response;
+    return passFileProvider.getFile(internals.url).then(function(buf) {
       var h = readHeader(buf);
       if (!h) throw new Error('Failed to read file header');
       if (h.innerRandomStreamId != 2) throw new Error('Invalid Stream Key - Salsa20 is supported by this implementation, Arc4 and others not implemented.')
