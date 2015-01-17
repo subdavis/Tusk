@@ -7,7 +7,8 @@ function Keepass(gdocs, pako) {
   };
 
   var internals = {
-    url: ""
+    url: "",
+    streamKey: undefined
   }
 
   internals.littleEndian = (function() {
@@ -176,12 +177,23 @@ function Keepass(gdocs, pako) {
   }
 
   /**
+   * Returns the decrypted data from a protected element of an entry
+   */
+  function getDecryptedEntry(protectedData) {
+    var iv = [0xE8, 0x30, 0x09, 0x4B, 0x97, 0x20, 0x5D, 0x2A];
+    var salsa = new Salsa20(new Uint8Array(internals.streamKey), iv);
+
+    salsa.getBytes(protectedData.position);
+    return atob(StringView.bytesToBase64(salsa.decrypt(protectedData.data)));
+  }
+  my.getDecryptedEntry = getDecryptedEntry;  //expose the function
+
+  /**
    * Parses the entries xml into an object format
    **/
   function parseXml(xml, protectedStreamKey) {
     return window.crypto.subtle.digest({name: "SHA-256"}, protectedStreamKey).then(function(streamKey) {
-      var iv = [0xE8, 0x30, 0x09, 0x4B, 0x97, 0x20, 0x5D, 0x2A];
-      var salsa = new Salsa20(new Uint8Array(streamKey), iv);
+      internals.streamKey = streamKey;
       var decoder = new TextDecoder();
       var parser = new DOMParser();
       var doc = parser.parseFromString(xml, "text/xml");
@@ -201,10 +213,11 @@ function Keepass(gdocs, pako) {
 
       var results = [];
       var entryNodes = doc.evaluate('//Entry', doc, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+      var protectedPosition = 0;
       for (var i=0 ; i < entryNodes.snapshotLength; i++) {
         var entryNode = entryNodes.snapshotItem(i);
         //console.log(entryNode);
-        var entry = {};
+        var entry = { protectedData: {}};
 
         //exclude histories and recycle bin:
         if (entryNode.parentNode.nodeName != "History") {
@@ -228,7 +241,13 @@ function Keepass(gdocs, pako) {
 
             if (protectedVal) {
               var encBytes = StringView.base64ToBytes(val);
-              val = atob(StringView.bytesToBase64(salsa.decrypt(encBytes)));
+              entry.protectedData[key] = {
+                position: protectedPosition,
+                data: encBytes
+              };
+
+              protectedPosition += encBytes.length;
+              //val = atob(StringView.bytesToBase64(salsa.decrypt(encBytes)));
             }
             entry[key] = val;
           }
@@ -239,43 +258,6 @@ function Keepass(gdocs, pako) {
       return results;
     });
   }
-
-  /* this works, but using the other way
-  function aes_ecb_encrypt(rawKey, data, rounds) {
-    var data = new Uint8Array(data);
-    //Simulate ECB encryption by using IV of the data.
-    var blockCount = data.byteLength / 16;
-    var blockPromises = new Array(blockCount);
-    for(var i=0; i<blockCount; i++) {
-      var block = data.subarray(i * 16, i * 16 + 16);
-
-      blockPromises[i] = (function(iv) {
-        var AES = {
-          name: "AES-CBC",
-            iv: iv
-        };
-
-        return window.crypto.subtle.importKey("raw", rawKey, AES, false, ["encrypt"]).then(function(secureKey) {
-          var fakeData = new Uint8Array(rounds * 16);
-
-          return window.crypto.subtle.encrypt(AES, secureKey, fakeData);
-        }).then(function(result) {
-          return new Uint8Array(result, (rounds - 1) * 16, 16);
-        });
-      })(block);
-    }
-
-    return Promise.all(blockPromises).then(function(blocks) {
-      //we now have the blocks, so chain them back together
-      var result = new Uint8Array(data.byteLength);
-      for (var i=0; i<blockCount; i++) {
-        result.set(blocks[i], i * 16);
-      }
-
-      return result;
-    });
-  }
-  */
 
   /**
    * ECB encryption has no native support, but we can fake it easy enough with CBC

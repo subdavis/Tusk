@@ -45,11 +45,13 @@ chrome.pageAction.onClicked.addListener(function(tab) {
 chrome.alarms.onAlarm.addListener(function(alarm) {
   if (alarm.name == "clearClipboard") {
     //clear the clipboard on timer
-    document.addEventListener('copy', function(e) {
+    var clearClipboard = function(e) {
       e.clipboardData.setData('text/plain', "");
       e.preventDefault();
-    });
+      document.removeEventListener('copy', clearClipboard);  //don't listen anymore
+    }
 
+    document.addEventListener('copy', clearClipboard);
     document.execCommand('copy');
   }
 });

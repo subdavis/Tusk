@@ -75,7 +75,7 @@ function MasterPasswordController($scope, $interval, $http, gdocs, keepass) {
 
   //listens for the copy event and does the copy
   document.addEventListener('copy', function(e) {
-    var textToPutOnClipboard = $scope.copyEntry.Password;
+    var textToPutOnClipboard = keepass.getDecryptedEntry($scope.copyEntry.protectedData.Password);
     $scope.copyEntry = null;
     e.clipboardData.setData('text/plain', textToPutOnClipboard);
     e.preventDefault();
