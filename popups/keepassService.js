@@ -130,7 +130,11 @@ function Keepass(gdocs, pako) {
       return window.crypto.subtle.digest(SHA, masterKey).then(function(masterKey) {
         return window.crypto.subtle.digest(SHA, masterKey);
       }).then(function(masterKey) {
-        return encryptMasterKey(h.transformSeed, masterKey, h.keyRounds);
+        //transform master key thousands of times
+        return aes_ecb_encrypt(h.transformSeed, masterKey, h.keyRounds);
+      }).then(function(finalVal) {
+        //do a final SHA-256 on the transformed key
+        return window.crypto.subtle.digest({name: "SHA-256"}, finalVal);
       }).then(function(encMasterKey) {
         var finalKeySource = new Uint8Array(64);
         finalKeySource.set(h.masterSeed);
@@ -236,43 +240,29 @@ function Keepass(gdocs, pako) {
     });
   }
 
-  /**
-   * encrypts the master key the specified times and hashes the result
-   **/
-  function encryptMasterKey(rawTransformKey, rawMasterKey, rounds) {
-    var arr = new Array(rounds - 1);
-    for(var i=0; i<rounds - 1; i++)
-      arr[i] = i;  //reduce ignores holes in the array, so we have to specify each
-
-    var AES = {
-      name: "AES-CBC",
-        iv: new Uint8Array(16)
-    };  //iv is intentionally 0, to simulate the ECB
-
-    return window.crypto.subtle.importKey("raw", rawTransformKey, AES, false, ["encrypt"]).then(function(secureKey) {
-      return arr.reduce(function(prev, curr) {
-        return prev.then(function(newKey) {
-          return aes_ecb_encyrpt(AES, secureKey, newKey);
-        });
-      }, aes_ecb_encyrpt(AES, secureKey, rawMasterKey));
-    }).then(function(finalVal) {
-      //do a final SHA-256 on the result
-      return window.crypto.subtle.digest({name: "SHA-256"}, finalVal);
-    });
-  }
-
-  /**
-   * Simulate ECB encryption by using IV of 0 and only one block.  AES block size is
-   * 16 bytes = 128 bits.  Data size must be 16 bytes, i.e. 1 blocks
-   **/
-  function aes_ecb_encyrpt(AES, secureKey, data) {
-    data = new Uint8Array(data);
+  /* this works, but using the other way
+  function aes_ecb_encrypt(rawKey, data, rounds) {
+    var data = new Uint8Array(data);
+    //Simulate ECB encryption by using IV of the data.
     var blockCount = data.byteLength / 16;
-
     var blockPromises = new Array(blockCount);
-    for (var i = 0; i<blockCount; i++) {
+    for(var i=0; i<blockCount; i++) {
       var block = data.subarray(i * 16, i * 16 + 16);
-      blockPromises[i] = aes_ecb_encrypt_block(AES, secureKey, block);
+
+      blockPromises[i] = (function(iv) {
+        var AES = {
+          name: "AES-CBC",
+            iv: iv
+        };
+
+        return window.crypto.subtle.importKey("raw", rawKey, AES, false, ["encrypt"]).then(function(secureKey) {
+          var fakeData = new Uint8Array(rounds * 16);
+
+          return window.crypto.subtle.encrypt(AES, secureKey, fakeData);
+        }).then(function(result) {
+          return new Uint8Array(result, (rounds - 1) * 16, 16);
+        });
+      })(block);
     }
 
     return Promise.all(blockPromises).then(function(blocks) {
@@ -285,12 +275,53 @@ function Keepass(gdocs, pako) {
       return result;
     });
   }
+  */
 
-  function aes_ecb_encrypt_block(AES, secureKey, data16) {
-    return window.crypto.subtle.encrypt(AES, secureKey, data16).then(function(encBlockWithPadding) {
+  /**
+   * ECB encryption has no native support, but we can fake it easy enough with CBC
+   */
+  function aes_ecb_encrypt(rawKey, data, rounds) {
+    var data = new Uint8Array(data);
+
+    //Simulate ECB encryption by using IV of 0 and only one block.
+    var AES = {
+      name: "AES-CBC",
+        iv: new Uint8Array(16)
+    };  //iv is intentionally 0, to simulate the ECB
+
+    return window.crypto.subtle.importKey("raw", rawKey, AES, false, ["encrypt"]).then(function(secureKey) {
+      //AES block size is 16 bytes = 128 bits.  Data must be broken into 16 byte blocks
+      var blockCount = data.byteLength / 16;
+      var arr = new Array(rounds - 1);
+      for(var i=0; i<rounds - 1; i++)
+        arr[i] = i;  //reduce ignores holes in the array, so we have to specify each
+
+      var blockPromises = new Array(blockCount);
+      for (var i = 0; i<blockCount; i++) {
+        var firstBlock = data.subarray(i * 16, i * 16 + 16);
+        blockPromises[i] = arr.reduce(function(prev, curr) {
+          return prev.then(function(newBlock) {
+            return aes_ecb_encrypt_block(AES, secureKey, newBlock);
+          });
+        }, aes_ecb_encrypt_block(AES, secureKey, firstBlock));
+      }
+
+      return Promise.all(blockPromises).then(function(blocks) {
+        //we now have the blocks, so chain them back together
+        var result = new Uint8Array(data.byteLength);
+        for (var i=0; i<blockCount; i++) {
+          result.set(blocks[i], i * 16);
+        }
+
+        return result;
+      });
+    });
+  }
+
+  function aes_ecb_encrypt_block(AES, secureKey, block) {
+    return window.crypto.subtle.encrypt(AES, secureKey, block).then(function(encBlockWithPadding) {
       //trim the padding
-      var encBlock = new Uint8Array(encBlockWithPadding, 0, 16);
-      return encBlock;
+      return new Uint8Array(encBlockWithPadding, 0, 16);
     });
   }
 
