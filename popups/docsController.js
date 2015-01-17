@@ -1,20 +1,15 @@
 
 
-function DocsController($scope, $http, gdocs, keepass) {
+function DocsController($scope, $http, $location, gdocs, keepass) {
 	$scope.docs = [];
 
 	$scope.choosePasswordFile = function(doc) {
 		chrome.storage.sync.set({'passwordFile': doc}, function() {
   		keepass.setFile(doc.url);
-  		$scope.fileName = doc.title;
+  		$location.path('/enter-password/' + doc.title);
   		$scope.$apply();
 		});
 	};
-
-  $scope.chooseAnotherDoc = function() {
-    $scope.fileName = "";
-    $scope.fetchDocs();
-  }
 
 	$scope.fetchDocs = function() {
 		$scope.docs = [];
@@ -88,21 +83,14 @@ function DocsController($scope, $http, gdocs, keepass) {
     return p;
 	}
 
+  //init:
+  $scope.refreshing = true;
   gdocs.auth(false).then(function() {
     $scope.fetchDocs();
-  	chrome.storage.sync.get('passwordFile', function(items) {
-  		if (items.passwordFile) {
-  			$scope.fileName = items.passwordFile.title;
-  			keepass.setFile(items.passwordFile.url);
-  			$scope.$apply();
-  		}
-  	});
   }).catch(function(err) {
     errorMessage = "";  //clear the message because we don't want to show errors on startup
   })
 
 }
 
-DocsController.$inject = ['$scope', '$http', 'gdocs', 'keepass'];
-// For code minifiers.
 

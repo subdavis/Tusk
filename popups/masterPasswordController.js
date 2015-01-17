@@ -1,9 +1,11 @@
 
 
-function MasterPasswordController($scope, $interval, $http, gdocs, keepass) {
+function MasterPasswordController($scope, $interval, $http, $routeParams, $location, gdocs, keepass) {
 	$scope.masterPassword = "";
 	$scope.busy = false;
+	$scope.fileName = $routeParams.fileTitle;
 
+  //determine current url:
   chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
     if (tabs && tabs.length) {
       var url = tabs[0].url.split('?');
@@ -12,6 +14,10 @@ function MasterPasswordController($scope, $interval, $http, gdocs, keepass) {
       $scope.$apply();
     }
   });
+
+  $scope.chooseAnotherFile = function() {
+    $location.path('/choose-file');
+  }
 
 	$scope.enterMasterPassword = function() {
 	  $scope.clearMessages();
@@ -117,6 +123,6 @@ function MasterPasswordController($scope, $interval, $http, gdocs, keepass) {
   }
 }
 
-MasterPasswordController.$inject = ['$scope', '$interval', '$http', 'gdocs', 'keepass'];
+//MasterPasswordController.$inject = ['$scope', '$interval', '$http', 'gdocs', 'keepass'];
 // For code minifiers.
 

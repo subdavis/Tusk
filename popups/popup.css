@@ -115,13 +115,9 @@ errorMessage.ng-hide-remove {
   animation: fadeIn 1s;
 }
 
-docs.ng-hide-remove {
+ng-view.ng-enter {
   -webkit-animation: fadeInDown 0.3s;
   animation: fadeInDown 0.3s;
 }
 
-passwords.ng-hide-remove {
-  -webkit-animation: fadeInDown 0.3s;
-  animation: fadeInDown 0.3s;
-}
 
