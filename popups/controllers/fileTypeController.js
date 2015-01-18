@@ -1,6 +1,6 @@
 
 
-function FileTypeController($scope, $http, $location) {
+function FileTypeController($scope, $http, $location, $routeParams) {
 
   $scope.chooseGdrive = function() {
     $location.path('/choose-file');

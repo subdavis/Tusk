@@ -30,22 +30,26 @@ keepassApp.factory('pako', function() {
   return pako;
 });
 
-keepassApp.factory('passFileProvider', ['gdocs', function(gdocs) {
-	return new GoogleDrivePasswordFileProvider(gdocs);
+keepassApp.factory('passwordFileStoreFactory', ['gdocs', function(gdocs) {
+	return new PasswordFileStoreFactory(gdocs);
 }]);
 
-keepassApp.factory('keepass', ['passFileProvider', 'pako', function(passFileProvider, pako) {
-	return new Keepass(passFileProvider, pako);
+keepassApp.factory('localStorage', ['passwordFileStoreFactory', function(passwordFileStoreFactory) {
+	return new LocalStorage(passwordFileStoreFactory);
 }]);
 
-keepassApp.controller('dragDropController', ['$scope', '$http', '$location', DragDropController]);
-keepassApp.controller('fileTypeController', ['$scope', '$http', '$location', FileTypeController]);
-keepassApp.controller('startupController', ['$scope', '$http', '$location', 'gdocs', 'keepass', StartupController]);
-keepassApp.controller('docsController', ['$scope', '$http', '$location', 'gdocs', 'keepass', DocsController]);
+keepassApp.factory('keepass', ['pako', 'localStorage', function(pako, localStorage) {
+	return new Keepass(pako, localStorage);
+}]);
+
+keepassApp.controller('dragDropController', ['$scope', '$http', '$location', 'localStorage', DragDropController]);
+keepassApp.controller('fileTypeController', ['$scope', '$http', '$location', '$routeParams', FileTypeController]);
+keepassApp.controller('startupController', ['$scope', '$http', '$location', 'gdocs', 'localStorage', StartupController]);
+keepassApp.controller('docsController', ['$scope', '$http', '$location', 'gdocs', 'localStorage', DocsController]);
 keepassApp.controller('masterPasswordController', ['$scope', '$interval', '$http', '$routeParams', '$location', 'keepass', MasterPasswordController]);
 
 //based on http://blog.parkji.co.uk/2013/08/11/native-drag-and-drop-in-angularjs.html
-passApp.directive('droppable', function() {
+keepassApp.directive('droppable', function() {
   return {
     scope: {
       drop: '&',

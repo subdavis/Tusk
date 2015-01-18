@@ -1,17 +1,12 @@
 
 
-function StartupController($scope, $http, $location, gdocs, keepass) {
+function StartupController($scope, $http, $location, gdocs, localStorage) {
 
   gdocs.auth(false).then(function() {
-  	chrome.storage.sync.get('passwordFile', function(items) {
-  		if (items.passwordFile) {
-  			keepass.setFile(items.passwordFile);
-  		  $location.path('/enter-password/' + items.passwordFile.title);
-  		} else {
-  		  $location.path('/choose-file-type');
-  		}
-  		$scope.$apply();
-  	});
+    return localStorage.getSavedPasswordChoice();
+  }).then(function(fileStore) {
+  	$location.path('/enter-password/' + fileStore.title);
+  	$scope.$apply();
   }).catch(function(err) {
 	  $location.path('/choose-file-type');
 		$scope.$apply();

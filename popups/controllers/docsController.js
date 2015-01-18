@@ -1,14 +1,13 @@
 
 
-function DocsController($scope, $http, $location, gdocs, keepass) {
+function DocsController($scope, $http, $location, gdocs, localStorage) {
 	$scope.docs = [];
 
 	$scope.choosePasswordFile = function(doc) {
-		chrome.storage.sync.set({'passwordFile': doc}, function() {
-  		keepass.setFile(doc);
-  		$location.path('/enter-password/' + doc.title);
+	  localStorage.savePasswordChoice("gdrive", doc).then(function(fileStore) {
+  		$location.path('/enter-password/' + fileStore.title);
   		$scope.$apply();
-		});
+	  });
 	};
 
 	$scope.fetchDocs = function() {

@@ -1,13 +1,12 @@
 
 "use strict";
 
-function Keepass(passFileProvider, pako) {
+function Keepass(pako, localStorage) {
   var my = {
-    fileSet: false
+
   };
 
   var internals = {
-    fileHandle: undefined,
     streamKey: undefined
   }
 
@@ -16,11 +15,6 @@ function Keepass(passFileProvider, pako) {
     new DataView(buffer).setInt16(0, 256, true);
     return new Int16Array(buffer)[0] === 256;
   })();
-
-  my.setFile = function(fileHandle) {
-    internals.fileHandle = fileHandle;
-    my.fileSet = true;
-  }
 
   function readHeader(buf) {
     var position = 12;  //after initial db signature + version
@@ -98,7 +92,9 @@ function Keepass(passFileProvider, pako) {
   }
 
   my.getPasswords = function(masterPassword) {
-    return passFileProvider.getFile(internals.fileHandle).then(function(buf) {
+    return localStorage.getSavedPasswordChoice().then(function(fileStore) {
+      return fileStore.getFile();
+    }).then(function(buf) {
       var h = readHeader(buf);
       if (!h) throw new Error('Failed to read file header');
       if (h.innerRandomStreamId != 2) throw new Error('Invalid Stream Key - Salsa20 is supported by this implementation, Arc4 and others not implemented.')

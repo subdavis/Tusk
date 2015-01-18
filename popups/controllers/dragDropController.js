@@ -1,6 +1,6 @@
 
 
-function DragDropController($scope, $http, $location) {
+function DragDropController($scope, $http, $location, localStorage) {
   $scope.files = [];
 
   $scope.handleDrop = function(filePromises) {
@@ -57,7 +57,10 @@ function DragDropController($scope, $http, $location) {
   };
 
   $scope.choosePasswordFile = function(fi) {
-
+	  localStorage.savePasswordChoice("local", fi).then(function(fileStore) {
+  		$location.path('/enter-password/' + fileStore.title);
+  		$scope.$apply();
+	  });
   };
 
   //chrome.storage.local.clear(function() {
