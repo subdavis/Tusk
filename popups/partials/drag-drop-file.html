@@ -1,16 +1,19 @@
 
-<infoMessage>Drag a KeePass file from your file-system onto the target below:</infoMessage>
 <drop-target droppable drop="handleDrop">
-Drop files here
+To add or update your KeePass file, drag it from your file system or desktop onto this area.
 </drop-target>
-{{success}}
+<errorMessage ng-show="errorMessage">{{errorMessage}}</errorMessage>
+<successMessage ng-show="loadedFiles > 0">{{loadedFiles}} files added or updated.  Files are stored in Chrome, so you won't need to add them again on this device.  Click on the one that you want to use right now.</successMessage>
+
 <fieldset ng-show="files.length">
   <legend>Choose a password file:</legend>
 	<filelist>
 		<ul>
-			<li ng-repeat="file in files" ng-click="choosePasswordFile(file)">
-				{{file.name}}
+			<li ng-repeat="file in files track by file.title" ng-click="choosePasswordFile(file)">
+				{{file.title}} <date>({{file.lastModified | date:short}})</date>
+				<a class="removeFile" title="Remove" ng-click="removePasswordFile(file)"><svg class="icon icon-times-circle"><use xlink:href="#icon-times-circle"></use></svg></a>
 			</li>
 		</ul>
 	</filelist>
 </fieldset>
+

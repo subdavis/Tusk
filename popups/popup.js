@@ -44,37 +44,8 @@ keepassApp.controller('startupController', ['$scope', '$http', '$location', 'gdo
 keepassApp.controller('docsController', ['$scope', '$http', '$location', 'gdocs', 'keepass', DocsController]);
 keepassApp.controller('masterPasswordController', ['$scope', '$interval', '$http', '$routeParams', '$location', 'keepass', MasterPasswordController]);
 
-//http://blog.parkji.co.uk/2013/08/11/native-drag-and-drop-in-angularjs.html
-keepassApp.directive('draggable', function() {
-  return function(scope, element) {
-    // this gives us the native JS object
-    var el = element[0];
-
-    el.draggable = true;
-
-    el.addEventListener(
-      'dragstart',
-      function(e) {
-        e.dataTransfer.effectAllowed = 'move';
-        e.dataTransfer.setData('Text', this.id);
-        this.classList.add('drag');
-        return false;
-      },
-      false
-    );
-
-    el.addEventListener(
-      'dragend',
-      function(e) {
-        this.classList.remove('drag');
-        return false;
-      },
-      false
-    );
-  }
-});
-
-keepassApp.directive('droppable', function() {
+//based on http://blog.parkji.co.uk/2013/08/11/native-drag-and-drop-in-angularjs.html
+passApp.directive('droppable', function() {
   return {
     scope: {
       drop: '&',

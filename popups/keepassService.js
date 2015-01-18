@@ -7,7 +7,7 @@ function Keepass(passFileProvider, pako) {
   };
 
   var internals = {
-    url: "",
+    fileHandle: undefined,
     streamKey: undefined
   }
 
@@ -17,8 +17,8 @@ function Keepass(passFileProvider, pako) {
     return new Int16Array(buffer)[0] === 256;
   })();
 
-  my.setFile = function(url) {
-    internals.url = url;
+  my.setFile = function(fileHandle) {
+    internals.fileHandle = fileHandle;
     my.fileSet = true;
   }
 
@@ -98,7 +98,7 @@ function Keepass(passFileProvider, pako) {
   }
 
   my.getPasswords = function(masterPassword) {
-    return passFileProvider.getFile(internals.url).then(function(buf) {
+    return passFileProvider.getFile(internals.fileHandle).then(function(buf) {
       var h = readHeader(buf);
       if (!h) throw new Error('Failed to read file header');
       if (h.innerRandomStreamId != 2) throw new Error('Invalid Stream Key - Salsa20 is supported by this implementation, Arc4 and others not implemented.')

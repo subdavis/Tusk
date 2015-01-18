@@ -5,7 +5,7 @@ function DocsController($scope, $http, $location, gdocs, keepass) {
 
 	$scope.choosePasswordFile = function(doc) {
 		chrome.storage.sync.set({'passwordFile': doc}, function() {
-  		keepass.setFile(doc.url);
+  		keepass.setFile(doc);
   		$location.path('/enter-password/' + doc.title);
   		$scope.$apply();
 		});
