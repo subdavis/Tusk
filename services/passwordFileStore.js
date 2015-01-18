@@ -1,10 +1,26 @@
-
 "use strict";
 
 /**
+ * This file has a factory plus the instances that it can create.
+ *
  * Angular DI only does constructor injection resulting in singletons, and we need to
- * be able to choose based on user action.  So, a plain ol' custom factory:
+ * be able to switch, i.e. singletons won't work.  So, a plain ol' vanilla factory method.
+ *
+ * The factory returns an instance based on a key.
+ *
+ * Each instance is responsible for retrieving a password-file from its particular storage.
+ *
+ * Instance parameters:
+ *  - fi, fileHandle = file info.  provider-specific, i.e. no guarantees on what properties it has
+ *
+ * Instance properties:
+ *  - title = title of the file
+ *
+ * Instance methods:
+ *  - getFile() - retrieves the file
  */
+
+
 function PasswordFileStoreFactory(gdocs) {
   var my = {
 

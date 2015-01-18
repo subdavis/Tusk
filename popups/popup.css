@@ -173,10 +173,13 @@ drop-target {
   cursor: copy;
   text-align: center;
   color: rgba(0,0,0,0.5);
+  transition: all 250ms;
 }
 
 drop-target.over {
   background: rgba(0,128,255,0.2);
+  -webkit-animation: pulse 1s infinite;
+  animation: pulse 1s infinite;
 }
 
 filelist li.ng-leave {
