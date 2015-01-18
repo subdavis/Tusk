@@ -9,4 +9,6 @@ function FileTypeController($scope, $http, $location, $routeParams) {
   $scope.chooseDragDrop = function() {
     $location.path('/drag-drop-file');
   }
+
+  $scope.ingognito = chrome.extension.inIncognitoContext;
 }

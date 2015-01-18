@@ -41,6 +41,7 @@ THE SOFTWARE.
  *
  * Instance properties:
  *  - title = title of the file
+ *  - supportsIngognito = works in ingognito mode
  *
  * Instance methods:
  *  - getFile() - retrieves the file
@@ -72,7 +73,8 @@ function PasswordFileStoreFactory(gdocs) {
  */
 function GoogleDrivePasswordFileProvider(gdocs, fileHandle) {
   var my = {
-    title: fileHandle.title
+    title: fileHandle.title,
+    supportsIngognito: false
   };
 
   function getFile() {
@@ -95,7 +97,8 @@ function GoogleDrivePasswordFileProvider(gdocs, fileHandle) {
  */
 function LocalChromePasswordFileProvider(fi) {
   var my = {
-    title: fi.title
+    title: fi.title,
+    supportsIngognito: false
   };
 
   function getFile() {

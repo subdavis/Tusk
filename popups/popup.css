@@ -176,7 +176,7 @@ drop-target {
   transition: all 250ms;
 }
 
-drop-target.over {
+drop-target.over, .over drop-target {
   background: rgba(0,128,255,0.2);
   -webkit-animation: pulse 1s infinite;
   animation: pulse 1s infinite;

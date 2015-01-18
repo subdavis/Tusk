@@ -1,22 +1,25 @@
 
-<drop-target droppable drop="handleDrop">
-To add or update your KeePass file, drag it from your file system or desktop onto this area.
-</drop-target>
-<errorMessage ng-show="errorMessage">{{errorMessage}}</errorMessage>
-<successMessage ng-show="loadedFiles > 0">
-  <ng-pluralize count="loadedFiles" when="{'one': '1 file added or updated.', 'other': '{} files added or updated.'}"></ng-pluralize>
-  Files are stored in Chrome, so you won't need to add them again on this device.  Click on the one that you want to use right now.
-</successMessage>
+<div droppable drop="handleDrop">
+  <drop-target>
+  To add or update your KeePass file, drag it from your file system or desktop onto this area.
+  </drop-target>
+  <errorMessage ng-show="errorMessage">{{errorMessage}}</errorMessage>
+  <successMessage ng-show="loadedFiles > 0">
+    <ng-pluralize count="loadedFiles" when="{'one': '1 file added or updated.', 'other': '{} files added or updated.'}"></ng-pluralize>
+    Files are stored in Chrome, so you won't need to add them again on this device.  Click on the one that you want to use right now.
+  </successMessage>
 
-<fieldset ng-show="files.length">
-  <legend>Choose a password file:</legend>
-	<filelist>
-		<ul>
-			<li ng-repeat="file in files track by file.title" ng-click="choosePasswordFile(file)">
-				{{file.title}} <date>({{file.lastModified | date:short}})</date>
-				<a class="removeFile" title="Remove" ng-click="removePasswordFile(file)"><svg class="icon icon-times-circle"><use xlink:href="#icon-times-circle"></use></svg></a>
-			</li>
-		</ul>
-	</filelist>
-</fieldset>
+  <infoMessage ng-show="!files.length">Leave this window open, then go to your desktop and find your password file.  Once you have found it, drag it back onto this window.</infoMessage>
+  <fieldset ng-show="files.length">
+    <legend>Choose a password file:</legend>
+  	<filelist>
+  		<ul>
+  			<li ng-repeat="file in files track by file.title" ng-click="choosePasswordFile(file)">
+  				{{file.title}} <date>({{file.lastModified | date:short}})</date>
+  				<a class="removeFile" title="Remove" ng-click="removePasswordFile(file)"><svg class="icon icon-times-circle"><use xlink:href="#icon-times-circle"></use></svg></a>
+  			</li>
+  		</ul>
+  	</filelist>
+  </fieldset>
 
+</div>

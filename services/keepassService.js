@@ -118,6 +118,9 @@ function Keepass(pako, localStorage) {
 
   my.getPasswords = function(masterPassword) {
     return localStorage.getSavedPasswordChoice().then(function(fileStore) {
+      if (chrome.extension.inIncognitoContext && !fileStore.supportsIngognito) {
+        throw new Error('Unable to access this password file in ingognito mode due to Chrome security restrictions.');
+      }
       return fileStore.getFile();
     }).then(function(buf) {
       var h = readHeader(buf);

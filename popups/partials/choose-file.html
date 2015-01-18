@@ -1,6 +1,8 @@
 <docs class="pure-form">
-	<infoMessage ng-hide="authorized()"><p>This extension works with your already-existing KeePass (.kdbx) files stored in your google drive.  Click the button below to login to your drive.</p>
-	<p>Chrome will ask you to allow this extension to access the Google Drive websites, and Google Drive will ask you to allow this extension to read your files.</p></infoMessage>
+	<infoMessage ng-hide="authorized()"><p>If you have already-existing KeePass (.kdbx) files stored in your google drive, then you can access them.</p>
+	<p>Chrome will ask you to allow this extension to access the Google Drive websites, and Google Drive will ask you to allow this extension to read your files.</p>
+	<p>Note that you will not be able to access your password files on Google Drive when in Ingognito mode.</p>
+	</infoMessage>
 	<button class="pure-button" ng-hide="authorized()" ng-click="authorize()"><svg class="icon icon-google"><use xlink:href="#icon-google"></use></svg>Authorize</button>
 	<button class="pure-button" ng-click="fetchDocs(false)" ng-show="authorized()"><svg class="icon icon-google"><use xlink:href="#icon-google"></use></svg>Refresh</button>
 	<button class="pure-button" ng-show="authorized()" ng-click="logout()"><svg class="icon icon-lock"><use xlink:href="#icon-lock"></use></svg>Deauthorize</button>

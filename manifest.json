@@ -1,6 +1,6 @@
 {
 	"name": "ChromeKeePass",
-	"version": "2015.1.18",
+	"version": "2015.1.18.1",
 	"manifest_version": 2,
 	"minimum_chrome_version": "37",
 
@@ -23,7 +23,7 @@
             "19": "icons/lock2_19.png",
             "38": "icons/lock2_38.png"
           },
-          "default_title": "Password field detected.  Click here to access your password file.",
+          "default_title": "Password field detected.  Click here to access your KeePass passwords.",
 		      "default_popup": "popups/popup.html"
         },
 

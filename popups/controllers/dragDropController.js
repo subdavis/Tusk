@@ -54,6 +54,7 @@ function DragDropController($scope, $http, $location, localStorage) {
     });
 
     chrome.storage.local.set({"passwordFiles": $scope.files });
+    $scope.loadedFiles = 0;
   };
 
   $scope.choosePasswordFile = function(fi) {
