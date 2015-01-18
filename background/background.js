@@ -3,23 +3,24 @@
   (they will be lost)
 */
 
-function addRules() {
-  var passwordField = {conditions: [
-    new chrome.declarativeContent.PageStateMatcher({
-        css: ["input[type='password']"]
-      })
-    ],
-    actions: [ new chrome.declarativeContent.ShowPageAction() ]
-  };
-  chrome.declarativeContent.onPageChanged.addRules([passwordField]);
+if (chrome.extension.inIncognitoContext) {
+  doReplaceRules();
+} else {
+  chrome.runtime.onInstalled.addListener(doReplaceRules);
 }
 
-//addRules();
-chrome.runtime.onInstalled.addListener(function(details) {
+function doReplaceRules() {
   chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
-    addRules();
+    var passwordField = {conditions: [
+      new chrome.declarativeContent.PageStateMatcher({
+          css: ["input[type='password']"]
+        })
+      ],
+      actions: [ new chrome.declarativeContent.ShowPageAction() ]
+    };
+    chrome.declarativeContent.onPageChanged.addRules([passwordField]);
   });
-});
+}
 
 chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 	if (!message || !message.m) return;  //message format unrecognized
