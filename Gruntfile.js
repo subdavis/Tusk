@@ -7,7 +7,7 @@ module.exports = function(grunt) {
     uglify: {
       options: {
         banner: '/*! <%= pkg.name %>, '
-          + ' Copyright <%= grunt.template.today("yyyy") %> Steven Campbell\n'
+          + 'Copyright <%= grunt.template.today("yyyy") %> Steven Campbell\n'
           + '*/\n',
         mangle: false,
         preserveComments: 'some'
@@ -20,6 +20,20 @@ module.exports = function(grunt) {
           {expand: true, src: 'options/**/*.js', dest:'build/'},
           {expand: true, src: ['*.js', '!Gruntfile.js'], dest:'build/'}
           ]
+      }
+    },
+    less: {
+      target: {
+        options: {
+          ieCompat: false,
+          banner: '/*! <%= pkg.name %>, '
+            + 'Copyright <%= grunt.template.today("yyyy") %> Steven Campbell\n'
+            + '    This file is generated.\n'
+            + '*/\n',
+        },
+        files: {
+          "popups/popup.css": "popups/popup.less"
+        }
       }
     },
     cssmin: {
@@ -50,7 +64,15 @@ module.exports = function(grunt) {
           {expand: true, src: 'license.txt', dest: '/'},
           ]
       }
+    },
+    watch: {
+      less: {
+        files: ['**/*.less'],
+        tasks: ['less'],
+        options: {
 
+        }
+      }
     }
   });
 
@@ -62,9 +84,11 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-htmlmin');
   grunt.loadNpmTasks('grunt-contrib-cssmin');
+  grunt.loadNpmTasks('grunt-contrib-less');
 
   // Default task(s).
   grunt.registerTask('default', ['clean']);
-  grunt.registerTask('package', ['clean', 'uglify', 'cssmin', 'htmlmin', 'compress']);
+  grunt.registerTask('package', ['clean', 'uglify', 'less', 'cssmin', 'htmlmin', 'compress']);
+  //grunt.registerTask('styles', ['watch']);
 
 };

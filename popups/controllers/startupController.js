@@ -10,6 +10,9 @@ function StartupController($scope, $http, $location, gdocs, localStorage) {
 		$scope.$apply();
   })
 
+  //trigger gdocs auth - doesn't matter if it succeeds or fails, we just want a token ready to go
+  gdocs.auth();
+
 }
 
 

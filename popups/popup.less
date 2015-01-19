@@ -1,0 +1,255 @@
+@blue-bg: rgba(0, 120, 231, 0.8);
+@yellow-bg: rgba(255, 255, 100, 0.1);
+@green-bg: rgba(100, 220, 100, 0.5);
+@red-bg: #B71C1C;
+@light-blue-bg: rgba(0,128,255,0.2);
+@light-grey-bg: #eee;
+@light-grey-text: rgba(255,255,255,0.9);
+@dark-grey-text: rgba(0,0,0,0.9);
+@red-icon: rgba(255, 128, 128, 0.5);
+@grey-icon: #444444;
+
+.transition {
+  transition: all 250ms ease 0s;
+}
+
+.BoxShadowHelper(@level: 1){
+  & when (@level = 1) {
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  }
+  & when (@level = 2) {
+    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+  }
+  & when (@level = 3) {
+    box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+  }
+  & when (@level = 4) {
+    box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+  }
+  & when (@level = 5) {
+    box-shadow: 0 19px 38px rgba(0,0,0,0.30), 0 15px 12px rgba(0,0,0,0.22);
+  }
+}
+
+.BorderedMessage(@bg-color: @light-grey-bg, @border-width: 2px) {
+  background: @bg-color;
+  display: block;
+  padding: 4px;
+  border: solid @border-width darken(fadein(@bg-color, 30%), 10%);
+  margin: 4px 0;
+  color: contrast(@bg-color, @dark-grey-text, @light-grey-text, 30%);
+
+  &:hover {
+  }
+}
+
+html, body {
+  margin: 0;
+  color: @dark-grey-text;
+}
+
+body {
+  width: 400px;
+  padding: 16px;
+  overflow: hidden;
+  text-rendering: optimizeLegibility;
+}
+
+ng-view {
+  display: block;
+
+  &.ng-enter {
+    -webkit-animation: fadeInDown 0.3s;
+    animation: fadeInDown 0.3s;
+  }
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+
+  li {
+    list-style-type: none;
+  }
+}
+
+.icon {
+	display: inline-block;
+	color: @grey-icon;
+	fill: currentColor;
+  .transition
+}
+
+fieldset {
+  margin-top: 8px;
+
+  &.ng-hide-add {
+    -webkit-animation: zoomOut 0.3s;
+    animation: zoomOut 0.3s;
+  }
+}
+
+filelist, passwordMatches {
+  ul {
+    overflow: auto;
+
+    li {
+      border: 1px solid fadein(@light-grey-bg, 30%);
+      background: @light-grey-bg;
+      padding: 4px;
+      margin: 4px 0;
+      display: block;
+      cursor: pointer;
+      list-style-type: none;
+      text-align: center;
+      .transition;
+
+      &:hover {
+        .BoxShadowHelper(1);
+        background: @light-blue-bg;
+        border-color: fadein(@light-blue-bg, 30%);
+      }
+
+      date {
+        font-size: 0.8em;
+        color: lighten(@dark-grey-text, 30%);
+      }
+
+      .removeFile {
+        float: right;
+
+        .icon {
+          width: 18px;
+          height: 18px;
+          color: @red-icon;
+
+          &:hover {
+            color: darken(@red-icon, 20%);
+          }
+        }
+      }
+
+      &.ng-leave {
+        -webkit-animation: zoomOut 0.3s;
+        animation: zoomOut 0.3s;
+      }
+
+      &.ng-enter {
+        -webkit-animation: zoomIn 0.5s;
+        animation: zoomIn 0.5s;
+      }
+    }
+  }
+}
+
+button .icon {
+  width: 19px;
+  height: 19px;
+  vertical-align: text-top;
+  padding-right: 4px;
+}
+
+.pure-table {
+  font-size: small;
+  margin-top: 8px;
+  width: 100%;
+
+  td .icon {
+    width: 19px;
+    height: 19px;
+
+    &:hover {
+      color: lighten(@grey-icon, 50%);
+    }
+  }
+}
+
+statusMessage {
+  display: block;
+  padding: 4px 0;
+  font-weight: 600;
+}
+
+pageInfo {
+  .BorderedMessage(@light-grey-bg, 2px);
+  font-weight: 600;
+}
+
+passwordMatches {
+  display: block;
+  max-height: 150px;
+  overflow-y: scroll;
+}
+
+successMessage {
+  margin-top: 8px;
+  .BorderedMessage(@green-bg, 2px);
+}
+
+busyMessage, infoMessage {
+  .BorderedMessage(@yellow-bg, 1px);
+  font-weight: 600;
+  .BoxShadowHelper(1);
+}
+
+errorMessage {
+  .BorderedMessage(@red-bg, 2px);
+}
+
+fileTypes {
+  display: block;
+  margin-bottom: 60px;
+
+  fileType {
+    display: block;
+    height: 70px;
+    margin: 8px;
+    padding: 8px;
+    cursor: pointer;
+    border: solid 1px fadein(@light-grey-bg, 30%);
+    background: @light-grey-bg;
+    text-align: center;
+    .BoxShadowHelper(1);
+    .transition;
+
+    &:hover {
+      .BoxShadowHelper(3);
+      background: @light-blue-bg;
+      border: solid 1px fadein(@light-blue-bg, 30%);
+
+      .icon {
+        -webkit-animation: tada 1s;
+        animation: tada 1s;
+        color: @blue-bg;
+      }
+    }
+
+    .icon {
+      display: block;
+      margin: auto;
+      width: 30px;
+      height: 30px;
+      padding-bottom: 8px;
+    }
+  }
+}
+
+drop-target {
+  display: block;
+  height: 60px;
+  padding: 8px;
+  margin: 8px 0;
+  border: dashed 3px rgba(0,0,0,0.5);
+  cursor: copy;
+  text-align: center;
+  color: rgba(0,0,0,0.5);
+  transition: all 250ms;
+
+  &.over, .over & {
+    background: rgba(0,128,255,0.2);
+    -webkit-animation: pulse 1s infinite;
+    animation: pulse 1s infinite;
+  }
+}
+
+
