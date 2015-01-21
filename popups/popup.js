@@ -73,6 +73,64 @@ keepassApp.controller('startupController', ['$scope', '$http', '$location', 'gdo
 keepassApp.controller('docsController', ['$scope', '$http', '$location', 'gdocs', 'localStorage', DocsController]);
 keepassApp.controller('masterPasswordController', ['$scope', '$interval', '$http', '$routeParams', '$location', 'keepass', MasterPasswordController]);
 
+keepassApp.directive('icon', function() {
+    function link(scope, element, attrs) {
+      function renderSVG() {
+        var icon = element.scope()[attrs.p];  //evaluate as scope expression
+        if (!icon)
+          icon = attrs.p;
+        var html = '<svg class="icon ' + icon + '"><use xlink:href="#' + icon + '"></use></svg>';
+        element.replaceWith( html );
+      }
+
+      renderSVG();
+    }
+
+    return {
+      link: link,
+      restrict: 'E'
+    };
+});
+
+//quick and dirty directive for file upload, based on answers from
+// http://stackoverflow.com/questions/17922557/angularjs-how-to-check-for-changes-in-file-input-fields
+keepassApp.directive('fileChange', function() {
+  return {
+    restrict: "A",
+    link: function (scope, element, attrs) {
+      var onChangeFunc = element.scope()[attrs.fileChange];
+      element.bind('change', function(e) {
+        var files = e.target.files;
+        var loadedFiles = [];
+        for (var i = 0, f; f = files[i]; i++) {
+          // Read the File objects in this FileList.
+          var loadedFile = new Promise(function(resolve, reject) {
+            var reader = new FileReader();
+
+            reader.onloadend = (function(theFile) {
+              return function(e) {
+                resolve({data: e.target.result, file: theFile});
+              };
+            })(f);
+
+            reader.onerror = reader.onabort = (function(theFile) {
+              return function(e) {
+                reject(new Error("File upload failed"));
+              };
+            })(f);
+
+            reader.readAsArrayBuffer(f);
+          });
+
+          loadedFiles.push(loadedFile);
+        }
+
+        onChangeFunc(loadedFiles);
+      });
+    }
+  };
+});
+
 //based on http://blog.parkji.co.uk/2013/08/11/native-drag-and-drop-in-angularjs.html
 keepassApp.directive('droppable', function() {
   return {

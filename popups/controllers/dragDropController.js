@@ -3,6 +3,10 @@
 function DragDropController($scope, $http, $location, localStorage) {
   $scope.files = [];
 
+  $scope.selectFile = function() {
+    document.getElementById('file').click();
+  };
+
   $scope.handleDrop = function(filePromises) {
     $scope.errorMessage = "";
     $scope.loadedFiles = 0;

@@ -11,4 +11,9 @@ function FileTypeController($scope, $http, $location, $routeParams) {
   }
 
   $scope.ingognito = chrome.extension.inIncognitoContext;
+
+  $scope.os = {};
+  chrome.runtime.getPlatformInfo(function(info) {
+    $scope.os[info.os] = true;
+  });
 }

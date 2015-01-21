@@ -2,9 +2,11 @@
 <div droppable drop="handleDrop">
   <drop-target>
   To add or update your KeePass file, drag it from your file system or desktop onto this area.
+  <p>Alternatively, click the button below to choose a file to upload</p>
   </drop-target>
+  <input type="file" style="display:none" id="file" name='file' file-change="handleDrop" multiple />
+  or... <button class="pure-button pure-button-primary" ng-click="selectFile()">Choose File to Upload</button>
   <errorMessage ng-show="errorMessage">{{errorMessage}}</errorMessage>
-  <infoMessage ng-show="!files.length">Leave this window open, then go to your desktop and find your password file.  Once you have found it, drag it back onto this window.</infoMessage>
   <fieldset ng-show="files.length">
     <legend>Choose a password file:</legend>
   	<filelist>

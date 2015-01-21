@@ -5,14 +5,14 @@
 
     <div class="pure-u-1-3" ng-hide="ingognito">
       <fileType ng-click="chooseGdrive()" ng-mouseenter="description='Access password files stored on your Google Drive.  The files will be fetched from Google Drive each time they are used.'" ng-mouseleave="description=''">
-        <svg class="icon icon-google"><use xlink:href="#icon-google"></use></svg>
+        <icon p="icon-google"></icon>
         <span>Google Drive</span>
       </fileType>
     </div>
     <div class="pure-u-1-3">
       <fileType ng-click="chooseDragDrop()" ng-mouseenter="description='Add files from your desktop.  The files will be saved in Chrome local storage.'" ng-mouseleave="description=''">
-        <svg class="icon icon-arrows"><use xlink:href="#icon-arrows"></use></svg>
-        <span>Drag and Drop</span>
+        <icon p="icon-upload"></icon>
+        <span>Upload to Chrome</span>
       </fileType>
     </div>
     <!--
