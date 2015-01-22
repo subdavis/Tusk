@@ -4,6 +4,8 @@ function MasterPasswordController($scope, $interval, $http, $routeParams, $locat
 	$scope.masterPassword = "";
 	$scope.busy = false;
 	$scope.fileName = $routeParams.fileTitle;
+	$scope.keyFileName = "";
+  var fileKey = undefined;
 
   //determine current url:
   chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
@@ -15,6 +17,29 @@ function MasterPasswordController($scope, $interval, $http, $routeParams, $locat
     }
   });
 
+  $scope.selectFile = function() {
+    document.getElementById('file').click();
+  };
+
+  $scope.handleKeyFile = function(filePromises) {
+    if (filePromises.length != 1) {
+      return;
+    }
+
+    filePromises[0].then(function(info) {
+      var bytes = info.data;
+      $scope.keyFileName = info.file.name;
+
+      return keepass.getKeyFromFile(info.data);
+    }).then(function(key) {
+      fileKey = key;
+    }).catch(function(err) {
+      $scope.errorMessage = err.message;
+    }).then(function() {
+      $scope.$apply();
+    });
+  }
+
   $scope.chooseAnotherFile = function() {
     $location.path('/choose-file-type');
   }
@@ -22,7 +47,7 @@ function MasterPasswordController($scope, $interval, $http, $routeParams, $locat
 	$scope.enterMasterPassword = function() {
 	  $scope.clearMessages();
 	  $scope.busy = true;
-	  keepass.getPasswords($scope.masterPassword).then(function(entries) {
+	  keepass.getPasswords($scope.masterPassword, fileKey).then(function(entries) {
 	    var url = parseUrl($scope.url);
 	    var siteTokens = (url.hostname + "." + $scope.title).toLowerCase().split(/\.|\s|\//);
 	    entries.forEach(function(entry) {

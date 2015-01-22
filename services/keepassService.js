@@ -116,7 +116,42 @@ function Keepass(pako, localStorage) {
     return h;
   }
 
-  my.getPasswords = function(masterPassword) {
+  function hex2arr(hex) {
+    try {
+      var arr = [];
+      for (var i = 0; i < hex.length; i += 2)
+          arr.push(parseInt(hex.substr(i, 2), 16));
+      return arr;
+    } catch(err) {
+      return [];
+    }
+  }
+
+  my.getKeyFromFile = function(keyFileBytes) {
+    var arr = new Uint8Array(keyFileBytes);
+    if (arr.byteLength == 0) {
+      throw new Error('key file has zero bytes');
+    } else if (arr.byteLength == 32) {
+      //file content is the key
+      return arr;
+    } else if (arr.byteLength == 64) {
+      //file content may be a hex string of the key
+      var decoder = new TextDecoder();
+      var hexString = decoder.decode(arr);
+      var newArr = hex2arr(hexString);
+      if (newArr.length == 32) {
+        return newArr;
+      }
+    }
+
+    var SHA = {
+      name: "SHA-256"
+    };
+
+    return window.crypto.subtle.digest(SHA, arr);
+  }
+
+  my.getPasswords = function(masterPassword, fileKey) {
     return localStorage.getSavedPasswordChoice().then(function(fileStore) {
       if (chrome.extension.inIncognitoContext && !fileStore.supportsIngognito) {
         throw new Error('Unable to access this password file in ingognito mode due to Chrome security restrictions.');
@@ -137,14 +172,33 @@ function Keepass(pako, localStorage) {
         iv: h.iv
       };
 
-      //console.log('password is ' + masterPassword);
-      var encoder = new TextEncoder();
-      var masterKey = encoder.encode(masterPassword);
+      var p;
+      if (masterPassword && fileKey) {
+        //both
+        var encoder = new TextEncoder();
+        var masterKey = encoder.encode(masterPassword);
 
-      //console.log(masterKey);
-      return window.crypto.subtle.digest(SHA, masterKey).then(function(masterKey) {
-        return window.crypto.subtle.digest(SHA, masterKey);
-      }).then(function(masterKey) {
+        p = window.crypto.subtle.digest(SHA, masterKey).then(function(masterKeyHash) {
+          var combinedKeySource = new Uint8Array(64);
+          combinedKeySource.set(new Uint8Array(masterKeyHash));
+          combinedKeySource.set(new Uint8Array(fileKey), 32);
+
+          return window.crypto.subtle.digest(SHA, combinedKeySource);
+        });
+      } else if (fileKey) {
+        //keyfile only
+        p = Promise.resolve(fileKey);
+      } else {
+        //password only
+        var encoder = new TextEncoder();
+        var masterKey = encoder.encode(masterPassword);
+
+        p = window.crypto.subtle.digest(SHA, masterKey).then(function(masterKey) {
+          return window.crypto.subtle.digest(SHA, masterKey);
+        });
+      }
+
+      return p.then(function(masterKey) {
         //transform master key thousands of times
         return aes_ecb_encrypt(h.transformSeed, masterKey, h.keyRounds);
       }).then(function(finalVal) {
