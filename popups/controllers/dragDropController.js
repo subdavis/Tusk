@@ -2,6 +2,11 @@
 
 function DragDropController($scope, $http, $location, localStorage) {
   $scope.files = [];
+  $scope.allowDrop = true;
+
+  chrome.runtime.getPlatformInfo(function(info) {
+    $scope.allowDrop = (info.os == "cros");  //does not work on some platforms because the popup closes.  Windows is 50-50, some PCs are a problem some not
+  });
 
   $scope.selectFile = function() {
     document.getElementById('file').click();
