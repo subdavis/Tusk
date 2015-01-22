@@ -179,15 +179,19 @@ function Keepass(pako, localStorage) {
         var masterKey = encoder.encode(masterPassword);
 
         p = window.crypto.subtle.digest(SHA, masterKey).then(function(masterKeyHash) {
-          var combinedKeySource = new Uint8Array(64);
-          combinedKeySource.set(new Uint8Array(masterKeyHash));
-          combinedKeySource.set(new Uint8Array(fileKey), 32);
+          var compositeKeySource = new Uint8Array(64);
+          compositeKeySource.set(new Uint8Array(masterKeyHash));
+          compositeKeySource.set(new Uint8Array(fileKey), 32);
 
-          return window.crypto.subtle.digest(SHA, combinedKeySource);
+          return window.crypto.subtle.digest(SHA, compositeKeySource);
         });
       } else if (fileKey) {
         //keyfile only
-        p = Promise.resolve(fileKey);
+        p = window.crypto.subtle.digest(SHA, new Uint8Array(fileKey));
+        //p = Promise.resolve(new Uint8Array(fileKey));
+        //p = window.crypto.subtle.digest(SHA, new Uint8Array(fileKey)).then(function(masterKey) {
+        //  return window.crypto.subtle.digest(SHA, masterKey);
+        //});
       } else {
         //password only
         var encoder = new TextEncoder();

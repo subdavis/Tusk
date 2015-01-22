@@ -85,10 +85,10 @@ function MasterPasswordController($scope, $interval, $http, $routeParams, $locat
 	      $scope.successMessage = "";
 	    }
 	    $scope.busy = false;
-	    $scope.$apply();
 	  }).catch(function(err) {
-	    $scope.errorMessage = err.message || "Incorrect password";
+	    $scope.errorMessage = err.message || "Incorrect password or key file";
 	    $scope.busy = false;
+	  }).then(function() {
 	    $scope.$apply();
 	  });
 	};
