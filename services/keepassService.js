@@ -151,6 +151,34 @@ function Keepass(pako, localStorage) {
     return window.crypto.subtle.digest(SHA, arr);
   }
 
+  my.getKey = function(masterPassword, fileKey) {
+    var partPromises = [];
+    var SHA = {
+      name: "SHA-256"
+    };
+
+    if (masterPassword) {
+      var encoder = new TextEncoder();
+      var masterKey = encoder.encode(masterPassword);
+
+      var p = window.crypto.subtle.digest(SHA, new Uint8Array(masterKey));
+      partPromises.push(p);
+    }
+
+    if (fileKey) {
+      partPromises.push(Promise.resolve(fileKey));
+    }
+
+    return Promise.all(partPromises).then(function(parts) {
+      var compositeKeySource = new Uint8Array(32 * parts.length);
+      for(var i=0; i<parts.length; i++) {
+        compositeKeySource.set(new Uint8Array(parts[i]), i*32);
+      }
+
+      return window.crypto.subtle.digest(SHA, compositeKeySource);
+    });
+  }
+
   my.getPasswords = function(masterPassword, fileKey) {
     return localStorage.getSavedPasswordChoice().then(function(fileStore) {
       if (chrome.extension.inIncognitoContext && !fileStore.supportsIngognito) {
@@ -172,37 +200,9 @@ function Keepass(pako, localStorage) {
         iv: h.iv
       };
 
-      var p;
-      if (masterPassword && fileKey) {
-        //both
-        var encoder = new TextEncoder();
-        var masterKey = encoder.encode(masterPassword);
+      var compositeKeyPromise = my.getKey(masterPassword, fileKey);
 
-        p = window.crypto.subtle.digest(SHA, masterKey).then(function(masterKeyHash) {
-          var compositeKeySource = new Uint8Array(64);
-          compositeKeySource.set(new Uint8Array(masterKeyHash));
-          compositeKeySource.set(new Uint8Array(fileKey), 32);
-
-          return window.crypto.subtle.digest(SHA, compositeKeySource);
-        });
-      } else if (fileKey) {
-        //keyfile only
-        p = window.crypto.subtle.digest(SHA, new Uint8Array(fileKey));
-        //p = Promise.resolve(new Uint8Array(fileKey));
-        //p = window.crypto.subtle.digest(SHA, new Uint8Array(fileKey)).then(function(masterKey) {
-        //  return window.crypto.subtle.digest(SHA, masterKey);
-        //});
-      } else {
-        //password only
-        var encoder = new TextEncoder();
-        var masterKey = encoder.encode(masterPassword);
-
-        p = window.crypto.subtle.digest(SHA, masterKey).then(function(masterKey) {
-          return window.crypto.subtle.digest(SHA, masterKey);
-        });
-      }
-
-      return p.then(function(masterKey) {
+      return compositeKeyPromise.then(function(masterKey) {
         //transform master key thousands of times
         return aes_ecb_encrypt(h.transformSeed, masterKey, h.keyRounds);
       }).then(function(finalVal) {
@@ -331,51 +331,33 @@ function Keepass(pako, localStorage) {
     });
   }
 
-  /**
-   * ECB encryption has no native support, but we can fake it easy enough with CBC
-   */
   function aes_ecb_encrypt(rawKey, data, rounds) {
     var data = new Uint8Array(data);
-
-    //Simulate ECB encryption by using IV of 0 and only one block.
-    var AES = {
-      name: "AES-CBC",
-        iv: new Uint8Array(16)
-    };  //iv is intentionally 0, to simulate the ECB
-
-    return window.crypto.subtle.importKey("raw", rawKey, AES, false, ["encrypt"]).then(function(secureKey) {
-      //AES block size is 16 bytes = 128 bits.  Data must be broken into 16 byte blocks
-      var blockCount = data.byteLength / 16;
-      var arr = new Array(rounds - 1);
-      for(var i=0; i<rounds - 1; i++)
-        arr[i] = i;  //reduce ignores holes in the array, so we have to specify each
-
-      var blockPromises = new Array(blockCount);
-      for (var i = 0; i<blockCount; i++) {
-        var firstBlock = data.subarray(i * 16, i * 16 + 16);
-        blockPromises[i] = arr.reduce(function(prev, curr) {
-          return prev.then(function(newBlock) {
-            return aes_ecb_encrypt_block(AES, secureKey, newBlock);
-          });
-        }, aes_ecb_encrypt_block(AES, secureKey, firstBlock));
+    //Simulate ECB encryption by using IV of the data.
+    var blockCount = data.byteLength / 16;
+    var blockPromises = new Array(blockCount);
+    for(var i=0; i<blockCount; i++) {
+      var block = data.subarray(i * 16, i * 16 + 16);
+      blockPromises[i] = (function(iv) {
+        var AES = {
+          name: "AES-CBC",
+            iv: iv
+        };
+        return window.crypto.subtle.importKey("raw", rawKey, AES, false, ["encrypt"]).then(function(secureKey) {
+          var fakeData = new Uint8Array(rounds * 16);
+          return window.crypto.subtle.encrypt(AES, secureKey, fakeData);
+        }).then(function(result) {
+          return new Uint8Array(result, (rounds - 1) * 16, 16);
+        });
+      })(block);
+    }
+    return Promise.all(blockPromises).then(function(blocks) {
+      //we now have the blocks, so chain them back together
+      var result = new Uint8Array(data.byteLength);
+      for (var i=0; i<blockCount; i++) {
+        result.set(blocks[i], i * 16);
       }
-
-      return Promise.all(blockPromises).then(function(blocks) {
-        //we now have the blocks, so chain them back together
-        var result = new Uint8Array(data.byteLength);
-        for (var i=0; i<blockCount; i++) {
-          result.set(blocks[i], i * 16);
-        }
-
-        return result;
-      });
-    });
-  }
-
-  function aes_ecb_encrypt_block(AES, secureKey, block) {
-    return window.crypto.subtle.encrypt(AES, secureKey, block).then(function(encBlockWithPadding) {
-      //trim the padding
-      return new Uint8Array(encBlockWithPadding, 0, 16);
+      return result;
     });
   }
 

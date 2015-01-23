@@ -108,8 +108,8 @@ function LocalChromePasswordFileProvider(fi) {
     		if (result && result.passwordFiles) {
           result.passwordFiles.forEach(function(storedFile) {
             if (storedFile.title == fi.title) {
-              var bytes = StringView.base64ToBytes(storedFile.data);
-              resolve(bytes.buffer);
+              var bytes = Base64.decode(storedFile.data);
+              resolve(bytes);
               success = true;
             }
           });

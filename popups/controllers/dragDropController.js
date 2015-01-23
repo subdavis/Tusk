@@ -28,7 +28,7 @@ function DragDropController($scope, $http, $location, localStorage) {
           lastModifiedDate: info.file.lastModifiedDate,
           size: info.file.size,
           type: info.file.type,
-          data: StringView.bytesToBase64(new Uint8Array(info.data))
+          data: Base64.encode(info.data)
         }
 
         var existingIndex = null;
