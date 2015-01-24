@@ -180,7 +180,7 @@ function Keepass(pako, localStorage) {
   }
 
   my.getPasswords = function(masterPassword, fileKey) {
-    return localStorage.getSavedPasswordChoice().then(function(fileStore) {
+    return localStorage.getSavedDatabaseChoice().then(function(fileStore) {
       if (chrome.extension.inIncognitoContext && !fileStore.supportsIngognito) {
         throw new Error('Unable to access this password file in ingognito mode due to Chrome security restrictions.');
       }
@@ -243,6 +243,7 @@ function Keepass(pako, localStorage) {
         var xml = decoder.decode(block);
 
         var entries = parseXml(xml, h.protectedStreamKey);
+
         return entries;
       });
     });

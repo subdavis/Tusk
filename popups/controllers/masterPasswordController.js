@@ -1,11 +1,23 @@
 
 
-function MasterPasswordController($scope, $interval, $http, $routeParams, $location, keepass) {
+function MasterPasswordController($scope, $interval, $http, $routeParams, $location, keepass, localStorage) {
 	$scope.masterPassword = "";
 	$scope.busy = false;
 	$scope.fileName = $routeParams.fileTitle;
 	$scope.keyFileName = "";
   var fileKey = undefined;
+
+  localStorage.getCurrentDatabaseUsage().then(function(usage) {
+    //tweak UI based on what we know about the database file
+    $scope.hidePassword = (usage.requiresPassword === false);
+    $scope.hideKeyFile = (usage.requiresKeyfile === false);
+    if (usage.fileKey && usage.forgetKeyFile !== true) {
+      fileKey = usage.fileKey;
+      $scope.keyFileName = usage.keyFileName;
+    }
+
+    $scope.$apply();
+  });
 
   //determine current url:
   chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
@@ -17,6 +29,7 @@ function MasterPasswordController($scope, $interval, $http, $routeParams, $locat
     }
   });
 
+  //---keyfile upload starts...
   $scope.selectFile = function() {
     document.getElementById('file').click();
   };
@@ -39,6 +52,7 @@ function MasterPasswordController($scope, $interval, $http, $routeParams, $locat
       $scope.$apply();
     });
   }
+  //---keyfile upload ends...
 
   $scope.chooseAnotherFile = function() {
     $location.path('/choose-file-type');
@@ -48,6 +62,17 @@ function MasterPasswordController($scope, $interval, $http, $routeParams, $locat
 	  $scope.clearMessages();
 	  $scope.busy = true;
 	  keepass.getPasswords($scope.masterPassword, fileKey).then(function(entries) {
+
+	    //remember usage for next time:
+      localStorage.saveCurrentDatabaseUsage({
+        requiresPassword: $scope.masterPassword ? true : false,
+        requiresKeyfile: fileKey ? true : false,
+        forgetKeyFile: false,
+        fileKey: fileKey,
+        keyFileName: $scope.keyFileName
+      });
+
+      //show results:
 	    var url = parseUrl($scope.url);
 	    var siteTokens = (url.hostname + "." + $scope.title).toLowerCase().split(/\.|\s|\//);
 	    entries.forEach(function(entry) {

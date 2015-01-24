@@ -67,7 +67,7 @@ function DragDropController($scope, $http, $location, localStorage) {
   };
 
   $scope.choosePasswordFile = function(fi) {
-	  localStorage.savePasswordChoice("local", fi).then(function(fileStore) {
+	  localStorage.saveDatabaseChoice("local", fi).then(function(fileStore) {
   		$location.path('/enter-password/' + fileStore.title);
   		$scope.$apply();
 	  });

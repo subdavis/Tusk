@@ -4,7 +4,7 @@ function DocsController($scope, $http, $location, gdocs, localStorage) {
 	$scope.docs = [];
 
 	$scope.choosePasswordFile = function(doc) {
-	  localStorage.savePasswordChoice("gdrive", doc).then(function(fileStore) {
+	  localStorage.saveDatabaseChoice("gdrive", doc).then(function(fileStore) {
   		$location.path('/enter-password/' + fileStore.title);
   		$scope.$apply();
 	  });

@@ -35,6 +35,9 @@ ul li {
   fill: currentColor;
   transition: all 250ms ease 0s;
 }
+.fill {
+  width: 100%;
+}
 fieldset {
   margin-top: 8px;
 }
@@ -116,7 +119,13 @@ statusMessage {
   padding: 4px 0;
   font-weight: 600;
 }
-pageInfo {
+keyFileName {
+  display: block;
+  text-align: center;
+  padding-bottom: 8px;
+}
+pageInfo,
+compositeKeyPart {
   background: #eeeeee;
   display: block;
   padding: 4px;

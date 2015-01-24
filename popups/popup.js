@@ -71,7 +71,7 @@ keepassApp.controller('dragDropController', ['$scope', '$http', '$location', 'lo
 keepassApp.controller('fileTypeController', ['$scope', '$http', '$location', '$routeParams', FileTypeController]);
 keepassApp.controller('startupController', ['$scope', '$http', '$location', 'gdocs', 'localStorage', StartupController]);
 keepassApp.controller('docsController', ['$scope', '$http', '$location', 'gdocs', 'localStorage', DocsController]);
-keepassApp.controller('masterPasswordController', ['$scope', '$interval', '$http', '$routeParams', '$location', 'keepass', MasterPasswordController]);
+keepassApp.controller('masterPasswordController', ['$scope', '$interval', '$http', '$routeParams', '$location', 'keepass', 'localStorage', MasterPasswordController]);
 
 keepassApp.directive('icon', function() {
     function link(scope, element, attrs) {
@@ -220,4 +220,16 @@ keepassApp.directive('droppable', function() {
       );
     }
   }
+});
+
+//autofocus, from an answer at http://stackoverflow.com/questions/14833326/how-to-set-focus-on-input-field
+keepassApp.directive('autoFocus', function($timeout) {
+    return {
+        restrict: 'AC',
+        link: function(_scope, _element) {
+            $timeout(function(){
+                _element[0].focus();
+            });
+        }
+    };
 });

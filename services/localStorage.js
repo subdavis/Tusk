@@ -28,43 +28,83 @@ THE SOFTWARE.
 
 function LocalStorage(passwordFileStoreFactory) {
   var my = {
-
+    saveDatabaseChoice: saveDatabaseChoice,
+    getSavedDatabaseChoice: getSavedDatabaseChoice,
+    saveCurrentDatabaseUsage: saveCurrentDatabaseUsage,
+    getCurrentDatabaseUsage: getCurrentDatabaseUsage
   };
 
   var passwordFileStoreFactory = passwordFileStoreFactory;
 
-  function savePasswordChoice(providerKey, fileInfo) {
-    return new Promise(function(resolve, reject) {
-      fileInfo = angular.copy(fileInfo);
-      fileInfo.data = undefined;  //don't save the data with the choice
-    	chrome.storage.sync.set({'passwordFile': fileInfo, 'providerKey': providerKey}, function() {
-    	  if (chrome.runtime.lastError) {
-    	    reject(new Error(chrome.runtime.lastError.message));
-    	  } else {
-    	    var fileStore = passwordFileStoreFactory.getInstance(providerKey, fileInfo);
-    		  resolve(fileStore);
-    	  }
-  		});
-    })
+  /**
+   * Remembers the user's last choice of database
+   */
+  function saveDatabaseChoice(providerKey, fileInfo) {
+    fileInfo = angular.copy(fileInfo);
+    fileInfo.data = undefined;  //don't save the data with the choice
+    return chrome.p.storage.local.set({'passwordFile': fileInfo, 'providerKey': providerKey}).then(function() {
+      return passwordFileStoreFactory.getInstance(providerKey, fileInfo);
+    });
   }
-  my.savePasswordChoice = savePasswordChoice;
 
   /**
    * Returns the saved password choice as a "fileStore", which exposes getFile() and title properties.
    */
-  function getSavedPasswordChoice() {
-    return new Promise(function(resolve, reject) {
-      chrome.storage.sync.get(['passwordFile', 'providerKey'], function(items) {
-    		if (items.passwordFile && items.providerKey) {
-    		  var fileStore = passwordFileStoreFactory.getInstance(items.providerKey, items.passwordFile);
-    		  resolve(fileStore);
-    		} else {
-    		  reject(new Error('Could not find a saved password file choice'));
-    		}
-    	});
+  function getSavedDatabaseChoice() {
+    return chrome.p.storage.local.get(['passwordFile', 'providerKey']).then(function(items) {
+  		if (items.passwordFile && items.providerKey) {
+  		  return passwordFileStoreFactory.getInstance(items.providerKey, items.passwordFile);
+  		} else {
+  		  throw new Error('Could not find a saved password file choice');
+  		}
     });
   }
-  my.getSavedPasswordChoice = getSavedPasswordChoice;
+
+  /**
+   * Saves information about how the database was opened, so we can optimize the
+   * UI next time by hiding the irrelevant options
+   */
+  function saveCurrentDatabaseUsage(usage) {
+    return getSavedDatabaseChoice().then(function(fileStore) {
+      return getDatabaseUsages(fileStore.title, fileStore.providerKey).then(function(usages) {
+        var key = fileStore.title + "__" + fileStore.providerKey;
+        usages[key] = usage;
+        if (usage.fileKey) {
+          usage.fileKeyBase64 = Base64.encode(usage.fileKey);
+          delete usage.fileKey;
+        }
+
+        return chrome.p.storage.local.set({'databaseUsages': usages});
+      });
+    });
+  }
+
+  /**
+   * Retrieves information about how the database was opened, so we can optimize the
+   * UI by hiding the irrelevant options
+   */
+  function getCurrentDatabaseUsage() {
+    return getSavedDatabaseChoice().then(function(fileStore) {
+      return getDatabaseUsages(fileStore.title, fileStore.providerKey).then(function(usages) {
+        var key = fileStore.title + "__" + fileStore.providerKey;
+        var usage = usages[key] || {};
+
+        if (usage.fileKeyBase64) {
+          usage.fileKey = Base64.decode(usage.fileKeyBase64);
+          delete usage.fileKeyBase64;
+        }
+
+        return usage;
+      });
+    })
+  }
+
+  function getDatabaseUsages(title, providerKey) {
+    return chrome.p.storage.local.get(['databaseUsages']).then(function(items) {
+      items.databaseUsages = items.databaseUsages || {};
+      return items.databaseUsages;
+    });
+  }
 
   return my;
 }

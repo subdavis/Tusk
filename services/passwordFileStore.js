@@ -41,6 +41,7 @@ THE SOFTWARE.
  *
  * Instance properties:
  *  - title = title of the file
+ *  - providerKey = unique key of the provider
  *  - supportsIngognito = works in ingognito mode
  *
  * Instance methods:
@@ -73,6 +74,7 @@ function PasswordFileStoreFactory(gdocs) {
  */
 function GoogleDrivePasswordFileProvider(gdocs, fileHandle) {
   var my = {
+    providerKey: "gdrive",
     title: fileHandle.title,
     supportsIngognito: false
   };
@@ -82,10 +84,10 @@ function GoogleDrivePasswordFileProvider(gdocs, fileHandle) {
       //this gets the file details, which we need to download the file
       var details = JSON.parse(e.currentTarget.responseText);
       var url = details.downloadUrl;
-      return gdocs.sendXhr('GET', url, 'arraybuffer').then(function(e) {
-        return e.currentTarget.response;
-      });
-    });
+      return gdocs.sendXhr('GET', url, 'arraybuffer');
+    }).then(function(e) {
+      return e.currentTarget.response;
+    });;
   }
   my.getFile = getFile;  //expose
 
@@ -97,6 +99,7 @@ function GoogleDrivePasswordFileProvider(gdocs, fileHandle) {
  */
 function LocalChromePasswordFileProvider(fi) {
   var my = {
+    providerKey: "local",
     title: fi.title,
     supportsIngognito: false
   };
