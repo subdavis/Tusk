@@ -18,7 +18,11 @@ function MasterPasswordController($scope, $interval, $http, $routeParams, $locat
       $scope.keyFileName = usage.keyFileName;
     }
 
-    $scope.$apply();
+    if ($scope.hidePassword && fileKey) {
+      $scope.enterMasterPassword();
+    } else {
+      $scope.$apply();
+    }
   });
 
   //determine current url:
