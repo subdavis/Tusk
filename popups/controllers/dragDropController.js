@@ -3,6 +3,8 @@
 function DragDropController($scope, $http, $location, localStorage) {
   $scope.files = [];
   $scope.allowDrop = true;
+  var backwardCompatibleVersion = 1;  //missing version or version less than this is ignored due missing info or bugs in old storage
+  var currentVersion = 1;             //current version
 
   chrome.runtime.getPlatformInfo(function(info) {
     $scope.allowDrop = (info.os == "cros");  //does not work on some platforms because the popup closes.  Windows is 50-50, some PCs are a problem some not
@@ -28,6 +30,7 @@ function DragDropController($scope, $http, $location, localStorage) {
           lastModifiedDate: info.file.lastModifiedDate,
           size: info.file.size,
           type: info.file.type,
+          storageVersion: currentVersion,
           data: Base64.encode(info.data)
         }
 
@@ -73,12 +76,13 @@ function DragDropController($scope, $http, $location, localStorage) {
 	  });
   };
 
-  //chrome.storage.local.clear(function() {
-    chrome.storage.local.get('passwordFiles', function(result) {
-  		if (result && result.passwordFiles) {
-  		  $scope.files = result.passwordFiles;
-  		  $scope.$apply();
-  		}
-    });
-  //});
+  chrome.storage.local.get('passwordFiles', function(result) {
+		if (result && result.passwordFiles) {
+		  $scope.files = result.passwordFiles.filter(function(fi) {
+		    return (fi.storageVersion && fi.storageVersion >= backwardCompatibleVersion);
+		  });
+
+		  $scope.$apply();
+		}
+  });
 }

@@ -62,7 +62,7 @@ function LocalStorage(passwordFileStoreFactory) {
 
   /**
    * Saves information about how the database was opened, so we can optimize the
-   * UI next time by hiding the irrelevant options
+   * UI next time by hiding the irrelevant options and remembering the keyfile
    */
   function saveCurrentDatabaseUsage(usage) {
     return getSavedDatabaseChoice().then(function(fileStore) {
@@ -70,7 +70,9 @@ function LocalStorage(passwordFileStoreFactory) {
         var key = fileStore.title + "__" + fileStore.providerKey;
         usages[key] = usage;
         if (usage.fileKey) {
-          usage.fileKeyBase64 = Base64.encode(usage.fileKey);
+          if (!usage.forgetKeyFile) {
+            usage.fileKeyBase64 = Base64.encode(usage.fileKey);
+          }
           delete usage.fileKey;
         }
 
@@ -81,7 +83,7 @@ function LocalStorage(passwordFileStoreFactory) {
 
   /**
    * Retrieves information about how the database was opened, so we can optimize the
-   * UI by hiding the irrelevant options
+   * UI by hiding the irrelevant options and remembering the keyfile
    */
   function getCurrentDatabaseUsage() {
     return getSavedDatabaseChoice().then(function(fileStore) {

@@ -5,12 +5,14 @@ function MasterPasswordController($scope, $interval, $http, $routeParams, $locat
 	$scope.busy = false;
 	$scope.fileName = $routeParams.fileTitle;
 	$scope.keyFileName = "";
+	$scope.rememberKeyFile = true;
   var fileKey = undefined;
 
   localStorage.getCurrentDatabaseUsage().then(function(usage) {
     //tweak UI based on what we know about the database file
     $scope.hidePassword = (usage.requiresPassword === false);
     $scope.hideKeyFile = (usage.requiresKeyfile === false);
+    $scope.rememberKeyFile = !usage.forgetKeyFile;
     if (usage.fileKey && usage.forgetKeyFile !== true) {
       fileKey = usage.fileKey;
       $scope.keyFileName = usage.keyFileName;
@@ -67,7 +69,7 @@ function MasterPasswordController($scope, $interval, $http, $routeParams, $locat
       localStorage.saveCurrentDatabaseUsage({
         requiresPassword: $scope.masterPassword ? true : false,
         requiresKeyfile: fileKey ? true : false,
-        forgetKeyFile: false,
+        forgetKeyFile: !$scope.rememberKeyFile,
         fileKey: fileKey,
         keyFileName: $scope.keyFileName
       });

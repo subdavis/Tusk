@@ -144,6 +144,20 @@ function Keepass(pako, localStorage) {
       }
     }
 
+    //attempt to parse xml
+    try {
+      var decoder = new TextDecoder();
+      var xml = decoder.decode(arr);
+      var parser = new DOMParser();
+      var doc = parser.parseFromString(xml, "text/xml");
+      var keyNode = doc.evaluate('//KeyFile/Key/Data', doc, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
+      if (keyNode.singleNodeValue && keyNode.singleNodeValue.textContent) {
+        return Base64.decode(keyNode.singleNodeValue.textContent);
+      }
+    } catch (err) {
+      //continue, not valid xml keyfile
+    }
+
     var SHA = {
       name: "SHA-256"
     };
