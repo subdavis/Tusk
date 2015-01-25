@@ -35,7 +35,7 @@
 		"persistent": false
 		},
 	"permissions": [
-	  "activeTab",
+		"activeTab",
 	  "storage",
 	  "clipboardWrite",
 	  "identity",
@@ -43,7 +43,8 @@
 	  "alarms"
 	],
 	"optional_permissions": [
-    "https://*/"
+		"https://*/",
+		"http://*/"
 	]
 
 }

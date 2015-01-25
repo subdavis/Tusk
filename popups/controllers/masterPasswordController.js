@@ -28,10 +28,20 @@ function MasterPasswordController($scope, $interval, $http, $routeParams, $locat
   //determine current url:
   chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
     if (tabs && tabs.length) {
-      var url = tabs[0].url.split('?');
-      $scope.url = url[0];
+			$scope.tabId = tabs[0].tabId;
+			var url = tabs[0].url.split('?');
+			$scope.url = url[0];
       $scope.title = tabs[0].title;
-      $scope.$apply();
+
+			var parsedUrl = parseUrl(tabs[0].url);
+			$scope.origin = parsedUrl.protocol + '//' + parsedUrl.hostname + '/';
+
+			$scope.$apply();
+
+			//testing:
+			chrome.p.permissions.remove({
+				origins: [$scope.origin]
+			});
     }
   });
 
@@ -64,10 +74,31 @@ function MasterPasswordController($scope, $interval, $http, $routeParams, $locat
     $location.path('/choose-file-type');
   }
 
+	$scope.autofill = function() {
+		chrome.p.permissions.contains({
+			origins: [$scope.origin]
+		}).catch(function() {
+			return chrome.p.permissions.request({
+				origins: [$scope.origin]
+			});
+		}).then(function() {
+			//granted one way or another
+			$scope.fillable = true;
+
+			chrome.tabs.executeScript($scope.tabId, {
+				file: "keepass.js"
+			}, function(result) {
+				//script injected
+				console.log('injected: ', result);
+			});
+		})
+	}
+
 	$scope.enterMasterPassword = function() {
 	  $scope.clearMessages();
 	  $scope.busy = true;
-	  keepass.getPasswords($scope.masterPassword, fileKey).then(function(entries) {
+
+		keepass.getPasswords($scope.masterPassword, fileKey).then(function(entries) {
 
 	    //remember usage for next time:
       localStorage.saveCurrentDatabaseUsage({

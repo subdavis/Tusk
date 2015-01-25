@@ -1,3 +1,7 @@
+//alert('hi');
+//handleTabLoaded();
+console.log("hello worldkp");
+
 chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 	if (!message || !message.m) return;  //unrecognized message format
 

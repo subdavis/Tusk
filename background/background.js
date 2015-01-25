@@ -11,12 +11,15 @@ if (chrome.extension.inIncognitoContext) {
 
 function doReplaceRules() {
   chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
-    var passwordField = {conditions: [
+    var passwordField = {id: "pwdField", conditions: [
       new chrome.declarativeContent.PageStateMatcher({
           css: ["input[type='password']"]
         })
       ],
-      actions: [ new chrome.declarativeContent.ShowPageAction() ]
+      actions: [
+        new chrome.declarativeContent.ShowPageAction()
+        //new chrome.declarativeContent.RequestContentScript({js: ['keepass.js']})
+        ]
     };
     chrome.declarativeContent.onPageChanged.addRules([passwordField]);
   });
@@ -36,7 +39,9 @@ chrome.pageAction.onClicked.addListener(function(tab) {
   //chrome.pageAction.setTitle({'tabId': tab.tabId, 'title': 'Password field detected.  Click to unlock.'});
 	//chrome.pageAction.show(tab.tabId);
 
-  chome.tabs.sendMessage(tab.id, {
+  chrome.tabs.executeScript(null, {file: '../keepass.js'});
+
+  chrome.tabs.sendMessage(tab.id, {
     m: 'pageInfo', 'url': tab.url, 'title': tab.title
   });
 
