@@ -28,7 +28,7 @@ function MasterPasswordController($scope, $interval, $http, $routeParams, $locat
   //determine current url:
   chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
     if (tabs && tabs.length) {
-			$scope.tabId = tabs[0].tabId;
+			$scope.tabId = tabs[0].id;
 			var url = tabs[0].url.split('?');
 			$scope.url = url[0];
       $scope.title = tabs[0].title;
@@ -39,9 +39,11 @@ function MasterPasswordController($scope, $interval, $http, $routeParams, $locat
 			$scope.$apply();
 
 			//testing:
+			/*
 			chrome.p.permissions.remove({
 				origins: [$scope.origin]
 			});
+			*/
     }
   });
 
@@ -74,24 +76,41 @@ function MasterPasswordController($scope, $interval, $http, $routeParams, $locat
     $location.path('/choose-file-type');
   }
 
-	$scope.autofill = function() {
+	$scope.autofill = function(entry) {
 		chrome.p.permissions.contains({
 			origins: [$scope.origin]
-		}).catch(function() {
-			return chrome.p.permissions.request({
-				origins: [$scope.origin]
-			});
 		}).then(function() {
-			//granted one way or another
-			$scope.fillable = true;
-
-			chrome.tabs.executeScript($scope.tabId, {
-				file: "keepass.js"
-			}, function(result) {
-				//script injected
-				console.log('injected: ', result);
+			autofillNow(entry);
+		}).catch(function() {
+			//does not have permission yet
+			chrome.p.permissions.request({
+				origins: [$scope.origin]
+			}).then(function() {
+				autofillNow(entry);
+			}).catch(function(err) {
+				$scope.errorMessage = err.message;
 			});
 		})
+	}
+
+	function autofillNow(entry) {
+		chrome.runtime.sendMessage({
+			m:"autofill",
+			tabId: $scope.tabId,
+			u: entry.UserName,
+			p: keepass.getDecryptedEntry(entry.protectedData.Password)
+		}, function() {
+			window.close();
+		});
+		
+		/*
+		chrome.tabs.executeScript($scope.tabId, {
+			file: "keepass.js"
+		}, function(result) {
+			//script injected
+			console.log('injected: ', result);
+		});
+		*/
 	}
 
 	$scope.enterMasterPassword = function() {
