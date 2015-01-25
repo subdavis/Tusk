@@ -37,13 +37,6 @@ function MasterPasswordController($scope, $interval, $http, $routeParams, $locat
 			$scope.origin = parsedUrl.protocol + '//' + parsedUrl.hostname + '/';
 
 			$scope.$apply();
-
-			//testing:
-			/*
-			chrome.p.permissions.remove({
-				origins: [$scope.origin]
-			});
-			*/
     }
   });
 
@@ -99,18 +92,9 @@ function MasterPasswordController($scope, $interval, $http, $routeParams, $locat
 			tabId: $scope.tabId,
 			u: entry.UserName,
 			p: keepass.getDecryptedEntry(entry.protectedData.Password)
-		}, function() {
-			window.close();
 		});
-		
-		/*
-		chrome.tabs.executeScript($scope.tabId, {
-			file: "keepass.js"
-		}, function(result) {
-			//script injected
-			console.log('injected: ', result);
-		});
-		*/
+
+		window.close();  //close the popup
 	}
 
 	$scope.enterMasterPassword = function() {

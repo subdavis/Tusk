@@ -28,39 +28,17 @@ function doReplaceRules() {
 chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 	if (!message || !message.m) return;  //message format unrecognized
 
-  if (message.m == 'requestPageInfo') {
-
-  }
-
   if (message.m == "autofill") {
     chrome.tabs.executeScript(message.tabId, {
       file: "keepass.js"
     }, function(result) {
       //script injected
-      console.log('injected: ', result);
-
       chrome.tabs.sendMessage(message.tabId, {
         m: "fillPassword", u: message.u, p: message.p
       });
     });
   }
 
-});
-
-chrome.pageAction.onClicked.addListener(function(tab) {
-	//handle click of action
-  //chrome.pageAction.setPopup({'tabId': tab.tabId, 'popup': '/popups/popup.html'});
-  //chrome.pageAction.setTitle({'tabId': tab.tabId, 'title': 'Password field detected.  Click to unlock.'});
-	//chrome.pageAction.show(tab.tabId);
-
-  //chrome.tabs.executeScript(null, {file: '../keepass.js'});
-/*
-  chrome.tabs.sendMessage(tab.id, {
-    m: 'pageInfo', 'url': tab.url, 'title': tab.title
-  });
-*/
-
-	//chrome.tabs.sendMessage(tab.id, {'m': 'fillPassword', 'u':'testuser', 'p':'testpassword'});
 });
 
 chrome.alarms.onAlarm.addListener(function(alarm) {
