@@ -6,7 +6,33 @@ function MasterPasswordController($scope, $interval, $http, $routeParams, $locat
 	$scope.fileName = $routeParams.fileTitle;
 	$scope.keyFileName = "";
 	$scope.rememberKeyFile = true;
-  var fileKey = undefined;
+  var fileKey, streamKey;
+
+	//wake up the background page and get a pipe to send/receive messages
+	var bgMessages = chrome.runtime.connect({name: "masterPasswordController.js"});
+	function bgMessageListener(savedState) {
+		$scope.entries = savedState.entries;
+		angular.forEach($scope.entries, function(entry) {
+			//deserialize passwords
+			entry.protectedData.Password.data = new Uint8Array(Base64.decode(entry.Base64Password));
+		})
+		streamKey = Base64.decode(savedState.streamKey);
+		$scope.$apply();
+	};
+	function bgDisconnectListener() {
+		bgMessages.onMessage.removeListener(bgMessageListener);
+		bgMessages = null;
+
+		console.log("disconnected!  how???")
+	}
+	bgMessages.onDisconnect.addListener(bgDisconnectListener);
+	bgMessages.onMessage.addListener(bgMessageListener);
+
+	//dispose:
+	$scope.$on("$destroy", function() {
+		bgMessages.onMessage.removeListener(bgMessageListener);
+		bgMessages.disconnect();
+	});
 
   localStorage.getCurrentDatabaseUsage().then(function(usage) {
     //tweak UI based on what we know about the database file
@@ -91,7 +117,7 @@ function MasterPasswordController($scope, $interval, $http, $routeParams, $locat
 			m:"autofill",
 			tabId: $scope.tabId,
 			u: entry.UserName,
-			p: keepass.getDecryptedEntry(entry.protectedData.Password)
+			p: keepass.getDecryptedEntry(entry.protectedData.Password, streamKey)
 		});
 
 		window.close();  //close the popup
@@ -149,6 +175,16 @@ function MasterPasswordController($scope, $interval, $http, $routeParams, $locat
 	      $scope.errorMessage = "No matches found for this site."
 	      $scope.successMessage = "";
 	    }
+
+			angular.forEach($scope.entries, function(entry) {
+				//process each entry for serialization
+				entry.Base64Password = Base64.encode(entry.protectedData.Password.data);
+			});
+
+			bgMessages.postMessage({
+				entries: $scope.entries,
+				streamKey: Base64.encode(keepass.streamKey)
+			});  //save for a brief time in the background page
 	    $scope.busy = false;
 	  }).catch(function(err) {
 	    $scope.errorMessage = err.message || "Incorrect password or key file";
@@ -175,7 +211,7 @@ function MasterPasswordController($scope, $interval, $http, $routeParams, $locat
       return;  //listener can get registered multiple times
     }
 
-    var textToPutOnClipboard = keepass.getDecryptedEntry($scope.copyEntry.protectedData.Password);
+    var textToPutOnClipboard = keepass.getDecryptedEntry($scope.copyEntry.protectedData.Password, streamKey);
     $scope.copyEntry = null;
     e.clipboardData.setData('text/plain', textToPutOnClipboard);
     e.preventDefault();

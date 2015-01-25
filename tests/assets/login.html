@@ -1,0 +1,80 @@
+<html>
+<head>
+  <title>ChromeKeePass - Sample Entry</title>
+</head>
+<body>
+  <form action="#">
+    <fieldset>
+      <legend>
+        Simple login
+      </legend>
+      <input type="text" placeholder="username">
+      <input type="password">
+    </fieldset>
+    <fieldset>
+      <legend>
+        Registration form
+      </legend>
+      <input type="text" placeholder="username">
+      <input type="password">
+      <input type="password" placeholder="repeat password">
+    </fieldset>
+    <fieldset>
+      <legend>
+        Login with non-sibling inputs
+      </legend>
+      <div>
+        <input type="text" placeholder="username">
+      </div>
+      <div>
+        <input type="password">
+      </div>
+    </fieldset>
+    <fieldset>
+      <legend>
+        Orphaned username field
+      </legend>
+      <div>
+        <input type="text" placeholder="username">
+      </div>
+    </fieldset>
+    <fieldset>
+      <legend>
+        email login
+      </legend>
+      <input type="email" placeholder="email">
+      <input type="password">
+    </fieldset>
+    <fieldset>
+      <legend>
+        Non-specified input type
+      </legend>
+      <input placeholder="username">
+      <input type="password">
+    </fieldset>
+    <fieldset>
+      <legend>
+        Visible password.  We don't fill in "shown" passwords, they have to be a true password type.
+      </legend>
+      <input placeholder="username">
+      <div class="uk-form-password">
+        <input type="text">
+      </div>
+    </fieldset>
+    <fieldset>
+      <legend>
+        Hidden password field.  (Should not fill in)
+      </legend>
+      <input type="text" placeholder="username">
+      <input type="password" style="display:none;">
+    </fieldset>
+    <fieldset>
+      <legend>
+        Hidden username field.  (Should not fill in, but not guaranteed in all scenarios)
+      </legend>
+      <input type="text" style="display:none;" placeholder="username">
+      <input type="password">
+    </fieldset>
+  </form>
+</body>
+</html>

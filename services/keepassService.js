@@ -32,7 +32,6 @@ function Keepass(pako, localStorage) {
   };
 
   var internals = {
-    streamKey: undefined
   }
 
   internals.littleEndian = (function() {
@@ -266,12 +265,14 @@ function Keepass(pako, localStorage) {
   /**
    * Returns the decrypted data from a protected element of an entry
    */
-  function getDecryptedEntry(protectedData) {
+  function getDecryptedEntry(protectedData, streamKey) {
     var iv = [0xE8, 0x30, 0x09, 0x4B, 0x97, 0x20, 0x5D, 0x2A];
-    var salsa = new Salsa20(new Uint8Array(internals.streamKey), iv);
+    var salsa = new Salsa20(new Uint8Array(streamKey || my.streamKey), iv);
+    var decoder = new TextDecoder();
 
     salsa.getBytes(protectedData.position);
-    return atob(StringView.bytesToBase64(salsa.decrypt(protectedData.data)));
+    var decryptedBytes = new Uint8Array(salsa.decrypt(protectedData.data));
+    return decoder.decode(decryptedBytes);
   }
   my.getDecryptedEntry = getDecryptedEntry;  //expose the function
 
@@ -280,7 +281,7 @@ function Keepass(pako, localStorage) {
    **/
   function parseXml(xml, protectedStreamKey) {
     return window.crypto.subtle.digest({name: "SHA-256"}, protectedStreamKey).then(function(streamKey) {
-      internals.streamKey = streamKey;
+      my.streamKey = streamKey;
       var decoder = new TextDecoder();
       var parser = new DOMParser();
       var doc = parser.parseFromString(xml, "text/xml");
@@ -378,4 +379,3 @@ function Keepass(pako, localStorage) {
 
   return my;
 }
-
