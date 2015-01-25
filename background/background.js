@@ -64,11 +64,32 @@ THE SOFTWARE.
     port.onMessage.addListener(function(state) {
       savedState[port.name] = state;
     });
+
+    port.onDisconnect.addListener(function() {
+      //uncomment below to forget the state when the popup closes
+      //savedState[port.name] = null;
+    })
   });
 
-  //listen for "autofill" message:
-  chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
-  	if (!message || !message.m) return;  //message format unrecognized
+  function handleMessage(message, sender, sendResponse) {
+    if (!message || !message.m) return;  //message format unrecognized
+
+    if (message.m == "requestPermission") {
+      //better to do the request here on the background, because on some platforms
+      //the popup may close prematurely when requesting access
+      chrome.permissions.contains(message.perms, function(alreadyGranted) {
+        if (alreadyGranted && message.then) {
+          handleMessage(message.then, sender, sendResponse);
+        } else {
+          //request
+          chrome.permissions.request(message.perms, function(granted){
+            if (granted && message.then) {
+              handleMessage(message.then, sender, sendResponse);
+            }
+          });
+        }
+      });
+    }
 
     if (message.m == "autofill") {
       chrome.tabs.executeScript(message.tabId, {
@@ -80,8 +101,10 @@ THE SOFTWARE.
         });
       });
     }
+  }
 
-  });
+  //listen for "autofill" message:
+  chrome.runtime.onMessage.addListener(handleMessage);
 
   //listen for "clear clipboard" alarm:
   chrome.alarms.onAlarm.addListener(function(alarm) {

@@ -19,13 +19,12 @@ function MasterPasswordController($scope, $interval, $http, $routeParams, $locat
 		$scope.$apply();
 	};
 
-	//dispose:
+	//dispose.  only runs when switching controllers, no need to run when unloading popup:
 	$scope.$on("$destroy", function() {
 		if (bgMessages) {
-
+			bgMessages.onMessage.removeListener(bgMessageListener);
+			bgMessages.disconnect();
 		}
-		bgMessages.onMessage.removeListener(bgMessageListener);
-		bgMessages.disconnect();
 	});
 
   localStorage.getCurrentDatabaseUsage().then(function(usage) {
@@ -94,28 +93,17 @@ function MasterPasswordController($scope, $interval, $http, $routeParams, $locat
   }
 
 	$scope.autofill = function(entry) {
-		chrome.p.permissions.contains({
-			origins: [$scope.origin]
-		}).then(function() {
-			autofillNow(entry);
-		}).catch(function() {
-			//does not have permission yet
-			chrome.p.permissions.request({
-				origins: [$scope.origin]
-			}).then(function() {
-				autofillNow(entry);
-			}).catch(function(err) {
-				$scope.errorMessage = err.message;
-			});
-		})
-	}
-
-	function autofillNow(entry) {
 		chrome.runtime.sendMessage({
-			m:"autofill",
-			tabId: $scope.tabId,
-			u: entry.UserName,
-			p: keepass.getDecryptedEntry(entry.protectedData.Password, streamKey)
+			m: "requestPermission",
+			perms: {
+				origins: [$scope.origin]
+			},
+			then: {
+				m:"autofill",
+				tabId: $scope.tabId,
+				u: entry.UserName,
+				p: keepass.getDecryptedEntry(entry.protectedData.Password, streamKey)
+			}
 		});
 
 		window.close();  //close the popup
@@ -183,6 +171,7 @@ function MasterPasswordController($scope, $interval, $http, $routeParams, $locat
 				entries: $scope.entries,
 				streamKey: Base64.encode(keepass.streamKey)
 			});  //save for a brief time in the background page
+
 	    $scope.busy = false;
 	  }).catch(function(err) {
 	    $scope.errorMessage = err.message || "Incorrect password or key file";
