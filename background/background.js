@@ -53,15 +53,16 @@ THE SOFTWARE.
   }
 
   //keep saved state for the popup for as long as we are alive (not long):
-  var savedState = undefined;
+  var savedState = {};
   chrome.runtime.onConnect.addListener(function(port) {
-    if (savedState) {
+    //communicate state on this pipe.  each named port gets its own state.
+    if (savedState[port.name]) {
       //we have some saved state that we can give to the popup
-      port.postMessage(savedState);
+      port.postMessage(savedState[port.name]);
     };
 
     port.onMessage.addListener(function(state) {
-      savedState = state;
+      savedState[port.name] = state;
     });
   });
 

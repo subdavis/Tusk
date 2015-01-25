@@ -6,11 +6,10 @@ function MasterPasswordController($scope, $interval, $http, $routeParams, $locat
 	$scope.fileName = $routeParams.fileTitle;
 	$scope.keyFileName = "";
 	$scope.rememberKeyFile = true;
-  var fileKey, streamKey;
+  var fileKey, streamKey, bgMessages;
 
-	//wake up the background page and get a pipe to send/receive messages
-	var bgMessages = chrome.runtime.connect({name: "masterPasswordController.js"});
 	function bgMessageListener(savedState) {
+		//called from the background.
 		$scope.entries = savedState.entries;
 		angular.forEach($scope.entries, function(entry) {
 			//deserialize passwords
@@ -19,17 +18,12 @@ function MasterPasswordController($scope, $interval, $http, $routeParams, $locat
 		streamKey = Base64.decode(savedState.streamKey);
 		$scope.$apply();
 	};
-	function bgDisconnectListener() {
-		bgMessages.onMessage.removeListener(bgMessageListener);
-		bgMessages = null;
-
-		console.log("disconnected!  how???")
-	}
-	bgMessages.onDisconnect.addListener(bgDisconnectListener);
-	bgMessages.onMessage.addListener(bgMessageListener);
 
 	//dispose:
 	$scope.$on("$destroy", function() {
+		if (bgMessages) {
+
+		}
 		bgMessages.onMessage.removeListener(bgMessageListener);
 		bgMessages.disconnect();
 	});
@@ -63,6 +57,10 @@ function MasterPasswordController($scope, $interval, $http, $routeParams, $locat
 			$scope.origin = parsedUrl.protocol + '//' + parsedUrl.hostname + '/';
 
 			$scope.$apply();
+
+			//wake up the background page and get a pipe to send/receive messages:
+			bgMessages = chrome.runtime.connect({name: "tab" + $scope.tabId});
+			bgMessages.onMessage.addListener(bgMessageListener);
     }
   });
 
