@@ -18,7 +18,7 @@ module.exports = function(grunt) {
           {expand: true, src: 'background/**/*.js', dest:'build/'},
           {expand: true, src: 'services/**/*.js', dest:'build/'},
           {expand: true, src: 'options/**/*.js', dest:'build/'},
-          {expand: true, src: ['*.js', '!Gruntfile.js'], dest:'build/'}
+          {expand: true, src: ['*.js', '!Gruntfile.js', '!tests/*'], dest:'build/'}
           ]
       }
     },
@@ -49,7 +49,7 @@ module.exports = function(grunt) {
     htmlmin: {
       options: {
       },
-      files: {expand: true, src: ['**/*.html', '!node_modules/**/*.html'], dest: 'build/'}
+      files: {expand: true, src: ['**/*.html', '!node_modules/**/*.html', '!tests/**/*'], dest: 'build/'}
     },
     compress: {
       options: {
