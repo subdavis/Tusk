@@ -21,5 +21,5 @@ Still working on it.  My aims are:
 * Clear-text passwords are not stored in memory.  Status = good.  Even once the database is decrypted, passwords are still encrypted until the user requests the specific password.  At that time only that password is decrypted.  Once the popup disappears, everything except whatever is in the clipboard is cleared.
 * Extension does not require any special permissions.  Status = excellent.  Extension installs without any permissions,
 and requests access to resources as it needs them the first time.
-* Password not copied to clipboard.  Todo - ideally it will fill in the passwords on the page, but that requires more permissions.  Still working on devising a usable+secure solution.
+* Password not copied to clipboard.  Status = good.  User can copy the password if they want, but autofill functionality is available so they don't have to.  
 
