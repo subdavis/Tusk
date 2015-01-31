@@ -1,6 +1,7 @@
 @blue-bg: rgba(0, 120, 231, 0.8);
 @yellow-bg: rgba(255, 255, 100, 0.1);
 @green-bg: rgba(100, 220, 100, 0.5);
+@orange-bg: rgba(255, 153, 51, 0.5);
 @red-bg: #B71C1C;
 @light-blue-bg: rgba(0,128,255,0.2);
 @light-grey-bg: #eee;
@@ -188,6 +189,11 @@ passwordMatches {
   display: block;
   max-height: 150px;
   overflow-y: scroll;
+}
+
+partialMatchWarning {
+  margin-top: 8px;
+  .BorderedMessage(@orange-bg, 2px);
 }
 
 successMessage {

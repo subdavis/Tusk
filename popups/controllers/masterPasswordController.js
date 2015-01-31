@@ -125,41 +125,52 @@ function MasterPasswordController($scope, $interval, $http, $routeParams, $locat
       });
 
       //show results:
-	    var url = parseUrl($scope.url);
-	    var siteTokens = (url.hostname + "." + $scope.title).toLowerCase().split(/\.|\s|\//);
+	    var siteUrl = parseUrl($scope.url);
+	    var siteTokens = getValidTokens(siteUrl.hostname + "." + $scope.title);
 	    entries.forEach(function(entry) {
 	      //apply a ranking algorithm to find the best matches
-	      entry.matchRank = 0;
-	      entry.matchRank += (entry.URL == url.hostname) ? 1 : 0;
-	      entry.matchRank += (entry.Title && $scope.title && entry.Title.toLowerCase() == $scope.title.toLowerCase()) ? 1 : 0;
-	      entry.matchRank += (entry.Title == url.hostname) ? 1: 0;
-        entry.matchRank += (entry.URL && url.hostname.indexOf(entry.URL.toLowerCase()) > -1) ? 0.9: 0;
-	      entry.matchRank += (entry.Title && url.hostname.indexOf(entry.Title.toLowerCase()) > -1) ? 0.9 : 0;
+				var entryHostName = parseUrl(entry.URL).hostname || "";
 
-	      var entryTokens = (entry.URL + "." + entry.Title).toLowerCase().split(/\.|\s|\//);
+				if (entryHostName && entryHostName == siteUrl.hostname)
+					entry.matchRank = 100;  //exact url match
+				else
+	      	entry.matchRank = 0;
+
+	      entry.matchRank += (entry.Title && $scope.title && entry.Title.toLowerCase() == $scope.title.toLowerCase()) ? 1 : 0;
+	      entry.matchRank += (entry.Title && entry.Title.toLowerCase() === siteUrl.hostname.toLowerCase()) ? 1: 0;
+        entry.matchRank += (entry.URL && siteUrl.hostname.indexOf(entry.URL.toLowerCase()) > -1) ? 0.9: 0;
+	      entry.matchRank += (entry.Title && siteUrl.hostname.indexOf(entry.Title.toLowerCase()) > -1) ? 0.9 : 0;
+
+	      var entryTokens = getValidTokens(entryHostName + "." + entry.Title);
 	      for (var i=0; i<entryTokens.length; i++) {
-	        for (var j=0; j<siteTokens.length; j++) {
-	          var token1 = entryTokens[i];
+					var token1 = entryTokens[i];
+					for (var j=0; j<siteTokens.length; j++) {
 	          var token2 = siteTokens[j];
 
-	          entry.matchRank += (token1 && token2 && token1 == token2) ? 0.2 : 0;
+	          entry.matchRank += (token1 === token2) ? 0.2 : 0;
 	        }
 	      }
 	    });
 
 	    $scope.entries = entries.filter(function(entry) {
-	      return (entry.matchRank > 0.8)
+	      return (entry.matchRank >= 100)
 	    });
-      $scope.successMessage = "" //$scope.entries.length == 1 ? "1 match found" : $scope.entries.length + " matches found";
+			if ($scope.entries.length == 0) {
+				$scope.entries = entries.filter(function(entry) {
+					return (entry.matchRank > 0.8 && !entry.URL);  //a good match for an entry without a url
+				});
+			}
 	    if ($scope.entries.length == 0) {
   	    $scope.entries = entries.filter(function(entry) {
-  	      return (entry.matchRank > 0.4);
+  	      return (entry.matchRank >= 0.4);
   	    });
-	      $scope.successMessage = "No close matches, showing " + $scope.entries.length + " partial matches";
+
+				if ($scope.entries.length) {
+					$scope.partialMatchMessage = "No close matches, showing " + $scope.entries.length + " partial matches.  Double-check that this is the correct site!";
+				}
 	    }
 	    if ($scope.entries.length == 0) {
 	      $scope.errorMessage = "No matches found for this site."
-	      $scope.successMessage = "";
 	    }
 
 			angular.forEach($scope.entries, function(entry) {
@@ -184,6 +195,7 @@ function MasterPasswordController($scope, $interval, $http, $routeParams, $locat
   $scope.clearMessages = function() {
 	  $scope.errorMessage = "";
 	  $scope.successMessage = "";
+		$scope.partialMatchMessage = "";
   }
 
   $scope.copyPassword = function(entry) {
@@ -220,6 +232,14 @@ function MasterPasswordController($scope, $interval, $http, $routeParams, $locat
       }
     }, 1000);
   });
+
+	function getValidTokens(tokenString) {
+		if (!tokenString) return [];
+
+		return tokenString.toLowerCase().split(/\.|\s|\//).filter(function(token) {
+			return (token && token !== "com" && token !== "www" && token.length > 1);
+		});
+	}
 
   function parseUrl(url) {
     //from https://gist.github.com/jlong/2428561

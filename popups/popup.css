@@ -138,6 +138,15 @@ passwordMatches {
   max-height: 150px;
   overflow-y: scroll;
 }
+partialMatchWarning {
+  margin-top: 8px;
+  background: rgba(255, 153, 51, 0.5);
+  display: block;
+  padding: 4px;
+  border: solid 2px rgba(255, 128, 0, 0.8);
+  margin: 4px 0;
+  color: rgba(0, 0, 0, 0.9);
+}
 successMessage {
   margin-top: 8px;
   background: rgba(100, 220, 100, 0.5);
