@@ -6,8 +6,8 @@
 
 	"description": "KeePass password database for Chrome",
 	"icons": {
-		"16": "icons/lock2_16.png",
-		"48": "icons/lock2_48.png"
+		"16": "icons/logo_16.png",
+		"48": "icons/logo_48.png"
 	},
 	"incognito": "split",
   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAg6mZuGtDqhMc9rJSd1EUxjGfOvYpGnOt2pGszrKPpJKWrjUiNh8bA1r+VMcarovr0DulASrZ/ifCpr0qgkloD0hKfJZzegLmsMzl8NMJKJy5p6+CFyuXaRsOPY1fCKb4Ia0pbjObqhnuUsuB9KOn+hKfzxqlL/qiRhelrQLr95zneCTAvAgL0jQX9pwRIjwEhR1tuW07rdJNpSOgJreYEJm+xMBgWxIwZn7+OG+M8PyBW2tbuOPLrfEP2XYzj0pzvKnL5IGEzMG8bdtSbzNOQLK7V5gs9AXV4MdzVV81xhw3H6KVvoa+fVTFuJXIS58oL1VdAZpSayqElLJislXTZwIDAQAB",
@@ -20,8 +20,8 @@
 
 	"page_action": {
           "default_icon": {
-            "19": "icons/lock2_19.png",
-            "38": "icons/lock2_38.png"
+            "19": "icons/logo_19.png",
+            "38": "icons/logo_38.png"
           },
           "default_title": "Password field detected.  Click here to access your KeePass passwords.",
 		      "default_popup": "popups/popup.html"
