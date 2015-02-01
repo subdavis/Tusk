@@ -55,7 +55,16 @@ function MasterPasswordController($scope, $interval, $http, $routeParams, $locat
 			var parsedUrl = parseUrl(tabs[0].url);
 			$scope.origin = parsedUrl.protocol + '//' + parsedUrl.hostname + '/';
 
-			$scope.$apply();
+			chrome.p.permissions.contains({origins: [$scope.origin]})
+				.then(function() {
+					$scope.sitePermission = true;
+				})
+				.catch(function(err) {
+					$scope.sitePermission = false;
+				})
+				.then(function() {
+					$scope.$apply();
+				})
 
 			//wake up the background page and get a pipe to send/receive messages:
 			bgMessages = chrome.runtime.connect({name: "tab" + $scope.tabId});
@@ -166,7 +175,7 @@ function MasterPasswordController($scope, $interval, $http, $routeParams, $locat
   	    });
 
 				if ($scope.entries.length) {
-					$scope.partialMatchMessage = "No close matches, showing " + $scope.entries.length + " partial matches.  Double-check that this is the correct site!";
+					$scope.partialMatchMessage = "No close matches, showing " + $scope.entries.length + " partial matches.";
 				}
 	    }
 	    if ($scope.entries.length == 0) {

@@ -138,7 +138,7 @@ passwordMatches {
   max-height: 150px;
   overflow-y: scroll;
 }
-partialMatchWarning {
+warningMessage {
   margin-top: 8px;
   background: rgba(255, 153, 51, 0.5);
   display: block;
