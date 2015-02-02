@@ -18,7 +18,7 @@ module.exports = function(grunt) {
           {expand: true, src: 'background/**/*.js', dest:'build/'},
           {expand: true, src: 'services/**/*.js', dest:'build/'},
           {expand: true, src: 'options/**/*.js', dest:'build/'},
-          {expand: true, src: ['*.js', '!Gruntfile.js', '!tests/*'], dest:'build/'}
+          {expand: true, src: ['*.js', '!Gruntfile.js', '!tests/*', '!bower_components/**/*'], dest:'build/'}
           ]
       }
     },
@@ -63,7 +63,7 @@ module.exports = function(grunt) {
     htmlmin: {
       options: {
       },
-      files: {expand: true, src: ['**/*.html', '!node_modules/**/*.html', '!tests/**/*'], dest: 'build/'}
+      files: {expand: true, src: ['**/*.html', '!node_modules/**/*.html', '!tests/**/*', '!bower_components/**/*'], dest: 'build/'}
     },
     compress: {
       options: {
@@ -102,7 +102,7 @@ module.exports = function(grunt) {
 
   // Default task(s).
   grunt.registerTask('default', ['clean']);
-  grunt.registerTask('package', ['clean', 'uglify', 'less', 'cssmin', 'htmlmin', 'compress']);
+  grunt.registerTask('package', ['clean', 'copy:bower', 'uglify', 'less', 'cssmin', 'htmlmin', 'compress']);
   grunt.registerTask('updatelib', ['copy:bower']);
   //grunt.registerTask('styles', ['watch']);
 
