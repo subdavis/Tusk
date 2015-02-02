@@ -1,0 +1,14 @@
+/*! ChromeKeePass, Copyright 2015 Steven Campbell
+    This file is generated.
+*/
+body {
+  padding: 16px;
+  max-width: 800px;
+  font-family: Roboto, Arial, Helvetica, sans-serif;
+  font-size: 1em;
+}
+fieldset legend {
+  font-style: italic;
+  font-weight: 500;
+  background-color: rgba(0, 128, 255, 0.2);
+}

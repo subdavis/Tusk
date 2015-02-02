@@ -1,11 +1,106 @@
-<!DOCTYPE html>
-<html>
+<html ng-app="keepassSettings" ng-csp>
 	<head>
-		<title>Settings | Keepass</title>
+		<title>Settings | ChromKeePass</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<link rel="stylesheet" href="/lib/animate.css" />
+		<link rel="stylesheet" href="/lib/pure.min.css" />
+		<link rel="stylesheet" href="/lib/angular-csp.css" />
+		<link rel="stylesheet" href="/lib/json-formatter.min.css" />
+		<link rel="stylesheet" href="options.css" />
+		<script type="text/javascript" src="/lib/chrome-api-promise.js"></script>
+		<script type="text/javascript" src="/lib/angular.min.js"></script>
+		<script type="text/javascript" src="/lib/angular-route.min.js"></script>
+		<script type="text/javascript" src="/lib/angular-animate.min.js"></script>
+		<script type="text/javascript" src="/lib/json-formatter.min.js"></script>
 		<script type="text/javascript" src="/options/options.js"></script>
 	</head>
-	<body>
-		TODO
+	<body class="pure-form" ng-controller="OptionsController">
+		<fieldset>
+			<legend>
+				Introduction <!--<img src="../icons/logo_19.png" width="19" height="19">-->
+			</legend>
+				ChromeKeePass is an extension that uses your existing KeePass database files to autofill passwords on websites.
+				<br /><br />
+				The extension activates automatically when you go to a website that requests a password.  When it activates, it shows a small KeePass icon
+				on the right hand side of the browser address bar.  Clicking on the icon will give you options
+				to connect to your KeePass database, unlock it, and then autofill in the password on the website.
+				<br /><br />
+				Try it out on this sample login page: <a href="http://keepass.info/help/kb/testform.html" target="_blank">http://keepass.info/help/kb/testform.html</a>
+				<br /><br />
+				There are currently no options you can set, but if the extension has stored any of your data, then you can view it here.
+				None of this data is accessible to websites or other Chrome extensions.
+		</fieldset>
+		<fieldset ng-show="localData.length">
+			<legend>Local Stored Data - (stored locally on this device on your profile).</legend>
+				We store only the data we need in order to provide a secure and user-friendly experience.  We never store a master password or decrypted data.  You can delete the data below if you so wish.
+			<table class="pure-table pure-table-horizontal">
+				<thead><tr>
+					<th>Entry</th>
+					<th>Data</th>
+					<th></th>
+				</tr></thead>
+				<tbody>
+					<tr ng-repeat="entry in localData track by entry.key">
+						<td>{{entry.key}}</td>
+						<td><json-formatter json="entry.data" open="1"></json-formatter></td>
+						<td>
+							<button class="pure-button" ng-click="deleteLocalData(entry.key)">Delete</button>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</fieldset>
+		<fieldset ng-show="syncData.length">
+			<legend>Synchronized Stored Data - (stored on all Chrome browsers where you are logged in).</legend>
+			<table class="pure-table pure-table-horizontal">
+				<thead><tr>
+					<th>Entry</th>
+					<th>Data</th>
+					<th></th>
+				</tr></thead>
+				<tbody>
+					<tr ng-repeat="entry in syncData">
+						<td>{{entry.key}}</td>
+						<td><json-formatter json="entry.data" open="1"></json-formatter></td>
+						<td>
+							<button class="pure-button" ng-click="deleteSyncData(entry.key)">Delete</button>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</fieldset>
+		<fieldset ng-show="permissions.origins">
+			<legend>Origin Permissions - the extension uses these rights to autofill passwords on the site.</legend>
+			When you grant access to fill in a password on a site, Chrome remembers that access.  You can revoke access below if you so wish.
+			<table class="pure-table pure-table-horizontal">
+				<thead><tr>
+					<th>Site</th>
+					<th></th>
+				</tr></thead>
+				<tbody>
+					<tr ng-repeat="entry in permissions.origins">
+						<td>{{entry}}</td>
+						<td>
+							<button class="pure-button" ng-click="deleteOriginPermission(entry)">Revoke</button>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</fieldset>
+		<!--
+		<fieldset ng-show="permissions.permissions">
+			<legend>Chrome Permissions</legend>
+			<table class="pure-table pure-table-horizontal">
+				<thead><tr>
+					<th>Permission</th>
+				</tr></thead>
+				<tbody>
+					<tr ng-repeat="entry in permissions.permissions">
+						<td>{{entry}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</fieldset>
+	-->
 	</body>
 </html>

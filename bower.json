@@ -1,0 +1,28 @@
+{
+  "name": "ChromeKeepass",
+  "version": "0.0.0",
+  "homepage": "https://github.com/perfectapi/ChromeKeePass",
+  "authors": [
+    "Steve Campbell <dukeytoo@gmail.com>"
+  ],
+  "moduleType": [
+    "es6"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "json-formatter": "~0.2.7",
+    "jquery": "~2.1",
+    "angular": "~1.2",
+    "angular-animate": "1.2",
+    "angular-route": "1.2",
+    "animate.css": "~3.2.0"
+  }
+}

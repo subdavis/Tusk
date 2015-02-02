@@ -78,7 +78,7 @@ THE SOFTWARE.
       //better to do the request here on the background, because on some platforms
       //the popup may close prematurely when requesting access
       chrome.permissions.contains(message.perms, function(alreadyGranted) {
-        if (alreadyGranted && message.then) {
+        if (chrome.runtime.lastError || (alreadyGranted && message.then)) {
           handleMessage(message.then, sender, sendResponse);
         } else {
           //request

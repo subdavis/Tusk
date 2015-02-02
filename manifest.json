@@ -26,8 +26,11 @@
           "default_title": "Password field detected.  Click here to access your KeePass passwords.",
 		      "default_popup": "popups/popup.html"
         },
-
 	"options_page": "options/options.html",
+	"options_ui": {
+		"page": "options/options.html",
+		"chrome_style": true
+		},
 	"background": {
 		"scripts": [
 			"background/background.js"

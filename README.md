@@ -10,16 +10,10 @@ Chrome recently implemented the Crypto API, so it became practical to write Java
 
 * Requires minimal permissions to install - done. Zero permissions required to install.
 * Decrypts the password file - done.  Works with default KeePass settings on v2 (.kdbx) files.  No plans to work with plugin-provided encryption schemes or v1 files.
-* Retrieves keepass password file from Google Drive - done.  Supports a plugin-provider model, so other types are possible.
-* Matches website url or title - done.  Will partial match the website vs. the Keepass entry, and present a filtered list of password entries.
+* Retrieves KeePass password file from Google Drive - done.  Supports a plugin-provider model, so other types are possible.
+* Matches website url or title - done.  Will partial match the website vs. the KeePass entry, and present a filtered list of password entries.
 * Ignores Historical and Recycle Bin passwords - done.
 
-## Security Excellence
-Still working on it.  My aims are:
+## Security
 
-* Master password and keys are not stored in memory or storage.  Status = good.  Master password is only in-memory during decryption.
-* Clear-text passwords are not stored in memory.  Status = good.  Even once the database is decrypted, passwords are still encrypted until the user requests the specific password.  At that time only that password is decrypted.  Once the popup disappears, everything except whatever is in the clipboard is cleared.
-* Extension does not require any special permissions.  Status = excellent.  Extension installs without any permissions,
-and requests access to resources as it needs them the first time.
-* Password not copied to clipboard.  Status = good.  User can copy the password if they want, but autofill functionality is available so they don't have to.  
-
+It is a top priority of this project to implement security correctly.  On the wiki, there is a [page describing this in detail](https://github.com/perfectapi/ChromeKeePass/wiki/OWASP-Security-Review).

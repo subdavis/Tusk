@@ -22,6 +22,19 @@ module.exports = function(grunt) {
           ]
       }
     },
+    copy: {
+      bower: {
+        files: [
+          {expand: true, cwd: 'bower_components/json-formatter/dist/', src: 'json-formatter.min.js', dest: 'lib/'},
+          {expand: true, cwd: 'bower_components/json-formatter/dist/', src: 'json-formatter.min.css', dest: 'lib/'},
+          {expand: true, cwd: 'bower_components/angular/', src: 'angular.min.css', dest: 'lib/'},
+          {expand: true, cwd: 'bower_components/angular/', src: 'angular-csp.css', dest: 'lib/'},
+          {expand: true, cwd: 'bower_components/angular-animate/', src: 'angular-animate.min.js', dest: 'lib/'},
+          {expand: true, cwd: 'bower_components/angular-route/', src: 'angular-route.min.js', dest: 'lib/'},
+          {expand: true, cwd: 'bower_components/animate.css/', src: 'animate.css', dest: 'lib/'}
+          ]
+      }
+    },
     less: {
       target: {
         options: {
@@ -32,7 +45,8 @@ module.exports = function(grunt) {
             + '*/\n',
         },
         files: {
-          "popups/popup.css": "popups/popup.less"
+          "popups/popup.css": "popups/popup.less",
+          "options/options.css": "options/options.less"
         }
       }
     },
@@ -89,6 +103,7 @@ module.exports = function(grunt) {
   // Default task(s).
   grunt.registerTask('default', ['clean']);
   grunt.registerTask('package', ['clean', 'uglify', 'less', 'cssmin', 'htmlmin', 'compress']);
+  grunt.registerTask('updatelib', ['copy:bower']);
   //grunt.registerTask('styles', ['watch']);
 
 };

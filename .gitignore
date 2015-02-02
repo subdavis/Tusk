@@ -73,3 +73,6 @@ node_modules
 
 # Debug log from npm
 npm-debug.log
+
+#bower components
+bower_components/
