@@ -26,24 +26,31 @@
 				to connect to your KeePass database, unlock it, and then autofill in the password on the website.
 				<br /><br />
 				Try it out on this sample login page: <a href="http://keepass.info/help/kb/testform.html" target="_blank">http://keepass.info/help/kb/testform.html</a>
-				<br /><br />
-				There are currently no options you can set, but if the extension has stored any of your data, then you can view it here.
-				None of this data is accessible to websites or other Chrome extensions.
+		</fieldset>
+		<fieldset>
+			<legend>
+				Settings
+			</legend>
+			<strong>There are currently no options you can set</strong>, but for the truly security-paranoid, 
+			all of the data that the extension has stored
+			is visible below.  None of the data is accessible to websites or other Chrome extensions.
 		</fieldset>
 		<fieldset ng-show="localData.length">
 			<legend>Local Stored Data - (stored locally on this device on your profile).</legend>
-				We store only the data we need in order to provide a secure and user-friendly experience.  We never store a master password or decrypted data.  You can delete the data below if you so wish.
-			<table class="pure-table pure-table-horizontal">
+			We store only the data we need in order to provide a secure and user-friendly experience.  We never store a master password or decrypted data
+			and we never send this data anywhere.
+			You can use the "Delete" buttons to remove the data if you so wish.
+			<table class="pure-table pure-table-horizontal fixed">
 				<thead><tr>
-					<th>Entry</th>
-					<th>Data</th>
-					<th></th>
+					<th class="key">Entry</th>
+					<th class="json">Data</th>
+					<th class="action"></th>
 				</tr></thead>
 				<tbody>
 					<tr ng-repeat="entry in localData track by entry.key">
-						<td>{{entry.key}}</td>
-						<td><json-formatter json="entry.data" open="1"></json-formatter></td>
-						<td>
+						<td class="key">{{entry.key}}</td>
+						<td class="json"><json-formatter json="entry.data" open="1"></json-formatter></td>
+						<td class="action">
 							<button class="pure-button" ng-click="deleteLocalData(entry.key)">Delete</button>
 						</td>
 					</tr>
@@ -71,7 +78,8 @@
 		</fieldset>
 		<fieldset ng-show="permissions.origins">
 			<legend>Origin Permissions - the extension uses these rights to autofill passwords on the site.</legend>
-			When you grant access to fill in a password on a site, Chrome remembers that access.  You can revoke access below if you so wish.
+			When you grant access to fill in a password on a site, Chrome remembers that access.  You can make ChromeKeePass forget its access below if you so wish,
+			however Chrome will silently re-grant the permission if requested.
 			<table class="pure-table pure-table-horizontal">
 				<thead><tr>
 					<th>Site</th>
@@ -81,7 +89,7 @@
 					<tr ng-repeat="entry in permissions.origins">
 						<td>{{entry}}</td>
 						<td>
-							<button class="pure-button" ng-click="deleteOriginPermission(entry)">Revoke</button>
+							<button class="pure-button" ng-click="deleteOriginPermission(entry)">Forget</button>
 						</td>
 					</tr>
 				</tbody>

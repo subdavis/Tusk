@@ -24,3 +24,25 @@ fieldset {
     background-color: @light-blue-bg;
   }
 }
+
+table.fixed {
+  table-layout: fixed;
+
+  td, th {
+    &.key {
+      width: 120px;
+    }
+
+    &.json {
+      width: 300px;
+
+      .json-formatter-row {
+        max-width: 500px;
+      }
+    }
+
+    &.action {
+      width: 100px;
+    }
+  }
+}

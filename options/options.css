@@ -12,3 +12,22 @@ fieldset legend {
   font-weight: 500;
   background-color: rgba(0, 128, 255, 0.2);
 }
+table.fixed {
+  table-layout: fixed;
+}
+table.fixed td.key,
+table.fixed th.key {
+  width: 120px;
+}
+table.fixed td.json,
+table.fixed th.json {
+  width: 300px;
+}
+table.fixed td.json .json-formatter-row,
+table.fixed th.json .json-formatter-row {
+  max-width: 500px;
+}
+table.fixed td.action,
+table.fixed th.action {
+  width: 100px;
+}
