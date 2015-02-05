@@ -15,25 +15,17 @@
 		<script type="text/javascript" src="/options/options.js"></script>
 	</head>
 	<body class="pure-form" ng-controller="OptionsController">
-		<fieldset>
+		<fieldset ng-hide="localData.length">
 			<legend>
 				Introduction <!--<img src="../icons/logo_19.png" width="19" height="19">-->
 			</legend>
 				ChromeKeePass is an extension that uses your existing KeePass database files to autofill passwords on websites.
 				<br /><br />
-				The extension activates automatically when you go to a website that requests a password.  When it activates, it shows a small KeePass icon
+				The extension is only visible when you go to a web page that requests a password.  When it activates, it shows a small KeePass icon
 				on the right hand side of the browser address bar.  Clicking on the icon will give you options
 				to connect to your KeePass database, unlock it, and then autofill in the password on the website.
 				<br /><br />
 				Try it out on this sample login page: <a href="http://keepass.info/help/kb/testform.html" target="_blank">http://keepass.info/help/kb/testform.html</a>
-		</fieldset>
-		<fieldset>
-			<legend>
-				Settings
-			</legend>
-			<strong>There are currently no options you can set</strong>, but for the truly security-paranoid, 
-			all of the data that the extension has stored
-			is visible below.  None of the data is accessible to websites or other Chrome extensions.
 		</fieldset>
 		<fieldset ng-show="localData.length">
 			<legend>Local Stored Data - (stored locally on this device on your profile).</legend>
