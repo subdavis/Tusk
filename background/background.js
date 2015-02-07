@@ -38,15 +38,17 @@ THE SOFTWARE.
 
   function doReplaceRules() {
     chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
-      var passwordField = {id: "pwdField", conditions: [
-        new chrome.declarativeContent.PageStateMatcher({
+      var passwordField = {
+        id: "pwdField",
+        conditions: [
+          new chrome.declarativeContent.PageStateMatcher({
             css: ["input[type='password']"]
           })
         ],
         actions: [
           new chrome.declarativeContent.ShowPageAction()
           //new chrome.declarativeContent.RequestContentScript({js: ['keepass.js']})
-          ]
+        ]
       };
       chrome.declarativeContent.onPageChanged.addRules([passwordField]);
     });
@@ -72,7 +74,7 @@ THE SOFTWARE.
   });
 
   function handleMessage(message, sender, sendResponse) {
-    if (!message || !message.m) return;  //message format unrecognized
+    if (!message || !message.m) return; //message format unrecognized
 
     if (message.m == "requestPermission") {
       //better to do the request here on the background, because on some platforms
@@ -82,7 +84,7 @@ THE SOFTWARE.
           handleMessage(message.then, sender, sendResponse);
         } else {
           //request
-          chrome.permissions.request(message.perms, function(granted){
+          chrome.permissions.request(message.perms, function(granted) {
             if (granted && message.then) {
               handleMessage(message.then, sender, sendResponse);
             }
@@ -97,7 +99,9 @@ THE SOFTWARE.
       }, function(result) {
         //script injected
         chrome.tabs.sendMessage(message.tabId, {
-          m: "fillPassword", u: message.u, p: message.p
+          m: "fillPassword",
+          u: message.u,
+          p: message.p
         });
       });
     }
@@ -113,7 +117,7 @@ THE SOFTWARE.
       var clearClipboard = function(e) {
         e.clipboardData.setData('text/plain', "");
         e.preventDefault();
-        document.removeEventListener('copy', clearClipboard);  //don't listen anymore
+        document.removeEventListener('copy', clearClipboard); //don't listen anymore
       }
 
       document.addEventListener('copy', clearClipboard);

@@ -55,7 +55,7 @@ function PasswordFileStoreFactory(gdocs) {
   };
 
   function getInstance(key, fi) {
-    switch(key) {
+    switch (key) {
       case "gdrive":
         return new GoogleDrivePasswordFileProvider(gdocs, fi);
       case "local":
@@ -64,7 +64,7 @@ function PasswordFileStoreFactory(gdocs) {
         return new LocalChromePasswordFileProvider(fi);
     }
   }
-  my.getInstance = getInstance;  //expose
+  my.getInstance = getInstance; //expose
 
   return my;
 }
@@ -89,7 +89,7 @@ function GoogleDrivePasswordFileProvider(gdocs, fileHandle) {
       return e.currentTarget.response;
     });;
   }
-  my.getFile = getFile;  //expose
+  my.getFile = getFile; //expose
 
   return my;
 }
@@ -108,7 +108,7 @@ function LocalChromePasswordFileProvider(fi) {
     return new Promise(function(resolve, reject) {
       chrome.storage.local.get('passwordFiles', function(result) {
         var success = false;
-    		if (result && result.passwordFiles) {
+        if (result && result.passwordFiles) {
           result.passwordFiles.forEach(function(storedFile) {
             if (storedFile.title == fi.title) {
               var bytes = Base64.decode(storedFile.data);
@@ -116,15 +116,15 @@ function LocalChromePasswordFileProvider(fi) {
               success = true;
             }
           });
-    		}
+        }
 
-    	  if (!success) {
-    	    reject(new Error("Failed to find the requested file"));
-    	  }
+        if (!success) {
+          reject(new Error("Failed to find the requested file"));
+        }
       });
     });
   }
-  my.getFile = getFile;  //expose
+  my.getFile = getFile; //expose
 
   return my;
 }

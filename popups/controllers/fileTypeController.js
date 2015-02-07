@@ -1,5 +1,3 @@
-
-
 function FileTypeController($scope, $http, $location, $routeParams) {
 
   $scope.chooseGdrive = function() {

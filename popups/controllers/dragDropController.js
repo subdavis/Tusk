@@ -1,13 +1,11 @@
-
-
 function DragDropController($scope, $http, $location, localStorage) {
   $scope.files = [];
   $scope.allowDrop = true;
-  var backwardCompatibleVersion = 1;  //missing version or version less than this is ignored due missing info or bugs in old storage
-  var currentVersion = 1;             //current version
+  var backwardCompatibleVersion = 1; //missing version or version less than this is ignored due missing info or bugs in old storage
+  var currentVersion = 1; //current version
 
   chrome.runtime.getPlatformInfo(function(info) {
-    $scope.allowDrop = (info.os == "cros");  //does not work on some platforms because the popup closes.  Windows is 50-50, some PCs are a problem some not
+    $scope.allowDrop = (info.os == "cros"); //does not work on some platforms because the popup closes.  Windows is 50-50, some PCs are a problem some not
   });
 
   $scope.selectFile = function() {
@@ -55,7 +53,9 @@ function DragDropController($scope, $http, $location, localStorage) {
 
     Promise.all(filePromises).then(function(info) {
       //save files in chrome storage
-      chrome.storage.local.set({"passwordFiles": $scope.files });
+      chrome.storage.local.set({
+        "passwordFiles": $scope.files
+      });
       $scope.$apply();
     });
   };
@@ -65,24 +65,26 @@ function DragDropController($scope, $http, $location, localStorage) {
       return (existingFi.title != fi.title);
     });
 
-    chrome.storage.local.set({"passwordFiles": $scope.files });
+    chrome.storage.local.set({
+      "passwordFiles": $scope.files
+    });
     $scope.loadedFiles = 0;
   };
 
   $scope.choosePasswordFile = function(fi) {
-	  localStorage.saveDatabaseChoice("local", fi).then(function(fileStore) {
-  		$location.path('/enter-password/' + fileStore.title);
-  		$scope.$apply();
-	  });
+    localStorage.saveDatabaseChoice("local", fi).then(function(fileStore) {
+      $location.path('/enter-password/' + fileStore.title);
+      $scope.$apply();
+    });
   };
 
   chrome.storage.local.get('passwordFiles', function(result) {
-		if (result && result.passwordFiles) {
-		  $scope.files = result.passwordFiles.filter(function(fi) {
-		    return (fi.storageVersion && fi.storageVersion >= backwardCompatibleVersion);
-		  });
+    if (result && result.passwordFiles) {
+      $scope.files = result.passwordFiles.filter(function(fi) {
+        return (fi.storageVersion && fi.storageVersion >= backwardCompatibleVersion);
+      });
 
-		  $scope.$apply();
-		}
+      $scope.$apply();
+    }
   });
 }

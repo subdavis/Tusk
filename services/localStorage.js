@@ -41,8 +41,11 @@ function LocalStorage(passwordFileStoreFactory) {
    */
   function saveDatabaseChoice(providerKey, fileInfo) {
     fileInfo = angular.copy(fileInfo);
-    fileInfo.data = undefined;  //don't save the data with the choice
-    return chrome.p.storage.local.set({'passwordFile': fileInfo, 'providerKey': providerKey}).then(function() {
+    fileInfo.data = undefined; //don't save the data with the choice
+    return chrome.p.storage.local.set({
+      'passwordFile': fileInfo,
+      'providerKey': providerKey
+    }).then(function() {
       return passwordFileStoreFactory.getInstance(providerKey, fileInfo);
     });
   }
@@ -52,11 +55,11 @@ function LocalStorage(passwordFileStoreFactory) {
    */
   function getSavedDatabaseChoice() {
     return chrome.p.storage.local.get(['passwordFile', 'providerKey']).then(function(items) {
-  		if (items.passwordFile && items.providerKey) {
-  		  return passwordFileStoreFactory.getInstance(items.providerKey, items.passwordFile);
-  		} else {
-  		  throw new Error('Could not find a saved password file choice');
-  		}
+      if (items.passwordFile && items.providerKey) {
+        return passwordFileStoreFactory.getInstance(items.providerKey, items.passwordFile);
+      } else {
+        throw new Error('Could not find a saved password file choice');
+      }
     });
   }
 
@@ -76,7 +79,9 @@ function LocalStorage(passwordFileStoreFactory) {
           delete usage.fileKey;
         }
 
-        return chrome.p.storage.local.set({'databaseUsages': usages});
+        return chrome.p.storage.local.set({
+          'databaseUsages': usages
+        });
       });
     });
   }

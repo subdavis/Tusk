@@ -35,7 +35,7 @@ function OptionsController($scope, $http) {
   function refreshLocalStorage() {
     $scope.localData = [];
     return chrome.p.storage.local.get(null).then(function(items) {
-      for(var name in items) {
+      for (var name in items) {
         var entry = {
           key: name,
           data: items[name]
@@ -49,7 +49,7 @@ function OptionsController($scope, $http) {
   function refreshSyncStorage() {
     $scope.syncData = [];
     return chrome.p.storage.sync.get(null).then(function(items) {
-      for(var name in items) {
+      for (var name in items) {
         var entry = {
           key: name,
           data: items[name]
@@ -76,7 +76,9 @@ function OptionsController($scope, $http) {
   }
 
   $scope.deleteOriginPermission = function(origin) {
-    chrome.p.permissions.remove({"origins": [origin]}).then(function() {
+    chrome.p.permissions.remove({
+      "origins": [origin]
+    }).then(function() {
       return refreshPermissions();
     }).then(function() {
       $scope.$apply();
@@ -87,11 +89,11 @@ function OptionsController($scope, $http) {
 keepassSettings.directive('icon', function() {
   function link(scope, element, attrs) {
     function renderSVG() {
-      var icon = element.scope()[attrs.p];  //evaluate as scope expression
+      var icon = element.scope()[attrs.p]; //evaluate as scope expression
       if (!icon)
-      icon = attrs.p;
+        icon = attrs.p;
       var html = '<svg class="icon ' + icon + '"><use xlink:href="#' + icon + '"></use></svg>';
-      element.replaceWith( html );
+      element.replaceWith(html);
     }
 
     renderSVG();

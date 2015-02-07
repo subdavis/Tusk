@@ -31,8 +31,7 @@ function Keepass(pako, localStorage) {
 
   };
 
-  var internals = {
-  }
+  var internals = {}
 
   internals.littleEndian = (function() {
     var buffer = new ArrayBuffer(2);
@@ -41,12 +40,12 @@ function Keepass(pako, localStorage) {
   })();
 
   function readHeader(buf) {
-    var position = 12;  //after initial db signature + version
+    var position = 12; //after initial db signature + version
     var sigHeader = new DataView(buf, 0, position)
     var h = {
-      sig1 : sigHeader.getUint32(0, internals.littleEndian),
-      sig2 : sigHeader.getUint32(4, internals.littleEndian),
-      version : sigHeader.getUint32(8, internals.littleEndian)
+      sig1: sigHeader.getUint32(0, internals.littleEndian),
+      sig2: sigHeader.getUint32(4, internals.littleEndian),
+      version: sigHeader.getUint32(8, internals.littleEndian)
     };
 
     var DBSIG_1 = 0x9AA2D903;
@@ -119,9 +118,9 @@ function Keepass(pako, localStorage) {
     try {
       var arr = [];
       for (var i = 0; i < hex.length; i += 2)
-          arr.push(parseInt(hex.substr(i, 2), 16));
+        arr.push(parseInt(hex.substr(i, 2), 16));
       return arr;
-    } catch(err) {
+    } catch (err) {
       return [];
     }
   }
@@ -184,8 +183,8 @@ function Keepass(pako, localStorage) {
 
     return Promise.all(partPromises).then(function(parts) {
       var compositeKeySource = new Uint8Array(32 * parts.length);
-      for(var i=0; i<parts.length; i++) {
-        compositeKeySource.set(new Uint8Array(parts[i]), i*32);
+      for (var i = 0; i < parts.length; i++) {
+        compositeKeySource.set(new Uint8Array(parts[i]), i * 32);
       }
 
       return window.crypto.subtle.digest(SHA, compositeKeySource);
@@ -220,7 +219,9 @@ function Keepass(pako, localStorage) {
         return aes_ecb_encrypt(h.transformSeed, masterKey, h.keyRounds);
       }).then(function(finalVal) {
         //do a final SHA-256 on the transformed key
-        return window.crypto.subtle.digest({name: "SHA-256"}, finalVal);
+        return window.crypto.subtle.digest({
+          name: "SHA-256"
+        }, finalVal);
       }).then(function(encMasterKey) {
         var finalKeySource = new Uint8Array(64);
         finalKeySource.set(h.masterSeed);
@@ -234,7 +235,7 @@ function Keepass(pako, localStorage) {
       }).then(function(decryptedData) {
         //at this point we probably have successfully decrypted data, just need to double-check:
         var storedStartBytes = new Uint8Array(decryptedData, 0, 32);
-        for (var i=0; i<32; i++) {
+        for (var i = 0; i < 32; i++) {
           if (storedStartBytes[i] != h.streamStartBytes[i]) {
             throw new Error('Decryption succeeded but payload corrupt');
             return;
@@ -274,42 +275,46 @@ function Keepass(pako, localStorage) {
     var decryptedBytes = new Uint8Array(salsa.decrypt(protectedData.data));
     return decoder.decode(decryptedBytes);
   }
-  my.getDecryptedEntry = getDecryptedEntry;  //expose the function
+  my.getDecryptedEntry = getDecryptedEntry; //expose the function
 
   /**
    * Parses the entries xml into an object format
    **/
   function parseXml(xml, protectedStreamKey) {
-    return window.crypto.subtle.digest({name: "SHA-256"}, protectedStreamKey).then(function(streamKey) {
+    return window.crypto.subtle.digest({
+      name: "SHA-256"
+    }, protectedStreamKey).then(function(streamKey) {
       my.streamKey = streamKey;
       var decoder = new TextDecoder();
       var parser = new DOMParser();
       var doc = parser.parseFromString(xml, "text/xml");
       //console.log(doc);
 
-/*
+      /*
 
-      var protectedNodes = doc.evaluate("//Value[@Protected='True']", doc, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
-      for (var i=0 ; i < protectedNodes.snapshotLength; i++) {
-        var protectedNode = protectedNodes.snapshotItem(i);
-        var val = protectedNode.textContent;
-        var encBytes = StringView.base64ToBytes(val);
-        var base64val = StringView.bytesToBase64(salsa.decrypt(encBytes));
-        var finalVal = atob(base64val);
-      }
-*/
+            var protectedNodes = doc.evaluate("//Value[@Protected='True']", doc, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+            for (var i=0 ; i < protectedNodes.snapshotLength; i++) {
+              var protectedNode = protectedNodes.snapshotItem(i);
+              var val = protectedNode.textContent;
+              var encBytes = StringView.base64ToBytes(val);
+              var base64val = StringView.bytesToBase64(salsa.decrypt(encBytes));
+              var finalVal = atob(base64val);
+            }
+      */
 
       var results = [];
       var entryNodes = doc.evaluate('//Entry', doc, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
       var protectedPosition = 0;
-      for (var i=0 ; i < entryNodes.snapshotLength; i++) {
+      for (var i = 0; i < entryNodes.snapshotLength; i++) {
         var entryNode = entryNodes.snapshotItem(i);
         //console.log(entryNode);
-        var entry = { protectedData: {}};
+        var entry = {
+          protectedData: {}
+        };
 
         //exclude histories and recycle bin:
         if (entryNode.parentNode.nodeName != "History") {
-          for (var m=0; m < entryNode.parentNode.children.length; m++) {
+          for (var m = 0; m < entryNode.parentNode.children.length; m++) {
             var groupNode = entryNode.parentNode.children[m];
             if (groupNode.nodeName == 'Name')
               entry.groupName = groupNode.textContent;
@@ -318,7 +323,7 @@ function Keepass(pako, localStorage) {
           if (entry.groupName != "Recycle Bin")
             results.push(entry);
         }
-        for (var j=0; j < entryNode.children.length; j++) {
+        for (var j = 0; j < entryNode.children.length; j++) {
           var childNode = entryNode.children[j];
 
           if (childNode.nodeName == "String") {
@@ -352,12 +357,12 @@ function Keepass(pako, localStorage) {
     //Simulate ECB encryption by using IV of the data.
     var blockCount = data.byteLength / 16;
     var blockPromises = new Array(blockCount);
-    for(var i=0; i<blockCount; i++) {
+    for (var i = 0; i < blockCount; i++) {
       var block = data.subarray(i * 16, i * 16 + 16);
       blockPromises[i] = (function(iv) {
         var AES = {
           name: "AES-CBC",
-            iv: iv
+          iv: iv
         };
         return window.crypto.subtle.importKey("raw", rawKey, AES, false, ["encrypt"]).then(function(secureKey) {
           var fakeData = new Uint8Array(rounds * 16);
@@ -370,7 +375,7 @@ function Keepass(pako, localStorage) {
     return Promise.all(blockPromises).then(function(blocks) {
       //we now have the blocks, so chain them back together
       var result = new Uint8Array(data.byteLength);
-      for (var i=0; i<blockCount; i++) {
+      for (var i = 0; i < blockCount; i++) {
         result.set(blocks[i], i * 16);
       }
       return result;

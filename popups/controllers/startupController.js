@@ -1,5 +1,3 @@
-
-
 function StartupController($scope, $http, $location, gdocs, localStorage) {
 
   //trigger gdocs auth - doesn't matter if it succeeds or fails, we just want a token ready to go
@@ -7,7 +5,7 @@ function StartupController($scope, $http, $location, gdocs, localStorage) {
     //don't care
   }).then(function() {
     //init app
-    
+
     localStorage.getSavedDatabaseChoice().then(function(fileStore) {
       $location.path('/enter-password/' + fileStore.title);
     }).catch(function(err) {
