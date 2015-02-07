@@ -114,6 +114,13 @@ button .icon {
 .pure-table td .icon:hover {
   color: #c3c3c3;
 }
+table.entries {
+  table-layout: fixed;
+}
+table.entries td,
+table.entries th {
+  overflow-wrap: break-word;
+}
 statusMessage {
   display: block;
   padding: 4px 0;

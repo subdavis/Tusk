@@ -36,9 +36,9 @@ function ProtectedStorage() {
     getData: getData,
     setData: setData,
     clearData: clearData,
-    serialize: serialize,
-    deserialize: deserialize,
-    hydrate: deserialize
+    serialize: serialize,      //not encrypted
+    deserialize: deserialize,  //not encrypted
+    hydrate: deserialize       //not encrypted
   }
 
   var enckey, keyPromise;
@@ -69,7 +69,6 @@ function ProtectedStorage() {
       var parsed = JSON.parse(decoded)
       return dePrepData(parsed);
     });
-    //return data[key];
   }
 
   function setData(key, data) {
@@ -83,11 +82,10 @@ function ProtectedStorage() {
       dataMap[key] = dataString;
       return Promise.resolve();
     });
-    //data[key] = data;
   }
 
   function clearData(key) {
-    data = {};
+    dataMap = {};
     keyPromise = initNewKey();
     return keyPromise
   }
@@ -99,19 +97,21 @@ function ProtectedStorage() {
     return Base64.encode(dataBytes);
   }
 
-  function deserialize(data) {
-    var encData = dataMap[key];
-    if (encData === undefined || typeof(encData) !== 'string')
+  function deserialize(serializedData) {
+    if (serializedData === undefined || typeof(serializedData) !== 'string')
       return undefined;
 
-    var dataBytes = Base64.decode(encData);
+    var dataBytes = Base64.decode(serializedData);
     var decoder = new TextDecoder();
     var decoded = decoder.decode(new Uint8Array(dataBytes));
     var parsed = JSON.parse(decoded)
     return dePrepData(parsed);
   }
 
-  //prep data for serializing by converting ArrayBuffer properties to base64 properties
+  /**
+  * Prep data for serializing by converting ArrayBuffer properties to base64 properties
+  * Also makes a deep copy, so what is returned is not the original.
+  */
   var randomString = "Ựៅ" // Base64.encode(window.crypto.getRandomValues(new Uint8Array(4)));
   function prepData(data) {
     if (data === null || data === undefined || typeof (data) !== 'object')

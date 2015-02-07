@@ -4,10 +4,12 @@ function MasterPasswordController($scope, $interval, $http, $routeParams, $locat
   $scope.fileName = $routeParams.fileTitle;
   $scope.keyFileName = "";
   $scope.rememberKeyFile = true;
+  $scope.usingSavedState = false;
   var fileKey, streamKey, bgMessages;
 
   function bgMessageListener(savedState) {
     //called from the background.
+    $scope.usingSavedState = true;
     $scope.entries = savedState.entries;
     angular.forEach($scope.entries, function(entry) {
       //deserialize passwords
@@ -137,11 +139,7 @@ function MasterPasswordController($scope, $interval, $http, $routeParams, $locat
         keyFileName: $scope.keyFileName
       });
 
-      protectedStorage.setData("lastEntries", entries).then(function() {
-        protectedStorage.getData("lastEntries").then(function(data) {
-          console.log(data);
-        })
-      });   //save all entries in case user wants to do a custom search
+      protectedStorage.setData("cachedEntries", entries);   //save all entries in case user wants to do a custom search
 
       //show results:
       var siteUrl = parseUrl($scope.url);

@@ -1,8 +1,7 @@
-<instructions>Sorry we couldn't find your password.  Matching works best when you fill in the URL field on the password entry.</instructions>
-<form>
-  <label for="filter">Type to filter</label><input type="text" id="filter">
+<form class="pure-form">
+  <input type="text" id="filter" ng-model="filter" class="fill" ng-change="filterKey()" autoFocus placeholder="Type to filter...">
 </form>
-<table ng-show="entries" class="pure-table pure-table-horizontal">
+<table ng-show="entries" class="pure-table pure-table-horizontal entries">
   <thead>
     <tr>
       <th>Entry</th>
