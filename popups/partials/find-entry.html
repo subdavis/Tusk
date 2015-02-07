@@ -1,0 +1,28 @@
+<instructions>Sorry we couldn't find your password.  Matching works best when you fill in the URL field on the password entry.</instructions>
+<form>
+  <label for="filter">Type to filter</label><input type="text" id="filter">
+</form>
+<table ng-show="entries" class="pure-table pure-table-horizontal">
+  <thead>
+    <tr>
+      <th>Entry</th>
+      <th>Username</th>
+      <th>Password</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr ng-repeat="entry in entries" title="{{entry.Notes}}">
+      <td>{{entry.Title || entry.Url}}</td>
+      <td>{{entry.UserName}}</td>
+      <td>
+        <a href="" ng-click="copyPassword(entry)" title="Copy password to clipboard" ng-hide="entry.copied">
+          <icon p="icon-copy"></icon>
+        </a>
+        <span ng-show="entry.copied">Copied</span>
+        <a href="" ng-click="autofill(entry)" title="Auto-fill credentials on site">
+          <icon p="icon-edit"></icon>
+        </a>
+      </td>
+    </tr>
+  </tbody>
+</table>

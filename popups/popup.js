@@ -39,6 +39,9 @@ keepassApp.config(['$routeProvider', function($routeProvider) {
   }).when('/enter-password/:fileTitle', {
     templateUrl: chrome.extension.getURL('/popups/partials/enter-password.html'),
     controller: 'masterPasswordController'
+  }).when('/find-entry', {
+    templateUrl: chrome.extension.getURL('/popups/partials/find-entry.html'),
+    controller: 'findEntryController'
   }).when('/startup', {
     templateUrl: chrome.extension.getURL('/popups/partials/startup.html'),
     controller: 'startupController'
@@ -63,6 +66,10 @@ keepassApp.factory('localStorage', ['passwordFileStoreFactory', function(passwor
 	return new LocalStorage(passwordFileStoreFactory);
 }]);
 
+keepassApp.factory('protectedStorage', [function() {
+  return new ProtectedStorage();
+}]);
+
 keepassApp.factory('keepass', ['pako', 'localStorage', function(pako, localStorage) {
 	return new Keepass(pako, localStorage);
 }]);
@@ -71,7 +78,8 @@ keepassApp.controller('dragDropController', ['$scope', '$http', '$location', 'lo
 keepassApp.controller('fileTypeController', ['$scope', '$http', '$location', '$routeParams', FileTypeController]);
 keepassApp.controller('startupController', ['$scope', '$http', '$location', 'gdocs', 'localStorage', StartupController]);
 keepassApp.controller('docsController', ['$scope', '$http', '$location', 'gdocs', 'localStorage', DocsController]);
-keepassApp.controller('masterPasswordController', ['$scope', '$interval', '$http', '$routeParams', '$location', 'keepass', 'localStorage', MasterPasswordController]);
+keepassApp.controller('masterPasswordController', ['$scope', '$interval', '$http', '$routeParams', '$location', 'keepass', 'localStorage', 'protectedStorage', MasterPasswordController]);
+keepassApp.controller('findEntryController', ['$scope', 'protectedStorage', FindEntryController]);
 
 keepassApp.directive('icon', function() {
     function link(scope, element, attrs) {

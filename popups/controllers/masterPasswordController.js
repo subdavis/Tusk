@@ -1,4 +1,4 @@
-function MasterPasswordController($scope, $interval, $http, $routeParams, $location, keepass, localStorage) {
+function MasterPasswordController($scope, $interval, $http, $routeParams, $location, keepass, localStorage, protectedStorage) {
   $scope.masterPassword = "";
   $scope.busy = false;
   $scope.fileName = $routeParams.fileTitle;
@@ -128,7 +128,6 @@ function MasterPasswordController($scope, $interval, $http, $routeParams, $locat
     $scope.busy = true;
 
     keepass.getPasswords($scope.masterPassword, fileKey).then(function(entries) {
-
       //remember usage for next time:
       localStorage.saveCurrentDatabaseUsage({
         requiresPassword: $scope.masterPassword ? true : false,
@@ -137,6 +136,12 @@ function MasterPasswordController($scope, $interval, $http, $routeParams, $locat
         fileKey: fileKey,
         keyFileName: $scope.keyFileName
       });
+
+      protectedStorage.setData("lastEntries", entries).then(function() {
+        protectedStorage.getData("lastEntries").then(function(data) {
+          console.log(data);
+        })
+      });   //save all entries in case user wants to do a custom search
 
       //show results:
       var siteUrl = parseUrl($scope.url);
@@ -205,6 +210,10 @@ function MasterPasswordController($scope, $interval, $http, $routeParams, $locat
       $scope.$apply();
     });
   };
+
+  $scope.findManually = function() {
+    $location.path('/find-entry');
+  }
 
   $scope.clearMessages = function() {
     $scope.errorMessage = "";
