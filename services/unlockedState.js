@@ -46,7 +46,7 @@ function UnlockedState($interval, keepass, protectedMemory) {
   my.messagePromise = new Promise(function(resolve, reject) {
     messageReceivedResolve = resolve;
   });
-  
+
   //determine current url:
   my.getTabDetails = function() {
     return new Promise(function(resolve, reject) {
@@ -113,7 +113,8 @@ function UnlockedState($interval, keepass, protectedMemory) {
         m: "autofill",
         tabId: my.tabId,
         u: entry.UserName,
-        p: keepass.getDecryptedEntry(entry.protectedData.Password, streamKey)
+        p: keepass.getDecryptedEntry(entry.protectedData.Password, streamKey),
+        o: my.origin
       }
     });
 

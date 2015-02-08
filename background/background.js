@@ -52,7 +52,18 @@ THE SOFTWARE.
           //new chrome.declarativeContent.RequestContentScript({js: ['keepass.js']})
         ]
       };
-      chrome.declarativeContent.onPageChanged.addRules([passwordField]);
+      var iframeLogin = {
+        id: "iframeLogin",
+        conditions: [
+        new chrome.declarativeContent.PageStateMatcher({
+          css: ["iframe[src^='https']"]
+        })
+        ],
+        actions: [
+        new chrome.declarativeContent.ShowPageAction()
+        ]
+      };
+      chrome.declarativeContent.onPageChanged.addRules([passwordField, iframeLogin]);
     });
   }
 
@@ -98,13 +109,15 @@ THE SOFTWARE.
 
     if (message.m == "autofill") {
       chrome.tabs.executeScript(message.tabId, {
-        file: "keepass.js"
+        file: "keepass.js",
+        allFrames: true
       }, function(result) {
         //script injected
         chrome.tabs.sendMessage(message.tabId, {
           m: "fillPassword",
           u: message.u,
-          p: message.p
+          p: message.p,
+          o: message.o
         });
       });
     }

@@ -35,7 +35,30 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 
 	if (message.m == "fillPassword") {
 		//user has selected to fill the password
+		var documentOrigin = parseUrl(document.URL);
+		var expectedOrigin = parseUrl(message.o);
+		if (documentOrigin.hostname !== expectedOrigin.hostname || (documentOrigin.protocol !== 'https:' && documentOrigin.protocol !== 'file:'))
+			return;  //security restriction - we will only fill in passwords on the correct, https origin
+
 		filler.fillPassword(message.u, message.p);
+	}
+
+	function parseUrl(url) {
+		//from https://gist.github.com/jlong/2428561
+		var parser = document.createElement('a');
+		parser.href = url;
+
+		/*
+		parser.protocol; // => "http:"
+		parser.hostname; // => "example.com"
+		parser.port;     // => "3000"
+		parser.pathname; // => "/pathname/"
+		parser.search;   // => "?search=test"
+		parser.hash;     // => "#hash"
+		parser.host;     // => "example.com:3000"
+		*/
+
+		return parser;
 	}
 });
 
@@ -49,6 +72,7 @@ var filler = (function() {
 		//identify user/password pairs
 		userPasswordPairs = [];
 		lonelyPasswords = [];
+
 		var inputPattern = "input[type='text'], input[type='email'], input[type='password'], input:not([type])";
 		var possibleUserName;
 		var lastFieldWasPassword = false; //used to detect registration forms which have 2 password fields, one after the other
@@ -160,7 +184,7 @@ var filler = (function() {
 		return (
 			rect.top >= 0 && rect.left >= 0 && rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&  /*or $(window).height() */
 			rect.right <= (window.innerWidth || document.documentElement.clientWidth) /*or $(window).width() */);
-		}
+	}
 
 	return {
 		fillPassword: fillPassword
