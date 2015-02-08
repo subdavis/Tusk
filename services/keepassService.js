@@ -409,18 +409,6 @@ function Keepass(keepassHeader, pako, localStorage) {
       var doc = parser.parseFromString(xml, "text/xml");
       //console.log(doc);
 
-      /*
-
-            var protectedNodes = doc.evaluate("//Value[@Protected='True']", doc, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
-            for (var i=0 ; i < protectedNodes.snapshotLength; i++) {
-              var protectedNode = protectedNodes.snapshotItem(i);
-              var val = protectedNode.textContent;
-              var encBytes = StringView.base64ToBytes(val);
-              var base64val = StringView.bytesToBase64(salsa.decrypt(encBytes));
-              var finalVal = atob(base64val);
-            }
-      */
-
       var results = [];
       var entryNodes = doc.evaluate('//Entry', doc, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
       var protectedPosition = 0;
@@ -453,14 +441,13 @@ function Keepass(keepassHeader, pako, localStorage) {
             var protectedVal = valNode.hasAttribute('Protected');
 
             if (protectedVal) {
-              var encBytes = StringView.base64ToBytes(val);
+              var encBytes = new Uint8Array(Base64.decode(val));
               entry.protectedData[key] = {
                 position: protectedPosition,
                 data: encBytes
               };
 
               protectedPosition += encBytes.length;
-              //val = atob(StringView.bytesToBase64(salsa.decrypt(encBytes)));
             }
             entry[key] = val;
           }
