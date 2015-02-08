@@ -77,7 +77,7 @@ function KeepassHeader() {
     var dv = new DataView(buf, position, 116);
     var flags = dv.getUint32(0, littleEndian);
     if (flags & FLAG_RIJNDAEL != FLAG_RIJNDAEL) {
-      throw new Error('We only support AES on KeePass KDB files.  This file is using something else.');
+      throw new Error('We only support AES (aka Rijndael) encryption on KeePass KDB files.  This file is using something else.');
     }
     h.cipher = AES_CIPHER_UUID;
     h.majorVersion = dv.getUint16(4, littleEndian);
@@ -93,7 +93,7 @@ function KeepassHeader() {
     //constants for KDB:
     h.keyRounds2 = 0;
     h.compressionFlags = 0;
-    h.protectedStreamKey = new Uint8Array(16);  //just put something there, it will not be used
+    h.protectedStreamKey = window.crypto.getRandomValues(new Uint8Array(16));  //KDB does not have this, but we will create in order to protect the passwords
     h.innerRandomStreamId = 0;
     h.streamStartBytes = null;
     h.kdb = true;
