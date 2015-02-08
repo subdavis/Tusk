@@ -1,4 +1,6 @@
-function MasterPasswordController($scope, $interval, $http, $routeParams, $location, keepass, localStorage, protectedStorage, unlockedState) {
+"use strict";
+
+function MasterPasswordController($scope, $interval, $http, $routeParams, $location, keepass, localStorage, protectedMemory, unlockedState) {
   $scope.masterPassword = "";
   $scope.busy = false;
   $scope.fileName = $routeParams.fileTitle;
@@ -78,7 +80,7 @@ function MasterPasswordController($scope, $interval, $http, $routeParams, $locat
         keyFileName: $scope.keyFileName
       });
 
-      protectedStorage.setData("cachedEntries", entries);   //save all entries in case user wants to do a custom search
+      protectedMemory.setData("cachedEntries", entries);   //save all entries in case user wants to do a custom search
 
       //show results:
       var siteUrl = parseUrl($scope.url);
@@ -129,14 +131,9 @@ function MasterPasswordController($scope, $interval, $http, $routeParams, $locat
         $scope.errorMessage = "No matches found for this site."
       }
 
-      angular.forEach(unlockedState.entries, function(entry) {
-        //process each entry for serialization
-        entry.Base64Password = Base64.encode(entry.protectedData.Password.data);
-      });
-
       unlockedState.saveBackgroundState({
         entries: unlockedState.entries,
-        streamKey: Base64.encode(keepass.streamKey)
+        streamKey: keepass.streamKey
       });
 
       $scope.busy = false;

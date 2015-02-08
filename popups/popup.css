@@ -120,6 +120,13 @@ table.entries {
 table.entries td,
 table.entries th {
   overflow-wrap: break-word;
+  text-overflow: ellipsis;
+}
+table.entries td a,
+table.entries th a {
+  text-overflow: inherit;
+  overflow-wrap: normal;
+  text-decoration: none;
 }
 statusMessage {
   display: block;

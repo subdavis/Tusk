@@ -24,6 +24,8 @@ THE SOFTWARE.
 
  */
 
+"use strict";
+
 var keepassApp = angular.module('keepassApp', ['ngAnimate', 'ngRoute']);
 
 keepassApp.config(['$routeProvider', function($routeProvider) {
@@ -66,24 +68,24 @@ keepassApp.factory('localStorage', ['passwordFileStoreFactory', function(passwor
 	return new LocalStorage(passwordFileStoreFactory);
 }]);
 
-keepassApp.factory('protectedStorage', [function() {
-  return new ProtectedStorage();
+keepassApp.factory('protectedMemory', [function() {
+  return new ProtectedMemory();
 }]);
 
 keepassApp.factory('keepass', ['pako', 'localStorage', function(pako, localStorage) {
 	return new Keepass(pako, localStorage);
 }]);
 
-keepassApp.factory('unlockedState', ['$interval', 'keepass', function($interval, keepass) {
-  return new UnlockedState($interval, keepass);
+keepassApp.factory('unlockedState', ['$interval', 'keepass', 'protectedMemory', function($interval, keepass, protectedMemory) {
+  return new UnlockedState($interval, keepass, protectedMemory);
 }]);
 
 keepassApp.controller('dragDropController', ['$scope', '$http', '$location', 'localStorage', DragDropController]);
 keepassApp.controller('fileTypeController', ['$scope', '$http', '$location', '$routeParams', FileTypeController]);
 keepassApp.controller('startupController', ['$scope', '$http', '$location', 'gdocs', 'localStorage', StartupController]);
 keepassApp.controller('docsController', ['$scope', '$http', '$location', 'gdocs', 'localStorage', DocsController]);
-keepassApp.controller('masterPasswordController', ['$scope', '$interval', '$http', '$routeParams', '$location', 'keepass', 'localStorage', 'protectedStorage', 'unlockedState', MasterPasswordController]);
-keepassApp.controller('findEntryController', ['$scope', 'protectedStorage', 'unlockedState', FindEntryController]);
+keepassApp.controller('masterPasswordController', ['$scope', '$interval', '$http', '$routeParams', '$location', 'keepass', 'localStorage', 'protectedMemory', 'unlockedState', MasterPasswordController]);
+keepassApp.controller('findEntryController', ['$scope', 'protectedMemory', 'unlockedState', FindEntryController]);
 
 keepassApp.directive('icon', function() {
     function link(scope, element, attrs) {

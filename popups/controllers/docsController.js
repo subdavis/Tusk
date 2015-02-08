@@ -1,3 +1,5 @@
+"use strict";
+
 function DocsController($scope, $http, $location, gdocs, localStorage) {
   $scope.docs = [];
 

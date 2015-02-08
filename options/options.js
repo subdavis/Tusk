@@ -24,6 +24,8 @@ THE SOFTWARE.
 
 */
 
+"use strict";
+
 var keepassSettings = angular.module('keepassSettings', ['ngAnimate', 'jsonFormatter']);
 
 function OptionsController($scope, $http) {

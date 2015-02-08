@@ -1,3 +1,5 @@
+"use strict";
+
 function DragDropController($scope, $http, $location, localStorage) {
   $scope.files = [];
   $scope.allowDrop = true;

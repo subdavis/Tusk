@@ -1,3 +1,5 @@
+"use strict";
+
 function StartupController($scope, $http, $location, gdocs, localStorage) {
 
   //trigger gdocs auth - doesn't matter if it succeeds or fails, we just want a token ready to go
@@ -14,6 +16,5 @@ function StartupController($scope, $http, $location, gdocs, localStorage) {
       $scope.$apply();
     })
   });
-
 
 }

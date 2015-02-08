@@ -29,7 +29,7 @@ THE SOFTWARE.
 /**
 * Shared state and methods for an unlocked password file.
 */
-function UnlockedState($interval, keepass) {
+function UnlockedState($interval, keepass, protectedMemory) {
   var my = {
     tabId: "",  //tab id of current tab
     url: "",    //url of current tab
@@ -38,7 +38,7 @@ function UnlockedState($interval, keepass) {
     sitePermission: false,  //true if the extension already has rights to autofill the password
     usingSavedState: false, //true if the entry data is from state that we saved to the background page, false when password file just unlocked
     entries: null,  //filtered password database entries
-    clipboardStatus: "",  //status message about clipboard, used when copying password to the clipboard
+    clipboardStatus: ""  //status message about clipboard, used when copying password to the clipboard
   };
   var streamKey, bgMessages, copyEntry;
 
@@ -46,7 +46,7 @@ function UnlockedState($interval, keepass) {
   my.messagePromise = new Promise(function(resolve, reject) {
     messageReceivedResolve = resolve;
   });
-
+  
   //determine current url:
   my.getTabDetails = function() {
     return new Promise(function(resolve, reject) {
@@ -89,18 +89,16 @@ function UnlockedState($interval, keepass) {
   };
 
   my.saveBackgroundState = function(savedState) {
-    bgMessages.postMessage(savedState);
+    var serializedState = protectedMemory.serialize(savedState);
+    bgMessages.postMessage(serializedState);
   }
 
-  function bgMessageListener(savedState) {
+  function bgMessageListener(serializedSavedState) {
     //called from the background.
+    var savedState = protectedMemory.hydrate(serializedSavedState);
     my.usingSavedState = true;
     my.entries = savedState.entries;
-    angular.forEach(my.entries, function(entry) {
-      //deserialize passwords
-      entry.protectedData.Password.data = new Uint8Array(Base64.decode(entry.Base64Password));
-    })
-    streamKey = Base64.decode(savedState.streamKey);
+    streamKey = savedState.streamKey;
 
     messageReceivedResolve();  //notify others
   };

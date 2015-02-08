@@ -31,7 +31,7 @@ THE SOFTWARE.
  * contents in a casual scan of RAM.  Does not prevent an attacker with direct
  * access to the code from reading the contents.
  */
-function ProtectedStorage() {
+function ProtectedMemory() {
   var my = {
     getData: getData,
     setData: setData,

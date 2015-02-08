@@ -1,7 +1,9 @@
+"use strict";
+
 function FindEntryController($scope, protectedData, unlockedState) {
   $scope.filter = "";
   $scope.unlockedState = unlockedState;
-  
+
   protectedData.getData('cachedEntries').then(function(entries) {
     $scope.entries = entries;
     $scope.allEntries = entries;
