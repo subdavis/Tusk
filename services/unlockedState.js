@@ -112,8 +112,8 @@ function UnlockedState($interval, keepass, protectedMemory) {
       then: {
         m: "autofill",
         tabId: my.tabId,
-        u: entry.UserName,
-        p: keepass.getDecryptedEntry(entry.protectedData.Password, streamKey),
+        u: entry.userName,
+        p: entry.protectedData ? keepass.getDecryptedEntry(entry.protectedData.password, streamKey): entry.password,
         o: my.origin
       }
     });
@@ -134,7 +134,7 @@ function UnlockedState($interval, keepass, protectedMemory) {
       return; //listener can get registered multiple times
     }
 
-    var textToPutOnClipboard = keepass.getDecryptedEntry(copyEntry.protectedData.Password, streamKey);
+    var textToPutOnClipboard = copyEntry.protectedData ? keepass.getDecryptedEntry(copyEntry.protectedData.password, streamKey): copyEntry.password;
     copyEntry = null;
     e.clipboardData.setData('text/plain', textToPutOnClipboard);
     e.preventDefault();
