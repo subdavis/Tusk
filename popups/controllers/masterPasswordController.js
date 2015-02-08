@@ -83,8 +83,8 @@ function MasterPasswordController($scope, $interval, $http, $routeParams, $locat
       protectedMemory.setData("cachedEntries", entries);   //save all entries in case user wants to do a custom search
 
       //show results:
-      var siteUrl = parseUrl($scope.url);
-      var siteTokens = getValidTokens(siteUrl.hostname + "." + $scope.title);
+      var siteUrl = parseUrl(unlockedState.url);
+      var siteTokens = getValidTokens(siteUrl.hostname + "." + unlockedState.title);
       entries.forEach(function(entry) {
         //apply a ranking algorithm to find the best matches
         var entryHostName = parseUrl(entry.URL).hostname || "";
@@ -94,7 +94,7 @@ function MasterPasswordController($scope, $interval, $http, $routeParams, $locat
         else
           entry.matchRank = 0;
 
-        entry.matchRank += (entry.Title && $scope.title && entry.Title.toLowerCase() == $scope.title.toLowerCase()) ? 1 : 0;
+        entry.matchRank += (entry.Title && unlockedState.title && entry.Title.toLowerCase() == unlockedState.title.toLowerCase()) ? 1 : 0;
         entry.matchRank += (entry.Title && entry.Title.toLowerCase() === siteUrl.hostname.toLowerCase()) ? 1 : 0;
         entry.matchRank += (entry.URL && siteUrl.hostname.indexOf(entry.URL.toLowerCase()) > -1) ? 0.9 : 0;
         entry.matchRank += (entry.Title && siteUrl.hostname.indexOf(entry.Title.toLowerCase()) > -1) ? 0.9 : 0;
