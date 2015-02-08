@@ -88,6 +88,13 @@ function UnlockedState($interval, keepass, protectedMemory) {
     });
   };
 
+  my.clearBackgroundState = function() {
+    bgMessages.postMessage("");
+    my.entries = null;
+    my.usingSavedState = false;
+    my.clipboardStatus = "";
+  }
+
   my.saveBackgroundState = function(savedState) {
     var serializedState = protectedMemory.serialize(savedState);
     bgMessages.postMessage(serializedState);

@@ -63,6 +63,7 @@ function MasterPasswordController($scope, $interval, $http, $routeParams, $locat
   //---keyfile upload ends...
 
   $scope.chooseAnotherFile = function() {
+    unlockedState.clearBackgroundState();
     $location.path('/choose-file-type');
   }
 
@@ -166,7 +167,7 @@ function MasterPasswordController($scope, $interval, $http, $routeParams, $locat
   function parseUrl(url) {
     if (url && !url.indexOf('http') == 0)
       url = 'http://' + url;
-      
+
     //from https://gist.github.com/jlong/2428561
     var parser = document.createElement('a');
     parser.href = url;
