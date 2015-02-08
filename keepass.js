@@ -35,11 +35,18 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 
 	if (message.m == "fillPassword") {
 		//user has selected to fill the password
+
+		//first check the origins.  This is necessary because we support iframes, and
+		//this script is injected into all, some of which may be malicious.  So we
+		//limit ourselves to the same origin.  Protocol (http vs https) is allowed to
+		//mismatch, but in that case we will only fill the password on the https.
 		var documentOrigin = parseUrl(document.URL);
 		var expectedOrigin = parseUrl(message.o);
-		if (documentOrigin.hostname !== expectedOrigin.hostname || (documentOrigin.protocol !== 'https:' && documentOrigin.protocol !== 'file:'))
-			return;  //security restriction - we will only fill in passwords on the correct, https origin
+		if (documentOrigin.hostname !== expectedOrigin.hostname
+			|| (documentOrigin.protocol !== expectedOrigin.protocol && documentOrigin.protocol !== 'https:'))
+			return;
 
+		//passed the origin check - go ahead and fill the password
 		filler.fillPassword(message.u, message.p);
 	}
 
