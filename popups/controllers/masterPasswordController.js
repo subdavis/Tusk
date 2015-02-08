@@ -1,31 +1,12 @@
-function MasterPasswordController($scope, $interval, $http, $routeParams, $location, keepass, localStorage, protectedStorage) {
+function MasterPasswordController($scope, $interval, $http, $routeParams, $location, keepass, localStorage, protectedStorage, unlockedState) {
   $scope.masterPassword = "";
   $scope.busy = false;
   $scope.fileName = $routeParams.fileTitle;
   $scope.keyFileName = "";
   $scope.rememberKeyFile = true;
-  $scope.usingSavedState = false;
-  var fileKey, streamKey, bgMessages;
-
-  function bgMessageListener(savedState) {
-    //called from the background.
-    $scope.usingSavedState = true;
-    $scope.entries = savedState.entries;
-    angular.forEach($scope.entries, function(entry) {
-      //deserialize passwords
-      entry.protectedData.Password.data = new Uint8Array(Base64.decode(entry.Base64Password));
-    })
-    streamKey = Base64.decode(savedState.streamKey);
-    $scope.$apply();
-  };
-
-  //dispose.  only runs when switching controllers, no need to run when unloading popup:
-  $scope.$on("$destroy", function() {
-    if (bgMessages) {
-      bgMessages.onMessage.removeListener(bgMessageListener);
-      bgMessages.disconnect();
-    }
-  });
+  $scope.unlockedState = unlockedState;
+  //$scope.usingSavedState = false;
+  var fileKey;
 
   localStorage.getCurrentDatabaseUsage().then(function(usage) {
     //tweak UI based on what we know about the database file
@@ -44,39 +25,14 @@ function MasterPasswordController($scope, $interval, $http, $routeParams, $locat
     }
   });
 
-  //determine current url:
-  chrome.tabs.query({
-    active: true,
-    currentWindow: true
-  }, function(tabs) {
-    if (tabs && tabs.length) {
-      $scope.tabId = tabs[0].id;
-      var url = tabs[0].url.split('?');
-      $scope.url = url[0];
-      $scope.title = tabs[0].title;
+  //determine current tab info:
+  unlockedState.getTabDetails().then(function() {
+    $scope.$apply();
+  });
 
-      var parsedUrl = parseUrl(tabs[0].url);
-      $scope.origin = parsedUrl.protocol + '//' + parsedUrl.hostname + '/';
-
-      chrome.p.permissions.contains({
-          origins: [$scope.origin]
-        })
-        .then(function() {
-          $scope.sitePermission = true;
-        })
-        .catch(function(err) {
-          $scope.sitePermission = false;
-        })
-        .then(function() {
-          $scope.$apply();
-        })
-
-      //wake up the background page and get a pipe to send/receive messages:
-      bgMessages = chrome.runtime.connect({
-        name: "tab" + $scope.tabId
-      });
-      bgMessages.onMessage.addListener(bgMessageListener);
-    }
+  //react to received message
+  unlockedState.messagePromise.then(function() {
+    $scope.$apply();
   });
 
   //---keyfile upload starts...
@@ -85,44 +41,27 @@ function MasterPasswordController($scope, $interval, $http, $routeParams, $locat
   };
 
   $scope.handleKeyFile = function(filePromises) {
-      if (filePromises.length != 1) {
-        return;
-      }
-
-      filePromises[0].then(function(info) {
-        var bytes = info.data;
-        $scope.keyFileName = info.file.name;
-
-        return keepass.getKeyFromFile(info.data);
-      }).then(function(key) {
-        fileKey = key;
-      }).catch(function(err) {
-        $scope.errorMessage = err.message;
-      }).then(function() {
-        $scope.$apply();
-      });
+    if (filePromises.length != 1) {
+      return;
     }
-    //---keyfile upload ends...
+
+    filePromises[0].then(function(info) {
+      var bytes = info.data;
+      $scope.keyFileName = info.file.name;
+
+      return keepass.getKeyFromFile(info.data);
+    }).then(function(key) {
+      fileKey = key;
+    }).catch(function(err) {
+      $scope.errorMessage = err.message;
+    }).then(function() {
+      $scope.$apply();
+    });
+  }
+  //---keyfile upload ends...
 
   $scope.chooseAnotherFile = function() {
     $location.path('/choose-file-type');
-  }
-
-  $scope.autofill = function(entry) {
-    chrome.runtime.sendMessage({
-      m: "requestPermission",
-      perms: {
-        origins: [$scope.origin]
-      },
-      then: {
-        m: "autofill",
-        tabId: $scope.tabId,
-        u: entry.UserName,
-        p: keepass.getDecryptedEntry(entry.protectedData.Password, streamKey)
-      }
-    });
-
-    window.close(); //close the popup
   }
 
   $scope.enterMasterPassword = function() {
@@ -169,36 +108,36 @@ function MasterPasswordController($scope, $interval, $http, $routeParams, $locat
         }
       });
 
-      $scope.entries = entries.filter(function(entry) {
+      unlockedState.entries = entries.filter(function(entry) {
         return (entry.matchRank >= 100)
       });
-      if ($scope.entries.length == 0) {
-        $scope.entries = entries.filter(function(entry) {
+      if (unlockedState.entries.length == 0) {
+        unlockedState.entries = entries.filter(function(entry) {
           return (entry.matchRank > 0.8 && !entry.URL); //a good match for an entry without a url
         });
       }
-      if ($scope.entries.length == 0) {
-        $scope.entries = entries.filter(function(entry) {
+      if (unlockedState.entries.length == 0) {
+        unlockedState.entries = entries.filter(function(entry) {
           return (entry.matchRank >= 0.4);
         });
 
-        if ($scope.entries.length) {
-          $scope.partialMatchMessage = "No close matches, showing " + $scope.entries.length + " partial matches.";
+        if (unlockedState.entries.length) {
+          $scope.partialMatchMessage = "No close matches, showing " + unlockedState.entries.length + " partial matches.";
         }
       }
-      if ($scope.entries.length == 0) {
+      if (unlockedState.entries.length == 0) {
         $scope.errorMessage = "No matches found for this site."
       }
 
-      angular.forEach($scope.entries, function(entry) {
+      angular.forEach(unlockedState.entries, function(entry) {
         //process each entry for serialization
         entry.Base64Password = Base64.encode(entry.protectedData.Password.data);
       });
 
-      bgMessages.postMessage({
-        entries: $scope.entries,
+      unlockedState.saveBackgroundState({
+        entries: unlockedState.entries,
         streamKey: Base64.encode(keepass.streamKey)
-      }); //save for a brief time in the background page
+      });
 
       $scope.busy = false;
     }).catch(function(err) {
@@ -218,41 +157,6 @@ function MasterPasswordController($scope, $interval, $http, $routeParams, $locat
     $scope.successMessage = "";
     $scope.partialMatchMessage = "";
   }
-
-  $scope.copyPassword = function(entry) {
-    $scope.copyEntry = entry;
-    entry.copied = true;
-    document.execCommand('copy');
-  }
-
-  //listens for the copy event and does the copy
-  document.addEventListener('copy', function(e) {
-    if (!$scope.copyEntry) {
-      return; //listener can get registered multiple times
-    }
-
-    var textToPutOnClipboard = keepass.getDecryptedEntry($scope.copyEntry.protectedData.Password, streamKey);
-    $scope.copyEntry = null;
-    e.clipboardData.setData('text/plain', textToPutOnClipboard);
-    e.preventDefault();
-
-    chrome.alarms.create("clearClipboard", {
-      delayInMinutes: 1
-    });
-
-    //actual clipboard clearing occurs on the background task via alarm, this is just for user feedback:
-    $scope.successMessage = "Copied to clipboard.  Clipboard will clear in 60 seconds."
-    var seconds = 60;
-    var instance = $interval(function() {
-      seconds -= 1;
-      if (seconds <= 0) {
-        $scope.successMessage = "Clipboard cleared"
-        $interval.cancel(instance);
-      } else {
-        $scope.successMessage = "Copied to clipboard.  Clipboard will clear in " + seconds + " seconds."
-      }
-    }, 1000);
-  });
 
   function getValidTokens(tokenString) {
     if (!tokenString) return [];

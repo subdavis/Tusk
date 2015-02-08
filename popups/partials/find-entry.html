@@ -1,3 +1,4 @@
+<pageInfo ng-show="entries && (url || title)">{{title}} - {{origin}}</pageInfo>
 <form class="pure-form">
   <input type="text" id="filter" ng-model="filter" class="fill" ng-change="filterKey()" autoFocus placeholder="Type to filter...">
 </form>
@@ -14,14 +15,15 @@
       <td>{{entry.Title || entry.Url}}</td>
       <td>{{entry.UserName}}</td>
       <td>
-        <a href="" ng-click="copyPassword(entry)" title="Copy password to clipboard" ng-hide="entry.copied">
+        <a href="" ng-click="unlockedState.copyPassword(entry)" title="Copy password to clipboard" ng-hide="entry.copied">
           <icon p="icon-copy"></icon>
         </a>
         <span ng-show="entry.copied">Copied</span>
-        <a href="" ng-click="autofill(entry)" title="Auto-fill credentials on site">
+        <a href="" ng-click="unlockedState.autofill(entry)" title="Auto-fill credentials on site">
           <icon p="icon-edit"></icon>
         </a>
       </td>
     </tr>
   </tbody>
 </table>
+<successMessage ng-show="unlockedState.clipboardStatus">{{unlockedState.clipboardStatus}}</successMessage>

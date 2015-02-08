@@ -74,12 +74,16 @@ keepassApp.factory('keepass', ['pako', 'localStorage', function(pako, localStora
 	return new Keepass(pako, localStorage);
 }]);
 
+keepassApp.factory('unlockedState', ['$interval', 'keepass', function($interval, keepass) {
+  return new UnlockedState($interval, keepass);
+}]);
+
 keepassApp.controller('dragDropController', ['$scope', '$http', '$location', 'localStorage', DragDropController]);
 keepassApp.controller('fileTypeController', ['$scope', '$http', '$location', '$routeParams', FileTypeController]);
 keepassApp.controller('startupController', ['$scope', '$http', '$location', 'gdocs', 'localStorage', StartupController]);
 keepassApp.controller('docsController', ['$scope', '$http', '$location', 'gdocs', 'localStorage', DocsController]);
-keepassApp.controller('masterPasswordController', ['$scope', '$interval', '$http', '$routeParams', '$location', 'keepass', 'localStorage', 'protectedStorage', MasterPasswordController]);
-keepassApp.controller('findEntryController', ['$scope', 'protectedStorage', FindEntryController]);
+keepassApp.controller('masterPasswordController', ['$scope', '$interval', '$http', '$routeParams', '$location', 'keepass', 'localStorage', 'protectedStorage', 'unlockedState', MasterPasswordController]);
+keepassApp.controller('findEntryController', ['$scope', 'protectedStorage', 'unlockedState', FindEntryController]);
 
 keepassApp.directive('icon', function() {
     function link(scope, element, attrs) {
