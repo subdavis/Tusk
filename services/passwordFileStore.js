@@ -80,7 +80,9 @@ function GoogleDrivePasswordFileProvider(gdocs, fileHandle) {
   };
 
   function getFile() {
-    return gdocs.sendXhr('GET', fileHandle.url).then(function(e) {
+    return gdocs.auth().then(function() {
+      return gdocs.sendXhr('GET', fileHandle.url);
+    }).then(function(e) {
       //this gets the file details, which we need to download the file
       var details = JSON.parse(e.currentTarget.responseText);
       var url = details.downloadUrl;
