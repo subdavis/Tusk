@@ -25,6 +25,7 @@ module.exports = function(grunt) {
     copy: {
       bower: {
         files: [
+          {expand: true, cwd: 'bower_components/Case/dist/', src: 'case.min.js', dest: 'lib/'},
           {expand: true, cwd: 'bower_components/json-formatter/dist/', src: 'json-formatter.min.js', dest: 'lib/'},
           {expand: true, cwd: 'bower_components/json-formatter/dist/', src: 'json-formatter.min.css', dest: 'lib/'},
           {expand: true, cwd: 'bower_components/angular/', src: 'angular.min.css', dest: 'lib/'},

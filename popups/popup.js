@@ -72,8 +72,12 @@ keepassApp.factory('protectedMemory', [function() {
   return new ProtectedMemory();
 }]);
 
-keepassApp.factory('keepass', ['pako', 'localStorage', function(pako, localStorage) {
-	return new Keepass(pako, localStorage);
+keepassApp.factory('keepassHeader', [function() {
+  return new KeepassHeader(pako, localStorage);
+}]);
+
+keepassApp.factory('keepass', ['keepassHeader', 'pako', 'localStorage', function(keepassHeader, pako, localStorage) {
+	return new Keepass(keepassHeader, pako, localStorage);
 }]);
 
 keepassApp.factory('unlockedState', ['$interval', 'keepass', 'protectedMemory', function($interval, keepass, protectedMemory) {

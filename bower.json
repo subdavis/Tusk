@@ -23,6 +23,7 @@
     "angular": "~1.2",
     "angular-animate": "1.2",
     "angular-route": "1.2",
-    "animate.css": "~3.2.0"
+    "animate.css": "~3.2.0",
+    "Case": "~1.2.1"
   }
 }

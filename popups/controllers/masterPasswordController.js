@@ -87,19 +87,19 @@ function MasterPasswordController($scope, $interval, $http, $routeParams, $locat
       var siteTokens = getValidTokens(siteUrl.hostname + "." + unlockedState.title);
       entries.forEach(function(entry) {
         //apply a ranking algorithm to find the best matches
-        var entryHostName = parseUrl(entry.URL).hostname || "";
+        var entryHostName = parseUrl(entry.url).hostname || "";
 
         if (entryHostName && entryHostName == siteUrl.hostname)
           entry.matchRank = 100; //exact url match
         else
           entry.matchRank = 0;
 
-        entry.matchRank += (entry.Title && unlockedState.title && entry.Title.toLowerCase() == unlockedState.title.toLowerCase()) ? 1 : 0;
-        entry.matchRank += (entry.Title && entry.Title.toLowerCase() === siteUrl.hostname.toLowerCase()) ? 1 : 0;
-        entry.matchRank += (entry.URL && siteUrl.hostname.indexOf(entry.URL.toLowerCase()) > -1) ? 0.9 : 0;
-        entry.matchRank += (entry.Title && siteUrl.hostname.indexOf(entry.Title.toLowerCase()) > -1) ? 0.9 : 0;
+        entry.matchRank += (entry.title && unlockedState.title && entry.title.toLowerCase() == unlockedState.title.toLowerCase()) ? 1 : 0;
+        entry.matchRank += (entry.title && entry.title.toLowerCase() === siteUrl.hostname.toLowerCase()) ? 1 : 0;
+        entry.matchRank += (entry.url && siteUrl.hostname.indexOf(entry.url.toLowerCase()) > -1) ? 0.9 : 0;
+        entry.matchRank += (entry.title && siteUrl.hostname.indexOf(entry.title.toLowerCase()) > -1) ? 0.9 : 0;
 
-        var entryTokens = getValidTokens(entryHostName + "." + entry.Title);
+        var entryTokens = getValidTokens(entryHostName + "." + entry.title);
         for (var i = 0; i < entryTokens.length; i++) {
           var token1 = entryTokens[i];
           for (var j = 0; j < siteTokens.length; j++) {
@@ -164,6 +164,9 @@ function MasterPasswordController($scope, $interval, $http, $routeParams, $locat
   }
 
   function parseUrl(url) {
+    if (url && !url.indexOf('http') == 0)
+      url = 'http://' + url;
+      
     //from https://gist.github.com/jlong/2428561
     var parser = document.createElement('a');
     parser.href = url;

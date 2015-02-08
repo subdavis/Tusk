@@ -19,8 +19,8 @@ function DragDropController($scope, $http, $location, localStorage) {
     $scope.loadedFiles = 0;
     filePromises.forEach(function(filePromise) {
       filePromise.then(function(info) {
-        if (info.file.name.indexOf('.kdbx') < 0 || info.file.size < 70) {
-          $scope.errorMessage += info.file.name + " is not a valid KeePass v2 file. "
+        if (info.file.name.indexOf('.kdb') < 0 || info.file.size < 70) {
+          $scope.errorMessage += info.file.name + " is not a valid KeePass file. "
           return;
         }
 
