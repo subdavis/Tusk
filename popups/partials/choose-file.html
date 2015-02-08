@@ -1,6 +1,6 @@
 <docs>
   <infoMessage ng-hide="authorized()">
-    <p>If you have already-existing KeePass (.kdbx) files stored in your google drive, then you can access them.</p>
+    <p>If you have already-existing KeePass (.kdbx or .kdb) files stored in your google drive, then you can access them.</p>
     <p>Chrome will ask you to allow this extension to access the Google Drive websites, and Google Drive will ask you to allow this extension to read your files.</p>
     <p>Note that you will not be able to access your password files on Google Drive when in Ingognito mode.</p>
   </infoMessage>
@@ -29,5 +29,5 @@
       </ul>
     </filelist>
   </fieldset>
-  <errorMessage ng-show="!refreshing && authorized() && (docs == null || docs.length == 0)">ChromeKeePass has accessed your drive but could not find any password files. Ensure your .kdbx file is in the root folder of your google drive.</errorMessage>
+  <errorMessage ng-show="!refreshing && authorized() && (docs == null || docs.length == 0)">ChromeKeePass has accessed your drive but could not find any password files. Ensure your .kdbx or .kdb file is in your google drive.</errorMessage>
 </docs>

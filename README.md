@@ -2,13 +2,13 @@
 Chrome extension for interacting with KeePass password file.  Still in beta.  Web Store url is https://chrome.google.com/webstore/detail/lnfepbjehgokldcaljagbmchhnaaogpc.   Give it a try!
 
 ## Motivation
-[KeePass](http://keepass.info/) password files work well enough for me on Windows, but on my Chromebook there was simply no secure way to access them.  Even on Windows, the setup for the keepass-http plugin is convoluted and I'm not sure how secure it is.
+[KeePass](http://keepass.info/) password files work well for me on Windows, but on my Chromebook there was simply no secure way to access them.  Even on Windows, the setup for [ChromeIPass](https://chrome.google.com/webstore/detail/chromeipass/ompiailgknfdndiefoaoiligalphfdae) + [KeePassHttp](https://github.com/pfn/keepasshttp) is too complex.
 
-Chrome recently implemented the [Web Crypto API](http://www.w3.org/TR/WebCryptoAPI/), so it became practical to write JavaScript code that could parse a Keepass file.  I decided to utilize those to create the extension that I wished existed - one that lets me control my own passwords in a secure format, does not require any special permissions (i.e. **no** "Access your browse data on all sites").
+Chrome recently implemented the [Web Crypto API](http://www.w3.org/TR/WebCryptoAPI/), so it became practical to write JavaScript code that could parse a Keepass file.  I decided to utilize those to create the extension that I wished existed - one that lets me control my own passwords in a secure format, is simple to use, and does not require any special permissions (i.e. **no** "Access your browse data on all sites").
 
 ## Major Features
 * Zero permissions required to install
-* Works with KeePass v2 (.kdbx) files, with any combination of key file and master password
+* Works with KeePass v1 (.kdb) and v2 (.kdbx) files, with any combination of key file and master password
 * Retrieves KeePass password file from Google Drive, or static copies can be stored in Chrome storage
 * Smart matching of password entry to website, so that you don't have to manually search for your entry
 * Manual searching of entries, for those wierd edge cases
