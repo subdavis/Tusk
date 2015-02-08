@@ -24,12 +24,14 @@ THE SOFTWARE.
 
 */
 
+"use strict";
+
 /*
   This page runs as an Event page, not a Background page, so don't use global variables
   (they will be lost)
 */
 
-(function() {
+(function(protectedMemory) {
   if (chrome.extension.inIncognitoContext) {
     doReplaceRules();
   } else {
@@ -55,21 +57,22 @@ THE SOFTWARE.
   }
 
   //keep saved state for the popup for as long as we are alive (not long):
-  var savedState = {};
   chrome.runtime.onConnect.addListener(function(port) {
     //communicate state on this pipe.  each named port gets its own state.
-    if (savedState[port.name]) {
-      //we have some saved state that we can give to the popup
-      port.postMessage(savedState[port.name]);
-    };
+    protectedMemory.getData(port.name).then(function(savedState) {
+      if (savedState) {
+        //we have some saved state that we can give to the popup
+        port.postMessage(savedState);
+      };
+    });
 
     port.onMessage.addListener(function(state) {
-      savedState[port.name] = state;
+      protectedMemory.setData(port.name, state);
     });
 
     port.onDisconnect.addListener(function() {
       //uncomment below to forget the state when the popup closes
-      //savedState[port.name] = null;
+      //protectedMemory.clearData();
     })
   });
 
@@ -125,4 +128,4 @@ THE SOFTWARE.
     }
   });
 
-})();
+})(new ProtectedMemory());
