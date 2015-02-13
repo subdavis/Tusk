@@ -7,7 +7,14 @@ function MasterPasswordController($scope, $interval, $http, $routeParams, $locat
   $scope.keyFileName = "";
   $scope.rememberKeyFile = true;
   $scope.unlockedState = unlockedState;
-  //$scope.usingSavedState = false;
+  $scope.os = {};
+
+  chrome.runtime.getPlatformInfo(function(info) {
+    $scope.$apply(function() {
+      $scope.os[info.os] = true;
+    })
+  });
+
   var fileKey;
 
   localStorage.getCurrentDatabaseUsage().then(function(usage) {
