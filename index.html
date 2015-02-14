@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="ChromeKeePass : Chrome extension for filling in passwords on websites">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>ChromeKeePass</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/perfectapi/ChromeKeePass">View on GitHub</a>
+
+          <h1 id="project_title">ChromeKeePass</h1>
+          <h2 id="project_tagline">Chrome extension for filling in passwords on websites</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/perfectapi/ChromeKeePass/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/perfectapi/ChromeKeePass/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
+<a id="chromekeepass" class="anchor" href="#chromekeepass" aria-hidden="true"><span class="octicon octicon-link"></span></a>ChromeKeePass</h1>
+
+<p>Chrome extension for interacting with KeePass password file.  Still in beta.  Web Store url is <a href="https://chrome.google.com/webstore/detail/lnfepbjehgokldcaljagbmchhnaaogpc">https://chrome.google.com/webstore/detail/lnfepbjehgokldcaljagbmchhnaaogpc</a>.   Give it a try!</p>
+
+<h2>
+<a id="motivation" class="anchor" href="#motivation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Motivation</h2>
+
+<p><a href="http://keepass.info/">KeePass</a> password files work well for me on Windows, but on my Chromebook there were no good options to access them.  </p>
+
+<p>Chrome recently implemented the <a href="http://www.w3.org/TR/WebCryptoAPI/">Web Crypto API</a>, so it became practical to write JavaScript code that could parse a KeePass file.  I decided to utilize those to create the extension that I wished existed - one that lets me control my own passwords in a secure format, is simple to use, and does not require any special permissions (i.e. <strong>no</strong> "Access your browse data on all sites").</p>
+
+<h2>
+<a id="major-features" class="anchor" href="#major-features" aria-hidden="true"><span class="octicon octicon-link"></span></a>Major Features</h2>
+
+<ul>
+<li>Zero permissions required to install</li>
+<li>Works with KeePass v1 (.kdb) and v2 (.kdbx) files, with any combination of key file and master password</li>
+<li>Retrieves KeePass password file from Google Drive, or static copies can be stored in Chrome storage</li>
+<li>Smart matching of password entry to website, so that you don't have to manually search for your entry</li>
+<li>Manual searching of entries, for those wierd edge cases</li>
+<li>Fills in password on website, no need to copy-paste!  (But if you prefer not to grant permission, you can still use copy-paste)</li>
+<li>Anti-phishing detection - warns if the site is not the one that ChromeKeePass remembers</li>
+<li>Passwords are always encrypted in memory (except briefly when you actually use them!)</li>
+</ul>
+
+<h2>
+<a id="additional-features" class="anchor" href="#additional-features" aria-hidden="true"><span class="octicon octicon-link"></span></a>Additional features</h2>
+
+<ul>
+<li>Easily switch between multiple password database files</li>
+<li>Automatic unlock of key-only databases</li>
+</ul>
+
+<h2>
+<a id="known-limitations" class="anchor" href="#known-limitations" aria-hidden="true"><span class="octicon octicon-link"></span></a>Known Limitations</h2>
+
+<p>File browse dialog may cause the popup to close on some OS's.  It is confirmed to do that on Xubuntu and on some Windows machines.  It works 100% on ChromeOS, and works ok on Mac.  </p>
+
+<p>The extension does not work in incognito mode.</p>
+
+<p>The extension icon activates on pages with iframes, even when there are no password fields.</p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">ChromeKeePass maintained by <a href="https://github.com/perfectapi">perfectapi</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
