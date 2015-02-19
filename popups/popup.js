@@ -84,6 +84,10 @@ keepassApp.factory('unlockedState', ['$interval', 'keepass', 'protectedMemory', 
   return new UnlockedState($interval, keepass, protectedMemory);
 }]);
 
+keepassApp.factory('secureCache', ['protectedMemory', function(protectedMemory) {
+  return new SecureCache(protectedMemory);
+}])
+
 keepassApp.controller('dragDropController', ['$scope', '$http', '$location', 'localStorage', DragDropController]);
 keepassApp.controller('fileTypeController', ['$scope', '$http', '$location', '$routeParams', FileTypeController]);
 keepassApp.controller('startupController', ['$scope', '$http', '$location', 'gdocs', 'localStorage', StartupController]);

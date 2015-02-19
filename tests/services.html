@@ -1,0 +1,24 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Mocha Tests - Services</title>
+  <link rel="stylesheet" href="../bower_components/mocha/mocha.css" />
+</head>
+<body>
+  <div id="mocha"></div>
+  <!--<script src="../bower_components/requirejs/require.js"></script>-->
+  <script src="../bower_components/mocha/mocha.js"></script>
+  <script>mocha.setup('bdd')</script>
+  <script src="../bower_components/should/should.js"></script>
+  <script src="../bower_components/sinonjs/sinon.js"></script>
+  <script src="../lib/base64.js"></script>
+  <script src="../services/protectedMemory.js"></script>
+  <script src="../services/secureCache.js"></script>
+  <script src="test.secureCache.js"></script>
+  <script>
+    mocha.checkLeaks();
+    //mocha.globals(['jQuery']);
+    mocha.run();
+  </script>
+</body>
+</html>

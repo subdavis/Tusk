@@ -24,6 +24,9 @@
     "angular-animate": "~1.2",
     "angular-route": "~1.2",
     "animate.css": "~3.2",
-    "Case": "~1.2"
+    "Case": "~1.2",
+    "mocha": "~2.1.0",
+    "should": "shouldjs/should.js#~5.0.0",
+    "sinonjs": "~1.10.2"
   }
 }

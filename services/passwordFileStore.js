@@ -50,7 +50,7 @@ THE SOFTWARE.
 
 
 function PasswordFileStoreFactory(gdocs) {
-  var my = {
+  var exports = {
 
   };
 
@@ -64,16 +64,16 @@ function PasswordFileStoreFactory(gdocs) {
         return new LocalChromePasswordFileProvider(fi);
     }
   }
-  my.getInstance = getInstance; //expose
+  exports.getInstance = getInstance; //expose
 
-  return my;
+  return exports;
 }
 
 /**
  * Provider for retrieving the encrypted password file from Google Drive
  */
 function GoogleDrivePasswordFileProvider(gdocs, fileHandle) {
-  var my = {
+  var exports = {
     providerKey: "gdrive",
     title: fileHandle.title,
     supportsIngognito: false
@@ -89,18 +89,18 @@ function GoogleDrivePasswordFileProvider(gdocs, fileHandle) {
       return gdocs.sendXhr('GET', url, 'arraybuffer');
     }).then(function(e) {
       return e.currentTarget.response;
-    });;
+    });
   }
-  my.getFile = getFile; //expose
+  exports.getFile = getFile; //expose
 
-  return my;
+  return exports;
 }
 
 /**
  * Provider for retrieving the encrypted password file from local chrome storage
  */
 function LocalChromePasswordFileProvider(fi) {
-  var my = {
+  var exports = {
     providerKey: "local",
     title: fi.title,
     supportsIngognito: false
@@ -126,7 +126,7 @@ function LocalChromePasswordFileProvider(fi) {
       });
     });
   }
-  my.getFile = getFile; //expose
+  exports.getFile = getFile; //expose
 
-  return my;
+  return exports;
 }
