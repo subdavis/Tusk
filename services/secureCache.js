@@ -69,7 +69,7 @@ function SecureCache(protectedMemory) {
         var encoder = new TextEncoder();
         return window.crypto.subtle.encrypt(AES, aesKey, encoder.encode(preppedData));
       }).then(function(encData) {
-        preppedData = protectedMemory.serialize(preppedData);
+        preppedData = protectedMemory.serialize(encData);
         var obj = {};
         obj[key] = preppedData;
         chrome.storage.local.set(obj, function() {
@@ -90,7 +90,7 @@ function SecureCache(protectedMemory) {
         tokenPromise.then(function(aesKey) {
           return window.crypto.subtle.decrypt(AES, aesKey, encData).then(function(decryptedBytes) {
             var decoder = new TextDecoder();
-            var serialized = decoder.decode(decryptedBytes);
+            var serialized = decoder.decode(new Uint8Array(decryptedBytes));
             var data = protectedMemory.hydrate(serialized);
 
             resolve(data);
