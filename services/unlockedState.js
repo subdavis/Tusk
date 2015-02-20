@@ -38,14 +38,10 @@ function UnlockedState($interval, keepass, protectedMemory) {
     sitePermission: false,  //true if the extension already has rights to autofill the password
     usingSavedState: false, //true if the entry data is from state that we saved to the background page, false when password file just unlocked
     entries: null,  //filtered password database entries
+    streamKey: null,  //key for accessing protected data fields
     clipboardStatus: ""  //status message about clipboard, used when copying password to the clipboard
   };
   var streamKey, bgMessages, copyEntry;
-
-  var messageReceivedResolve;
-  my.messagePromise = new Promise(function(resolve, reject) {
-    messageReceivedResolve = resolve;
-  });
 
   //determine current url:
   my.getTabDetails = function() {
@@ -89,26 +85,11 @@ function UnlockedState($interval, keepass, protectedMemory) {
   };
 
   my.clearBackgroundState = function() {
-    bgMessages.postMessage("");
     my.entries = null;
+    my.streamKey = null;
     my.usingSavedState = false;
     my.clipboardStatus = "";
   }
-
-  my.saveBackgroundState = function(savedState) {
-    var serializedState = protectedMemory.serialize(savedState);
-    bgMessages.postMessage(serializedState);
-  }
-
-  function bgMessageListener(serializedSavedState) {
-    //called from the background.
-    var savedState = protectedMemory.hydrate(serializedSavedState);
-    my.usingSavedState = true;
-    my.entries = savedState.entries;
-    streamKey = savedState.streamKey;
-
-    messageReceivedResolve();  //notify others
-  };
 
   my.autofill = function(entry) {
     chrome.runtime.sendMessage({
@@ -120,7 +101,7 @@ function UnlockedState($interval, keepass, protectedMemory) {
         m: "autofill",
         tabId: my.tabId,
         u: entry.userName,
-        p: entry.protectedData ? keepass.getDecryptedEntry(entry.protectedData.password, streamKey): entry.password,
+        p: entry.protectedData ? keepass.getDecryptedEntry(entry.protectedData.password, my.streamKey): entry.password,
         o: my.origin
       }
     });
@@ -141,7 +122,7 @@ function UnlockedState($interval, keepass, protectedMemory) {
       return; //listener can get registered multiple times
     }
 
-    var textToPutOnClipboard = copyEntry.protectedData ? keepass.getDecryptedEntry(copyEntry.protectedData.password, streamKey): copyEntry.password;
+    var textToPutOnClipboard = copyEntry.protectedData ? keepass.getDecryptedEntry(copyEntry.protectedData.password, my.streamKey): copyEntry.password;
     copyEntry = null;
     e.clipboardData.setData('text/plain', textToPutOnClipboard);
     e.preventDefault();

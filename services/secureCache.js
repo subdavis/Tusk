@@ -32,7 +32,8 @@ THE SOFTWARE.
 function SecureCache(protectedMemory) {
   var exports = {
     save: set,
-    get: get
+    get: get,
+    clear: clear
   }
 
   var AES = {
@@ -100,6 +101,10 @@ function SecureCache(protectedMemory) {
         });
       });
     });
+  }
+
+  function clear(key) {
+    chrome.storage.local.remove(key);
   }
 
   return exports;

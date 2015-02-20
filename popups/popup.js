@@ -92,7 +92,7 @@ keepassApp.controller('dragDropController', ['$scope', '$http', '$location', 'lo
 keepassApp.controller('fileTypeController', ['$scope', '$http', '$location', '$routeParams', FileTypeController]);
 keepassApp.controller('startupController', ['$scope', '$http', '$location', 'gdocs', 'localStorage', StartupController]);
 keepassApp.controller('docsController', ['$scope', '$http', '$location', 'gdocs', 'localStorage', DocsController]);
-keepassApp.controller('masterPasswordController', ['$scope', '$interval', '$http', '$routeParams', '$location', 'keepass', 'localStorage', 'protectedMemory', 'unlockedState', MasterPasswordController]);
+keepassApp.controller('masterPasswordController', ['$scope', '$interval', '$http', '$routeParams', '$location', 'keepass', 'localStorage', 'unlockedState', 'secureCache', MasterPasswordController]);
 keepassApp.controller('findEntryController', ['$scope', 'protectedMemory', 'unlockedState', FindEntryController]);
 
 keepassApp.directive('icon', function() {
