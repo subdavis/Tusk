@@ -27,9 +27,17 @@ THE SOFTWARE.
 "use strict";
 
 /**
- * Storage in cache using a key derived from 3rd party-provided secret.
+ * Storage on disk using a key derived from a temporary 3rd party-provided secret.
+ * If a 3rd-party secret is not available, falls back to storing in-memory (still
+ * encrypted though).
+ *
+ * Our secret is the access token for google drive.  It is secret from other 
+ * extensions, and it is cached in-memory by Chrome.
+ *
+ * Max storage time is 40 minutes, which is the expected TTL of the secret.  You
+ * can see details of the expiry time in chrome://identity-internals/
  */
-function SecureCache(protectedMemory) {
+function SecureCacheDisk(protectedMemory, secureCacheMemory) {
   var exports = {
     save: set,
     get: get,
@@ -52,7 +60,7 @@ function SecureCache(protectedMemory) {
           resolve(aesKey);
         });
       } else {
-        reject(new Error('Failed to get a 3rd party secret, cache not possible.'))
+        reject(new Error('Failed to get a 3rd party secret, cache not possible.'));
       }
     });
   });
@@ -60,10 +68,18 @@ function SecureCache(protectedMemory) {
   exports.ready = function() {
     return tokenPromise.then(function() {
       return true;
-    })
+    }).catch(function(err) {
+      //can still use memory
+      return secureCacheMemory.ready().then(function(val) {
+        return val;
+      }).catch(function(err) {
+        return false;
+      });
+    });
   }
 
   function set(key, data) {
+    key = 'secureCache.' + key;
     var preppedData = protectedMemory.serialize(data);
     return new Promise(function(resolve, reject) {
       tokenPromise.then(function(aesKey) {
@@ -78,12 +94,18 @@ function SecureCache(protectedMemory) {
           resolve();
         });
       }).catch(function(err) {
-        reject(err);
+        //fallback to in-memory
+        secureCacheMemory.save(key, data).then(function() {
+          resolve();
+        }).catch(function(err) {
+          reject(err);
+        });
       });
     });
   }
 
   function get(key) {
+    key = 'secureCache.' + key;
     return new Promise(function(resolve, reject) {
       chrome.storage.local.get(key, function(encSerializedData) {
         var encData = protectedMemory.hydrate(encSerializedData[key]);
@@ -97,7 +119,12 @@ function SecureCache(protectedMemory) {
             resolve(data);
           });
         }).catch(function(err) {
-          reject(err);
+          //fallback to in-memory
+          secureCacheMemory.get(key).then(function(data) {
+            resolve(data);
+          }).catch(function(err) {
+            reject(err);
+          })
         });
       });
     });

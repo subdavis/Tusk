@@ -84,16 +84,20 @@ keepassApp.factory('unlockedState', ['$interval', 'keepass', 'protectedMemory', 
   return new UnlockedState($interval, keepass, protectedMemory);
 }]);
 
-keepassApp.factory('secureCache', ['protectedMemory', function(protectedMemory) {
-  return new SecureCache(protectedMemory);
+keepassApp.factory('secureCacheMemory', ['protectedMemory', function(protectedMemory) {
+  return new SecureCacheMemory(protectedMemory);
+}])
+
+keepassApp.factory('secureCacheDisk', ['protectedMemory', 'secureCacheMemory', function(protectedMemory, secureCacheMemory) {
+  return new SecureCacheDisk(protectedMemory, secureCacheMemory);
 }])
 
 keepassApp.controller('dragDropController', ['$scope', '$http', '$location', 'localStorage', DragDropController]);
 keepassApp.controller('fileTypeController', ['$scope', '$http', '$location', '$routeParams', FileTypeController]);
 keepassApp.controller('startupController', ['$scope', '$http', '$location', 'gdocs', 'localStorage', StartupController]);
 keepassApp.controller('docsController', ['$scope', '$http', '$location', 'gdocs', 'localStorage', DocsController]);
-keepassApp.controller('masterPasswordController', ['$scope', '$interval', '$http', '$routeParams', '$location', 'keepass', 'localStorage', 'unlockedState', 'secureCache', MasterPasswordController]);
-keepassApp.controller('findEntryController', ['$scope', 'protectedMemory', 'unlockedState', FindEntryController]);
+keepassApp.controller('masterPasswordController', ['$scope', '$interval', '$http', '$routeParams', '$location', 'keepass', 'localStorage', 'unlockedState', 'secureCacheDisk', MasterPasswordController]);
+keepassApp.controller('findEntryController', ['$scope', 'unlockedState', 'secureCacheDisk', FindEntryController]);
 
 keepassApp.directive('icon', function() {
     function link(scope, element, attrs) {

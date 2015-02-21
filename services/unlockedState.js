@@ -36,12 +36,11 @@ function UnlockedState($interval, keepass, protectedMemory) {
     title: "",  //window title of current tab
     origin: "", //url of current tab without path or querystring
     sitePermission: false,  //true if the extension already has rights to autofill the password
-    usingSavedState: false, //true if the entry data is from state that we saved to the background page, false when password file just unlocked
     entries: null,  //filtered password database entries
     streamKey: null,  //key for accessing protected data fields
     clipboardStatus: ""  //status message about clipboard, used when copying password to the clipboard
   };
-  var streamKey, bgMessages, copyEntry;
+  var streamKey, copyEntry;
 
   //determine current url:
   my.getTabDetails = function() {
@@ -71,12 +70,6 @@ function UnlockedState($interval, keepass, protectedMemory) {
           .then(function() {
             resolve();
           })
-
-          //wake up the background page and get a pipe to send/receive messages:
-          bgMessages = chrome.runtime.connect({
-            name: "tab" + my.tabId
-          });
-          bgMessages.onMessage.addListener(bgMessageListener);
         } else {
           reject(new Error("Unable to determine tab details"));
         }
@@ -87,7 +80,6 @@ function UnlockedState($interval, keepass, protectedMemory) {
   my.clearBackgroundState = function() {
     my.entries = null;
     my.streamKey = null;
-    my.usingSavedState = false;
     my.clipboardStatus = "";
   }
 
