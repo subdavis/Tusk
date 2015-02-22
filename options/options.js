@@ -26,67 +26,30 @@ THE SOFTWARE.
 
 "use strict";
 
-var keepassSettings = angular.module('keepassSettings', ['ngAnimate', 'jsonFormatter']);
+var keepassSettings = angular.module('keepassSettings', ['ngAnimate', 'ngRoute', 'jsonFormatter']);
 
-function OptionsController($scope, $http) {
+keepassSettings.config(['$routeProvider', function($routeProvider) {
+  $routeProvider.when('/storedData', {
+    templateUrl: chrome.extension.getURL('/options/partials/storedData.html'),
+    controller: 'storedDataController'
+  }).when('/keyFiles', {
+    templateUrl: chrome.extension.getURL('/options/partials/manageKeyFiles.html'),
+    controller: 'manageKeyFilesController'
+  }).otherwise({
+    redirectTo: '/keyFiles'
+  });
+}]);
 
-  Promise.all([refreshLocalStorage(), refreshSyncStorage(), refreshPermissions()]).then(function() {
-    $scope.$apply();
-  })
+keepassSettings.factory('settings', [function() {
+  return new Settings();
+}]);
 
-  function refreshLocalStorage() {
-    $scope.localData = [];
-    return chrome.p.storage.local.get(null).then(function(items) {
-      for (var name in items) {
-        var entry = {
-          key: name,
-          data: items[name]
-        };
+keepassSettings.factory('keyFileParser', [function() {
+  return new KeyFileParser();
+}]);
 
-        $scope.localData.push(entry);
-      }
-    });
-  }
-
-  function refreshSyncStorage() {
-    $scope.syncData = [];
-    return chrome.p.storage.sync.get(null).then(function(items) {
-      for (var name in items) {
-        var entry = {
-          key: name,
-          data: items[name]
-        };
-
-        $scope.syncData.push(entry);
-      }
-    });
-  }
-
-  function refreshPermissions() {
-    $scope.permissions = {};
-    return chrome.p.permissions.getAll().then(function(perms) {
-      $scope.permissions = perms;
-    });
-  }
-
-  $scope.deleteLocalData = function(key) {
-    chrome.p.storage.local.remove(key).then(function() {
-      return refreshLocalStorage();
-    }).then(function() {
-      $scope.$apply();
-    });
-  }
-
-  $scope.deleteOriginPermission = function(origin) {
-    chrome.p.permissions.remove({
-      "origins": [origin]
-    }).then(function() {
-      return refreshPermissions();
-    }).then(function() {
-      $scope.$apply();
-    })
-  }
-}
+keepassSettings.controller('storedDataController', ['$scope', '$http', StoredDataController]);
+keepassSettings.controller('manageKeyFilesController', ['$scope', '$http', 'settings', 'keyFileParser', ManageKeyFilesController]);
 
 keepassSettings.directive('icon', function() {
   function link(scope, element, attrs) {
@@ -104,5 +67,44 @@ keepassSettings.directive('icon', function() {
   return {
     link: link,
     restrict: 'E'
+  };
+});
+
+//quick and dirty directive for file upload, based on answers from
+// http://stackoverflow.com/questions/17922557/angularjs-how-to-check-for-changes-in-file-input-fields
+keepassSettings.directive('fileChange', function() {
+  return {
+    restrict: "A",
+    link: function (scope, element, attrs) {
+      var onChangeFunc = element.scope()[attrs.fileChange];
+      element.bind('change', function(e) {
+        var files = e.target.files;
+        var loadedFiles = [];
+        for (var i = 0, f; f = files[i]; i++) {
+          // Read the File objects in this FileList.
+          var loadedFile = new Promise(function(resolve, reject) {
+            var reader = new FileReader();
+
+            reader.onloadend = (function(theFile) {
+              return function(e) {
+                resolve({data: e.target.result, file: theFile});
+              };
+            })(f);
+
+            reader.onerror = reader.onabort = (function(theFile) {
+              return function(e) {
+                reject(new Error("File upload failed"));
+              };
+            })(f);
+
+            reader.readAsArrayBuffer(f);
+          });
+
+          loadedFiles.push(loadedFile);
+        }
+
+        onChangeFunc(loadedFiles);
+      });
+    }
   };
 });

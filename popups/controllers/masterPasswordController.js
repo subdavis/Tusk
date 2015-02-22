@@ -53,30 +53,22 @@ function MasterPasswordController($scope, $interval, $http, $routeParams, $locat
     secureCache.clear('streamKey');
   });
 
-  //---keyfile upload starts...
-  $scope.selectFile = function() {
-    document.getElementById('file').click();
-  };
-
-  $scope.handleKeyFile = function(filePromises) {
-    if (filePromises.length != 1) {
-      return;
+  $scope.manageKeyFiles = function() {
+    if (chrome.runtime.openOptionsPage) {
+      //from chrome 42 onward, per Xan on http://stackoverflow.com/questions/6782391/programmatically-open-a-chrome-plugins-options-html-page
+      chrome.runtime.openOptionsPage();
+    } else {
+      //chrome://extensions/?options=lnfepbjehgokldcaljagbmchhnaaogpc
+      var optionsUrl = "chrome://extensions/?options=" + chrome.runtime.id;
+      chrome.tabs.query({url: optionsUrl}, function(tabs) {
+        if (tabs.length) {
+          chrome.tabs.update(tabs[0].id, {active: true});
+        } else {
+          chrome.tabs.create({url: optionsUrl});
+        }
+      });
     }
-
-    filePromises[0].then(function(info) {
-      var bytes = info.data;
-      $scope.keyFileName = info.file.name;
-
-      return keepass.getKeyFromFile(info.data);
-    }).then(function(key) {
-      fileKey = key;
-    }).catch(function(err) {
-      $scope.errorMessage = err.message;
-    }).then(function() {
-      $scope.$apply();
-    });
   }
-  //---keyfile upload ends...
 
   $scope.chooseAnotherFile = function() {
     unlockedState.clearBackgroundState();

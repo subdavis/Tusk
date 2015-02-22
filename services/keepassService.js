@@ -37,55 +37,6 @@ function Keepass(keepassHeader, pako, localStorage) {
     return new Int16Array(buffer)[0] === 256;
   })();
 
-  function hex2arr(hex) {
-    try {
-      var arr = [];
-      for (var i = 0; i < hex.length; i += 2)
-        arr.push(parseInt(hex.substr(i, 2), 16));
-      return arr;
-    } catch (err) {
-      return [];
-    }
-  }
-
-  my.getKeyFromFile = function(keyFileBytes) {
-    var arr = new Uint8Array(keyFileBytes);
-    if (arr.byteLength == 0) {
-      throw new Error('key file has zero bytes');
-    } else if (arr.byteLength == 32) {
-      //file content is the key
-      return arr;
-    } else if (arr.byteLength == 64) {
-      //file content may be a hex string of the key
-      var decoder = new TextDecoder();
-      var hexString = decoder.decode(arr);
-      var newArr = hex2arr(hexString);
-      if (newArr.length == 32) {
-        return newArr;
-      }
-    }
-
-    //attempt to parse xml
-    try {
-      var decoder = new TextDecoder();
-      var xml = decoder.decode(arr);
-      var parser = new DOMParser();
-      var doc = parser.parseFromString(xml, "text/xml");
-      var keyNode = doc.evaluate('//KeyFile/Key/Data', doc, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
-      if (keyNode.singleNodeValue && keyNode.singleNodeValue.textContent) {
-        return Base64.decode(keyNode.singleNodeValue.textContent);
-      }
-    } catch (err) {
-      //continue, not valid xml keyfile
-    }
-
-    var SHA = {
-      name: "SHA-256"
-    };
-
-    return window.crypto.subtle.digest(SHA, arr);
-  }
-
   function getKey(h, masterPassword, fileKey) {
     var partPromises = [];
     var SHA = {

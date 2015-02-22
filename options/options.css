@@ -1,16 +1,313 @@
 /*! ChromeKeePass, Copyright 2015 Steven Campbell
     This file is generated.
 */
+.transition {
+  transition: all 250ms ease 0s;
+}
+html,
+body {
+  margin: 0;
+  color: rgba(0, 0, 0, 0.9);
+}
+body {
+  width: 400px;
+  padding: 16px;
+  overflow: hidden;
+  text-rendering: optimizeLegibility;
+}
+ng-view {
+  display: block;
+}
+ng-view.ng-enter {
+  -webkit-animation: fadeInDown 0.3s;
+  animation: fadeInDown 0.3s;
+}
+ul {
+  margin: 0;
+  padding: 0;
+}
+ul li {
+  list-style-type: none;
+}
+.icon {
+  display: inline-block;
+  color: #444444;
+  fill: currentColor;
+  transition: all 250ms ease 0s;
+}
+.fill {
+  width: 100%;
+  box-sizing: border-box;
+}
+fieldset {
+  margin-top: 8px;
+}
+fieldset.ng-hide-add {
+  -webkit-animation: zoomOut 0.3s;
+  animation: zoomOut 0.3s;
+}
+filelist ul,
+passwordMatches ul,
+keyFiles ul {
+  overflow: auto;
+}
+filelist ul li,
+passwordMatches ul li,
+keyFiles ul li {
+  border: 1px solid #eeeeee;
+  background: #eeeeee;
+  padding: 4px;
+  margin: 4px 0;
+  display: block;
+  cursor: pointer;
+  list-style-type: none;
+  text-align: center;
+  transition: all 250ms ease 0s;
+}
+filelist ul li:hover,
+passwordMatches ul li:hover,
+keyFiles ul li:hover {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  background: rgba(0, 128, 255, 0.2);
+  border-color: rgba(0, 128, 255, 0.5);
+}
+filelist ul li date,
+passwordMatches ul li date,
+keyFiles ul li date {
+  font-size: 0.8em;
+  color: rgba(77, 77, 77, 0.9);
+}
+filelist ul li .icon,
+passwordMatches ul li .icon,
+keyFiles ul li .icon {
+  width: 18px;
+  height: 18px;
+  padding: 0 4px;
+}
+filelist ul li .removeFile,
+passwordMatches ul li .removeFile,
+keyFiles ul li .removeFile {
+  float: right;
+}
+filelist ul li .removeFile .icon,
+passwordMatches ul li .removeFile .icon,
+keyFiles ul li .removeFile .icon {
+  padding: 0;
+  color: rgba(255, 128, 128, 0.5);
+}
+filelist ul li .removeFile .icon:hover,
+passwordMatches ul li .removeFile .icon:hover,
+keyFiles ul li .removeFile .icon:hover {
+  color: rgba(255, 26, 26, 0.5);
+}
+filelist ul li.ng-leave,
+passwordMatches ul li.ng-leave,
+keyFiles ul li.ng-leave {
+  -webkit-animation: zoomOut 0.3s;
+  animation: zoomOut 0.3s;
+}
+filelist ul li.ng-enter,
+passwordMatches ul li.ng-enter,
+keyFiles ul li.ng-enter {
+  -webkit-animation: zoomIn 0.5s;
+  animation: zoomIn 0.5s;
+}
+button .icon,
+a .icon {
+  width: 16px;
+  height: 16px;
+  vertical-align: text-top;
+  padding-right: 4px;
+}
+button.pure-button-primary .icon,
+a.pure-button-primary .icon {
+  color: white;
+}
+.pure-table {
+  font-size: small;
+  margin-top: 8px;
+  width: 100%;
+}
+.pure-table td .icon {
+  width: 19px;
+  height: 19px;
+}
+.pure-table td .icon:hover {
+  color: #c3c3c3;
+}
+table.entries {
+  table-layout: fixed;
+}
+table.entries td,
+table.entries th {
+  overflow-wrap: break-word;
+  text-overflow: ellipsis;
+}
+table.entries td a,
+table.entries th a {
+  text-overflow: inherit;
+  overflow-wrap: normal;
+  text-decoration: none;
+}
+statusMessage {
+  display: block;
+  padding: 4px 0;
+  font-weight: 600;
+}
+keyFileName {
+  display: block;
+  padding-bottom: 8px;
+}
+pageInfo,
+compositeKeyPart {
+  background: #eeeeee;
+  display: block;
+  padding: 4px;
+  border: solid 2px #d5d5d5;
+  margin: 4px 0;
+  color: rgba(0, 0, 0, 0.9);
+  font-weight: 600;
+}
+passwordMatches {
+  display: block;
+  max-height: 150px;
+  overflow-y: scroll;
+}
+warningMessage {
+  margin-top: 8px;
+  background: rgba(255, 153, 51, 0.5);
+  display: block;
+  padding: 4px;
+  border: solid 2px rgba(255, 128, 0, 0.8);
+  margin: 4px 0;
+  color: rgba(0, 0, 0, 0.9);
+}
+successMessage {
+  margin-top: 8px;
+  background: rgba(100, 220, 100, 0.5);
+  display: block;
+  padding: 4px;
+  border: solid 2px rgba(58, 211, 58, 0.8);
+  margin: 4px 0;
+  color: rgba(0, 0, 0, 0.9);
+}
+busyMessage,
+infoMessage {
+  background: rgba(255, 255, 100, 0.1);
+  display: block;
+  padding: 4px;
+  border: solid 1px rgba(255, 255, 49, 0.4);
+  margin: 4px 0;
+  color: rgba(0, 0, 0, 0.9);
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+}
+errorMessage {
+  background: #b71c1c;
+  display: block;
+  padding: 4px;
+  border: solid 2px #8b1515;
+  margin: 4px 0;
+  color: rgba(255, 255, 255, 0.9);
+}
+fileTypes {
+  display: block;
+  margin-bottom: 60px;
+}
+fileTypes fileType {
+  display: block;
+  height: 70px;
+  margin: 8px;
+  padding: 8px;
+  cursor: pointer;
+  border: solid 1px #eeeeee;
+  background: #eeeeee;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  transition: all 250ms ease 0s;
+}
+fileTypes fileType:hover {
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+  background: rgba(0, 128, 255, 0.2);
+  border: solid 1px rgba(0, 128, 255, 0.5);
+}
+fileTypes fileType:hover .icon {
+  -webkit-animation: tada 1s;
+  animation: tada 1s;
+  color: rgba(0, 120, 231, 0.8);
+}
+fileTypes fileType .icon {
+  display: block;
+  margin: auto;
+  width: 30px;
+  height: 30px;
+  padding-bottom: 8px;
+}
+drop-target {
+  display: block;
+  height: 60px;
+  padding: 8px;
+  margin: 8px 0;
+  border: dashed 3px rgba(0, 0, 0, 0.5);
+  cursor: copy;
+  text-align: center;
+  color: rgba(0, 0, 0, 0.5);
+  transition: all 250ms;
+}
+drop-target.over,
+.over drop-target {
+  background: rgba(0, 128, 255, 0.2);
+  -webkit-animation: pulse 1s infinite;
+  animation: pulse 1s infinite;
+}
 body {
   padding: 16px;
   max-width: 800px;
+  min-width: 600px;
   font-family: Roboto, Arial, Helvetica, sans-serif;
   font-size: 1em;
 }
-fieldset legend {
+ng-view.ng-enter {
+  -webkit-animation: zoomInLeft 0.3s;
+  animation: zoomInLeft 0.3s;
+}
+.pure-form fieldset legend {
   font-style: italic;
   font-weight: 500;
   background-color: rgba(0, 128, 255, 0.2);
+  padding-left: 4px;
+  box-sizing: border-box;
+}
+.pure-form fieldset legend .icon {
+  width: 18px;
+  height: 18px;
+  padding: 0 4px;
+}
+keyfiles {
+  display: block;
+}
+keyfiles li {
+  display: block;
+}
+.menu {
+  display: block;
+  margin-bottom: 4px;
+  border-bottom: 2px solid rgba(0, 120, 231, 0.8);
+}
+.menu a {
+  text-decoration: none;
+  padding: 8px;
+}
+.menu .menu-item {
+  display: inline-block;
+  background-color: rgba(0, 120, 231, 0.8);
+  color: white;
+}
+.menu .menu-item:hover {
+  background-color: rgba(78, 170, 255, 0.8);
+}
+.menu .menu-item.selected {
+  background-color: rgba(78, 170, 255, 0.8);
 }
 table.fixed {
   table-layout: fixed;

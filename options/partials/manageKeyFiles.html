@@ -1,0 +1,28 @@
+<fieldset>
+  <!--
+  <legend>
+    <icon p="icon-key2"></icon> Key Files
+  </legend>
+-->
+  ChromeKeePass can store your key files locally in Chrome storage, and apply them automatically when opening a file.
+  <br />
+  <br />Websites and other Chrome extensions do not have access to these files.  However, they are stored
+  unencrypted in your local Chrome profile and someone with access to your device could read them.
+
+  <keyfiles>
+    <ul>
+      <li ng-repeat="keyFile in keyFiles">
+        <!--<icon p="icon-key2"></icon>-->{{keyFile.name}}
+        <a class="removeFile" title="Remove" ng-click="removeKeyFile(keyFile)">
+          <icon p="icon-times-circle"></icon>
+        </a>
+      </li>
+    </ul>
+  </keyfiles>
+  <errorMessage ng-show="errorMessage">{{errorMessage}}</errorMessage>
+  <input type="file" style="display:none;" id="file" name='file' file-change="handleKeyFile" />
+  <a class="pure-button fill pure-button-primary" ng-click="selectFile()">
+    <!--<icon p="icon-key2"></icon>-->Add Key File
+  </a>
+
+</fieldset>

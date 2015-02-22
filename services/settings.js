@@ -34,13 +34,64 @@ function Settings() {
 
   //upgrade old settings.  Called on install.
   exports.upgrade = function() {
+    //move key files out of usages into key file section
+    exports.getDatabaseUsages().then(function(usages) {
+      usages.forEach(function(usage) {
+        if (usage.keyFileName && usage.fileKeyBase64) {
+          exports.addKeyFile(usage.keyFileName, Base64.decode(usage.fileKeyBase64));
+        }
+        usage.fileKeyBase64 = undefined;
+        usage.forgetKeyFile = undefined;
+      });
 
+      exports.saveDatabaseUsages(usages);
+    });
+  }
+
+  exports.getKeyFiles = function() {
+    return chrome.p.storage.local.get(['keyFiles']).then(function(items) {
+      return items.keyFiles || [];
+    });
+  }
+
+  exports.deleteKeyFile = function(name) {
+    return exports.getKeyFiles().then(function(keyFiles) {
+      keyFiles.forEach(function(keyFile, index) {
+        if (keyFile.name == name) {
+          keyFiles.splice(index, 1);
+        }
+      })
+
+      return chrome.p.storage.local.set({'keyFiles': keyFiles});
+    });
+  }
+
+  exports.addKeyFile = function(name, key) {
+    return exports.getKeyFiles().then(function(keyFiles) {
+      var matches = keyFiles.filter(function(keyFile) {
+        return keyFile.name == name;
+      })
+
+      var encodedKey = Base64.encode(key);
+      if (matches.length) {
+        //update
+        matches[0].encodedKey = encodedKey;
+      } else {
+        //insert
+        keyFiles.push({
+          name: name,
+          encodedKey: encodedKey
+        })
+      }
+
+      return chrome.p.storage.local.set({'keyFiles': keyFiles});
+    });
   }
 
   exports.saveDatabaseUsages = function(usages) {
-    //TODO: refactor usages so they can be retrived and saved inbdividually
+    //TODO: refactor usages so they can be retrived and saved individually
     return chrome.p.storage.local.set({
-      'databaseUsage': usages
+      'databaseUsages': usages
     });
   }
 

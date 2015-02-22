@@ -83,6 +83,7 @@ ul {
 
 .fill {
   width: 100%;
+  box-sizing: border-box;
 }
 
 fieldset {
@@ -94,7 +95,7 @@ fieldset {
   }
 }
 
-filelist, passwordMatches {
+filelist, passwordMatches, keyFiles {
   ul {
     overflow: auto;
 
@@ -120,12 +121,17 @@ filelist, passwordMatches {
         color: lighten(@dark-grey-text, 30%);
       }
 
+      .icon {
+        width: 18px;
+        height: 18px;
+        padding: 0 4px;
+      }
+
       .removeFile {
         float: right;
 
         .icon {
-          width: 18px;
-          height: 18px;
+          padding: 0;
           color: @red-icon;
 
           &:hover {
@@ -147,12 +153,19 @@ filelist, passwordMatches {
   }
 }
 
-button .icon {
-  width: 16px;
-  height: 16px;
-  vertical-align: text-top;
-  padding-right: 4px;
+button, a {
+  .icon {
+    width: 16px;
+    height: 16px;
+    vertical-align: text-top;
+    padding-right: 4px;
+  }
+
+  &.pure-button-primary .icon {
+    color: white;
+  }
 }
+
 
 .pure-table {
   font-size: small;
