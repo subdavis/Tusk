@@ -11,7 +11,7 @@
     </tr>
   </thead>
   <tbody>
-    <tr ng-repeat="entry in entries" title="{{entry.notes}}">
+    <tr ng-repeat="entry in entries track by $index" title="{{entry.notes}}">
       <td>{{entry.title || entry.url}}</td>
       <td>{{entry.userName}}</td>
       <td>

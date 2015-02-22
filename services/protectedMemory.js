@@ -84,7 +84,7 @@ function ProtectedMemory() {
     });
   }
 
-  function clearData(key) {
+  function clearData() {
     dataMap = {};
     keyPromise = initNewKey();
     return keyPromise

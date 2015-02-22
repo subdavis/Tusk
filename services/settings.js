@@ -36,13 +36,14 @@ function Settings() {
   exports.upgrade = function() {
     //move key files out of usages into key file section
     exports.getDatabaseUsages().then(function(usages) {
-      usages.forEach(function(usage) {
+      for(var usageKey in usages) {
+        var usage = usages[usageKey];
         if (usage.keyFileName && usage.fileKeyBase64) {
           exports.addKeyFile(usage.keyFileName, Base64.decode(usage.fileKeyBase64));
         }
         usage.fileKeyBase64 = undefined;
         usage.forgetKeyFile = undefined;
-      });
+      }
 
       exports.saveDatabaseUsages(usages);
     });
@@ -85,6 +86,18 @@ function Settings() {
       }
 
       return chrome.p.storage.local.set({'keyFiles': keyFiles});
+    });
+  }
+
+  exports.setDiskCacheFlag = function(val) {
+    return chrome.p.storage.local.set({
+      'useDiskCache': val
+    });
+  }
+
+  exports.getDiskCacheFlag = function() {
+    return chrome.p.storage.local.get('useDiskCache').then(function(items) {
+      return items.useDiskCache;
     });
   }
 

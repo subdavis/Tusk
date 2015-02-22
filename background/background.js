@@ -71,15 +71,24 @@ THE SOFTWARE.
   //keep saved state for the popup for as long as we are alive (not long):
   chrome.runtime.onConnect.addListener(function(port) {
     //communicate state on this pipe.  each named port gets its own state.
-    protectedMemory.getData(port.name).then(function(savedState) {
-      if (savedState) {
-        //we have some saved state that we can give to the popup
-        port.postMessage(savedState);
-      };
-    });
-
-    port.onMessage.addListener(function(state) {
-      protectedMemory.setData(port.name, state);
+    port.onMessage.addListener(function(msg) {
+      if (!msg) return;
+      switch(msg.action) {
+        case 'clear':
+          protectedMemory.clearData();
+          break;
+        case 'save':
+          protectedMemory.setData(msg.key, msg.value);
+          break;
+        case 'get':
+          protectedMemory.getData(msg.key).then(function(value) {
+            port.postMessage(value);
+          });
+          break;
+        default:
+          throw new Error('unrecognized action ' + obj.action)
+          break;
+      }
     });
 
     port.onDisconnect.addListener(function() {

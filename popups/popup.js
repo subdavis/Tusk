@@ -92,8 +92,8 @@ keepassApp.factory('secureCacheMemory', ['protectedMemory', function(protectedMe
   return new SecureCacheMemory(protectedMemory);
 }])
 
-keepassApp.factory('secureCacheDisk', ['protectedMemory', 'secureCacheMemory', function(protectedMemory, secureCacheMemory) {
-  return new SecureCacheDisk(protectedMemory, secureCacheMemory);
+keepassApp.factory('secureCacheDisk', ['protectedMemory', 'secureCacheMemory', 'settings', function(protectedMemory, secureCacheMemory, settings) {
+  return new SecureCacheDisk(protectedMemory, secureCacheMemory, settings);
 }])
 
 keepassApp.controller('dragDropController', ['$scope', '$http', '$location', 'localStorage', DragDropController]);

@@ -38,6 +38,9 @@ keepassSettings.config(['$routeProvider', function($routeProvider) {
   }).when('/keyFiles', {
     templateUrl: chrome.extension.getURL('/options/partials/manageKeyFiles.html'),
     controller: 'manageKeyFilesController'
+  }).when('/advanced', {
+    templateUrl: chrome.extension.getURL('/options/partials/advanced.html'),
+    controller: 'advancedController'
   }).otherwise({
     redirectTo: '/startup'
   });
@@ -51,9 +54,23 @@ keepassSettings.factory('keyFileParser', [function() {
   return new KeyFileParser();
 }]);
 
+keepassSettings.factory('protectedMemory', [function() {
+  return new ProtectedMemory();
+}]);
+
+keepassSettings.factory('secureCacheMemory', ['protectedMemory', function(protectedMemory) {
+  return new SecureCacheMemory(protectedMemory);
+}])
+
+keepassSettings.factory('secureCacheDisk', ['protectedMemory', 'secureCacheMemory', 'settings', function(protectedMemory, secureCacheMemory, settings) {
+  return new SecureCacheDisk(protectedMemory, secureCacheMemory, settings);
+}])
+
+
 keepassSettings.controller('startupController', ['$scope', '$location', StartupController]);
 keepassSettings.controller('storedDataController', ['$scope', '$http', StoredDataController]);
 keepassSettings.controller('manageKeyFilesController', ['$scope', '$http', 'settings', 'keyFileParser', ManageKeyFilesController]);
+keepassSettings.controller('advancedController', ['$scope', 'settings', 'secureCacheDisk', AdvancedController]);
 
 keepassSettings.directive('icon', function() {
   function link(scope, element, attrs) {

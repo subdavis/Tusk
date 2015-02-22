@@ -37,7 +37,7 @@ THE SOFTWARE.
  * Max storage time is 40 minutes, which is the expected TTL of the secret.  You
  * can see details of the expiry time in chrome://identity-internals/
  */
-function SecureCacheDisk(protectedMemory, secureCacheMemory) {
+function SecureCacheDisk(protectedMemory, secureCacheMemory, settings) {
   var exports = {
     save: set,
     get: get,
@@ -50,18 +50,25 @@ function SecureCacheDisk(protectedMemory, secureCacheMemory) {
   };
 
   var tokenPromise = new Promise(function(resolve, reject) {
-    chrome.identity.getAuthToken({interactive: false}, function(token) {
-      if (token) {
-        var encoder = new TextEncoder();
-        var tokenBytes = encoder.encode(token);
-        window.crypto.subtle.digest({name: 'SHA-256'}, tokenBytes).then(function(hash) {
-          return window.crypto.subtle.importKey("raw", hash, AES, false, ['encrypt', 'decrypt']);
-        }).then(function(aesKey) {
-          resolve(aesKey);
-        });
-      } else {
-        reject(new Error('Failed to get a 3rd party secret, cache not possible.'));
+    settings.getDiskCacheFlag().then(function(enabled) {
+      if (!enabled) {
+        reject(new Error('Disk cache is not enabled'));
+        return;
       }
+
+      chrome.identity.getAuthToken({interactive: false}, function(token) {
+        if (token) {
+          var encoder = new TextEncoder();
+          var tokenBytes = encoder.encode(token);
+          window.crypto.subtle.digest({name: 'SHA-256'}, tokenBytes).then(function(hash) {
+            return window.crypto.subtle.importKey("raw", hash, AES, false, ['encrypt', 'decrypt']);
+          }).then(function(aesKey) {
+            resolve(aesKey);
+          });
+        } else {
+          reject(new Error('Failed to get a 3rd party secret, cache not possible.'));
+        }
+      });
     });
   });
 

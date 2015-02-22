@@ -15,11 +15,15 @@
   <script type="text/javascript" src="/lib/angular-animate.min.js"></script>
   <script type="text/javascript" src="/lib/json-formatter.min.js"></script>
   <script type="text/javascript" src="/services/settings.js"></script>
+  <script type="text/javascript" src="/services/protectedMemory.js"></script>
+  <script type="text/javascript" src="/services/secureCacheMemory.js"></script>
+  <script type="text/javascript" src="/services/secureCacheDisk.js"></script>
   <script type="text/javascript" src="/services/keyFileParser.js"></script>
   <script type="text/javascript" src="/options/controllers/startup.js"></script>
   <script type="text/javascript" src="/options/controllers/navController.js"></script>
   <script type="text/javascript" src="/options/controllers/storedData.js"></script>
   <script type="text/javascript" src="/options/controllers/manageKeyFiles.js"></script>
+  <script type="text/javascript" src="/options/controllers/advanced.js"></script>
   <script type="text/javascript" src="/options/options.js"></script>
 </head>
 
@@ -28,6 +32,7 @@
     <a class="menu-item" ng-class="{selected: isActive('/startup')}" href="#startup?stay=1">Introduction</a>
     <a class="menu-item" ng-class="{selected: isActive('/keyFiles')}" href="#keyFiles">Key Files</a>
     <a class="menu-item" ng-class="{selected: isActive('/storedData')}" href="#storedData">Stored Data</a>
+    <a class="menu-item" ng-class="{selected: isActive('/advanced')}" href="#advanced">Advanced Options</a>
   </nav>
   <ng-view></ng-view>
 
