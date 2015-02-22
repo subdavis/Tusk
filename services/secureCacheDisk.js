@@ -31,7 +31,7 @@ THE SOFTWARE.
  * If a 3rd-party secret is not available, falls back to storing in-memory (still
  * encrypted though).
  *
- * Our secret is the access token for google drive.  It is secret from other 
+ * Our secret is the access token for google drive.  It is secret from other
  * extensions, and it is cached in-memory by Chrome.
  *
  * Max storage time is 40 minutes, which is the expected TTL of the secret.  You
@@ -131,7 +131,7 @@ function SecureCacheDisk(protectedMemory, secureCacheMemory) {
   }
 
   function clear(key) {
-    chrome.storage.local.remove(key);
+    chrome.storage.local.remove('secureCache.' + key);
   }
 
   return exports;

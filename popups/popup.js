@@ -64,8 +64,12 @@ keepassApp.factory('passwordFileStoreFactory', ['gdocs', function(gdocs) {
 	return new PasswordFileStoreFactory(gdocs);
 }]);
 
-keepassApp.factory('localStorage', ['passwordFileStoreFactory', function(passwordFileStoreFactory) {
-	return new LocalStorage(passwordFileStoreFactory);
+keepassApp.factory('settings', [function() {
+  return new Settings();
+}]);
+
+keepassApp.factory('localStorage', ['settings', 'passwordFileStoreFactory', function(settings, passwordFileStoreFactory) {
+	return new LocalStorage(settings, passwordFileStoreFactory);
 }]);
 
 keepassApp.factory('protectedMemory', [function() {

@@ -31,11 +31,12 @@ THE SOFTWARE.
   (they will be lost)
 */
 
-(function(protectedMemory) {
+(function(protectedMemory, settings) {
   if (chrome.extension.inIncognitoContext) {
     doReplaceRules();
   } else {
     chrome.runtime.onInstalled.addListener(doReplaceRules);
+    chrome.runtime.onInstalled.addListener(settings.upgrade);
   }
 
   function doReplaceRules() {
@@ -141,4 +142,4 @@ THE SOFTWARE.
     }
   });
 
-})(new ProtectedMemory());
+})(new ProtectedMemory(), new Settings());

@@ -26,7 +26,7 @@ THE SOFTWARE.
 
 "use strict";
 
-function LocalStorage(passwordFileStoreFactory) {
+function LocalStorage(settings, passwordFileStoreFactory) {
   var my = {
     saveDatabaseChoice: saveDatabaseChoice,
     getSavedDatabaseChoice: getSavedDatabaseChoice,
@@ -40,12 +40,7 @@ function LocalStorage(passwordFileStoreFactory) {
    * Remembers the user's last choice of database
    */
   function saveDatabaseChoice(providerKey, fileInfo) {
-    fileInfo = angular.copy(fileInfo);
-    fileInfo.data = undefined; //don't save the data with the choice
-    return chrome.p.storage.local.set({
-      'passwordFile': fileInfo,
-      'providerKey': providerKey
-    }).then(function() {
+    return settings.saveCurrentDatabaseChoice(fileInfo, providerKey).then(function() {
       return passwordFileStoreFactory.getInstance(providerKey, fileInfo);
     });
   }
@@ -54,7 +49,7 @@ function LocalStorage(passwordFileStoreFactory) {
    * Returns the saved password choice as a "fileStore", which exposes getFile() and title properties.
    */
   function getSavedDatabaseChoice() {
-    return chrome.p.storage.local.get(['passwordFile', 'providerKey']).then(function(items) {
+    return settings.getCurrentDatabaseChoice().then(function(items) {
       if (items.passwordFile && items.providerKey) {
         return passwordFileStoreFactory.getInstance(items.providerKey, items.passwordFile);
       } else {
@@ -69,7 +64,7 @@ function LocalStorage(passwordFileStoreFactory) {
    */
   function saveCurrentDatabaseUsage(usage) {
     return getSavedDatabaseChoice().then(function(fileStore) {
-      return getDatabaseUsages(fileStore.title, fileStore.providerKey).then(function(usages) {
+      return settings.getDatabaseUsages().then(function(usages) {
         var key = fileStore.title + "__" + fileStore.providerKey;
         usages[key] = usage;
         if (usage.fileKey) {
@@ -79,9 +74,7 @@ function LocalStorage(passwordFileStoreFactory) {
           delete usage.fileKey;
         }
 
-        return chrome.p.storage.local.set({
-          'databaseUsages': usages
-        });
+        return settings.saveDatabaseUsages(usages);
       });
     });
   }
@@ -92,7 +85,7 @@ function LocalStorage(passwordFileStoreFactory) {
    */
   function getCurrentDatabaseUsage() {
     return getSavedDatabaseChoice().then(function(fileStore) {
-      return getDatabaseUsages(fileStore.title, fileStore.providerKey).then(function(usages) {
+      return settings.getDatabaseUsages().then(function(usages) {
         var key = fileStore.title + "__" + fileStore.providerKey;
         var usage = usages[key] || {};
 
@@ -104,13 +97,6 @@ function LocalStorage(passwordFileStoreFactory) {
         return usage;
       });
     })
-  }
-
-  function getDatabaseUsages(title, providerKey) {
-    return chrome.p.storage.local.get(['databaseUsages']).then(function(items) {
-      items.databaseUsages = items.databaseUsages || {};
-      return items.databaseUsages;
-    });
   }
 
   return my;

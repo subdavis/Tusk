@@ -33,7 +33,7 @@
   },
   "background": {
     "scripts": [
-      "lib/base64.js", "services/protectedMemory.js", "background/background.js"
+      "lib/base64.js", "services/settings.js", "services/protectedMemory.js", "background/background.js"
     ],
     "persistent": false
   },
