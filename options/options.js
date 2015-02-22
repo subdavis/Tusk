@@ -29,14 +29,17 @@ THE SOFTWARE.
 var keepassSettings = angular.module('keepassSettings', ['ngAnimate', 'ngRoute', 'jsonFormatter']);
 
 keepassSettings.config(['$routeProvider', function($routeProvider) {
-  $routeProvider.when('/storedData', {
+  $routeProvider.when('/startup', {
+    templateUrl: chrome.extension.getURL('/options/partials/startup.html'),
+    controller: 'startupController'
+  }).when('/storedData', {
     templateUrl: chrome.extension.getURL('/options/partials/storedData.html'),
     controller: 'storedDataController'
   }).when('/keyFiles', {
     templateUrl: chrome.extension.getURL('/options/partials/manageKeyFiles.html'),
     controller: 'manageKeyFilesController'
   }).otherwise({
-    redirectTo: '/keyFiles'
+    redirectTo: '/startup'
   });
 }]);
 
@@ -48,6 +51,7 @@ keepassSettings.factory('keyFileParser', [function() {
   return new KeyFileParser();
 }]);
 
+keepassSettings.controller('startupController', ['$scope', '$location', StartupController]);
 keepassSettings.controller('storedDataController', ['$scope', '$http', StoredDataController]);
 keepassSettings.controller('manageKeyFilesController', ['$scope', '$http', 'settings', 'keyFileParser', ManageKeyFilesController]);
 

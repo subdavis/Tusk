@@ -16,6 +16,7 @@
   <script type="text/javascript" src="/lib/json-formatter.min.js"></script>
   <script type="text/javascript" src="/services/settings.js"></script>
   <script type="text/javascript" src="/services/keyFileParser.js"></script>
+  <script type="text/javascript" src="/options/controllers/startup.js"></script>
   <script type="text/javascript" src="/options/controllers/navController.js"></script>
   <script type="text/javascript" src="/options/controllers/storedData.js"></script>
   <script type="text/javascript" src="/options/controllers/manageKeyFiles.js"></script>
@@ -24,6 +25,7 @@
 
 <body class="pure-form">
   <nav class="menu" ng-controller="NavController">
+    <a class="menu-item" ng-class="{selected: isActive('/startup')}" href="#startup?stay=1">Introduction</a>
     <a class="menu-item" ng-class="{selected: isActive('/keyFiles')}" href="#keyFiles">Key Files</a>
     <a class="menu-item" ng-class="{selected: isActive('/storedData')}" href="#storedData">Stored Data</a>
   </nav>

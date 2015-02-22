@@ -62,20 +62,18 @@ function MasterPasswordController($scope, $interval, $http, $routeParams, $locat
 
   //go to the options page to manage key files
   $scope.manageKeyFiles = function() {
-    if (chrome.runtime.openOptionsPage) {
-      //from chrome 42 onward, per Xan on http://stackoverflow.com/questions/6782391/programmatically-open-a-chrome-plugins-options-html-page
-      chrome.runtime.openOptionsPage();
-    } else {
-      //chrome://extensions/?options=lnfepbjehgokldcaljagbmchhnaaogpc
-      var optionsUrl = "chrome://extensions/?options=" + chrome.runtime.id;
-      chrome.tabs.query({url: optionsUrl}, function(tabs) {
-        if (tabs.length) {
-          chrome.tabs.update(tabs[0].id, {active: true});
-        } else {
-          chrome.tabs.create({url: optionsUrl});
-        }
-      });
-    }
+    //from chrome 42 onward, per Xan on http://stackoverflow.com/questions/6782391/programmatically-open-a-chrome-plugins-options-html-page
+    //chrome.runtime.openOptionsPage();
+
+    //until then...
+    var optionsUrl = "chrome://extensions/?options=" + chrome.runtime.id;
+    chrome.tabs.query({url: optionsUrl}, function(tabs) {
+      if (tabs.length) {
+        chrome.tabs.update(tabs[0].id, {active: true});
+      } else {
+        chrome.tabs.create({url: optionsUrl});
+      }
+    });
   }
 
   $scope.chooseAnotherFile = function() {
