@@ -139,6 +139,7 @@ function SecureCacheDisk(protectedMemory, secureCacheMemory, settings) {
 
   function clear(key) {
     chrome.storage.local.remove('secureCache.' + key);
+    secureCacheMemory.clear();
   }
 
   return exports;
