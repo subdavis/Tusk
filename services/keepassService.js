@@ -26,6 +26,9 @@ THE SOFTWARE.
 
 "use strict";
 
+/**
+ * Service for opening keepass files
+ */
 function Keepass(keepassHeader, pako, localStorage) {
   var my = {
 
@@ -72,7 +75,8 @@ function Keepass(keepassHeader, pako, localStorage) {
     });
   }
 
-  my.getPasswords = function(masterPassword, fileKey) {
+  my.getPasswords = function(masterPassword, keyFileInfo) {
+    var fileKey = keyFileInfo ? Base64.decode(keyFileInfo.encodedKey) : null;
     return localStorage.getSavedDatabaseChoice().then(function(fileStore) {
       if (chrome.extension.inIncognitoContext && !fileStore.supportsIngognito) {
         throw new Error('Unable to access this password file in ingognito mode due to Chrome security restrictions.');

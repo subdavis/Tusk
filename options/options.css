@@ -156,7 +156,9 @@ statusMessage {
 }
 keyFileName {
   display: block;
-  padding-bottom: 8px;
+}
+keyFileName div.center {
+  text-align: center;
 }
 pageInfo,
 compositeKeyPart {

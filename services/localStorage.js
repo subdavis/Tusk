@@ -67,12 +67,6 @@ function LocalStorage(settings, passwordFileStoreFactory) {
       return settings.getDatabaseUsages().then(function(usages) {
         var key = fileStore.title + "__" + fileStore.providerKey;
         usages[key] = usage;
-        if (usage.fileKey) {
-          if (!usage.forgetKeyFile) {
-            usage.fileKeyBase64 = Base64.encode(usage.fileKey);
-          }
-          delete usage.fileKey;
-        }
 
         return settings.saveDatabaseUsages(usages);
       });
@@ -88,11 +82,6 @@ function LocalStorage(settings, passwordFileStoreFactory) {
       return settings.getDatabaseUsages().then(function(usages) {
         var key = fileStore.title + "__" + fileStore.providerKey;
         var usage = usages[key] || {};
-
-        if (usage.fileKeyBase64) {
-          usage.fileKey = Base64.decode(usage.fileKeyBase64);
-          delete usage.fileKeyBase64;
-        }
 
         return usage;
       });

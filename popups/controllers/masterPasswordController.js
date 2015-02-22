@@ -1,11 +1,10 @@
 "use strict";
 
-function MasterPasswordController($scope, $interval, $http, $routeParams, $location, keepass, localStorage, unlockedState, secureCache) {
+function MasterPasswordController($scope, $interval, $http, $routeParams, $location, keepass, localStorage, unlockedState, secureCache, settings) {
   $scope.masterPassword = "";
   $scope.busy = false;
   $scope.fileName = $routeParams.fileTitle;
-  $scope.keyFileName = "";
-  $scope.rememberKeyFile = true;
+  $scope.selectedKeyFile = null;
   $scope.unlockedState = unlockedState;
   $scope.os = {};
 
@@ -15,23 +14,31 @@ function MasterPasswordController($scope, $interval, $http, $routeParams, $locat
     })
   });
 
-  var fileKey;
-
-  localStorage.getCurrentDatabaseUsage().then(function(usage) {
+  settings.getKeyFiles().then(function(keyFiles) {
+    $scope.keyFiles = keyFiles;
+  }).then(function() {
+    return localStorage.getCurrentDatabaseUsage();
+  }).then(function(usage) {
     //tweak UI based on what we know about the database file
     $scope.hidePassword = (usage.requiresPassword === false);
     $scope.hideKeyFile = (usage.requiresKeyfile === false);
-    $scope.rememberKeyFile = !usage.forgetKeyFile;
-    if (usage.fileKey && usage.forgetKeyFile !== true) {
-      fileKey = usage.fileKey;
-      $scope.keyFileName = usage.keyFileName;
+
+    if (usage.keyFileName) {
+      var matches = $scope.keyFiles.filter(function(keyFile) {
+        return keyFile.name == usage.keyFileName;
+      })
+
+      if (matches.length) {
+        $scope.selectedKeyFile = matches[0];
+      }
     }
 
-    if ($scope.hidePassword && fileKey) {
+    if ($scope.hidePassword && $scope.selectedKeyFile) {
+      //key file selected and we have a file key already - auto-unlock
       $scope.enterMasterPassword();
-    } else {
-      $scope.$apply();
     }
+  }).then(function() {
+    $scope.$apply();
   });
 
   //determine current tab info:
@@ -53,6 +60,7 @@ function MasterPasswordController($scope, $interval, $http, $routeParams, $locat
     secureCache.clear('streamKey');
   });
 
+  //go to the options page to manage key files
   $scope.manageKeyFiles = function() {
     if (chrome.runtime.openOptionsPage) {
       //from chrome 42 onward, per Xan on http://stackoverflow.com/questions/6782391/programmatically-open-a-chrome-plugins-options-html-page
@@ -81,14 +89,12 @@ function MasterPasswordController($scope, $interval, $http, $routeParams, $locat
     $scope.clearMessages();
     $scope.busy = true;
 
-    keepass.getPasswords($scope.masterPassword, fileKey).then(function(entries) {
+    keepass.getPasswords($scope.masterPassword, $scope.selectedKeyFile).then(function(entries) {
       //remember usage for next time:
       localStorage.saveCurrentDatabaseUsage({
         requiresPassword: $scope.masterPassword ? true : false,
-        requiresKeyfile: fileKey ? true : false,
-        forgetKeyFile: !$scope.rememberKeyFile,
-        fileKey: fileKey,
-        keyFileName: $scope.keyFileName
+        requiresKeyfile: $scope.selectedKeyFile ? true : false,
+        keyFileName: $scope.selectedKeyFile ? $scope.selectedKeyFile.name : ""
       });
 
       //show results:
