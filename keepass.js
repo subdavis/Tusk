@@ -73,14 +73,43 @@ var filler = (function() {
 	"use strict";
 
 	var userPasswordPairs = [];
-	var lonelyPasswords = [];
+	var lonelyPasswords = [];  //passwords without usernames
+	var priorityPair = null;   //most likely pair of fields.
 
 	function identifyPasswordFields() {
 		//identify user/password pairs
 		userPasswordPairs = [];
 		lonelyPasswords = [];
-
+		priorityPair = null;
 		var inputPattern = "input[type='text'], input[type='email'], input[type='password'], input:not([type])";
+
+		//algorithm 1 - based on focused field
+		var focusedField = $('input:focus');
+		if (focusedField.length) {
+			var pair = {}, focusedPassword = false;
+			if (isPasswordField(focusedField)) {
+				pair.p = focusedField;
+				focusedPassword = true;
+			} else {
+				pair.u = focusedField;
+			}
+
+			var all = $(inputPattern);
+			var focusedIndex = all.index(focusedField);
+			if (focusedIndex > -1 && focusedIndex < all.length) {
+				if (focusedPassword && focusedIndex > 0) {
+					//field before the password is the username
+					pair.u = all[focusedIndex - 1];
+				} else if (!focusedPassword && focusedIndex < all.length) {
+					//field after the username is the password
+					pair.p = all[focusedIndex + 1];
+				}
+			}
+
+			priorityPair = pair;
+		}
+
+		//algorithm 2 - based on types of fields and visibility
 		var possibleUserName;
 		var lastFieldWasPassword = false; //used to detect registration forms which have 2 password fields, one after the other
 		$(inputPattern).each(function() {
@@ -121,6 +150,18 @@ var filler = (function() {
 	function fillPassword(username, password) {
 		identifyPasswordFields();
 		var filled = false;
+
+		if (priorityPair) {
+			//don't bother with the others, this is the one
+			if (priorityPair.u && priorityPair.u.is(':visible'))
+				fillField(priorityPair.u, username);
+
+			if (priorityPair.p && priorityPair.p.is(':visible'))
+				fillField(priorityPair.p, password);
+
+			return;
+		}
+
 		if (userPasswordPairs.length > 0) {
 			//we have found some possible username/passwords.  Check if the are visible:
 			for (var i = 0; i < userPasswordPairs.length; i++) {

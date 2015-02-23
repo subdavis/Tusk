@@ -53,6 +53,17 @@ THE SOFTWARE.
           //new chrome.declarativeContent.RequestContentScript({js: ['keepass.js']})
         ]
       };
+      var textField = {
+        id: "textField",
+        conditions: [
+          new chrome.declarativeContent.PageStateMatcher({
+            css: ["input[type='text'], input[type='email'], input:not([type])" ]
+          })
+        ],
+        actions: [
+          new chrome.declarativeContent.ShowPageAction()
+        ]
+      };
       var iframeLogin = {
         id: "iframeLogin",
         conditions: [
@@ -64,7 +75,7 @@ THE SOFTWARE.
         new chrome.declarativeContent.ShowPageAction()
         ]
       };
-      chrome.declarativeContent.onPageChanged.addRules([passwordField, iframeLogin]);
+      chrome.declarativeContent.onPageChanged.addRules([passwordField, textField, iframeLogin]);
     });
   }
 
