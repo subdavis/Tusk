@@ -3,30 +3,32 @@
 function StartupController($scope, $location, settings, optionsLink, passwordFileStoreFactory) {
   $scope.ready = false;
 
-  var readyPromises = [];
-  passwordFileStoreFactory.listProviders('listDatabases').forEach(function(provider) {
-    readyPromises.push(provider.listDatabases());
-  });
-
-  Promise.all(readyPromises).then(function(filesArrays) {
-    var availableFiles = filesArrays.reduce(function(prev, curr) {
-      return prev.concat(curr);
+  settings.getCurrentDatabaseChoice().then(function(info) {
+    //use the last chosen database
+    $location.path('/enter-password/' + info.providerKey + '/' + info.passwordFile.title);
+  }).catch(function(err) {
+    //user has not yet chosen a database.  Lets see if there are any available to choose...
+    var readyPromises = [];
+    passwordFileStoreFactory.listProviders('listDatabases').forEach(function(provider) {
+      readyPromises.push(provider.listDatabases());
     });
 
-    if (availableFiles.length) {
-      settings.getCurrentDatabaseChoice().then(function(info) {
-        $location.path('/enter-password/' + info.providerKey + '/' + info.passwordFile.title);
-      }).catch(function(err) {
-        $location.path('/choose-file')
-      }).then(function() {
-        $scope.$apply();
+    return Promise.all(readyPromises).then(function(filesArrays) {
+      var availableFiles = filesArrays.reduce(function(prev, curr) {
+        return prev.concat(curr);
       });
-    } else {
-      //no files available - allow then user to link to the options page
-      $scope.ready = true;
-      $scope.$apply();
-    }
-  });
+
+      if (availableFiles.length) {
+        //choose one of the files
+        $location.path('/choose-file')
+      } else {
+        //no files available - allow the user to link to the options page
+        $scope.ready = true;
+      }
+    });
+  }).then(function() {
+    $scope.$apply();
+  })
 
   $scope.openOptionsPage = function() {
     optionsLink.go();
