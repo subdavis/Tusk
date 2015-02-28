@@ -26,7 +26,7 @@ THE SOFTWARE.
 
 "use strict";
 
-var keepassSettings = angular.module('keepassSettings', ['ngAnimate', 'ngRoute', 'jsonFormatter']);
+var keepassSettings = angular.module('keepassSettings', ['ngAnimate', 'ngRoute', 'ngSanitize', 'jsonFormatter']);
 
 keepassSettings.config(['$routeProvider', function($routeProvider) {
   $routeProvider.when('/startup', {
@@ -38,6 +38,15 @@ keepassSettings.config(['$routeProvider', function($routeProvider) {
   }).when('/keyFiles', {
     templateUrl: chrome.extension.getURL('/options/partials/manageKeyFiles.html'),
     controller: 'manageKeyFilesController'
+  }).when('/databases', {
+    templateUrl: chrome.extension.getURL('/options/partials/choose-file-type.html'),
+    controller: 'fileTypeController'
+  }).when('/choose-file', {
+    templateUrl: chrome.extension.getURL('/options/partials/choose-file.html'),
+    controller: 'docsController'
+  }).when('/drag-drop-file', {
+    templateUrl: chrome.extension.getURL('/options/partials/drag-drop-file.html'),
+    controller: 'dragDropController'
   }).when('/advanced', {
     templateUrl: chrome.extension.getURL('/options/partials/advanced.html'),
     controller: 'advancedController'
@@ -46,8 +55,20 @@ keepassSettings.config(['$routeProvider', function($routeProvider) {
   });
 }]);
 
+keepassSettings.factory('gdocs', function() {
+	return new GDocs();
+});
+
+keepassSettings.factory('passwordFileStoreFactory', ['gdocs', function(gdocs) {
+	return new PasswordFileStoreFactory(gdocs);
+}]);
+
 keepassSettings.factory('settings', [function() {
   return new Settings();
+}]);
+
+keepassSettings.factory('localStorage', ['settings', 'passwordFileStoreFactory', function(settings, passwordFileStoreFactory) {
+	return new LocalStorage(settings, passwordFileStoreFactory);
 }]);
 
 keepassSettings.factory('keyFileParser', [function() {
@@ -66,11 +87,13 @@ keepassSettings.factory('secureCacheDisk', ['protectedMemory', 'secureCacheMemor
   return new SecureCacheDisk(protectedMemory, secureCacheMemory, settings);
 }])
 
-
 keepassSettings.controller('startupController', ['$scope', '$location', StartupController]);
 keepassSettings.controller('storedDataController', ['$scope', '$http', StoredDataController]);
 keepassSettings.controller('manageKeyFilesController', ['$scope', '$http', 'settings', 'keyFileParser', ManageKeyFilesController]);
 keepassSettings.controller('advancedController', ['$scope', 'settings', 'secureCacheDisk', AdvancedController]);
+keepassSettings.controller('dragDropController', ['$scope', '$http', '$location', 'localStorage', DragDropController]);
+keepassSettings.controller('fileTypeController', ['$scope', '$http', '$location', '$routeParams', FileTypeController]);
+keepassSettings.controller('docsController', ['$scope', '$http', '$location', 'gdocs', 'localStorage', DocsController]);
 
 keepassSettings.directive('icon', function() {
   function link(scope, element, attrs) {

@@ -1,0 +1,30 @@
+<docs ng-cloak>
+  <div ng-hide="authorized() || refreshing">
+    If you have already-existing KeePass (.kdbx or .kdb) files stored in your google drive, then you can access them.
+    <br><br>
+    Chrome will ask you to allow this extension to access the Google Drive websites, and Google Drive will ask you to allow this extension to read your files.
+    <br><br>
+  </div>
+  <a class="pure-button fill pure-button-primary" ng-hide="authorized() || refreshing" ng-click="authorize()">
+    <icon p="icon-google"></icon>Authorize
+  </a>
+  <errorMessage ng-show="errorMessage">{{errorMessage}}</errorMessage>
+  <fieldset ng-show="authorized() && docs && docs.length">
+    These files will be available to unlock when logging into a website...
+    <br>
+    <filelist>
+      <ul>
+        <li ng-repeat="doc in docs">
+          {{doc.title}}
+        </li>
+      </ul>
+    </filelist>
+  </fieldset>
+  <errorMessage ng-show="!refreshing && authorized() && (docs == null || docs.length == 0)">ChromeKeePass has accessed your drive but could not find any password files. Ensure your .kdbx or .kdb file is in your google drive.</errorMessage>
+  <button class="pure-button" ng-click="refresh()" ng-show="authorized()" title="Refresh the list to see new files">
+    <icon p="icon-google"></icon>Refresh
+  </button>
+  <button class="pure-button" ng-show="authorized()" ng-click="logout()" title="Remove ChromeKeePass permission to access Google Drive.">
+    <icon p="icon-lock"></icon>Deauthorize
+  </button>
+</docs>

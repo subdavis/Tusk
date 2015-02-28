@@ -1,6 +1,6 @@
 "use strict";
 
-function MasterPasswordController($scope, $interval, $http, $routeParams, $location, keepass, localStorage, unlockedState, secureCache, settings) {
+function MasterPasswordController($scope, $interval, $http, $routeParams, $location, keepass, localStorage, unlockedState, secureCache, settings, optionsLink) {
   $scope.masterPassword = "";
   $scope.busy = false;
   $scope.fileName = $routeParams.fileTitle;
@@ -62,18 +62,7 @@ function MasterPasswordController($scope, $interval, $http, $routeParams, $locat
 
   //go to the options page to manage key files
   $scope.manageKeyFiles = function() {
-    //from chrome 42 onward, per Xan on http://stackoverflow.com/questions/6782391/programmatically-open-a-chrome-plugins-options-html-page
-    //chrome.runtime.openOptionsPage();
-
-    //until then...
-    var optionsUrl = "chrome://extensions/?options=" + chrome.runtime.id;
-    chrome.tabs.query({url: optionsUrl}, function(tabs) {
-      if (tabs.length) {
-        chrome.tabs.update(tabs[0].id, {active: true});
-      } else {
-        chrome.tabs.create({url: optionsUrl});
-      }
-    });
+    optionsLink.go();
   }
 
   $scope.chooseAnotherFile = function() {

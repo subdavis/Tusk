@@ -32,6 +32,7 @@ module.exports = function(grunt) {
           {expand: true, cwd: 'bower_components/angular/', src: 'angular-csp.css', dest: 'lib/'},
           {expand: true, cwd: 'bower_components/angular-animate/', src: 'angular-animate.min.js', dest: 'lib/'},
           {expand: true, cwd: 'bower_components/angular-route/', src: 'angular-route.min.js', dest: 'lib/'},
+          {expand: true, cwd: 'bower_components/angular-sanitize/', src: 'angular-sanitize.min.js', dest: 'lib/'},
           {expand: true, cwd: 'bower_components/animate.css/', src: 'animate.css', dest: 'lib/'}
           ]
       }

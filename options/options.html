@@ -12,15 +12,23 @@
   <script type="text/javascript" src="/lib/chrome-api-promise.js"></script>
   <script type="text/javascript" src="/lib/angular.min.js"></script>
   <script type="text/javascript" src="/lib/angular-route.min.js"></script>
+  <script type="text/javascript" src="/lib/angular-sanitize.min.js"></script>
   <script type="text/javascript" src="/lib/angular-animate.min.js"></script>
   <script type="text/javascript" src="/lib/json-formatter.min.js"></script>
+  <script type="text/javascript" src="/lib/util.js"></script>
+  <script type="text/javascript" src="/lib/gdocs.js"></script>
   <script type="text/javascript" src="/services/settings.js"></script>
   <script type="text/javascript" src="/services/protectedMemory.js"></script>
   <script type="text/javascript" src="/services/secureCacheMemory.js"></script>
   <script type="text/javascript" src="/services/secureCacheDisk.js"></script>
   <script type="text/javascript" src="/services/keyFileParser.js"></script>
+  <script type="text/javascript" src="/services/passwordFileStore.js"></script>
+  <script type="text/javascript" src="/services/localStorage.js"></script>
   <script type="text/javascript" src="/options/controllers/startup.js"></script>
   <script type="text/javascript" src="/options/controllers/navController.js"></script>
+  <script type="text/javascript" src="/options/controllers/docsController.js"></script>
+  <script type="text/javascript" src="/options/controllers/dragDropController.js"></script>
+  <script type="text/javascript" src="/options/controllers/fileTypeController.js"></script>
   <script type="text/javascript" src="/options/controllers/storedData.js"></script>
   <script type="text/javascript" src="/options/controllers/manageKeyFiles.js"></script>
   <script type="text/javascript" src="/options/controllers/advanced.js"></script>
@@ -30,9 +38,10 @@
 <body class="pure-form">
   <nav class="menu" ng-controller="NavController">
     <a class="menu-item" ng-class="{selected: isActive('/startup')}" href="#startup?stay=1">Introduction</a>
+    <a class="menu-item" ng-class="{selected: isActive('/databases') || isActive('/choose-file') || isActive('/drag-drop-file')}" href="#databases">KeePass Databases</a>
     <a class="menu-item" ng-class="{selected: isActive('/keyFiles')}" href="#keyFiles">Key Files</a>
-    <a class="menu-item" ng-class="{selected: isActive('/storedData')}" href="#storedData">Stored Data</a>
     <a class="menu-item" ng-class="{selected: isActive('/advanced')}" href="#advanced">Advanced Options</a>
+    <a class="menu-item" ng-class="{selected: isActive('/storedData')}" href="#storedData">Stored Data</a>
   </nav>
   <ng-view></ng-view>
 

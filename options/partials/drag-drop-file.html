@@ -1,0 +1,26 @@
+<div droppable drop="handleDrop">
+  Use the big blue button to upload files from your local or remote filesystem.  A copy of the selected
+  file(s) will be stored in Chrome's local storage.
+  <br>
+  <a class="pure-button pure-button-primary fill" ng-click="selectFile()">Browse Files</a>
+  <input type="file" style="display:none" id="file" name='file' file-change="handleDrop" multiple />
+  <errorMessage ng-show="errorMessage">{{errorMessage}}</errorMessage>
+  <fieldset ng-show="files.length">
+    The following files have been uploaded:
+    <filelist>
+      <ul>
+        <li ng-repeat="file in files track by file.title">
+          {{file.title}}
+          <date>({{file.lastModified | date:short}})</date>
+          <a class="removeFile" title="Remove" ng-click="removePasswordFile(file)">
+            <icon p="icon-times-circle"></icon>
+          </a>
+        </li>
+      </ul>
+    </filelist>
+  </fieldset>
+  <successMessage ng-show="loadedFiles > 0">
+    <ng-pluralize count="loadedFiles" when="{'one': '1 file added or updated.', 'other': '{} files added or updated.'}"></ng-pluralize>
+    Files are stored in Chrome.  If the original file changes, then you must re-upload it in order to see the changes in ChromeKeePass.
+  </successMessage>
+</div>

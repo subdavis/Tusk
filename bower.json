@@ -27,6 +27,7 @@
     "Case": "~1.2",
     "mocha": "~2.1.0",
     "should": "shouldjs/should.js#~5.0.0",
-    "sinonjs": "~1.10.2"
+    "sinonjs": "~1.10.2",
+    "angular-sanitize": "~1.2"
   }
 }

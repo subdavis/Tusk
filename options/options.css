@@ -262,7 +262,7 @@ fileTypes fileType .icon {
 }
 drop-target {
   display: block;
-  height: 60px;
+  height: 127px;
   padding: 8px;
   margin: 8px 0;
   border: dashed 3px rgba(0, 0, 0, 0.5);
@@ -280,7 +280,7 @@ drop-target.over,
 body {
   padding: 16px;
   max-width: 800px;
-  min-width: 600px;
+  min-width: 700px;
   font-family: Roboto, Arial, Helvetica, sans-serif;
   font-size: 1em;
 }
