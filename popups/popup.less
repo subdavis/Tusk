@@ -9,6 +9,7 @@
 @dark-grey-text: rgba(0,0,0,0.9);
 @red-icon: rgba(255, 128, 128, 0.5);
 @grey-icon: #444444;
+@blue-icon: lighten(@blue-bg, 30%);
 
 .transition {
   transition: all 250ms ease 0s;
@@ -62,6 +63,24 @@ ng-view {
   &.ng-enter {
     -webkit-animation: fadeInDown 0.3s;
     animation: fadeInDown 0.3s;
+  }
+}
+
+options-link {
+  display: block;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+
+  .icon {
+    color: @blue-icon;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+
+    &:hover {
+      color: @blue-bg;
+    }
   }
 }
 

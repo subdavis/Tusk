@@ -25,6 +25,7 @@
   <script type="text/javascript" src="/services/keepassService.js"></script>
   <script type="text/javascript" src="/services/secureCacheMemory.js"></script>
   <script type="text/javascript" src="/services/secureCacheDisk.js"></script>
+  <script type="text/javascript" src="controllers/settingsLink.js"></script>
   <script type="text/javascript" src="controllers/docsController.js"></script>
   <script type="text/javascript" src="controllers/masterPasswordController.js"></script>
   <script type="text/javascript" src="controllers/startupController.js"></script>
@@ -36,12 +37,18 @@
 
 <body>
   <ng-view></ng-view>
-
+  <options-link title="Settings" ng-controller="SettingsLinkController" ng-click="showSettingsPage()">
+    <icon p="icon-cog"></icon>
+  </options-link>
   <svg display="none" width="0" height="0" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <defs>
       <symbol id="icon-search" viewBox="0 0 951 1024">
         <title>search</title>
         <path class="path1" d="M658.286 475.429q0-105.714-75.143-180.857t-180.857-75.143-180.857 75.143-75.143 180.857 75.143 180.857 180.857 75.143 180.857-75.143 75.143-180.857zM950.857 950.857q0 29.714-21.714 51.429t-51.429 21.714q-30.857 0-51.429-21.714l-196-195.429q-102.286 70.857-228 70.857-81.714 0-156.286-31.714t-128.571-85.714-85.714-128.571-31.714-156.286 31.714-156.286 85.714-128.571 128.571-85.714 156.286-31.714 156.286 31.714 128.571 85.714 85.714 128.571 31.714 156.286q0 125.714-70.857 228l196 196q21.143 21.143 21.143 51.429z"></path>
+      </symbol>
+      <symbol id="icon-cog" viewBox="0 0 1024 1024">
+        <title>cog</title>
+        <path class="path1" d="M585.143 512q0-60.571-42.857-103.429t-103.429-42.857-103.429 42.857-42.857 103.429 42.857 103.429 103.429 42.857 103.429-42.857 42.857-103.429zM877.714 449.714v126.857q0 6.857-4.571 13.143t-11.429 7.429l-105.714 16q-10.857 30.857-22.286 52 20 28.571 61.143 78.857 5.714 6.857 5.714 14.286t-5.143 13.143q-15.429 21.143-56.571 61.714t-53.714 40.571q-6.857 0-14.857-5.143l-78.857-61.714q-25.143 13.143-52 21.714-9.143 77.714-16.571 106.286-4 16-20.571 16h-126.857q-8 0-14-4.857t-6.571-12.286l-16-105.143q-28-9.143-51.429-21.143l-80.571 61.143q-5.714 5.143-14.286 5.143-8 0-14.286-6.286-72-65.143-94.286-96-4-5.714-4-13.143 0-6.857 4.571-13.143 8.571-12 29.143-38t30.857-40.286q-15.429-28.571-23.429-56.571l-104.571-15.429q-7.429-1.143-12-7.143t-4.571-13.429v-126.857q0-6.857 4.571-13.143t10.857-7.429l106.286-16q8-26.286 22.286-52.571-22.857-32.571-61.143-78.857-5.714-6.857-5.714-13.714 0-5.714 5.143-13.143 14.857-20.571 56.286-61.429t54-40.857q7.429 0 14.857 5.714l78.857 61.143q25.143-13.143 52-21.714 9.143-77.714 16.571-106.286 4-16 20.571-16h126.857q8 0 14 4.857t6.571 12.286l16 105.143q28 9.143 51.429 21.143l81.143-61.143q5.143-5.143 13.714-5.143 7.429 0 14.286 5.714 73.714 68 94.286 97.143 4 4.571 4 12.571 0 6.857-4.571 13.143-8.571 12-29.143 38t-30.857 40.286q14.857 28.571 23.429 56l104.571 16q7.429 1.143 12 7.143t4.571 13.429z"></path>
       </symbol>
       <symbol id="icon-lock" viewBox="0 0 658 1024">
         <title>lock</title>

@@ -22,6 +22,21 @@ ng-view.ng-enter {
   -webkit-animation: fadeInDown 0.3s;
   animation: fadeInDown 0.3s;
 }
+options-link {
+  display: block;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+}
+options-link .icon {
+  color: rgba(129, 194, 255, 0.8);
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+options-link .icon:hover {
+  color: rgba(0, 120, 231, 0.8);
+}
 ul {
   margin: 0;
   padding: 0;
