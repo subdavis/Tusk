@@ -51,20 +51,52 @@ THE SOFTWARE.
 
 function PasswordFileStoreFactory(gdocs) {
   var exports = {
-
+    getInstance: getInstance,
+    listProviders: listProviders
   };
 
   function getInstance(key, fi) {
     switch (key) {
       case "gdrive":
-        return new GoogleDrivePasswordFileProvider(gdocs, fi);
+        return new GoogleDrivePasswordFileFetcher(gdocs, fi);
       case "local":
-        return new LocalChromePasswordFileProvider(fi);
+        return new LocalChromePasswordFileFetcher(fi);
       default:
-        return new LocalChromePasswordFileProvider(fi);
+        return new LocalChromePasswordFileFetcher(fi);
     }
   }
-  exports.getInstance = getInstance; //expose
+
+  function listProviders(requiredFeature) {
+    var all = [new GoogleDrivePasswordFileManager(gdocs), new LocalChromePasswordFileManager()];
+
+    if (!requiredFeature) return all;
+
+    return all.filter(function(provider) {
+      return provider.supportedFeatures.indexOf(requiredFeature) > -1;
+    });
+  }
+
+  return exports;
+}
+
+function GoogleDrivePasswordFileManager(gdocs) {
+  var exports = {
+    key: 'gdrive',
+    listDatabases: listDatabases,
+    supportedFeatures: ['listDatabases'],
+    title: 'Google Drive',
+    icon: 'icon-google',
+    chooseTitle: 'Google Drive',
+    chooseDescription: 'Access password files stored on your Google Drive.  The file(s) will be fetched from Google Drive each time they are used.'
+  };
+
+  function listDatabases() {
+    return gdocs.auth().then(function() {
+      return gdocs.getPasswordFiles(true);
+    }).catch(function(err) {
+      return [];
+    });
+  }
 
   return exports;
 }
@@ -72,7 +104,7 @@ function PasswordFileStoreFactory(gdocs) {
 /**
  * Provider for retrieving the encrypted password file from Google Drive
  */
-function GoogleDrivePasswordFileProvider(gdocs, fileHandle) {
+function GoogleDrivePasswordFileFetcher(gdocs, fileHandle) {
   var exports = {
     providerKey: "gdrive",
     title: fileHandle.title,
@@ -96,10 +128,31 @@ function GoogleDrivePasswordFileProvider(gdocs, fileHandle) {
   return exports;
 }
 
+function LocalChromePasswordFileManager() {
+  var exports = {
+    key: 'local',
+    listDatabases: listDatabases,
+    supportedFeatures: ['listDatabases', 'addDatabase'],
+    supportsIngognito: true,
+    title: 'Chrome Storage',
+    icon: 'icon-upload',
+    chooseTitle: 'File System',
+    chooseDescription: 'Upload files from your local or remote file-system.  A one-time copy of the file(s) will be saved in Chrome local storage.  If you update the database on your local system then you will have to re-upload it in order to see the changes.'
+  };
+
+  function listDatabases() {
+    return chrome.p.storage.local.get('passwordFiles').then(function(result) {
+      return result.passwordFiles || [];
+    });
+  }
+
+  return exports;
+}
+
 /**
  * Provider for retrieving the encrypted password file from local chrome storage
  */
-function LocalChromePasswordFileProvider(fi) {
+function LocalChromePasswordFileFetcher(fi) {
   var exports = {
     providerKey: "local",
     title: fi.title,

@@ -115,13 +115,13 @@ function Settings() {
     });
   }
 
-  exports.saveCurrentDatabaseChoice = function(passwordFile, providerKey) {
+  exports.saveCurrentDatabaseChoice = function(passwordFile, provider) {
     passwordFile = angular.copy(passwordFile);
     passwordFile.data = undefined; //don't save the data with the choice
 
     return chrome.p.storage.local.set({
       'passwordFile': passwordFile,
-      'providerKey': providerKey
+      'providerKey': provider.key
     });
   }
 

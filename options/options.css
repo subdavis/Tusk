@@ -25,8 +25,8 @@ ng-view.ng-enter {
 options-link {
   display: block;
   position: absolute;
-  right: 0;
-  bottom: 0;
+  right: -3;
+  bottom: -1;
 }
 options-link .icon {
   color: rgba(129, 194, 255, 0.8);

@@ -1,4 +1,4 @@
-"use strict;"
+"use strict";
 
 //simple service to link to the options page
 function OptionsLink() {

@@ -1,25 +1,21 @@
 "use strict";
 
-function StartupController($scope, $http, $location, gdocs, localStorage, optionsLink) {
+function StartupController($scope, $location, settings, optionsLink, passwordFileStoreFactory) {
   $scope.ready = false;
 
-  var p1 = gdocs.auth().then(function() {
-    return gdocs.getPasswordFiles(true);
-  }).catch(function(err) {
-    return [];
-  });
-  var p2 = chrome.p.storage.local.get('passwordFiles').then(function(result) {
-    return result.passwordFiles || [];
+  var readyPromises = [];
+  passwordFileStoreFactory.listProviders('listDatabases').forEach(function(provider) {
+    readyPromises.push(provider.listDatabases());
   });
 
-  Promise.all([p1, p2]).then(function(filesArrays) {
+  Promise.all(readyPromises).then(function(filesArrays) {
     var availableFiles = filesArrays.reduce(function(prev, curr) {
       return prev.concat(curr);
     });
 
     if (availableFiles.length) {
-      localStorage.getSavedDatabaseChoice().then(function(fileStore) {
-        $location.path('/enter-password/' + fileStore.title);
+      settings.getCurrentDatabaseChoice().then(function(info) {
+        $location.path('/enter-password/' + info.providerKey + '/' + info.passwordFile.title);
       }).catch(function(err) {
         $location.path('/choose-file')
       }).then(function() {

@@ -31,14 +31,8 @@ var keepassApp = angular.module('keepassApp', ['ngAnimate', 'ngRoute']);
 keepassApp.config(['$routeProvider', function($routeProvider) {
   $routeProvider.when('/choose-file', {
     templateUrl: chrome.extension.getURL('/popups/partials/choose-file.html'),
-    controller: 'docsController'
-  }).when('/choose-file-type', {
-    templateUrl: chrome.extension.getURL('/popups/partials/choose-file-type.html'),
-    controller: 'fileTypeController'
-  }).when('/drag-drop-file', {
-    templateUrl: chrome.extension.getURL('/popups/partials/drag-drop-file.html'),
-    controller: 'dragDropController'
-  }).when('/enter-password/:fileTitle', {
+    controller: 'chooseFileController'
+  }).when('/enter-password/:providerKey/:fileTitle', {
     templateUrl: chrome.extension.getURL('/popups/partials/enter-password.html'),
     controller: 'masterPasswordController'
   }).when('/find-entry', {
@@ -100,11 +94,9 @@ keepassApp.factory('secureCacheDisk', ['protectedMemory', 'secureCacheMemory', '
   return new SecureCacheDisk(protectedMemory, secureCacheMemory, settings);
 }])
 
-keepassApp.controller('dragDropController', ['$scope', '$http', '$location', 'localStorage', DragDropController]);
-keepassApp.controller('fileTypeController', ['$scope', '$http', '$location', '$routeParams', FileTypeController]);
-keepassApp.controller('startupController', ['$scope', '$http', '$location', 'gdocs', 'localStorage', 'optionsLink', StartupController]);
-keepassApp.controller('docsController', ['$scope', '$http', '$location', 'gdocs', 'localStorage', DocsController]);
-keepassApp.controller('masterPasswordController', ['$scope', '$interval', '$http', '$routeParams', '$location', 'keepass', 'localStorage', 'unlockedState', 'secureCacheDisk', 'settings', MasterPasswordController]);
+keepassApp.controller('startupController', ['$scope', '$location', 'settings', 'optionsLink', 'passwordFileStoreFactory', StartupController]);
+keepassApp.controller('chooseFileController', ['$scope', '$location', 'passwordFileStoreFactory', 'settings', ChooseFileController]);
+keepassApp.controller('masterPasswordController', ['$scope', '$interval', '$http', '$routeParams', '$location', 'keepass', 'localStorage', 'unlockedState', 'secureCacheDisk', 'settings', 'optionsLink', MasterPasswordController]);
 keepassApp.controller('findEntryController', ['$scope', 'unlockedState', 'secureCacheDisk', FindEntryController]);
 
 keepassApp.directive('icon', function() {

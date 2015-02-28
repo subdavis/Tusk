@@ -69,7 +69,7 @@ function MasterPasswordController($scope, $interval, $http, $routeParams, $locat
     unlockedState.clearBackgroundState();
     secureCache.clear('entries');
     secureCache.clear('streamKey');
-    $location.path('/choose-file-type');
+    $location.path('/choose-file');
   }
 
   $scope.enterMasterPassword = function() {
