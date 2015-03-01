@@ -99,10 +99,10 @@ var filler = (function() {
 			if (focusedIndex > -1 && focusedIndex < all.length) {
 				if (focusedPassword && focusedIndex > 0) {
 					//field before the password is the username
-					pair.u = all[focusedIndex - 1];
+					pair.u = all.eq(focusedIndex - 1);
 				} else if (!focusedPassword && focusedIndex < all.length) {
 					//field after the username is the password
-					pair.p = all[focusedIndex + 1];
+					pair.p = all.eq(focusedIndex + 1);
 				}
 			}
 
