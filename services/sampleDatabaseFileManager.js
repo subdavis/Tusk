@@ -38,13 +38,21 @@ function SampleDatabaseFileManager($http) {
     title: 'Sample',
     icon: 'icon-flask',
     chooseTitle: 'Sample Database',
-    chooseDescription: 'Sample database that you can use to try out the functionality.  The master password is 123.'
+    chooseDescription: 'Sample database that you can use to try out the functionality.  The master password is 123.',
+    getActive: getActive,
+    setActive: setActive
   };
 
   function listDatabases() {
-    return Promise.resolve([{
-      title: 'Sample.kdbx - password is 123'
-    }]);
+    return getActive().then(function(flag) {
+      if (flag) {
+        return [{
+          title: 'Sample.kdbx - password is 123'
+        }];
+      } else {
+        return [];
+      }
+    });
   }
 
   //get the minimum information needed to identify this file for future retrieval
@@ -63,6 +71,19 @@ function SampleDatabaseFileManager($http) {
       cache: true
     }).then(function(response) {
       return response.data;
+    });
+  }
+
+  function setActive(flag) {
+    if (flag)
+      return chrome.p.storage.local.set({'useSampleDatabase': true});
+    else
+      return chrome.p.storage.local.remove('useSampleDatabase');
+  }
+
+  function getActive() {
+    return chrome.p.storage.local.get('useSampleDatabase').then(function(results) {
+      return !!results.useSampleDatabase;
     });
   }
 
