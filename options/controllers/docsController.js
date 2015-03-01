@@ -6,6 +6,7 @@ function DocsController($scope, googleDrivePasswordFileManager) {
   $scope.refresh = function() {
     $scope.docs = [];
     $scope.refreshing = true;
+    $scope.errorMessage = "";
     googleDrivePasswordFileManager.interactiveRequestAuth().then(function() {
       return googleDrivePasswordFileManager.listDatabases();
     }).then(function(docs) {
@@ -22,21 +23,31 @@ function DocsController($scope, googleDrivePasswordFileManager) {
   //authorizes and fetches the docs
   $scope.authorize = function() {
     $scope.refreshing = true;
+    $scope.errorMessage = "";
+    $scope.requestingUrl = true;
     requestGoogleUrlPermissions(true).then(function() {
+      $scope.requestingUrl = false;
+      $scope.requestingDriveAccess = true;
+      $scope.$apply();
       return googleDrivePasswordFileManager.interactiveRequestAuth();
     }).then(function() {
+      $scope.requestingDriveAccess = false;
+      $scope.$apply();
       return googleDrivePasswordFileManager.listDatabases();
     }).then(function(docs) {
       $scope.docs = docs;
     }).catch(function(err) {
       $scope.errorMessage = err.message || "Error authorizing"
     }).then(function() {
+      $scope.requestingUrl = false;
+      $scope.requestingDriveAccess = false;
       $scope.refreshing = false;
       $scope.$apply();
     });
   };
 
   $scope.logout = function() {
+    $scope.errorMessage = "";
     googleDrivePasswordFileManager.revokeAuth().then(function() {
       $scope.$apply();
     });
