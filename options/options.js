@@ -59,16 +59,24 @@ keepassSettings.factory('gdocs', function() {
 	return new GDocs();
 });
 
-keepassSettings.factory('passwordFileStoreFactory', ['gdocs', function(gdocs) {
-	return new PasswordFileStoreFactory(gdocs);
+keepassSettings.factory('passwordFileStoreRegistry', ['localChromePasswordFileManager', 'googleDrivePasswordFileManager', function(localChromePasswordFileManager, googleDrivePasswordFileManager) {
+	return new PasswordFileStoreRegistry(localChromePasswordFileManager, googleDrivePasswordFileManager);
+}]);
+
+keepassSettings.factory('googleDrivePasswordFileManager', ['gdocs', function(gdocs) {
+	return new GoogleDrivePasswordFileManager(gdocs);
+}]);
+
+keepassSettings.factory('localChromePasswordFileManager', [function() {
+	return new LocalChromePasswordFileManager();
 }]);
 
 keepassSettings.factory('settings', [function() {
   return new Settings();
 }]);
 
-keepassSettings.factory('localStorage', ['settings', 'passwordFileStoreFactory', function(settings, passwordFileStoreFactory) {
-	return new LocalStorage(settings, passwordFileStoreFactory);
+keepassSettings.factory('localStorage', ['settings', function(settings) {
+	return new LocalStorage(settings);
 }]);
 
 keepassSettings.factory('keyFileParser', [function() {
@@ -91,9 +99,9 @@ keepassSettings.controller('startupController', ['$scope', '$location', StartupC
 keepassSettings.controller('storedDataController', ['$scope', '$http', StoredDataController]);
 keepassSettings.controller('manageKeyFilesController', ['$scope', '$http', 'settings', 'keyFileParser', ManageKeyFilesController]);
 keepassSettings.controller('advancedController', ['$scope', 'settings', 'secureCacheDisk', AdvancedController]);
-keepassSettings.controller('dragDropController', ['$scope', '$http', '$location', 'localStorage', DragDropController]);
+keepassSettings.controller('dragDropController', ['$scope', 'localChromePasswordFileManager', DragDropController]);
 keepassSettings.controller('fileTypeController', ['$scope', '$http', '$location', '$routeParams', FileTypeController]);
-keepassSettings.controller('docsController', ['$scope', '$http', '$location', 'gdocs', 'localStorage', DocsController]);
+keepassSettings.controller('docsController', ['$scope', 'googleDrivePasswordFileManager', DocsController]);
 
 keepassSettings.directive('icon', function() {
   function link(scope, element, attrs) {

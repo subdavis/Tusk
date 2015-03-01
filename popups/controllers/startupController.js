@@ -1,6 +1,6 @@
 "use strict";
 
-function StartupController($scope, $location, settings, optionsLink, passwordFileStoreFactory) {
+function StartupController($scope, $location, settings, optionsLink, passwordFileStoreRegistry) {
   $scope.ready = false;
 
   settings.getCurrentDatabaseChoice().then(function(info) {
@@ -9,7 +9,7 @@ function StartupController($scope, $location, settings, optionsLink, passwordFil
   }).catch(function(err) {
     //user has not yet chosen a database.  Lets see if there are any available to choose...
     var readyPromises = [];
-    passwordFileStoreFactory.listProviders('listDatabases').forEach(function(provider) {
+    passwordFileStoreRegistry.listProviders('listDatabases').forEach(function(provider) {
       readyPromises.push(provider.listDatabases());
     });
 

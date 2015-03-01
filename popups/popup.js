@@ -54,8 +54,16 @@ keepassApp.factory('pako', function() {
   return pako;
 });
 
-keepassApp.factory('passwordFileStoreFactory', ['gdocs', function(gdocs) {
-	return new PasswordFileStoreFactory(gdocs);
+keepassApp.factory('passwordFileStoreRegistry', ['localChromePasswordFileManager', 'googleDrivePasswordFileManager', function(localChromePasswordFileManager, googleDrivePasswordFileManager) {
+	return new PasswordFileStoreRegistry(localChromePasswordFileManager, googleDrivePasswordFileManager);
+}]);
+
+keepassApp.factory('googleDrivePasswordFileManager', ['gdocs', function(gdocs) {
+	return new GoogleDrivePasswordFileManager(gdocs);
+}]);
+
+keepassApp.factory('localChromePasswordFileManager', [function() {
+	return new LocalChromePasswordFileManager();
 }]);
 
 keepassApp.factory('optionsLink', [function() {
@@ -66,8 +74,8 @@ keepassApp.factory('settings', [function() {
   return new Settings();
 }]);
 
-keepassApp.factory('localStorage', ['settings', 'passwordFileStoreFactory', function(settings, passwordFileStoreFactory) {
-	return new LocalStorage(settings, passwordFileStoreFactory);
+keepassApp.factory('localStorage', ['settings', function(settings) {
+	return new LocalStorage(settings);
 }]);
 
 keepassApp.factory('protectedMemory', [function() {
@@ -78,8 +86,8 @@ keepassApp.factory('keepassHeader', [function() {
   return new KeepassHeader(pako, localStorage);
 }]);
 
-keepassApp.factory('keepass', ['keepassHeader', 'pako', 'localStorage', function(keepassHeader, pako, localStorage) {
-	return new Keepass(keepassHeader, pako, localStorage);
+keepassApp.factory('keepass', ['keepassHeader', 'pako', 'settings', 'passwordFileStoreRegistry', function(keepassHeader, pako, settings, passwordFileStoreRegistry) {
+	return new Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry);
 }]);
 
 keepassApp.factory('unlockedState', ['$interval', 'keepass', 'protectedMemory', function($interval, keepass, protectedMemory) {
@@ -94,8 +102,8 @@ keepassApp.factory('secureCacheDisk', ['protectedMemory', 'secureCacheMemory', '
   return new SecureCacheDisk(protectedMemory, secureCacheMemory, settings);
 }])
 
-keepassApp.controller('startupController', ['$scope', '$location', 'settings', 'optionsLink', 'passwordFileStoreFactory', StartupController]);
-keepassApp.controller('chooseFileController', ['$scope', '$location', 'passwordFileStoreFactory', 'settings', ChooseFileController]);
+keepassApp.controller('startupController', ['$scope', '$location', 'settings', 'optionsLink', 'passwordFileStoreRegistry', StartupController]);
+keepassApp.controller('chooseFileController', ['$scope', '$location', 'passwordFileStoreRegistry', 'settings', ChooseFileController]);
 keepassApp.controller('masterPasswordController', ['$scope', '$interval', '$http', '$routeParams', '$location', 'keepass', 'localStorage', 'unlockedState', 'secureCacheDisk', 'settings', 'optionsLink', MasterPasswordController]);
 keepassApp.controller('findEntryController', ['$scope', 'unlockedState', 'secureCacheDisk', FindEntryController]);
 

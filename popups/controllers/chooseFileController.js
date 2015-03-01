@@ -1,11 +1,11 @@
 "use strict";
 
-function ChooseFileController($scope, $location, passwordFileStoreFactory, settings) {
+function ChooseFileController($scope, $location, passwordFileStoreRegistry, settings) {
   $scope.errorMessage = "";
   $scope.successMessage = "";
   $scope.databases = [];
 
-  passwordFileStoreFactory.listProviders('listDatabases').forEach(function(provider) {
+  passwordFileStoreRegistry.listProviders('listDatabases').forEach(function(provider) {
     provider.listDatabases().then(function(databases) {
       databases.forEach(function(database) {
         database.provider = provider;

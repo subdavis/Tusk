@@ -26,46 +26,20 @@ THE SOFTWARE.
 
 "use strict";
 
-function LocalStorage(settings, passwordFileStoreFactory) {
+function LocalStorage(settings) {
   var my = {
-    saveDatabaseChoice: saveDatabaseChoice,
-    getSavedDatabaseChoice: getSavedDatabaseChoice,
     saveCurrentDatabaseUsage: saveCurrentDatabaseUsage,
     getCurrentDatabaseUsage: getCurrentDatabaseUsage
   };
-
-  var passwordFileStoreFactory = passwordFileStoreFactory;
-
-  /**
-   * Remembers the user's last choice of database
-   */
-  function saveDatabaseChoice(providerKey, fileInfo) {
-    return settings.saveCurrentDatabaseChoice(fileInfo, providerKey).then(function() {
-      return passwordFileStoreFactory.getInstance(providerKey, fileInfo);
-    });
-  }
-
-  /**
-   * Returns the saved password choice as a "fileStore", which exposes getFile() and title properties.
-   */
-  function getSavedDatabaseChoice() {
-    return settings.getCurrentDatabaseChoice().then(function(items) {
-      if (items.passwordFile && items.providerKey) {
-        return passwordFileStoreFactory.getInstance(items.providerKey, items.passwordFile);
-      } else {
-        throw new Error('Could not find a saved password file choice');
-      }
-    });
-  }
 
   /**
    * Saves information about how the database was opened, so we can optimize the
    * UI next time by hiding the irrelevant options and remembering the keyfile
    */
   function saveCurrentDatabaseUsage(usage) {
-    return getSavedDatabaseChoice().then(function(fileStore) {
+    return settings.getCurrentDatabaseChoice().then(function(info) {
       return settings.getDatabaseUsages().then(function(usages) {
-        var key = fileStore.title + "__" + fileStore.providerKey;
+        var key = info.title + "__" + info.providerKey;
         usages[key] = usage;
 
         return settings.saveDatabaseUsages(usages);
@@ -78,9 +52,9 @@ function LocalStorage(settings, passwordFileStoreFactory) {
    * UI by hiding the irrelevant options and remembering the keyfile
    */
   function getCurrentDatabaseUsage() {
-    return getSavedDatabaseChoice().then(function(fileStore) {
+    return settings.getCurrentDatabaseChoice().then(function(info) {
       return settings.getDatabaseUsages().then(function(usages) {
-        var key = fileStore.title + "__" + fileStore.providerKey;
+        var key = info.title + "__" + info.providerKey;
         var usage = usages[key] || {};
 
         return usage;

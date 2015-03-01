@@ -1,20 +1,13 @@
 "use strict";
 
-function DocsController($scope, $http, $location, gdocs, localStorage) {
+function DocsController($scope, googleDrivePasswordFileManager) {
   $scope.docs = [];
-
-  $scope.choosePasswordFile = function(doc) {
-    localStorage.saveDatabaseChoice("gdrive", doc).then(function(fileStore) {
-      $location.path('/enter-password/' + fileStore.title);
-      $scope.$apply();
-    });
-  };
 
   $scope.refresh = function() {
     $scope.docs = [];
     $scope.refreshing = true;
-    gdocs.auth(true).then(function() {
-      return gdocs.getPasswordFiles(true);
+    googleDrivePasswordFileManager.interactiveRequestAuth().then(function() {
+      return googleDrivePasswordFileManager.listDatabases();
     }).then(function(docs) {
       $scope.docs = docs;
       $scope.errorMessage = "";
@@ -30,9 +23,9 @@ function DocsController($scope, $http, $location, gdocs, localStorage) {
   $scope.authorize = function() {
     $scope.refreshing = true;
     requestGoogleUrlPermissions(true).then(function() {
-      return gdocs.auth(true);
+      return googleDrivePasswordFileManager.interactiveRequestAuth();
     }).then(function() {
-      return gdocs.getPasswordFiles(true);
+      return googleDrivePasswordFileManager.listDatabases();
     }).then(function(docs) {
       $scope.docs = docs;
     }).catch(function(err) {
@@ -44,14 +37,14 @@ function DocsController($scope, $http, $location, gdocs, localStorage) {
   };
 
   $scope.logout = function() {
-    gdocs.revokeAuthToken().then(function() {
+    googleDrivePasswordFileManager.revokeAuth().then(function() {
       $scope.$apply();
     });
   };
 
   //returns true if user is authenticated to google docs
   $scope.authorized = function() {
-    return (gdocs.accessToken) ? true : false;
+    return googleDrivePasswordFileManager.isAuthorized();
   }
 
   //requests permissions to google urls
@@ -80,9 +73,7 @@ function DocsController($scope, $http, $location, gdocs, localStorage) {
 
   //init:
   $scope.refreshing = true;
-  gdocs.auth(false).then(function() {
-    return gdocs.getPasswordFiles(true);
-  }).then(function(docs) {
+  googleDrivePasswordFileManager.listDatabases().then(function(docs) {
     $scope.docs = docs;
   }).catch(function(err) {
     $scope.errorMessage = ""; //clear the message because we don't want to show errors on startup
