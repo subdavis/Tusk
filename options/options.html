@@ -19,6 +19,7 @@
   <script type="text/javascript" src="/lib/gdocs.js"></script>
   <script type="text/javascript" src="/services/googleDrivePasswordFileManager.js"></script>
   <script type="text/javascript" src="/services/localChromePasswordFileManager.js"></script>
+  <script type="text/javascript" src="/services/sampleDatabaseFileManager.js"></script>
   <script type="text/javascript" src="/services/settings.js"></script>
   <script type="text/javascript" src="/services/protectedMemory.js"></script>
   <script type="text/javascript" src="/services/secureCacheMemory.js"></script>
@@ -27,6 +28,7 @@
   <script type="text/javascript" src="/services/passwordFileStore.js"></script>
   <script type="text/javascript" src="/services/localStorage.js"></script>
   <script type="text/javascript" src="/options/controllers/startup.js"></script>
+  <script type="text/javascript" src="/options/controllers/sample-database.js"></script>
   <script type="text/javascript" src="/options/controllers/navController.js"></script>
   <script type="text/javascript" src="/options/controllers/docsController.js"></script>
   <script type="text/javascript" src="/options/controllers/dragDropController.js"></script>
@@ -40,7 +42,7 @@
 <body class="pure-form">
   <nav class="menu" ng-controller="NavController">
     <a class="menu-item" ng-class="{selected: isActive('/startup')}" href="#startup?stay=1">Introduction</a>
-    <a class="menu-item" ng-class="{selected: isActive('/databases') || isActive('/choose-file') || isActive('/drag-drop-file')}" href="#databases">KeePass Databases</a>
+    <a class="menu-item" ng-class="{selected: isActive('/databases') || isActive('/choose-file') || isActive('/drag-drop-file') || isActive('/sample-database')}" href="#databases">KeePass Databases</a>
     <a class="menu-item" ng-class="{selected: isActive('/keyFiles')}" href="#keyFiles">Key Files</a>
     <a class="menu-item" ng-class="{selected: isActive('/advanced')}" href="#advanced">Advanced Options</a>
     <a class="menu-item" ng-class="{selected: isActive('/storedData')}" href="#storedData">Stored Data</a>

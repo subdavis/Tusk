@@ -54,8 +54,12 @@ keepassApp.factory('pako', function() {
   return pako;
 });
 
-keepassApp.factory('passwordFileStoreRegistry', ['localChromePasswordFileManager', 'googleDrivePasswordFileManager', function(localChromePasswordFileManager, googleDrivePasswordFileManager) {
-	return new PasswordFileStoreRegistry(localChromePasswordFileManager, googleDrivePasswordFileManager);
+keepassApp.factory('passwordFileStoreRegistry', ['localChromePasswordFileManager', 'googleDrivePasswordFileManager', 'sampleDatabaseFileManager', function(localChromePasswordFileManager, googleDrivePasswordFileManager, sampleDatabaseFileManager) {
+	return new PasswordFileStoreRegistry(localChromePasswordFileManager, googleDrivePasswordFileManager, sampleDatabaseFileManager);
+}]);
+
+keepassApp.factory('sampleDatabaseFileManager', ['$http', function($http) {
+	return new SampleDatabaseFileManager($http);
 }]);
 
 keepassApp.factory('googleDrivePasswordFileManager', ['gdocs', function(gdocs) {

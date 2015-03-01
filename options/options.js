@@ -47,6 +47,9 @@ keepassSettings.config(['$routeProvider', function($routeProvider) {
   }).when('/drag-drop-file', {
     templateUrl: chrome.extension.getURL('/options/partials/drag-drop-file.html'),
     controller: 'dragDropController'
+  }).when('/sample-database', {
+    templateUrl: chrome.extension.getURL('/options/partials/sample-database.html'),
+    controller: 'sampleDatabaseController'
   }).when('/advanced', {
     templateUrl: chrome.extension.getURL('/options/partials/advanced.html'),
     controller: 'advancedController'
@@ -59,12 +62,16 @@ keepassSettings.factory('gdocs', function() {
 	return new GDocs();
 });
 
-keepassSettings.factory('passwordFileStoreRegistry', ['googleDrivePasswordFileManager', 'localChromePasswordFileManager', function(googleDrivePasswordFileManager, localChromePasswordFileManager) {
-	return new PasswordFileStoreRegistry(googleDrivePasswordFileManager, localChromePasswordFileManager);
+keepassSettings.factory('passwordFileStoreRegistry', ['googleDrivePasswordFileManager', 'localChromePasswordFileManager', 'sampleDatabaseFileManager', function(googleDrivePasswordFileManager, localChromePasswordFileManager, sampleDatabaseFileManager) {
+	return new PasswordFileStoreRegistry(googleDrivePasswordFileManager, localChromePasswordFileManager, sampleDatabaseFileManager);
 }]);
 
 keepassSettings.factory('googleDrivePasswordFileManager', ['gdocs', function(gdocs) {
 	return new GoogleDrivePasswordFileManager(gdocs);
+}]);
+
+keepassSettings.factory('sampleDatabaseFileManager', ['$http', function($http) {
+	return new SampleDatabaseFileManager($http);
 }]);
 
 keepassSettings.factory('localChromePasswordFileManager', [function() {
@@ -100,6 +107,7 @@ keepassSettings.controller('storedDataController', ['$scope', '$http', StoredDat
 keepassSettings.controller('manageKeyFilesController', ['$scope', '$http', 'settings', 'keyFileParser', ManageKeyFilesController]);
 keepassSettings.controller('advancedController', ['$scope', 'settings', 'secureCacheDisk', AdvancedController]);
 keepassSettings.controller('dragDropController', ['$scope', 'localChromePasswordFileManager', DragDropController]);
+keepassSettings.controller('sampleDatabaseController', ['$scope', 'sampleDatabaseFileManager', SampleDatabaseController]);
 keepassSettings.controller('fileTypeController', ['$scope', '$location', 'passwordFileStoreRegistry', FileTypeController]);
 keepassSettings.controller('docsController', ['$scope', 'googleDrivePasswordFileManager', DocsController]);
 
