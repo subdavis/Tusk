@@ -1,6 +1,6 @@
 "use strict";
 
-function StoredDataController($scope, $http) {
+function StoredDataController($scope) {
   Promise.all([refreshLocalStorage(), refreshSyncStorage(), refreshPermissions()]).then(function() {
     $scope.$apply();
   })

@@ -104,7 +104,7 @@ keepassApp.factory('secureCacheDisk', ['protectedMemory', 'secureCacheMemory', '
 
 keepassApp.controller('startupController', ['$scope', '$location', 'settings', 'optionsLink', 'passwordFileStoreRegistry', StartupController]);
 keepassApp.controller('chooseFileController', ['$scope', '$location', 'passwordFileStoreRegistry', 'settings', ChooseFileController]);
-keepassApp.controller('masterPasswordController', ['$scope', '$interval', '$http', '$routeParams', '$location', 'keepass', 'localStorage', 'unlockedState', 'secureCacheDisk', 'settings', 'optionsLink', MasterPasswordController]);
+keepassApp.controller('masterPasswordController', ['$scope', '$interval', '$routeParams', '$location', 'keepass', 'localStorage', 'unlockedState', 'secureCacheDisk', 'settings', 'optionsLink', MasterPasswordController]);
 keepassApp.controller('findEntryController', ['$scope', 'unlockedState', 'secureCacheDisk', FindEntryController]);
 
 keepassApp.directive('icon', function() {

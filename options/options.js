@@ -99,8 +99,8 @@ keepassSettings.factory('secureCacheDisk', ['protectedMemory', 'secureCacheMemor
 }])
 
 keepassSettings.controller('startupController', ['$scope', 'settings', StartupController]);
-keepassSettings.controller('storedDataController', ['$scope', '$http', StoredDataController]);
-keepassSettings.controller('manageKeyFilesController', ['$scope', '$http', 'settings', 'keyFileParser', ManageKeyFilesController]);
+keepassSettings.controller('storedDataController', ['$scope', StoredDataController]);
+keepassSettings.controller('manageKeyFilesController', ['$scope', 'settings', 'keyFileParser', ManageKeyFilesController]);
 keepassSettings.controller('advancedController', ['$scope', 'settings', 'secureCacheDisk', AdvancedController]);
 keepassSettings.controller('dragDropController', ['$scope', 'localChromePasswordFileManager', DragDropController]);
 keepassSettings.controller('sampleDatabaseController', ['$scope', 'sampleDatabaseFileManager', SampleDatabaseController]);

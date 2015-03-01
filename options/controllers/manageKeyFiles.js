@@ -1,6 +1,6 @@
 "use strict";
 
-function ManageKeyFilesController($scope, $http, settings, keyFileParser) {
+function ManageKeyFilesController($scope, settings, keyFileParser) {
 
   loadKeyFiles();
   function loadKeyFiles() {
