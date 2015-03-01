@@ -1,9 +1,10 @@
 "use strict";
 
-function MasterPasswordController($scope, $interval, $routeParams, $location, keepass, localStorage, unlockedState, secureCache, settings, optionsLink) {
+function MasterPasswordController($scope, $routeParams, $location, keepass, localStorage, unlockedState, secureCache, settings, optionsLink) {
   $scope.masterPassword = "";
   $scope.busy = false;
   $scope.fileName = $routeParams.fileTitle;
+  $scope.providerKey = $routeParams.providerKey;
   $scope.selectedKeyFile = null;
   $scope.unlockedState = unlockedState;
   $scope.os = {};
