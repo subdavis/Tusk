@@ -4,7 +4,7 @@
   "manifest_version": 2,
   "minimum_chrome_version": "38",
 
-  "description": "KeePass password database for Chrome",
+  "description": "KeePass password database integration for Chrome",
   "icons": {
     "16": "assets/icons/logo_16.png",
     "48": "assets/icons/logo_48.png"
@@ -23,7 +23,7 @@
       "19": "assets/icons/logo_19.png",
       "38": "assets/icons/logo_38.png"
     },
-    "default_title": "Password field detected.  Click here to access your KeePass passwords.",
+    "default_title": "Input field detected.  Click here to access your KeePass passwords.",
     "default_popup": "popups/popup.html"
   },
   "options_page": "options/options.html",

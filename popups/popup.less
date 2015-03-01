@@ -211,7 +211,22 @@ table.entries {
     a {
       text-overflow: inherit;
       overflow-wrap: normal;
-      text-decoration: none;
+      font-size: 1em;
+      font-weight: 600;
+      color: @blue-bg;
+
+      &:visited {
+        color: @blue-bg;
+      }
+
+      &:hover {
+        color: darken(@blue-bg, 20%);
+      }
+    }
+
+    .copied {
+      font-size: smaller;
+      background-color: @green-bg;
     }
   }
 }

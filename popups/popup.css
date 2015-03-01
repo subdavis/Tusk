@@ -162,7 +162,22 @@ table.entries td a,
 table.entries th a {
   text-overflow: inherit;
   overflow-wrap: normal;
-  text-decoration: none;
+  font-size: 1em;
+  font-weight: 600;
+  color: rgba(0, 120, 231, 0.8);
+}
+table.entries td a:visited,
+table.entries th a:visited {
+  color: rgba(0, 120, 231, 0.8);
+}
+table.entries td a:hover,
+table.entries th a:hover {
+  color: rgba(0, 67, 129, 0.8);
+}
+table.entries td .copied,
+table.entries th .copied {
+  font-size: smaller;
+  background-color: rgba(100, 220, 100, 0.5);
 }
 statusMessage {
   display: block;
