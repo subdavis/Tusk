@@ -46,10 +46,6 @@ keepassApp.config(['$routeProvider', function($routeProvider) {
   });
 }]);
 
-keepassApp.factory('gdocs', function() {
-	return new GDocs();
-});
-
 keepassApp.factory('pako', function() {
   return pako;
 });
@@ -62,7 +58,7 @@ keepassApp.factory('sampleDatabaseFileManager', ['$http', function($http) {
 	return new SampleDatabaseFileManager($http);
 }]);
 
-keepassApp.factory('googleDrivePasswordFileManager', ['gdocs', function(gdocs) {
+keepassApp.factory('googleDrivePasswordFileManager', ['$http', function(gdocs) {
 	return new GoogleDrivePasswordFileManager(gdocs);
 }]);
 

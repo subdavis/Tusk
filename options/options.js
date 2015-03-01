@@ -58,15 +58,11 @@ keepassSettings.config(['$routeProvider', function($routeProvider) {
   });
 }]);
 
-keepassSettings.factory('gdocs', function() {
-	return new GDocs();
-});
-
 keepassSettings.factory('passwordFileStoreRegistry', ['googleDrivePasswordFileManager', 'localChromePasswordFileManager', 'sampleDatabaseFileManager', function(googleDrivePasswordFileManager, localChromePasswordFileManager, sampleDatabaseFileManager) {
 	return new PasswordFileStoreRegistry(googleDrivePasswordFileManager, localChromePasswordFileManager, sampleDatabaseFileManager);
 }]);
 
-keepassSettings.factory('googleDrivePasswordFileManager', ['gdocs', function(gdocs) {
+keepassSettings.factory('googleDrivePasswordFileManager', ['$http', function(gdocs) {
 	return new GoogleDrivePasswordFileManager(gdocs);
 }]);
 

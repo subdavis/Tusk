@@ -5,7 +5,7 @@
     Chrome will ask you to allow this extension to access the Google Drive websites, and Google Drive will ask you to allow this extension to read your files.
     <br><br>
   </div>
-  <pageInfo ng-show="requestingUrl">ChromeKeePass needs to access https://www.googleapis.com/ in order to continue.  Please press "Allow"" on the dialog.</pageInfo>
+  <pageInfo ng-show="requestingUrl">ChromeKeePass needs to access https://www.googleapis.com/ and https://accounts.google.com/ in order to continue.  Please press "Allow"" on the dialog.</pageInfo>
   <pageInfo ng-show="requestingDriveAccess">ChromeKeePass needs to view the files in your Google Drive in order to continue.  Please press "Accept" on the dialog.</pageInfo>
   <a class="pure-button fill pure-button-primary" ng-hide="authorized() || refreshing" ng-click="authorize()">
     <icon p="icon-google"></icon>Authorize
