@@ -56,6 +56,8 @@ function Settings() {
             'providerKey': items.providerKey,
             'passwordFile': items.passwordFile
           }
+        }).then(function() {
+          chrome.p.storage.local.set.remove(['passwordFile', 'providerKey']);
         })
       }
     });

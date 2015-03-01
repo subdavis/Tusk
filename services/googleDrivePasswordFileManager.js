@@ -62,19 +62,21 @@ function GoogleDrivePasswordFileManager($http) {
 
   //remove chrome's cached copy of the oauth2 token
   function removeCachedAuthToken() {
-    return new Promise(function(resolve) {
-      if (accessToken) {
-        var tempAccessToken = accessToken;
-        accessToken = null;
-        // Remove token from the token cache.
-        chrome.identity.removeCachedAuthToken({
-          token : tempAccessToken
-        }, function() {
+    return auth().then(function() {
+      return new Promise(function(resolve) {
+        if (accessToken) {
+          var tempAccessToken = accessToken;
+          accessToken = null;
+          // Remove token from the token cache.
+          chrome.identity.removeCachedAuthToken({
+            token : tempAccessToken
+          }, function() {
+            resolve();
+          });
+        } else {
           resolve();
-        });
-      } else {
-        resolve();
-      }
+        }
+      });
     });
   }
 
@@ -120,7 +122,8 @@ function GoogleDrivePasswordFileManager($http) {
 
   //sends an authorized request to google drive, including retry
   //(retry is necessary because local cached token may get out of sync, then we need a new one)
-  function sendAuthorizedGoogleDriveGet(url, optionalResponseType, dontRetry) {
+  function sendAuthorizedGoogleDriveGet(url, optionalResponseType, attempt) {
+    attempt = attempt || 0;
     return auth().then(function() {
       var request = {
         method: 'GET',
@@ -136,9 +139,9 @@ function GoogleDrivePasswordFileManager($http) {
     }).then(function(response) {
       return response.data;
     }).catch(function(response) {
-      if (response.status == 401 && !dontRetry) {
+      if (response.status == 401 && attempt == 0) {
         return removeCachedAuthToken().then(function() {
-          return sendAuthorizedGoogleDriveGet(url, optionalResponseType, true);
+          return sendAuthorizedGoogleDriveGet(url, optionalResponseType, 1);
         });
       } else {
         throw new Error("Request to retrieve files from drive failed - " + (response.statusText || response.message))
@@ -149,6 +152,7 @@ function GoogleDrivePasswordFileManager($http) {
   //get authorization token
   function auth(interactive) {
     return new Promise(function(resolve, reject) {
+      accessToken = null;
   		chrome.identity.getAuthToken({
   			interactive : interactive
   		}, function(token) {

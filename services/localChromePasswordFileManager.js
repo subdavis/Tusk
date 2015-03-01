@@ -68,15 +68,16 @@ function LocalChromePasswordFileManager() {
   //given minimal file information, retrieve the actual file
   function getChosenDatabaseFile(dbInfo) {
     return listDatabases().then(function(databases) {
-      var bytes = databases.map(function(storedFile) {
+      var bytes = databases.reduce(function(prev, storedFile) {
         if (storedFile.title == dbInfo.title) {
-          var bytes = Base64.decode(storedFile.data);
-          return bytes;
-        }
-      });
+          var data = Base64.decode(storedFile.data);
+          return data;
+        } else
+          return prev;
+      }, []);
 
       if (bytes)
-        return bytes[0];  //array map returns an array of results
+        return bytes;
       else
         throw new Error("Failed to find the requested file");
     });
