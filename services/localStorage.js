@@ -39,7 +39,7 @@ function LocalStorage(settings) {
   function saveCurrentDatabaseUsage(usage) {
     return settings.getCurrentDatabaseChoice().then(function(info) {
       return settings.getDatabaseUsages().then(function(usages) {
-        var key = info.title + "__" + info.providerKey;
+        var key = info.passwordFile.title + "__" + info.providerKey;
         usages[key] = usage;
 
         return settings.saveDatabaseUsages(usages);
@@ -54,7 +54,7 @@ function LocalStorage(settings) {
   function getCurrentDatabaseUsage() {
     return settings.getCurrentDatabaseChoice().then(function(info) {
       return settings.getDatabaseUsages().then(function(usages) {
-        var key = info.title + "__" + info.providerKey;
+        var key = info.passwordFile.title + "__" + info.providerKey;
         var usage = usages[key] || {};
 
         return usage;
