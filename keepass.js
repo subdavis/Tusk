@@ -84,7 +84,7 @@ var filler = (function() {
 		var inputPattern = "input[type='text'], input[type='email'], input[type='password'], input:not([type])";
 
 		//algorithm 1 - based on focused field
-		var focusedField = $('input:focus');
+		var focusedField = $(inputPattern).filter(':focus');
 		if (focusedField.length) {
 			var pair = {}, focusedPassword = false;
 			if (isPasswordField(focusedField)) {
