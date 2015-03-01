@@ -102,7 +102,7 @@ keepassSettings.factory('secureCacheDisk', ['protectedMemory', 'secureCacheMemor
   return new SecureCacheDisk(protectedMemory, secureCacheMemory, settings);
 }])
 
-keepassSettings.controller('startupController', ['$scope', '$location', StartupController]);
+keepassSettings.controller('startupController', ['$scope', 'settings', StartupController]);
 keepassSettings.controller('storedDataController', ['$scope', '$http', StoredDataController]);
 keepassSettings.controller('manageKeyFilesController', ['$scope', '$http', 'settings', 'keyFileParser', ManageKeyFilesController]);
 keepassSettings.controller('advancedController', ['$scope', 'settings', 'secureCacheDisk', AdvancedController]);

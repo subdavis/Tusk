@@ -47,6 +47,18 @@ function Settings() {
 
       exports.saveDatabaseUsages(usages);
     });
+
+    //change the way we store currently selected database
+    chrome.p.storage.local.get(['passwordFile', 'providerKey']).then(function(items) {
+      if (items.passwordFile && items.providerKey) {
+        chrome.p.storage.local.set({
+          'selectedDatabase': {
+            'providerKey': items.providerKey,
+            'passwordFile': items.passwordFile
+          }
+        })
+      }
+    });
   }
 
   exports.getKeyFiles = function() {
@@ -120,17 +132,20 @@ function Settings() {
     passwordFile.data = undefined; //don't save the data with the choice
 
     return chrome.p.storage.local.set({
-      'passwordFile': passwordFile,
-      'providerKey': provider.key
+      'selectedDatabase': {
+        'passwordFile': passwordFile,
+        'providerKey': provider.key
+      }
     });
   }
 
   exports.getCurrentDatabaseChoice = function() {
-    return chrome.p.storage.local.get(['passwordFile', 'providerKey']).then(function(items) {
-      return {
-        passwordFile: items.passwordFile,
-        providerKey: items.providerKey
-      };
+    return chrome.p.storage.local.get(['selectedDatabase']).then(function(items) {
+      if (items.selectedDatabase) {
+        return items.selectedDatabase;
+      } else {
+        return null;
+      }
     });
   }
 
