@@ -5,7 +5,7 @@ function ChooseFileController($scope, $location, passwordFileStoreRegistry, sett
   $scope.successMessage = "";
   $scope.databases = [];
 
-  passwordFileStoreRegistry.listProviders('listDatabases').forEach(function(provider) {
+  passwordFileStoreRegistry.listFileManagers('listDatabases').forEach(function(provider) {
     provider.listDatabases().then(function(databases) {
       databases.forEach(function(database) {
         database.provider = provider;

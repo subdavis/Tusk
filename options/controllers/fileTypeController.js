@@ -1,20 +1,27 @@
 "use strict";
 
-function FileTypeController($scope, $http, $location, $routeParams) {
+function FileTypeController($scope, $location, passwordFileStoreRegistry) {
 
-  $scope.chooseGdrive = function() {
-    $location.path('/choose-file');
+  $scope.fileManagers = passwordFileStoreRegistry.listFileManagers();
+
+  $scope.choose = function(fm) {
+    $location.path(fm.routePath);
   }
 
-  $scope.chooseDragDrop = function() {
-    $location.path('/drag-drop-file');
+  $scope.setDescription = function(fm) {
+    $scope.description=fm.chooseDescription;
   }
 
-  $scope.ingognito = chrome.extension.inIncognitoContext;
+  $scope.clearDescription = function() {
+    $scope.description='';
+  }
+
+  /*
   $scope.os = {};
   chrome.runtime.getPlatformInfo(function(info) {
     $scope.$apply(function() {
       $scope.os[info.os] = true;
     })
   });
+  */
 }

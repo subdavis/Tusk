@@ -9,7 +9,7 @@ function StartupController($scope, $location, settings, optionsLink, passwordFil
   }).catch(function(err) {
     //user has not yet chosen a database.  Lets see if there are any available to choose...
     var readyPromises = [];
-    passwordFileStoreRegistry.listProviders('listDatabases').forEach(function(provider) {
+    passwordFileStoreRegistry.listFileManagers('listDatabases').forEach(function(provider) {
       readyPromises.push(provider.listDatabases());
     });
 

@@ -32,7 +32,7 @@ THE SOFTWARE.
 **/
 function PasswordFileStoreRegistry() {
   var exports = {
-    listProviders: listFileManagers,
+    listFileManagers: listFileManagers,
     getChosenDatabaseFile: getChosenDatabaseFile
   };
 

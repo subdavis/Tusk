@@ -29,6 +29,7 @@ THE SOFTWARE.
 function GoogleDrivePasswordFileManager(gdocs) {
   var exports = {
     key: 'gdrive',
+    routePath: '/choose-file',
     listDatabases: listDatabases,
     getDatabaseChoiceData: getDatabaseChoiceData,
     getChosenDatabaseFile: getChosenDatabaseFile,
