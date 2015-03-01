@@ -141,7 +141,7 @@ function GoogleDrivePasswordFileManager($http) {
           return sendAuthorizedGoogleDriveGet(url, optionalResponseType, true);
         });
       } else {
-        throw new Error("Request to retrieve files from drive failed - " + response.statusText)
+        throw new Error("Request to retrieve files from drive failed - " + (response.statusText || response.message))
       }
     });
   }
