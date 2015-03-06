@@ -226,7 +226,8 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry) {
           salsaPosition += passwordBytes.byteLength;
         }
 
-        entries.push(currentEntry);
+        if (!(currentEntry.title == 'Meta-Info' && currentEntry.userName == 'SYSTEM'))
+          entries.push(currentEntry);
         //}
       }
 
