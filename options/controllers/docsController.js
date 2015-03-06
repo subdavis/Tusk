@@ -69,7 +69,8 @@ function DocsController($scope, googleDrivePasswordFileManager) {
     chrome.permissions.request({
       origins: [
         "https://www.googleapis.com/",
-        "https://accounts.google.com/"
+        "https://accounts.google.com/",
+        "https://*.googleusercontent.com/"
       ]
     }, function(granted) {
       // The callback argument will be true if the user granted the permissions.

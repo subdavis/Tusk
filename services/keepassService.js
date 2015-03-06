@@ -237,7 +237,10 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry) {
   //read KDB entry field
   function readEntryField(fieldType, fieldSize, buf, pos, entry) {
     var dv = new DataView(buf, pos, fieldSize);
-    var arr = new Uint8Array(buf, pos, fieldSize);
+    var arr = [];
+    if (fieldSize > 0) {
+      arr = new Uint8Array(buf, pos, fieldSize - 1);
+    }
     var decoder = new TextDecoder();
 
     switch (fieldType) {
