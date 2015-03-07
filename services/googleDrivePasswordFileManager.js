@@ -63,21 +63,19 @@ function GoogleDrivePasswordFileManager($http) {
 
   //remove chrome's cached copy of the oauth2 token
   function removeCachedAuthToken() {
-    return auth().then(function() {
-      return new Promise(function(resolve) {
-        if (accessToken) {
-          var tempAccessToken = accessToken;
-          accessToken = null;
-          // Remove token from the token cache.
-          chrome.identity.removeCachedAuthToken({
-            token : tempAccessToken
-          }, function() {
-            resolve();
-          });
-        } else {
+    return new Promise(function(resolve) {
+      if (accessToken) {
+        var tempAccessToken = accessToken;
+        accessToken = null;
+        // Remove token from the token cache.
+        chrome.identity.removeCachedAuthToken({
+          token : tempAccessToken
+        }, function() {
           resolve();
-        }
-      });
+        });
+      } else {
+        resolve();
+      }
     });
   }
 
