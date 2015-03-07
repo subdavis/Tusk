@@ -40,7 +40,8 @@ function GoogleDrivePasswordFileManager($http) {
     chooseDescription: 'Access password files stored on your Google Drive.  The file(s) will be fetched from Google Drive each time they are used.',
     interactiveRequestAuth: interactiveRequestAuth,
     revokeAuth: revokeAuth,
-    isAuthorized: isAuthorized
+    isAuthorized: isAuthorized,
+    ensureGoogleUrlPermissions: ensureGoogleUrlPermissions
   };
 
   var accessToken;  //cached access token
@@ -82,6 +83,31 @@ function GoogleDrivePasswordFileManager($http) {
 
   function isAuthorized() {
     return accessToken ? true : false;
+  }
+
+  function ensureGoogleUrlPermissions() {
+    var origins = [
+      "https://www.googleapis.com/",
+      "https://accounts.google.com/",
+      "https://*.googleusercontent.com/"
+    ];
+
+    return new Promise(function(resolve, reject) {
+      chrome.permissions.contains({origins: origins}, function(alreadyGranted) {
+        if (alreadyGranted) {
+          resolve();
+        } else {
+          chrome.permissions.request({origins: origins}, function(granted) {
+            // The callback argument will be true if the user granted the permissions.
+            if (granted) {
+              resolve();
+            } else {
+              reject(new Error('User denied access to google docs urls'));
+            }
+          });
+        }
+      });
+    });
   }
 
   function listDatabases() {
@@ -139,11 +165,17 @@ function GoogleDrivePasswordFileManager($http) {
     }).then(function(response) {
       return response.data;
     }).catch(function(response) {
-      if (response.status == 401 && attempt == 0) {
+      if (response.status == 401 && attempt < 2) {
         return removeCachedAuthToken().then(function() {
+          return sendAuthorizedGoogleDriveGet(url, optionalResponseType, attempt + 1);
+        });
+      } else if (response.status == 403 && attempt == 0) {
+        //something is wrong with the google docs permission origins.  request access again
+        return ensureGoogleUrlPermissions().then(function() {
           return sendAuthorizedGoogleDriveGet(url, optionalResponseType, 1);
         });
       } else {
+        //console.log('failed to fetch', url, accessToken);
         throw new Error("Request to retrieve files from drive failed - " + (response.statusText || response.message))
       }
     });
@@ -151,6 +183,7 @@ function GoogleDrivePasswordFileManager($http) {
 
   //get authorization token
   function auth(interactive) {
+    interactive = !!interactive;
     return new Promise(function(resolve, reject) {
       accessToken = null;
   		chrome.identity.getAuthToken({

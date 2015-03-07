@@ -25,7 +25,7 @@ function DocsController($scope, googleDrivePasswordFileManager) {
     $scope.refreshing = true;
     $scope.errorMessage = "";
     $scope.requestingUrl = true;
-    requestGoogleUrlPermissions(true).then(function() {
+    googleDrivePasswordFileManager.ensureGoogleUrlPermissions().then(function() {
       $scope.requestingUrl = false;
       $scope.requestingDriveAccess = true;
       $scope.$apply();
@@ -56,32 +56,6 @@ function DocsController($scope, googleDrivePasswordFileManager) {
   //returns true if user is authenticated to google docs
   $scope.authorized = function() {
     return googleDrivePasswordFileManager.isAuthorized();
-  }
-
-  //requests permissions to google urls
-  function requestGoogleUrlPermissions() {
-    var resolve, reject;
-    var p = new Promise(function(res, rej) {
-      resolve = res;
-      reject = rej;
-    });
-
-    chrome.permissions.request({
-      origins: [
-        "https://www.googleapis.com/",
-        "https://accounts.google.com/",
-        "https://*.googleusercontent.com/"
-      ]
-    }, function(granted) {
-      // The callback argument will be true if the user granted the permissions.
-      if (granted) {
-        resolve();
-      } else {
-        reject(new Error('User denied access to google docs urls'));
-      }
-    });
-
-    return p;
   }
 
   //init:
