@@ -26,7 +26,7 @@ THE SOFTWARE.
 
 "use strict";
 
-function GoogleDrivePasswordFileManager($http) {
+function GoogleDrivePasswordFileManager($http, $timeout) {
   var exports = {
     key: 'gdrive',
     routePath: '/choose-file',
@@ -53,7 +53,7 @@ function GoogleDrivePasswordFileManager($http) {
   function revokeAuth() {
     if (accessToken) {
       var url = 'https://accounts.google.com/o/oauth2/revoke?token=' + accessToken
-      return $http.get(url).then(function(response) {
+      return $http.get(url, {responseType: 'jsonp'}).then(function(response) {
         return removeCachedAuthToken();
       });
   	} else {
@@ -100,6 +100,8 @@ function GoogleDrivePasswordFileManager($http) {
             if (granted) {
               resolve();
             } else {
+            	var err = chrome.runtime.lastError;
+            	console.log(err);
               reject(new Error('User denied access to google docs urls'));
             }
           });
@@ -148,6 +150,7 @@ function GoogleDrivePasswordFileManager($http) {
   //(retry is necessary because local cached token may get out of sync, then we need a new one)
   function sendAuthorizedGoogleDriveGet(url, optionalResponseType, attempt) {
     attempt = attempt || 0;
+    var rateLimits = [1, 2, 4, 8, 16];
     return auth().then(function() {
       var request = {
         method: 'GET',
@@ -167,13 +170,14 @@ function GoogleDrivePasswordFileManager($http) {
         return removeCachedAuthToken().then(function() {
           return sendAuthorizedGoogleDriveGet(url, optionalResponseType, attempt + 1);
         });
-      } else if (response.status == 403 && attempt == 0) {
-        //something is wrong with the google docs permission origins.  request access again
-        return ensureGoogleUrlPermissions().then(function() {
-          return sendAuthorizedGoogleDriveGet(url, optionalResponseType, 1);
-        });
+      } else if (response.status == 403 && attempt < rateLimits.length) {
+        //rate limited, retry
+        return $timeout(function() {
+	        console.log('403, retrying', url, response.statusText, response.data);
+        	return sendAuthorizedGoogleDriveGet(url, optionalResponseType, attempt + 1);
+        }, rateLimits[attempt] + Math.floor(Math.random() * 1000));
       } else {
-        //console.log('failed to fetch', url, accessToken);
+        console.log('failed to fetch', url, accessToken, response);
         throw new Error("Request to retrieve files from drive failed - " + (response.statusText || response.message))
       }
     });
@@ -191,7 +195,7 @@ function GoogleDrivePasswordFileManager($http) {
   			if (token)
   			  resolve();
   			else
-  			  var err = chrome.extension.lastError;
+  			  var err = chrome.runtime.lastError;
   			  if (!err) {
   			    err = new Error("Failed to authenticate.");
   			  }

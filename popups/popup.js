@@ -58,8 +58,8 @@ keepassApp.factory('sampleDatabaseFileManager', ['$http', function($http) {
 	return new SampleDatabaseFileManager($http);
 }]);
 
-keepassApp.factory('googleDrivePasswordFileManager', ['$http', function(gdocs) {
-	return new GoogleDrivePasswordFileManager(gdocs);
+keepassApp.factory('googleDrivePasswordFileManager', ['$http', '$timeout', function($http, $timeout) {
+	return new GoogleDrivePasswordFileManager($http, $timeout);
 }]);
 
 keepassApp.factory('localChromePasswordFileManager', [function() {
