@@ -76,3 +76,4 @@ npm-debug.log
 
 #bower components
 bower_components/
+*.sublime-workspace

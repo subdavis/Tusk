@@ -1,0 +1,12 @@
+{
+	"folders":
+	[
+		{
+			"follow_symlinks": true,
+			"path": "."
+		}
+	],
+	"settings": {
+		"color_scheme": "Packages/Color Scheme - Default/Twilight.tmTheme"
+	}
+}
