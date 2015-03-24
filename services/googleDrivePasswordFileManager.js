@@ -137,12 +137,20 @@ function GoogleDrivePasswordFileManager($http, $timeout) {
   }
 
   //given minimal file information, retrieve the actual file
-  function getChosenDatabaseFile(databaseChoiceData) {
+  function getChosenDatabaseFile(databaseChoiceData, attempt) {
     return sendAuthorizedGoogleDriveGet(databaseChoiceData.url).then(function(details) {
       //the first url just gets us the file details, which we use to download the file
       return sendAuthorizedGoogleDriveGet(details.downloadUrl, 'arraybuffer');
     }).then(function(data) {
       return data;
+    }).catch(function(err) {
+    	attempt = attempt || 0;
+    	if (attempt == 0) {
+    		//sometimes the url returned returns 403 OK, because somehow it is invalid.  In this scenario, try again to get a working url
+    		return getChosenDatabaseFile(databaseChoiceData, 1);
+    	} else {
+    		throw err
+    	}
     });
   }
 
@@ -172,8 +180,9 @@ function GoogleDrivePasswordFileManager($http, $timeout) {
         });
       } else if (response.status == 403 && attempt < rateLimits.length) {
         //rate limited, retry
+      	var message = (optionalResponseType == 'arraybuffer') ? new Uint8Array(response.data) : response.data;
+        console.log('403, retrying', url, response.statusText, message);
         return $timeout(function() {
-	        console.log('403, retrying', url, response.statusText, response.data);
         	return sendAuthorizedGoogleDriveGet(url, optionalResponseType, attempt + 1);
         }, rateLimits[attempt] + Math.floor(Math.random() * 1000));
       } else {
