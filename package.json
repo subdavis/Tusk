@@ -1,5 +1,5 @@
 {
-  "name": "ChromeKeePass",
+  "name": "CKP",
   "version": "2015.1.18",
   "devDependencies": {
     "grunt": "^0.4.5",

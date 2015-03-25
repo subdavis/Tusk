@@ -1,4 +1,4 @@
-This license covers the ChromeKeePass app, excluding the individual libraries
+This license covers the CKP Chrome extension, excluding the individual libraries
 in /lib folder, which have their own copyrights and licenses inside each file.
 
 The MIT License (MIT)

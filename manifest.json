@@ -1,10 +1,11 @@
 {
-  "name": "ChromeKeePass Extension",
-  "version": "2015.3.24",
+  "name": "CKP - KeePass integration for Chrome™",
+  "short_name": "CKP Extension",
+  "version": "2015.3.24.3",
   "manifest_version": 2,
   "minimum_chrome_version": "38",
 
-  "description": "KeePass password database integration for Chrome",
+  "description": "Readonly KeePass password database integration for Chrome™",
   "icons": {
     "16": "assets/icons/logo_16.png",
     "48": "assets/icons/logo_48.png"

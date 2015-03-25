@@ -210,7 +210,7 @@ function GoogleDrivePasswordFileManager($http, $timeout) {
   			  }
   			  if (err.message == "OAuth2 not granted or revoked.") {
   			    //too confusing
-  			    reject(new Error("ChromeKeePass needs access to Google Drive to access this password file.  You must Authorize google drive access to continue."))
+  			    reject(new Error("CKP needs access to Google Drive to access this password file.  You must Authorize google drive access to continue."))
   			  } else {
     			  reject(err);
   			  }

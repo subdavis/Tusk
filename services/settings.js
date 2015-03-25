@@ -27,7 +27,7 @@ THE SOFTWARE.
 "use strict";
 
 /**
- * Settings for ChromeKeePass
+ * Settings for CKP
  */
 function Settings() {
   var exports = {}

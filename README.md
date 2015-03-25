@@ -1,4 +1,4 @@
-# ChromeKeePass
+# CKP
 Chrome extension for interacting with KeePass password file.  Still in beta.  Web Store url is https://chrome.google.com/webstore/detail/lnfepbjehgokldcaljagbmchhnaaogpc.   Give it a try!
 
 More info available at http://perfectapi.github.io/ChromeKeePass/
