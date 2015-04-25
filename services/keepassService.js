@@ -226,7 +226,10 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry) {
           salsaPosition += passwordBytes.byteLength;
         }
 
-        if (!(currentEntry.title == 'Meta-Info' && currentEntry.userName == 'SYSTEM'))
+        if (!(currentEntry.title == 'Meta-Info' && currentEntry.userName == 'SYSTEM')
+        	&& (currentEntry.groupName != 'Backup')
+        	&& (currentEntry.groupName != 'Search Results'))
+
           entries.push(currentEntry);
         //}
       }
@@ -298,7 +301,11 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry) {
   //read KDB group field
   function readGroupField(fieldType, fieldSize, buf, pos, group) {
     var dv = new DataView(buf, pos, fieldSize);
-    var arr = new Uint8Array(buf, pos, fieldSize);
+    var arr = [];
+		if (fieldSize > 0) {
+      arr = new Uint8Array(buf, pos, fieldSize - 1);
+    }
+    
     switch (fieldType) {
       case 0x0000:
         // Ignore field
@@ -310,6 +317,11 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry) {
         var decoder = new TextDecoder();
         group.name = decoder.decode(arr);
         break;
+      /*
+      case 0x0009:
+      	group.flags = dv.getUint32(0, littleEndian);
+      	break; 
+      */
       /*
       case 0x0003:
         group.tCreation = new PwDate(buf, offset);
