@@ -12,7 +12,8 @@ body {
 body {
   width: 400px;
   padding: 16px;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
   text-rendering: optimizeLegibility;
 }
 ng-view {
@@ -24,7 +25,7 @@ ng-view.ng-enter {
 }
 options-link {
   display: block;
-  position: absolute;
+  position: fixed;
   right: -3;
   bottom: -1;
 }

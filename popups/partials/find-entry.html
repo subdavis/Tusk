@@ -2,28 +2,5 @@
 <form class="pure-form">
   <input type="text" id="filter" ng-model="filter" class="fill" ng-change="filterKey()" autoFocus placeholder="Type to filter...">
 </form>
-<table ng-show="entries" class="pure-table pure-table-horizontal entries">
-  <thead>
-    <tr>
-      <th width="100">Entry</th>
-      <th>Username</th>
-      <th width="65">Password</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr ng-repeat="entry in entries track by $index" title="{{entry.notes}}">
-      <td>{{entry.title || entry.url}}</td>
-      <td>{{entry.userName}}</td>
-      <td>
-        <a href="" ng-click="unlockedState.copyPassword(entry)" title="Copy password to clipboard" ng-hide="entry.copied">
-          <icon p="icon-copy"></icon>
-        </a>
-        <span ng-show="entry.copied">Copied</span>
-        <a href="" ng-click="unlockedState.autofill(entry)" title="Auto-fill credentials on site">
-          <icon p="icon-edit"></icon>
-        </a>
-      </td>
-    </tr>
-  </tbody>
-</table>
+<ng-include src="'partials/password-list.html'"></ng-include>
 <successMessage ng-show="unlockedState.clipboardStatus">{{unlockedState.clipboardStatus}}</successMessage>

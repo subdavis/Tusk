@@ -352,6 +352,8 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry) {
    * Returns the decrypted data from a protected element of a KDBX entry
    */
   function getDecryptedEntry(protectedData, streamKey) {
+  	if (protectedData === undefined) return "";  //can happen with entries with no password
+
     var iv = [0xE8, 0x30, 0x09, 0x4B, 0x97, 0x20, 0x5D, 0x2A];
     var salsa = new Salsa20(new Uint8Array(streamKey || my.streamKey), iv);
     var decoder = new TextDecoder();
