@@ -191,7 +191,7 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry) {
       var entries = [];
       for(var i=0; i<h.numberOfEntries; i++) {
         var fieldType = 0, fieldSize = 0;
-        var currentEntry = {};
+        var currentEntry = {keys: []};
         var preventInfinite = 100;
         while (fieldType != 0xFFFF && preventInfinite > 0) {
           fieldType = dv.getUint16(pos, littleEndian);
@@ -262,18 +262,22 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry) {
         break;
       case 0x0004:
         entry.title = decoder.decode(arr);
+        entry.keys.push('title');
         break;
       case 0x0005:
         entry.url = decoder.decode(arr);
+        entry.keys.push('url');
         break;
       case 0x0006:
         entry.userName = decoder.decode(arr);
+        entry.keys.push('userName');
         break;
       case 0x0007:
         entry.password = decoder.decode(arr);
         break;
       case 0x0008:
         entry.notes = decoder.decode(arr);
+        entry.keys.push('notes');
         break;
 /*
       case 0x0009:
@@ -384,7 +388,8 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry) {
         var entryNode = entryNodes.snapshotItem(i);
         //console.log(entryNode);
         var entry = {
-          protectedData: {}
+          protectedData: {},
+          keys: []
         };
 
         //exclude histories and recycle bin:
@@ -401,7 +406,17 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry) {
         for (var j = 0; j < entryNode.children.length; j++) {
           var childNode = entryNode.children[j];
 
-          if (childNode.nodeName == "String") {
+          if (childNode.nodeName == "UUID") {
+          	entry.id = childNode.textContent;  //base64 encoded, but we don't care since we don't display it
+          } else if (childNode.nodeName == "IconID") {
+          	entry.iconId = Number(childNode.textContent);  //integer
+          } else if (childNode.nodeName == "Tags" && childNode.textContent) {
+          	entry.tags = childNode.textContent;
+          	entry.keys.push('tags');
+          } else if (childNode.nodeName == "Binary") {
+          	entry.binaryFiles = childNode.textContent;
+          	entry.keys.push('binaryFiles');  //the actual files are stored elsewhere in the xml, not sure where
+          } else if (childNode.nodeName == "String") {
             var key = childNode.getElementsByTagName('Key')[0].textContent;
             key = Case.camel(key);
             var valNode = childNode.getElementsByTagName('Value')[0];
@@ -416,6 +431,8 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry) {
               };
 
               protectedPosition += encBytes.length;
+            } else {
+            	entry.keys.push(key);
             }
             entry[key] = val;
           }

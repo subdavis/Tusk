@@ -1,0 +1,21 @@
+
+<a href="" ng-click="goBack()" style="float: right;">Go Back</a>
+<table class="pure-table pure-table-horizontal">
+	<thead>
+		<tr>
+			<th>Attribute</th>
+			<th>Value</th>
+			<th></th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr ng-repeat="attr in attributes track by $index">
+			<td ng-bind="attr.key"></td>
+			<td ng-bind-html="attr.value"></td>
+			<td>
+				<a ng-if="attr.protected && attr.value == ''" href="" ng-click="exposeAttribute(attr)">Show</a>
+				<a ng-if="attr.protected && attr.value != ''" href="" ng-click="attr.value = ''">Hide</a>
+			</td>
+		</tr>
+	</tbody>
+</table>

@@ -6,7 +6,6 @@ function FindEntryController($scope, unlockedState, secureCache) {
 
   secureCache.get('entries').then(function(entries) {
     unlockedState.entries = entries;
-    $scope.entries = entries;
     $scope.allEntries = entries;
     createEntryFilters(entries);
     $scope.$apply();
@@ -18,11 +17,11 @@ function FindEntryController($scope, unlockedState, secureCache) {
 
   $scope.filterKey = function() {
     if (!$scope.filter) {
-      $scope.entries = $scope.allEntries;
+      unlockedState.entries = $scope.allEntries;
       return;
     }
     var filter = $scope.filter.toLocaleLowerCase();
-    $scope.entries = $scope.allEntries.filter(function(entry) {
+    unlockedState.entries = $scope.allEntries.filter(function(entry) {
       return (entry.filterKey.indexOf(filter) > -1);
     });
   }

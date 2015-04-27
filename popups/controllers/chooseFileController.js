@@ -1,6 +1,6 @@
-"use strict";
-
 function ChooseFileController($scope, $location, passwordFileStoreRegistry, settings) {
+	"use strict";
+
   $scope.errorMessage = "";
   $scope.successMessage = "";
   $scope.databases = [];

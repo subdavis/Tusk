@@ -29,7 +29,7 @@ THE SOFTWARE.
 /**
 * Shared state and methods for an unlocked password file.
 */
-function UnlockedState($interval, keepass, protectedMemory) {
+function UnlockedState($interval, $location, keepass, protectedMemory) {
   var my = {
     tabId: "",  //tab id of current tab
     url: "",    //url of current tab
@@ -105,6 +105,14 @@ function UnlockedState($interval, keepass, protectedMemory) {
     copyEntry = entry;
     entry.copied = true;
     document.execCommand('copy');
+  }
+
+  my.gotoDetails = function(entry) {
+  	$location.path('/entry-details/' + entry.id);
+  }
+
+  my.getDecryptedAttribute = function(protectedAttr) {
+  	return keepass.getDecryptedEntry(protectedAttr, my.streamKey);
   }
 
   //listens for the copy event and does the copy

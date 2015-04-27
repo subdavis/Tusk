@@ -26,7 +26,7 @@ THE SOFTWARE.
 
 "use strict";
 
-var keepassApp = angular.module('keepassApp', ['ngAnimate', 'ngRoute']);
+var keepassApp = angular.module('keepassApp', ['ngAnimate', 'ngRoute', 'ngSanitize']);
 
 keepassApp.config(['$routeProvider', function($routeProvider) {
   $routeProvider.when('/choose-file', {
@@ -41,6 +41,9 @@ keepassApp.config(['$routeProvider', function($routeProvider) {
   }).when('/startup', {
     templateUrl: chrome.extension.getURL('/popups/partials/startup.html'),
     controller: 'startupController'
+  }).when('/entry-details/:entryId', {
+    templateUrl: chrome.extension.getURL('/popups/partials/entry-details.html'),
+    controller: 'entryDetailsController'
   }).otherwise({
     redirectTo: '/startup'
   });
@@ -90,8 +93,8 @@ keepassApp.factory('keepass', ['keepassHeader', 'pako', 'settings', 'passwordFil
 	return new Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry);
 }]);
 
-keepassApp.factory('unlockedState', ['$interval', 'keepass', 'protectedMemory', function($interval, keepass, protectedMemory) {
-  return new UnlockedState($interval, keepass, protectedMemory);
+keepassApp.factory('unlockedState', ['$interval', '$location', 'keepass', 'protectedMemory', function($interval, $location, keepass, protectedMemory) {
+  return new UnlockedState($interval, $location, keepass, protectedMemory);
 }]);
 
 keepassApp.factory('secureCacheMemory', ['protectedMemory', function(protectedMemory) {
@@ -106,6 +109,7 @@ keepassApp.controller('startupController', ['$scope', '$location', 'settings', '
 keepassApp.controller('chooseFileController', ['$scope', '$location', 'passwordFileStoreRegistry', 'settings', ChooseFileController]);
 keepassApp.controller('masterPasswordController', ['$scope', '$routeParams', '$location', 'keepass', 'localStorage', 'unlockedState', 'secureCacheDisk', 'settings', 'optionsLink', MasterPasswordController]);
 keepassApp.controller('findEntryController', ['$scope', 'unlockedState', 'secureCacheDisk', FindEntryController]);
+keepassApp.controller('entryDetailsController', ['$scope', '$routeParams', '$location', 'unlockedState', EntryDetailsController]);
 
 keepassApp.directive('icon', function() {
     function link(scope, element, attrs) {
@@ -266,4 +270,15 @@ keepassApp.directive('autoFocus', function($timeout) {
             });
         }
     };
+});
+
+//http://stackoverflow.com/questions/12393703/how-to-include-one-partials-into-other-without-creating-a-new-scope
+keepassApp.directive('staticInclude', function($http, $templateCache, $compile) {
+	return function(scope, element, attrs) {
+		var templatePath = attrs.staticInclude;
+		$http.get(templatePath, { cache: $templateCache }).success(function(response) {
+			var contents = element.html(response).contents();
+			$compile(contents)(scope);
+		});
+	};
 });
