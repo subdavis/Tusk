@@ -1,7 +1,7 @@
 {
   "name": "CKP - KeePass integration for Chrome™",
   "short_name": "CKP Extension",
-  "version": "2015.4.26.1",
+  "version": "2015.4.27",
   "manifest_version": 2,
   "minimum_chrome_version": "38",
 
