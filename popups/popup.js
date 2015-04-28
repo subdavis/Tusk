@@ -112,22 +112,22 @@ keepassApp.controller('findEntryController', ['$scope', 'unlockedState', 'secure
 keepassApp.controller('entryDetailsController', ['$scope', '$routeParams', '$location', 'unlockedState', EntryDetailsController]);
 
 keepassApp.directive('icon', function() {
-    function link(scope, element, attrs) {
-      function renderSVG() {
-        var icon = element.scope()[attrs.p];  //evaluate as scope expression
-        if (!icon)
-          icon = attrs.p;
-        var html = '<svg class="icon ' + icon + '"><use xlink:href="#' + icon + '"></use></svg>';
-        element.replaceWith( html );
-      }
-
-      renderSVG();
+  function link(scope, element, attrs) {
+    function renderSVG() {
+      var icon = element.scope()[attrs.p];  //evaluate as scope expression
+      if (!icon)
+        icon = attrs.p;
+      var html = '<svg class="icon ' + icon + '"><use xlink:href="#' + icon + '"></use></svg>';
+      element.replaceWith( html );
     }
 
-    return {
-      link: link,
-      restrict: 'E'
-    };
+   	renderSVG();
+  }
+
+  return {
+    link: link,
+    restrict: 'E'
+  };
 });
 
 //quick and dirty directive for file upload, based on answers from

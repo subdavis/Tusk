@@ -1,6 +1,7 @@
 function EntryDetailsController($scope, $routeParams, $location, unlockedState) {
 	"use strict";
 
+	$scope.unlockedState = unlockedState;
 	var entryId = decodeURIComponent($routeParams.entryId);
 	$scope.entry = unlockedState.entries.filter(function(entry) {
 		return entry.id == entryId;
