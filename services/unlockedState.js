@@ -108,7 +108,7 @@ function UnlockedState($interval, $location, keepass, protectedMemory) {
   }
 
   my.gotoDetails = function(entry) {
-  	$location.path('/entry-details/' + entry.id);
+  	$location.path('/entry-details/' + encodeURIComponent(entry.id));
   }
 
   my.getDecryptedAttribute = function(protectedAttr) {
