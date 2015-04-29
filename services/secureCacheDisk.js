@@ -48,6 +48,7 @@ function SecureCacheDisk(protectedMemory, secureCacheMemory, settings) {
     name: "AES-CBC",
     iv: new Uint8Array([0x18, 0x37, 0xC9, 0x4C, 0x1F, 0x42, 0x61, 0x73, 0x92, 0x5A, 0x1D, 0xC3, 0x44, 0x0A, 0x24, 0x40])
   };
+  var salt = new Uint8Array([0xC9, 0x04, 0xF5, 0x6B, 0xCE, 0x60, 0x66, 0x24, 0xE5, 0xAA, 0xA3, 0x60, 0xDD, 0x8E, 0xDD, 0xE8]);
 
   var tokenPromise = new Promise(function(resolve, reject) {
     settings.getDiskCacheFlag().then(function(enabled) {
@@ -60,11 +61,36 @@ function SecureCacheDisk(protectedMemory, secureCacheMemory, settings) {
         if (token) {
           var encoder = new TextEncoder();
           var tokenBytes = encoder.encode(token);
-          window.crypto.subtle.digest({name: 'SHA-256'}, tokenBytes).then(function(hash) {
-            return window.crypto.subtle.importKey("raw", hash, AES, false, ['encrypt', 'decrypt']);
-          }).then(function(aesKey) {
-            resolve(aesKey);
-          });
+
+          window.crypto.subtle.importKey(
+						"raw", //only "raw" is allowed
+						tokenBytes, //your password
+						{
+						    name: "PBKDF2",
+						},
+						false, //whether the key is extractable (i.e. can be used in exportKey)
+						["deriveKey"] //can be any combination of "deriveKey" and "deriveBits"
+					).then(function(key){
+						//returns a key object
+						return window.crypto.subtle.deriveKey(
+					    {
+				        "name": "PBKDF2",
+				        salt: salt,
+				        iterations: 100000,
+				        hash: {name: "SHA-256"}, //can be "SHA-1", "SHA-256", "SHA-384", or "SHA-512"
+				   		},
+					    key, //your key from generateKey or importKey
+					    { //the key type you want to create based on the derived bits
+				        name: "AES-CBC", //can be any AES algorithm ("AES-CTR", "AES-CBC", "AES-CMAC", "AES-GCM", "AES-CFB", "AES-KW", "ECDH", "DH", or "HMAC")
+				        //the generateKey parameters for that type of algorithm
+				        length: 256, //can be  128, 192, or 256
+					    },
+					    false, //whether the derived key is extractable (i.e. can be used in exportKey)
+					    ["encrypt", "decrypt"] //limited to the options in that algorithm's importKey
+						)
+					}).then(function(aesKey) {
+						resolve(aesKey);
+					});
         } else {
           reject(new Error('Failed to get a 3rd party secret, cache not possible.'));
         }
