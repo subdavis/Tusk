@@ -114,7 +114,6 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry) {
         return window.crypto.subtle.decrypt(AES, finalKey, encData);
       }).then(function(decryptedData) {
         //at this point we probably have successfully decrypted data, just need to double-check:
-        var block = null;
         if (h.kdbx) {
           //kdbx
           var storedStartBytes = new Uint8Array(decryptedData, 0, 32);
@@ -126,32 +125,44 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry) {
           }
 
           //ok, data decrypted, lets start parsing:
-          var blockHeader = new DataView(decryptedData, 32, 40);
-          var blockId = blockHeader.getUint32(0, littleEndian);
-          var blockSize = blockHeader.getUint32(36, littleEndian);
-          var blockHash = new Uint8Array(decryptedData, 36, 32);
+          var done = false, pos = 32;
+          var blockArray = [], totalDataLength = 0;
+          while (!done) {
+	          var blockHeader = new DataView(decryptedData, pos, 40);
+	          var blockId = blockHeader.getUint32(0, littleEndian);
+	          var blockSize = blockHeader.getUint32(36, littleEndian);
+	          var blockHash = new Uint8Array(decryptedData, pos+4, 32);
 
-          block = new Uint8Array(decryptedData, 72, blockSize);
+	          if (blockSize > 0) {
+		          var block = new Uint8Array(decryptedData, pos+40, blockSize);
+
+		          blockArray.push(block);
+		          totalDataLength += blockSize;
+		          pos += blockSize + 40;
+	          } else {
+	          	//final block is a zero block
+	          	done = true;
+	          }
+          }
+
+          var allBlocks = new Uint8Array(totalDataLength);
+          pos = 0;
+          for (var i=0; i<blockArray.length; i++) {
+          	allBlocks.set(blockArray[i], pos);
+          	pos += blockArray[i].byteLength;
+          }
 
           if (h.compressionFlags == 1) {
-            block = pako.inflate(block);
+            allBlocks = pako.inflate(allBlocks);
           }
-        } else {
-          //kdb
-          block = decryptedData;
-        }
-
-
-        if (h.kdbx) {
-          //xml
           var decoder = new TextDecoder();
-          var xml = decoder.decode(block);
-
+	        var xml = decoder.decode(allBlocks);
           var entries = parseXml(xml, h.protectedStreamKey);
           return entries;
+
         } else {
-          //custom format
-          var entries = parseKdb(block, h);
+          //kdb
+          var entries = parseKdb(decryptedData, h);
           return entries;
         }
       });
