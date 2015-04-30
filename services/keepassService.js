@@ -252,7 +252,7 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry) {
         // Ignore field
         break;
       case 0x0001:
-        entry.id = arr;
+        entry.id = Base64.encode(arr);
         break;
       case 0x0002:
         entry.groupId = dv.getUint32(0, littleEndian);
