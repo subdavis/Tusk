@@ -263,7 +263,7 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry) {
         // Ignore field
         break;
       case 0x0001:
-        entry.id = Base64.encode(arr);
+        entry.id = convertArrayToUUID(new Uint8Array(buf, pos, fieldSize));
         break;
       case 0x0002:
         entry.groupId = dv.getUint32(0, littleEndian);
@@ -418,7 +418,7 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry) {
           var childNode = entryNode.children[j];
 
           if (childNode.nodeName == "UUID") {
-          	entry.id = childNode.textContent;  //base64 encoded, but we don't care since we don't display it
+          	entry.id = convertArrayToUUID(Base64.decode(childNode.textContent));  
           } else if (childNode.nodeName == "IconID") {
           	entry.iconId = Number(childNode.textContent);  //integer
           } else if (childNode.nodeName == "Tags" && childNode.textContent) {
@@ -483,6 +483,15 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry) {
       }
       return result;
     });
+  }
+
+  function convertArrayToUUID(arr) {
+  	var int8Arr = new Uint8Array(arr);
+  	var result = new Array(int8Arr.byteLength * 2);
+  	for (var i=0;i<int8Arr.byteLength;i++) {
+  		result[i * 2] = int8Arr[i].toString(16).toUpperCase();
+  	}
+  	return result.join("");
   }
 
   return my;
