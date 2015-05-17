@@ -79,84 +79,93 @@ function KeepassHeader() {
     if (flags & FLAG_RIJNDAEL != FLAG_RIJNDAEL) {
       throw new Error('We only support AES (aka Rijndael) encryption on KeePass KDB files.  This file is using something else.');
     }
-    h.cipher = AES_CIPHER_UUID;
-    h.majorVersion = dv.getUint16(4, littleEndian);
-    h.minorVersion = dv.getUint16(6, littleEndian);
-    h.masterSeed = new Uint8Array(buf, position + 8, 16);
-    h.iv = new Uint8Array(buf, position + 24, 16);
-    h.numberOfGroups = dv.getUint32(40, littleEndian);
-    h.numberOfEntries = dv.getUint32(44, littleEndian);
-    h.contentsHash = new Uint8Array(buf, position + 48, 32);
-    h.transformSeed = new Uint8Array(buf, position + 80, 32);
-    h.keyRounds = dv.getUint32(112, littleEndian);
 
-    //constants for KDB:
-    h.keyRounds2 = 0;
-    h.compressionFlags = 0;
-    h.protectedStreamKey = window.crypto.getRandomValues(new Uint8Array(16));  //KDB does not have this, but we will create in order to protect the passwords
-    h.innerRandomStreamId = 0;
-    h.streamStartBytes = null;
-    h.kdb = true;
+    try {
+	    h.cipher = AES_CIPHER_UUID;
+	    h.majorVersion = dv.getUint16(4, littleEndian);
+	    h.minorVersion = dv.getUint16(6, littleEndian);
+	    h.masterSeed = new Uint8Array(buf, position + 8, 16);
+	    h.iv = new Uint8Array(buf, position + 24, 16);
+	    h.numberOfGroups = dv.getUint32(40, littleEndian);
+	    h.numberOfEntries = dv.getUint32(44, littleEndian);
+	    h.contentsHash = new Uint8Array(buf, position + 48, 32);
+	    h.transformSeed = new Uint8Array(buf, position + 80, 32);
+	    h.keyRounds = dv.getUint32(112, littleEndian);
 
-    h.dataStart = position + 116;  //=124 - the size of the KDB header
+	    //constants for KDB:
+	    h.keyRounds2 = 0;
+	    h.compressionFlags = 0;
+	    h.protectedStreamKey = window.crypto.getRandomValues(new Uint8Array(16));  //KDB does not have this, but we will create in order to protect the passwords
+	    h.innerRandomStreamId = 0;
+	    h.streamStartBytes = null;
+	    h.kdb = true;
+
+	    h.dataStart = position + 116;  //=124 - the size of the KDB header
+    } catch (err) {
+    	throw new Error('Failed to parse KDB file header - file is corrupt or format not supported');
+    }
   }
 
   function readKdbxHeader(buf, position, h) {
-    var version = new DataView(buf, position, 4)
-    h.majorVersion = version.getUint16(0, littleEndian);
-    h.minorVersion = version.getUint16(2, littleEndian);
-    position += 4;
+    try {
+	    var version = new DataView(buf, position, 4)
+	    h.majorVersion = version.getUint16(0, littleEndian);
+	    h.minorVersion = version.getUint16(2, littleEndian);
+	    position += 4;
 
-    var done = false;
-    while (!done) {
-      var descriptor = new DataView(buf, position, 3);
-      var fieldId = descriptor.getUint8(0, littleEndian);
-      var len = descriptor.getUint16(1, littleEndian);
+	    var done = false;
+	    while (!done) {
+	      var descriptor = new DataView(buf, position, 3);
+	      var fieldId = descriptor.getUint8(0, littleEndian);
+	      var len = descriptor.getUint16(1, littleEndian);
 
-      var dv = new DataView(buf, position + 3, len);
-      //console.log("fieldid " + fieldId + " found at " + position);
-      position += 3;
-      switch (fieldId) {
-        case 0: //end of header
-          done = true;
-          break;
-        case 2: //cipherid, 16 bytes
-          h.cipher = new Uint8Array(buf, position, len);
-          break;
-        case 3: //compression flags, 4 bytes
-          h.compressionFlags = dv.getUint32(0, littleEndian);
-          break;
-        case 4: //master seed
-          h.masterSeed = new Uint8Array(buf, position, len);
-          break;
-        case 5: //transform seed
-          h.transformSeed = new Uint8Array(buf, position, len);
-          break;
-        case 6: //transform rounds, 8 bytes
-          h.keyRounds = dv.getUint32(0, littleEndian);
-          h.keyRounds2 = dv.getUint32(4, littleEndian);
-          break;
-        case 7: //iv
-          h.iv = new Uint8Array(buf, position, len);
-          break;
-        case 8: //protected stream key
-          h.protectedStreamKey = new Uint8Array(buf, position, len);
-          break;
-        case 9:
-          h.streamStartBytes = new Uint8Array(buf, position, len);
-          break;
-        case 10:
-          h.innerRandomStreamId = dv.getUint32(0, littleEndian);
-          break;
-        default:
-          break;
-      }
+	      var dv = new DataView(buf, position + 3, len);
+	      //console.log("fieldid " + fieldId + " found at " + position);
+	      position += 3;
+	      switch (fieldId) {
+	        case 0: //end of header
+	          done = true;
+	          break;
+	        case 2: //cipherid, 16 bytes
+	          h.cipher = new Uint8Array(buf, position, len);
+	          break;
+	        case 3: //compression flags, 4 bytes
+	          h.compressionFlags = dv.getUint32(0, littleEndian);
+	          break;
+	        case 4: //master seed
+	          h.masterSeed = new Uint8Array(buf, position, len);
+	          break;
+	        case 5: //transform seed
+	          h.transformSeed = new Uint8Array(buf, position, len);
+	          break;
+	        case 6: //transform rounds, 8 bytes
+	          h.keyRounds = dv.getUint32(0, littleEndian);
+	          h.keyRounds2 = dv.getUint32(4, littleEndian);
+	          break;
+	        case 7: //iv
+	          h.iv = new Uint8Array(buf, position, len);
+	          break;
+	        case 8: //protected stream key
+	          h.protectedStreamKey = new Uint8Array(buf, position, len);
+	          break;
+	        case 9:
+	          h.streamStartBytes = new Uint8Array(buf, position, len);
+	          break;
+	        case 10:
+	          h.innerRandomStreamId = dv.getUint32(0, littleEndian);
+	          break;
+	        default:
+	          break;
+	      }
 
-      position += len;
+	      position += len;
+	    }
+
+	    h.kdbx = true;
+	    h.dataStart = position;
+    } catch (err) {
+    	throw new Error('Failed to parse KDBX file header - file is corrupt or format not supported');
     }
-
-    h.kdbx = true;
-    h.dataStart = position;
   }
 
   return my;
