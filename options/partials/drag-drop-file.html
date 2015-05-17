@@ -2,6 +2,7 @@
   Use the big blue button to upload files from your local or remote filesystem.  A copy of the selected
   file(s) will be stored in Chrome's local storage.
   <br>
+  <warningMessage>Loading files this way is ONLY suitable for old files that are never updated.  Please use <a href="#/choose-file">Google Drive</a> or <a href="#/dropbox">Dropbox</a> for the best CKP experience!</warningMessage>
   <a class="pure-button pure-button-primary fill" ng-click="selectFile()">Browse Files</a>
   <input type="file" style="display:none" id="file" name='file' file-change="handleDrop" multiple />
   <errorMessage ng-show="errorMessage">{{errorMessage}}</errorMessage>
