@@ -19,7 +19,7 @@ function ChooseFileController($scope, $location, passwordFileStoreRegistry, sett
   $scope.chooseDatabase = function(database) {
     var info = database.provider.getDatabaseChoiceData(database);
     settings.saveCurrentDatabaseChoice(info, database.provider).then(function() {
-      $location.path('/enter-password/' + database.provider.key + '/' + database.title);
+      $location.path('/enter-password/' + database.provider.key + '/' + encodeURIComponent(database.title));
       $scope.$apply();
     });
   }

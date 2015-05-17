@@ -1,0 +1,13 @@
+
+<login ng-if="!state.loggedIn">
+	<a class="pure-button" ng-click="listFiles()">Login to DropBox</a>
+</login>
+<files ng-if="state.loggedIn">
+	<filelist>
+	  <ul>
+	    <li ng-repeat="file in files" ng-click="selectFile(file)">
+	      {{file.title}}
+	    </li>
+	  </ul>
+	</filelist>
+</files>

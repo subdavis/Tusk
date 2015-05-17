@@ -3,7 +3,7 @@
 function MasterPasswordController($scope, $routeParams, $location, keepass, localStorage, unlockedState, secureCache, settings, optionsLink) {
   $scope.masterPassword = "";
   $scope.busy = false;
-  $scope.fileName = $routeParams.fileTitle;
+  $scope.fileName = decodeURIComponent($routeParams.fileTitle);
   $scope.providerKey = $routeParams.providerKey;
   $scope.selectedKeyFile = null;
   $scope.unlockedState = unlockedState;
