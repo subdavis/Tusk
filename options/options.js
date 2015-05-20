@@ -75,6 +75,10 @@ keepassSettings.factory('passwordFileStoreRegistry', ['googleDrivePasswordFileMa
 		sampleDatabaseFileManager);
 }]);
 
+keepassSettings.factory('chromeWebStore', ['$http', 'settings', function($http, settings) {
+	return new ChromeWebStore($http, settings);
+}]);
+
 keepassSettings.factory('googleDrivePasswordFileManager', ['$http', '$timeout', function($http, $timeout) {
 	return new GoogleDrivePasswordFileManager($http, $timeout);
 }]);

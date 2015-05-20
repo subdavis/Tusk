@@ -151,5 +151,18 @@ function Settings() {
     });
   }
 
+  exports.saveLicense = function(license) {
+  	return chrome.p.storage.local.set({'license': license});
+  }
+
+  exports.getLicense = function() {
+  	return chrome.p.storage.local.get(['license']).then(function(items) {
+  		if (items.license)
+  			return items.license;
+  		else
+  			return null;
+  	})
+  }
+
   return exports;
 }
