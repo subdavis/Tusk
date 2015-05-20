@@ -26,13 +26,22 @@ THE SOFTWARE.
 
 function ChromeWebStore($http, settings) {
 	const statusCodes = {
-		basic: 0,
-		premium: 1  //either grandfathered or purchased
+		unknown: 0,
+		basic: 1,
+		paid: 2,
+		grandFathered: 3
 	};
+	const origins = ["https://www.googleapis.com/"];
 
 	var exports = {
-		getLicenseStatus: getLicenseStatus
+		getLicenseStatus: getLicenseStatus,
+		statusCodes: statusCodes,
+		ensurePermissions: ensurePermissions
 	};
+
+	function ensurePermissions() {
+		return chrome.p.permissions.request({origins: origins});
+	}
 
 	function getLicenseStatus() {
 		return settings.getLicense().then(function(license) {
@@ -45,30 +54,35 @@ function ChromeWebStore($http, settings) {
 			var grandfatheredTime = (new Date(2015, 8, 1)).valueOf();
 			var licenseTime = parseInt(license.createdTime, 10);
 			if (license.result && license.accessLevel === 'FULL')
-				return statusCodes.premium;
+				return statusCodes.paid;
 			else if (license.result && license.accessLevel === "FREE_TRIAL" && licenseTime < grandfatheredTime)
-				return statusCodes.premium;
+				return statusCodes.grandFathered;
 			else
 				return statusCodes.basic;
 		}).catch(function(err) {
-			//give some leeway, just allow it:
 			console.log(err);
-			return statusCodes.premium;
+			return statusCodes.unknown;
 		});
 	}
 
-	function fetchLicense() {
-		return chrome.p.permissions.request({origins: "https://www.googleapis.com/"}).then(function() {
-			return chrome.p.identity.getAuthToken({interactive: true});
-		}).then(function(token) {
+	function fetchLicense(dontRetry) {
+		return chrome.p.identity.getAuthToken({interactive: true}).then(function(token) {
 			return $http({
 				url: "https://www.googleapis.com/chromewebstore/v1.1/userlicenses/" + chrome.runtime.id,
-				headers: ['Authorization', 'Bearer ' + token]
+				headers: {'Authorization': 'Bearer ' + token}
+			}).then(function(response) {
+				settings.saveLicense(response.data);  //no need to wait for it to finish
+				return response.data;
+			}).catch(function(response) {
+				if (response.status == 401 && !dontRetry) {
+					return chrome.p.identity.removeCachedAuthToken({ token: token }).then(function() {
+						fetchLicense(true);
+					});
+				}
+				else
+					throw new Error('Failed to fetch license');
 			});
-		}).then(function(response) {
-			settings.saveLicense(response.data);  //no need to wait for it to finish
-			return response.data;
-		})
+		});
 	}
 
 	return exports;
