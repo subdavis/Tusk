@@ -93,12 +93,22 @@ function UnlockedState($interval, $location, keepass, protectedMemory) {
         m: "autofill",
         tabId: my.tabId,
         u: entry.userName,
-        p: entry.protectedData ? keepass.getDecryptedEntry(entry.protectedData.password, my.streamKey): entry.password,
+        p: getPassword(entry),
         o: my.origin
       }
     });
 
     window.close(); //close the popup
+  }
+
+  //get clear-text password from entry
+  function getPassword(entry) {
+  	if (entry.protectedData && entry.protectedData.password) 
+  		return keepass.getDecryptedEntry(entry.protectedData.password, my.streamKey);
+  	else {
+  		//KyPass support - it does not use protectedData for passwords that it adds
+  		return entry.password;
+  	}
   }
 
   my.copyPassword = function(entry) {
@@ -122,7 +132,7 @@ function UnlockedState($interval, $location, keepass, protectedMemory) {
       return; //listener can get registered multiple times
     }
 
-    var textToPutOnClipboard = copyEntry.protectedData ? keepass.getDecryptedEntry(copyEntry.protectedData.password, my.streamKey): copyEntry.password;
+    var textToPutOnClipboard = getPassword(copyEntry);
     copyEntry = null;
     e.clipboardData.setData('text/plain', textToPutOnClipboard);
     e.preventDefault();
