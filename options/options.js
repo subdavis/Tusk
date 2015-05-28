@@ -90,8 +90,8 @@ keepassSettings.factory('sampleDatabaseFileManager', ['$http', function($http) {
 	return new SampleDatabaseFileManager($http);
 }]);
 
-keepassSettings.factory('dropboxFileManager', ['$http', function($http) {
-	return new DropboxFileManager($http);
+keepassSettings.factory('dropboxFileManager', ['$http', 'settings', function($http, settings) {
+	return new DropboxFileManager($http, settings);
 }]);
 
 keepassSettings.factory('localChromePasswordFileManager', [function() {
