@@ -152,7 +152,7 @@ function DropboxFileManager($http, settings) {
 						var uid = uidMatches[1];
 						if (checkState === randomState) {
 							state.loggedIn = true;
-							settings.saveDropboxToken(new_token).then(function() {
+							settings.saveDropboxToken(access_token).then(function() {
 								resolve(access_token);
 							});							
 						} else {
