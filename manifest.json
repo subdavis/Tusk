@@ -38,6 +38,16 @@
     ],
     "persistent": false
   },
+  "commands": {
+    "_execute_page_action": {
+      "suggested_key": {
+        "windows": "Ctrl+Shift+Space",
+        "mac": "Command+Shift+Space",
+        "chromeos": "Ctrl+Shift+Space",
+        "linux": "Ctrl+Shift+Space"
+      }
+    }
+  },
   "permissions": [
     "activeTab",
     "storage",
