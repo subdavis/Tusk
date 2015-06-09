@@ -24,7 +24,7 @@
       "19": "assets/icons/logo_19.png",
       "38": "assets/icons/logo_38.png"
     },
-    "default_title": "Input field detected.  Click here to access your KeePass passwords.",
+    "default_title": "Input field detected.  Click here or press Ctrl-Shift-Space to access your KeePass passwords.",
     "default_popup": "popups/popup.html"
   },
   "options_page": "options/options.html",
