@@ -15,7 +15,8 @@
   "oauth2": {
     "client_id": "252911279862-spv4ks48i07fqbjvd3isorei5au254b5.apps.googleusercontent.com",
     "scopes": [
-      "https://www.googleapis.com/auth/drive.readonly"
+      "https://www.googleapis.com/auth/drive.readonly",
+      "https://www.googleapis.com/auth/chromewebstore.readonly"
     ]
   },
 

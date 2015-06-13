@@ -68,8 +68,8 @@ keepassApp.factory('sampleDatabaseFileManager', ['$http', function($http) {
 	return new SampleDatabaseFileManager($http);
 }]);
 
-keepassApp.factory('dropboxFileManager', ['$http', function($http) {
-	return new DropboxFileManager($http);
+keepassApp.factory('dropboxFileManager', ['$http', 'settings', function($http, settings) {
+	return new DropboxFileManager($http, settings);
 }]);
 
 keepassApp.factory('googleDrivePasswordFileManager', ['$http', '$timeout', function($http, $timeout) {

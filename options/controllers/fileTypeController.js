@@ -1,6 +1,5 @@
-"use strict";
-
 function FileTypeController($scope, $location, passwordFileStoreRegistry) {
+	"use strict";
 
   $scope.fileManagers = passwordFileStoreRegistry.listFileManagers();
 

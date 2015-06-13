@@ -26,12 +26,13 @@ THE SOFTWARE.
 
 "use strict";
 
-function DropboxFileManager($http) {
+function DropboxFileManager($http, settings) {
 	var state = {
 		loggedIn: false
 	}
 	var exports = {
 		key: 'dropbox',
+		premium: true,
 		routePath: '/dropbox',
 		listDatabases: listDatabases,
 		getDatabaseChoiceData: getDatabaseChoiceData,
@@ -47,7 +48,7 @@ function DropboxFileManager($http) {
 	};
 
 	function listDatabases() {
-		return interactiveLogin().then(function(accessToken) {
+		return getToken().then(function(accessToken) {
 			var req = {
 				method: 'GET', 
 				url: 'https://api.dropbox.com/1/search/auto/',
@@ -66,6 +67,11 @@ function DropboxFileManager($http) {
 					title: fileInfo.path
 				};
 			});
+		}).catch(function(response) {
+			if (response.status == 401) {
+				//unauthorized, means the token is bad.  retry with new token.
+				return interactiveLogin().then(listDatabases);
+			}
 		});
 	}
 
@@ -78,7 +84,7 @@ function DropboxFileManager($http) {
 
 	//given minimal file information, retrieve the actual file
 	function getChosenDatabaseFile(dbInfo) {
-		return interactiveLogin().then(function(accessToken) {
+		return getToken().then(function(accessToken) {
 			return $http({
 				method: 'GET',
 				url: 'https://api-content.dropbox.com/1/files/auto' + dbInfo.title,
@@ -89,6 +95,13 @@ function DropboxFileManager($http) {
 			})
 		}).then(function(response) {
 			return response.data;
+		}).catch(function(response) {
+			if (response.status == 401) {
+				//unauthorized, means the token is bad.  retry with new token.
+				return interactiveLogin().then(function() {
+					return getChosenDatabaseFile(dbInfo);
+				});
+			}
 		});
 	}
 
@@ -105,16 +118,30 @@ function DropboxFileManager($http) {
 		});
 	}
 
+	function getToken() {
+		return settings.getDropboxToken().then(function(stored_token) {
+			if (stored_token) {
+				state.loggedIn = true;
+				return stored_token;
+			}
+
+			return interactiveLogin().then(function(new_token) {
+				return new_token;
+			});
+		})
+	} 
+
 	function interactiveLogin() {
 		return ensureOriginPermissions().then(function() {
 			return new Promise(function(resolve, reject) {
 				var randomState = Base64.encode(window.crypto.getRandomValues(new Uint8Array(16)));  //random state, protects against CSRF
 				var authUrl = 'https://www.dropbox.com/1/oauth2/authorize?response_type=token&client_id=6kxu9nd18t4g74m'
 					+ '&state=' + encodeURIComponent(randomState)
-					+ '&redirect_uri=' + encodeURIComponent('https://lnfepbjehgokldcaljagbmchhnaaogpc.chromiumapp.org/dropbox');
+					+ '&redirect_uri=' + encodeURIComponent(chrome.identity.getRedirectURL('dropbox'))
+					+ '&force_reapprove=false';
 
 				chrome.p.identity.launchWebAuthFlow({'url': authUrl, 'interactive': true}).then(function(redirect_url) {
-					//console.log(redirect_url);  //e.g. https://lnfepbjehgokldcaljagbmchhnaaogpc.chromiumapp.org/dropbox#access_token=LB3C7zTHGgkAAAAAAABsZNguQ_SIqLwfvSPuZ3qvRta9lHpMnV0KPr6GOzWaxQby&token_type=bearer&uid=19350000
+					//console.log(redirect_url); 
 					var tokenMatches = /access_token=([^&]+)/.exec(redirect_url);
 					var stateMatches = /state=([^&]+)/.exec(redirect_url);
 					var uidMatches = /uid=(\d+)/.exec(redirect_url);
@@ -125,7 +152,9 @@ function DropboxFileManager($http) {
 						var uid = uidMatches[1];
 						if (checkState === randomState) {
 							state.loggedIn = true;
-							resolve(access_token);
+							settings.saveDropboxToken(access_token).then(function() {
+								resolve(access_token);
+							});							
 						} else {
 							//some sort of error or parsing failure
 							reject();
