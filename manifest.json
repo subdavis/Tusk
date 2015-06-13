@@ -1,7 +1,7 @@
 {
   "name": "CKP - KeePass integration for Chrome™",
   "short_name": "CKP Extension",
-  "version": "2015.5.19",
+  "version": "2015.5.27",
   "manifest_version": 2,
   "minimum_chrome_version": "42",
 
@@ -25,7 +25,7 @@
       "19": "assets/icons/logo_19.png",
       "38": "assets/icons/logo_38.png"
     },
-    "default_title": "Input field detected.  Click here to access your KeePass passwords.",
+    "default_title": "Input field detected.  Click here or press Ctrl-Shift-Space to access your KeePass passwords.",
     "default_popup": "popups/popup.html"
   },
   "options_page": "options/options.html",
@@ -38,6 +38,16 @@
       "lib/base64.js", "lib/chrome-api-promise.js", "services/settings.js", "services/protectedMemory.js", "background/background.js"
     ],
     "persistent": false
+  },
+  "commands": {
+    "_execute_page_action": {
+      "suggested_key": {
+        "windows": "Ctrl+Shift+Space",
+        "mac": "Command+Shift+Space",
+        "chromeos": "Ctrl+Shift+Space",
+        "linux": "Ctrl+Shift+Space"
+      }
+    }
   },
   "permissions": [
     "activeTab",
