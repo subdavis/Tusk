@@ -6,7 +6,7 @@ function StartupController($scope, $location, settings, optionsLink, passwordFil
   settings.getCurrentDatabaseChoice().then(function(info) {
     //use the last chosen database
     if (info) {
-      $location.path('/enter-password/' + info.providerKey + '/' + info.passwordFile.title);
+      $location.path('/enter-password/' + info.providerKey + '/' + encodeURIComponent(info.passwordFile.title));
     } else {
       //user has not yet chosen a database.  Lets see if there are any available to choose...
       var readyPromises = [];

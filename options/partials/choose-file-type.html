@@ -9,6 +9,7 @@
       <fileType ng-click="choose(fm)" ng-mouseenter="setDescription(fm)" ng-mouseleave="clearDescription()">
         <icon p="{{fm.icon}}"></icon>
         <span ng-bind="fm.chooseTitle"></span>
+        <premiumText ng-if="fm.premium">Premium Feature</premiumText>
       </fileType>
     </div>
 

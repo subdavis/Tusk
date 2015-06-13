@@ -76,7 +76,7 @@ function LocalChromePasswordFileManager() {
           return prev;
       }, []);
 
-      if (bytes)
+      if (bytes && bytes.byteLength)
         return bytes;
       else
         throw new Error("Failed to find the requested file");

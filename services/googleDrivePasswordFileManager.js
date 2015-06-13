@@ -24,9 +24,9 @@ THE SOFTWARE.
 
  */
 
-"use strict";
-
 function GoogleDrivePasswordFileManager($http, $timeout) {
+	"use strict";
+  
   var exports = {
     key: 'gdrive',
     routePath: '/choose-file',

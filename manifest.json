@@ -15,7 +15,8 @@
   "oauth2": {
     "client_id": "252911279862-spv4ks48i07fqbjvd3isorei5au254b5.apps.googleusercontent.com",
     "scopes": [
-      "https://www.googleapis.com/auth/drive.readonly"
+      "https://www.googleapis.com/auth/drive.readonly",
+      "https://www.googleapis.com/auth/chromewebstore.readonly"
     ]
   },
 
@@ -24,7 +25,7 @@
       "19": "assets/icons/logo_19.png",
       "38": "assets/icons/logo_38.png"
     },
-    "default_title": "Input field detected.  Click here to access your KeePass passwords.",
+    "default_title": "Input field detected.  Click here or press Ctrl-Shift-Space to access your KeePass passwords.",
     "default_popup": "popups/popup.html"
   },
   "options_page": "options/options.html",
@@ -37,6 +38,16 @@
       "lib/base64.js", "lib/chrome-api-promise.js", "services/settings.js", "services/protectedMemory.js", "background/background.js"
     ],
     "persistent": false
+  },
+  "commands": {
+    "_execute_page_action": {
+      "suggested_key": {
+        "windows": "Ctrl+Shift+Space",
+        "mac": "Command+Shift+Space",
+        "chromeos": "Ctrl+Shift+Space",
+        "linux": "Ctrl+Shift+Space"
+      }
+    }
   },
   "permissions": [
     "activeTab",

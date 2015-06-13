@@ -1,6 +1,6 @@
-"use strict";
-
 function DocsController($scope, googleDrivePasswordFileManager) {
+	"use strict";
+
   $scope.docs = [];
 
   $scope.refresh = function() {

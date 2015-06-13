@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="/lib/angular-csp.css" />
   <link rel="stylesheet" href="/lib/json-formatter.min.css" />
   <link rel="stylesheet" href="options.css" />
+  <script type="text/javascript" src="/lib/buy.js"></script>
   <script type="text/javascript" src="/lib/base64.js"></script>
   <script type="text/javascript" src="/lib/chrome-api-promise.js"></script>
   <script type="text/javascript" src="/lib/angular.min.js"></script>
@@ -18,6 +19,7 @@
   <script type="text/javascript" src="/services/googleDrivePasswordFileManager.js"></script>
   <script type="text/javascript" src="/services/localChromePasswordFileManager.js"></script>
   <script type="text/javascript" src="/services/sampleDatabaseFileManager.js"></script>
+  <script type="text/javascript" src="/services/dropboxFileManager.js"></script>
   <script type="text/javascript" src="/services/settings.js"></script>
   <script type="text/javascript" src="/services/protectedMemory.js"></script>
   <script type="text/javascript" src="/services/secureCacheMemory.js"></script>
@@ -25,8 +27,10 @@
   <script type="text/javascript" src="/services/keyFileParser.js"></script>
   <script type="text/javascript" src="/services/passwordFileStore.js"></script>
   <script type="text/javascript" src="/services/localStorage.js"></script>
+  <script type="text/javascript" src="/services/chromeWebStore.js"></script>
   <script type="text/javascript" src="/options/controllers/startup.js"></script>
   <script type="text/javascript" src="/options/controllers/sample-database.js"></script>
+  <script type="text/javascript" src="/options/controllers/choose-dropbox-file.js"></script>
   <script type="text/javascript" src="/options/controllers/navController.js"></script>
   <script type="text/javascript" src="/options/controllers/docsController.js"></script>
   <script type="text/javascript" src="/options/controllers/dragDropController.js"></script>
@@ -34,16 +38,18 @@
   <script type="text/javascript" src="/options/controllers/storedData.js"></script>
   <script type="text/javascript" src="/options/controllers/manageKeyFiles.js"></script>
   <script type="text/javascript" src="/options/controllers/advanced.js"></script>
+  <script type="text/javascript" src="/options/controllers/licenseController.js"></script>
   <script type="text/javascript" src="/options/options.js"></script>
 </head>
 
 <body class="pure-form">
   <nav class="menu" ng-controller="NavController">
     <a class="menu-item" ng-class="{selected: isActive('/startup')}" href="#startup?stay=1">Introduction</a>
-    <a class="menu-item" ng-class="{selected: isActive('/databases') || isActive('/choose-file') || isActive('/drag-drop-file') || isActive('/sample-database')}" href="#databases">KeePass Databases</a>
+    <a class="menu-item" ng-class="{selected: isActive('/databases') || isActive('/dropbox') || isActive('/choose-file') || isActive('/drag-drop-file') || isActive('/sample-database')}" href="#databases">KeePass Databases</a>
     <a class="menu-item" ng-class="{selected: isActive('/keyFiles')}" href="#keyFiles">Key Files</a>
     <a class="menu-item" ng-class="{selected: isActive('/advanced')}" href="#advanced">Advanced Options</a>
     <a class="menu-item" ng-class="{selected: isActive('/storedData')}" href="#storedData">Stored Data</a>
+    <a class="menu-item" ng-class="{selected: isActive('/license')}" href="#license">License</a>
   </nav>
   <ng-view></ng-view>
 
