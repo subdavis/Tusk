@@ -48,29 +48,35 @@ function DropboxFileManager($http, settings) {
 	};
 
 	function listDatabases() {
-		return getToken().then(function(accessToken) {
-			var req = {
-				method: 'GET', 
-				url: 'https://api.dropbox.com/1/search/auto/',
-				params: {
-					query: '.kdbx .kdb'
-				},
-				headers: {
-					'Authorization': 'Bearer ' + accessToken
-				}
-			};
+		return settings.getDropboxToken().then(function(stored_token) {
+			if (stored_token) {
+				return getToken().then(function(accessToken) {
+					var req = {
+						method: 'GET', 
+						url: 'https://api.dropbox.com/1/search/auto/',
+						params: {
+							query: '.kdbx .kdb'
+						},
+						headers: {
+							'Authorization': 'Bearer ' + accessToken
+						}
+					};
 
-			return $http(req);
-		}).then(function(response) {
-			return response.data.map(function(fileInfo) {
-				return {
-					title: fileInfo.path
-				};
-			});
-		}).catch(function(response) {
-			if (response.status == 401) {
-				//unauthorized, means the token is bad.  retry with new token.
-				return interactiveLogin().then(listDatabases);
+					return $http(req);
+				}).then(function(response) {
+					return response.data.map(function(fileInfo) {
+						return {
+							title: fileInfo.path
+						};
+					});
+				}).catch(function(response) {
+					if (response.status == 401) {
+						//unauthorized, means the token is bad.  retry with new token.
+						return interactiveLogin().then(listDatabases);
+					}
+				});
+			} else {
+				return [];
 			}
 		});
 	}
