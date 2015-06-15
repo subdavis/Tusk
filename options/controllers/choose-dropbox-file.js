@@ -17,6 +17,18 @@ function ChooseDropboxFileController($scope, dropboxFileManager) {
 		});
 	}
 
+	$scope.login = function() {
+		dropboxFileManager.login().then(function() {
+			$scope.listFiles();
+		})
+	}
+
+	$scope.logout = function() {
+		dropboxFileManager.logout().then(function() {
+			$scope.listFiles();
+		});
+	}
+
 	$scope.selectFile = function(file) {
 		
 	}

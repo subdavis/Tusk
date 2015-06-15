@@ -1,7 +1,10 @@
 
 <login ng-if="!state.loggedIn && !busy">
-	<a class="pure-button" ng-click="listFiles()">Login to DropBox</a>
+	<a class="pure-button" ng-click="login()">Login to DropBox</a>
 </login>
+<logout ng-if="state.loggedIn && !busy">
+	<a class="pure-button" ng-click="logout()">Logout of Dropbox</a>
+</logout>
 <infoMessage ng-if="busy">Fetching list of files...</infoMessage>
 <files ng-if="state.loggedIn">
 	<filelist>
