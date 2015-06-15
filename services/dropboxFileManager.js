@@ -34,7 +34,7 @@ function DropboxFileManager($http, settings) {
 		key: 'dropbox',
 		premium: true,
 		routePath: '/dropbox',
-		listDatabases: listDatabases,
+		listDatabases: listDatabasesSafe,
 		getDatabaseChoiceData: getDatabaseChoiceData,
 		getChosenDatabaseFile: getChosenDatabaseFile,
 		supportedFeatures: ['ingognito', 'listDatabases'],
@@ -44,41 +44,58 @@ function DropboxFileManager($http, settings) {
 		chooseDescription: 'Access password files stored on Dropbox.  Files will be retrieved from Dropbox each time they are used.',
 		interactiveLogin: interactiveLogin,
 		ensureOriginPermissions: ensureOriginPermissions,
-		state: state
+		state: state,
+		login: login,
+		logout: logout
 	};
 
-	function listDatabases() {
+	//lists databases if a token is already stored
+	function listDatabasesSafe() {
 		return settings.getDropboxToken().then(function(stored_token) {
 			if (stored_token) {
-				return getToken().then(function(accessToken) {
-					var req = {
-						method: 'GET', 
-						url: 'https://api.dropbox.com/1/search/auto/',
-						params: {
-							query: '.kdbx .kdb'
-						},
-						headers: {
-							'Authorization': 'Bearer ' + accessToken
-						}
-					};
-
-					return $http(req);
-				}).then(function(response) {
-					return response.data.map(function(fileInfo) {
-						return {
-							title: fileInfo.path
-						};
-					});
-				}).catch(function(response) {
-					if (response.status == 401) {
-						//unauthorized, means the token is bad.  retry with new token.
-						return interactiveLogin().then(listDatabases);
-					}
-				});
+				return listDatabases();
 			} else {
 				return [];
 			}
 		});
+	}
+
+	function login() {
+		return listDatabases();
+	}
+
+	function logout() {
+		return settings.saveDropboxToken(null).then(function() {
+			state.loggedIn = false;
+		});
+	}
+
+	function listDatabases() {
+		return getToken().then(function(accessToken) {
+			var req = {
+				method: 'GET', 
+				url: 'https://api.dropbox.com/1/search/auto/',
+				params: {
+					query: '.kdbx .kdb'
+				},
+				headers: {
+					'Authorization': 'Bearer ' + accessToken
+				}
+			};
+
+			return $http(req);
+		}).then(function(response) {
+			return response.data.map(function(fileInfo) {
+				return {
+					title: fileInfo.path
+				};
+			});
+		}).catch(function(response) {
+			if (response.status == 401) {
+				//unauthorized, means the token is bad.  retry with new token.
+				return interactiveLogin().then(listDatabases);
+			}
+		});		
 	}
 
 	//get the minimum information needed to identify this file for future retrieval
