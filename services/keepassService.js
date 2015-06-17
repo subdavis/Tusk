@@ -463,16 +463,7 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry) {
     for (var i = 0; i < blockCount; i++) {
       var block = data.subarray(i * 16, i * 16 + 16);
       blockPromises[i] = (function(iv) {
-        var AES = {
-          name: "AES-CBC",
-          iv: iv
-        };
-        return window.crypto.subtle.importKey("raw", rawKey, AES, false, ["encrypt"]).then(function(secureKey) {
-          var fakeData = new Uint8Array(rounds * 16);
-          return window.crypto.subtle.encrypt(AES, secureKey, fakeData);
-        }).then(function(result) {
-          return new Uint8Array(result, (rounds - 1) * 16, 16);
-        });
+        return aes_cbc_rounds(iv, rawKey, rounds);
       })(block);
     }
     return Promise.all(blockPromises).then(function(blocks) {
@@ -482,6 +473,37 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry) {
         result.set(blocks[i], i * 16);
       }
       return result;
+    });
+  }
+
+  /*
+	* Performs rounds of CBC encryption on data using rawKey
+  */
+  function aes_cbc_rounds(data, rawKey, rounds) {
+  	if (rounds == 0) {
+  		//just pass back the current value
+  		return data;
+  	} else if (rounds > 0xFFFF) {
+  		//limit memory use to avoid chrome crash:
+  		return aes_cbc_rounds_single(data, rawKey, 0xFFFF).then(function(result) {
+  			return aes_cbc_rounds(result, rawKey, rounds - 0xFFFF);
+  		});
+  	} else {
+  		//last iteration, or only iteration if original rounds was low:
+  		return aes_cbc_rounds_single(data, rawKey, rounds);
+  	}
+  }
+
+  function aes_cbc_rounds_single(data, rawKey, rounds) {
+    var AES = {
+      name: "AES-CBC",
+      iv: data
+    };
+    return window.crypto.subtle.importKey("raw", rawKey, AES, false, ["encrypt"]).then(function(secureKey) {
+      var fakeData = new Uint8Array(rounds * 16);
+      return window.crypto.subtle.encrypt(AES, secureKey, fakeData);
+    }).then(function(result) {
+      return new Uint8Array(result, (rounds - 1) * 16, 16);
     });
   }
 
