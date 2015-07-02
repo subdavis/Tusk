@@ -117,7 +117,8 @@ function GoogleDrivePasswordFileManager($http, $timeout) {
   }
 
   function getPasswordFiles() {
-    var url = "https://www.googleapis.com/drive/v2/files?q=fileExtension='kdbx' or fileExtension='kdb'";
+    var url = "https://www.googleapis.com/drive/v2/files?q=" +
+      "(fileExtension='kdbx' or fileExtension='kdb') and trashed=false";
     return sendAuthorizedGoogleDriveGet(url).then(function(data) {
       return data.items.map(function(entry) {
         return {
