@@ -191,34 +191,29 @@ var filler = (function() {
 		sendKeyEvent(field);
 		field.val(val);
 		var filled = (field.val() === val);
-
 		return filled;
 	}
 
 	function sendKeyEvent(field) {
 		field.focus();
 
-		/* doesn't work.  I think the content script has a separate event dispatch cycle.   Extension cannot trigger dom events on page in such a way that normal page can detect them?
-		field.trigger('keydown');
+		var eventsToFire = {
+			keydown: 'KeyboardEvent',
+			keyup  : 'KeyboardEvent',
+			change : 'HTMLEvents',
+		};
 
-		var keyboardEvent = document.createEvent("KeyboardEvent");
-		var initMethod = typeof keyboardEvent.initKeyboardEvent !== 'undefined' ? "initKeyboardEvent" : "initKeyEvent";
-
-		keyboardEvent[initMethod](
-			"keydown", // event type : keydown, keyup, keypress
-			true, // bubbles
-			true, // cancelable
-			window, // viewArg: should be window
-			false, // ctrlKeyArg
-			false, // altKeyArg
-			false, // shiftKeyArg
-			false, // metaKeyArg
-			40, // keyCodeArg : unsigned long the virtual key code, else 0
-			0 // charCodeArgs : unsigned long the Unicode character associated with the depressed key, else 0
-		);
-		document.dispatchEvent(keyboardEvent);
-		*/
+		window.setTimeout(function() {
+			var i;
+			var evt;
+			for (i in eventsToFire) {
+				evt = document.createEvent(eventsToFire[i]);
+				evt.initEvent(i, true, true);
+				field.get(0).dispatchEvent(evt);
+			}
+		});
 	}
+
 	/**
 	function to determine if element is visible
 	*/
