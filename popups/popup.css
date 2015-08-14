@@ -62,12 +62,6 @@ fieldset.ng-hide-add {
   -webkit-animation: zoomOut 0.3s;
   animation: zoomOut 0.3s;
 }
-premiumText {
-  display: block;
-  font-style: italic;
-  font-size: 11pt;
-  background-color: rgba(255, 153, 51, 0.5);
-}
 filelist ul,
 passwordMatches ul,
 keyFiles ul {
