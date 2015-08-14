@@ -204,10 +204,8 @@ var filler = (function() {
 		};
 
 		window.setTimeout(function() {
-			var i;
-			var evt;
-			for (i in eventsToFire) {
-				evt = document.createEvent(eventsToFire[i]);
+			for (var i in eventsToFire) {
+				var evt = document.createEvent(eventsToFire[i]);
 				evt.initEvent(i, true, true);
 				field.get(0).dispatchEvent(evt);
 			}
