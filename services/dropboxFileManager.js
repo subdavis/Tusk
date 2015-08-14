@@ -32,7 +32,6 @@ function DropboxFileManager($http, settings) {
 	}
 	var exports = {
 		key: 'dropbox',
-		premium: true,
 		routePath: '/dropbox',
 		listDatabases: listDatabasesSafe,
 		getDatabaseChoiceData: getDatabaseChoiceData,

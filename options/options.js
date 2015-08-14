@@ -56,9 +56,6 @@ keepassSettings.config(['$routeProvider', function($routeProvider) {
   }).when('/advanced', {
     templateUrl: chrome.extension.getURL('/options/partials/advanced.html'),
     controller: 'advancedController'
-  }).when('/license', {
-    templateUrl: chrome.extension.getURL('/options/partials/license.html'),
-    controller: 'licenseController'
   }).otherwise({
     redirectTo: '/startup'
   });
@@ -76,10 +73,6 @@ keepassSettings.factory('passwordFileStoreRegistry', ['googleDrivePasswordFileMa
 		dropboxFileManager, 
 		localChromePasswordFileManager, 
 		sampleDatabaseFileManager);
-}]);
-
-keepassSettings.factory('chromeWebStore', ['$http', 'settings', function($http, settings) {
-	return new ChromeWebStore($http, settings);
 }]);
 
 keepassSettings.factory('googleDrivePasswordFileManager', ['$http', '$timeout', function($http, $timeout) {
@@ -131,7 +124,6 @@ keepassSettings.controller('sampleDatabaseController', ['$scope', 'sampleDatabas
 keepassSettings.controller('fileTypeController', ['$scope', '$location', 'passwordFileStoreRegistry', FileTypeController]);
 keepassSettings.controller('docsController', ['$scope', 'googleDrivePasswordFileManager', DocsController]);
 keepassSettings.controller('chooseDropboxFileController', ['$scope', 'dropboxFileManager', ChooseDropboxFileController]);
-keepassSettings.controller('licenseController', ['$scope', 'chromeWebStore', LicenseController]);
 
 keepassSettings.directive('icon', function() {
   function link(scope, element, attrs) {
