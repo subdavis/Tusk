@@ -76,7 +76,7 @@ function DropboxFileManager($http, settings) {
 				method: 'GET', 
 				url: 'https://api.dropbox.com/1/search/auto/',
 				params: {
-					query: '.kdbx .kdb'
+					query: '.kdb'
 				},
 				headers: {
 					'Authorization': 'Bearer ' + accessToken
