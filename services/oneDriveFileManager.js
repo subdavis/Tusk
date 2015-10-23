@@ -123,6 +123,7 @@ function OneDriveFileManager ($http, $q, settings) {
 
   function revokeAuth () {
     settings.saveAccessToken(accessTokenType, null);
+    chrome.p.identity.launchWebAuthFlow({url: 'https://login.live.com/oauth20_logout.srf'});
   }
 
   return exports;
