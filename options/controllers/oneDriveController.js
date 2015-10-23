@@ -25,9 +25,13 @@ function ChooseOneDriveFileController($scope, oneDriveFileManager) {
   }
 
   $scope.deauthorize = function () {
-    oneDriveFileManager.revokeAuth();
+    $scope.busy = true;
     $scope.authorized = false;
     $scope.files = [];
+
+    oneDriveFileManager.revokeAuth().finally(function () {
+      $scope.busy = false;
+    }); 
   }
 
   function listDatabases () {

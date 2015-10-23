@@ -33,8 +33,8 @@ function OneDriveFileManager ($http, $q, settings) {
     key: 'onedrive',
     routePath: '/onedrive',
     listDatabases: listDatabases,
-    //getDatabaseChoiceData: getDatabaseChoiceData,
-    //getChosenDatabaseFile: getChosenDatabaseFile,
+    getDatabaseChoiceData: getDatabaseChoiceData,
+    getChosenDatabaseFile: getChosenDatabaseFile,
     supportedFeatures: ['listDatabases'],
     title: 'OneDrive',
     icon: 'icon-onedrive',
@@ -73,7 +73,7 @@ function OneDriveFileManager ($http, $q, settings) {
   }
 
   function listDatabases () {
-    var promise = settings.getAccessToken(accessTokenType)
+    var promise = getToken()
       .then(searchFiles)
       .then(filterFiles)
       .catch(function (response) {
@@ -87,10 +87,6 @@ function OneDriveFileManager ($http, $q, settings) {
   }
 
   function searchFiles (token) {
-    if (!token) {
-      return Promise.reject('No access token available. Did you authorize yet?');
-    }
-
     // there is no proper way of searching for file-extensions right now (?), so we search for files containing kdb and filter ourselves afterwards
     var query = encodeURIComponent('kdb');
     var filter = encodeURIComponent('file ne null');
@@ -104,9 +100,11 @@ function OneDriveFileManager ($http, $q, settings) {
     }
 
     // only return files that have a .kdb or .kdbx extension
-    return response.data.value.filter(function (file) {
+    var files = response.data.value.filter(function (file) {
       return file.name && /\.kdbx?$/.exec(file.name);
     });
+
+    return files.map(transformFile);
   }
 
   function parseAuthInfoFromUrl (url) {
@@ -121,9 +119,82 @@ function OneDriveFileManager ($http, $q, settings) {
     });
   }
 
+  function transformFile (file) {
+    var path = "";
+    if (file.parentReference) {
+      // path will be e.g. "/drive/root:/Documents"
+      path = file.parentReference.path;
+
+      // extract the part after the colon, so "/Documents"
+      var split = /:(.+)$/.exec(path);
+      if (split) {
+        path = split[1];
+      }
+
+      if (!/\/$/.exec(path)) {
+        // append trailing slash, if there was none
+        path += "/";
+      }
+    }
+
+    return {
+      url: file['@content.downloadUrl'],
+      title: path + file.name
+    }
+  }
+
+  //get the minimum information needed to identify this file for future retrieval
+  function getDatabaseChoiceData(dbInfo) {
+    return {
+      url: dbInfo.url,
+      title: dbInfo.title
+    };
+  }
+
+  //given minimal file information, retrieve the actual file
+  function getChosenDatabaseFile(dbInfo) {
+    return getToken()
+      .then(function (token) {
+        return loadFile(dbInfo, token);
+      })
+      .then(function (response) {
+        return response.data;
+      })
+      .catch(function (response) {
+        // token expired
+        if (response.status && response.status == 401) {
+          return authorize().then(function () {
+            return getChosenDatabaseFile(dbInfo);
+          });
+        }
+      });
+  }
+
+  function loadFile (dbInfo, token) {
+    var id = encodeURIComponent(dbInfo.id);
+    return $http({
+      method: 'GET',
+      url: dbInfo.url,
+      responseType: 'arraybuffer',
+      headers: {
+        Authorization: 'Bearer ' + token
+      }
+    });
+  }
+
   function revokeAuth () {
     settings.saveAccessToken(accessTokenType, null);
-    chrome.p.identity.launchWebAuthFlow({url: 'https://login.live.com/oauth20_logout.srf'});
+    var promise = chrome.p.identity.launchWebAuthFlow({url: 'https://login.live.com/oauth20_logout.srf'});
+    return $q.when(promise);
+  }
+
+  function getToken () {
+    return settings.getAccessToken(accessTokenType).then(function (token) {
+      if (!token) {
+        return Promise.reject('No access token available. Did you authorize yet?');
+      }
+      return token;
+    });
   }
 
   return exports;
