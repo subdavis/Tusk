@@ -10,7 +10,11 @@
 
 <infoMessage ng-if="busy">Loading...</infoMessage>
 
-<files ng-show="authorized">
+<infoMessage ng-if="authorized && !busy && files.length == 0">No keepass databases found</infoMessage>
+
+<files ng-show="authorized && files.length > 0">
+    These databases will be available to unlock when logging into a website...
+    <br>
     <filelist>
       <ul>
         <li ng-repeat="file in files" ng-click="selectFile(file)">

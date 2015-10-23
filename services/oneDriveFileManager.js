@@ -29,9 +29,6 @@ THE SOFTWARE.
 function OneDriveFileManager ($http, $q, settings) {
   var accessTokenType = 'onedrive';
 
-  var state = {
-    loggedIn: false
-  }
   var exports = {
     key: 'onedrive',
     routePath: '/onedrive',
@@ -44,10 +41,8 @@ function OneDriveFileManager ($http, $q, settings) {
     chooseTitle: 'OneDrive',
     chooseDescription: 'Access password files stored on OneDrive.  Files will be retrieved from OneDrive each time they are used.',
     authorize: authorize,
-    //interactiveRequestAuth: interactiveRequestAuth,
-    //revokeAuth: revokeAuth,
+    revokeAuth: revokeAuth,
     isAuthorized: isAuthorized
-    //state: state
   };
 
   function isAuthorized () {
@@ -78,27 +73,40 @@ function OneDriveFileManager ($http, $q, settings) {
   }
 
   function listDatabases () {
-    return $q.when(settings.getAccessToken(accessTokenType).then(function (token) {
-      if (!token) {
-        return Promise.reject('No access token available. Did you authorize yet?');
-      }
+    var promise = settings.getAccessToken(accessTokenType)
+      .then(searchFiles)
+      .then(filterFiles)
+      .catch(function (response) {
+        // token expired
+        if (response.status && response.status == 401) {
+          return authorize().then(listDatabases);
+        }
+      });
 
-      // there is no proper way of searching for file-extensions right now (?), so we search for files containing kdb and filter ourselves afterwards
-      var query = encodeURIComponent('kdb');
-      var filter = encodeURIComponent('file ne null');
-      var url = 'https://api.onedrive.com/v1.0/drive/root/view.search?q=' + query + '&filter=' + filter;
-      return $http({ method: 'GET', url: url, headers: { Authorization: 'Bearer ' + token }});
-    })
-    .then(function (response) {
-      if (!response.data.value) {
-        return Promise.reject('Unexpected response from OneDrive API');
-      }
+    return $q.when(promise);
+  }
 
-      // only return files that have a .kdb or .kdbx extension
-      return response.data.value.filter(function (file) {
-        return file.name && /\.kdbx?$/.exec(file.name);
-      })
-    }));
+  function searchFiles (token) {
+    if (!token) {
+      return Promise.reject('No access token available. Did you authorize yet?');
+    }
+
+    // there is no proper way of searching for file-extensions right now (?), so we search for files containing kdb and filter ourselves afterwards
+    var query = encodeURIComponent('kdb');
+    var filter = encodeURIComponent('file ne null');
+    var url = 'https://api.onedrive.com/v1.0/drive/root/view.search?q=' + query + '&filter=' + filter;
+    return $http({ method: 'GET', url: url, headers: { Authorization: 'Bearer ' + token }});
+  }
+
+  function filterFiles (response) {
+    if (!response.data.value) {
+      return Promise.reject('Unexpected response from OneDrive API');
+    }
+
+    // only return files that have a .kdb or .kdbx extension
+    return response.data.value.filter(function (file) {
+      return file.name && /\.kdbx?$/.exec(file.name);
+    });
   }
 
   function parseAuthInfoFromUrl (url) {
@@ -111,6 +119,10 @@ function OneDriveFileManager ($http, $q, settings) {
     return JSON.parse('{"' + hash.replace(/&/g, '","').replace(/=/g, '":"') + '"}', function(key, value) {
       return key === "" ? value : decodeURIComponent(value);
     });
+  }
+
+  function revokeAuth () {
+    settings.saveAccessToken(accessTokenType, null);
   }
 
   return exports;

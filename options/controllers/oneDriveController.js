@@ -17,17 +17,23 @@ function ChooseOneDriveFileController($scope, oneDriveFileManager) {
     oneDriveFileManager.authorize()
       .then(function () {
         $scope.authorized = true;
-        listDatabases();
+        return listDatabases();
       })
       .finally(function () {
         $scope.busy = false;
       });
   }
 
+  $scope.deauthorize = function () {
+    oneDriveFileManager.revokeAuth();
+    $scope.authorized = false;
+    $scope.files = [];
+  }
+
   function listDatabases () {
     $scope.busy = true;
 
-    oneDriveFileManager.listDatabases()
+    return oneDriveFileManager.listDatabases()
       .then(function (files) {
         $scope.files = files;
       })
