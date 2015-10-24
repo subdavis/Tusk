@@ -164,18 +164,22 @@ function Settings() {
   	})
   }
 
-  exports.saveDropboxToken = function(accessToken) {
-  	return chrome.p.storage.local.set({'dropboxAccessToken': accessToken});
-  }
+  exports.saveAccessToken = function(type, accessToken) {
+    var entries = {};
+    entries[type + 'AccessToken'] = accessToken;
 
-  exports.getDropboxToken = function() {
-  	return chrome.p.storage.local.get(['dropboxAccessToken']).then(function(items) {
-  		if (items.dropboxAccessToken)
-  			return items.dropboxAccessToken;
-  		else
-  			return null;
-  	})
-  }
+    return chrome.p.storage.local.set(entries);
+  };
+
+  exports.getAccessToken = function(type) {
+    var key = type + 'AccessToken';
+    return chrome.p.storage.local.get([key]).then(function(items) {
+      if (items[key])
+        return items[key];
+      else
+        return null;
+    });
+  };
 
   return exports;
 }

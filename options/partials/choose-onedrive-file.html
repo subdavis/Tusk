@@ -1,0 +1,29 @@
+
+<login ng-if="!authorized && !busy">
+    If you have already-existing KeePass (.kdbx or .kdb) files stored in your OneDrive, then you can access them.
+    <br><br>
+    Chrome will ask you to allow this extension to access your OneDrive, and OneDrive will ask you to allow this extension to read your files.
+    <br><br>
+
+    <a class="pure-button" ng-click="authorize()">Authorize</a>
+</login>
+
+<infoMessage ng-if="busy">Loading...</infoMessage>
+
+<infoMessage ng-if="authorized && !busy && files.length == 0">No keepass databases found</infoMessage>
+
+<files ng-show="authorized && files.length > 0">
+    These databases will be available to unlock when logging into a website...
+    <br>
+    <filelist>
+      <ul>
+        <li ng-repeat="file in files" ng-click="selectFile(file)">
+          {{ file.title }}
+        </li>
+      </ul>
+    </filelist>
+</files>
+
+<logout ng-if="authorized && !busy">
+    <a class="pure-button" ng-click="deauthorize()">Deauthorize</a>
+</logout>
