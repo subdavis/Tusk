@@ -27,6 +27,8 @@ THE SOFTWARE.
 "use strict";
 
 function DropboxFileManager($http, settings) {
+	var accessTokenType = 'dropbox';
+
 	var state = {
 		loggedIn: false
 	}
@@ -50,7 +52,7 @@ function DropboxFileManager($http, settings) {
 
 	//lists databases if a token is already stored
 	function listDatabasesSafe() {
-		return settings.getDropboxToken().then(function(stored_token) {
+		return settings.getAccessToken(accessTokenType).then(function(stored_token) {
 			if (stored_token) {
 				return listDatabases();
 			} else {
@@ -64,7 +66,7 @@ function DropboxFileManager($http, settings) {
 	}
 
 	function logout() {
-		return settings.saveDropboxToken(null).then(function() {
+		return settings.saveAccessToken(accessTokenType, null).then(function() {
 			state.loggedIn = false;
 		});
 	}
@@ -141,7 +143,7 @@ function DropboxFileManager($http, settings) {
 	}
 
 	function getToken() {
-		return settings.getDropboxToken().then(function(stored_token) {
+		return settings.getAccessToken(accessTokenType).then(function(stored_token) {
 			if (stored_token) {
 				state.loggedIn = true;
 				return stored_token;
@@ -174,7 +176,7 @@ function DropboxFileManager($http, settings) {
 						var uid = uidMatches[1];
 						if (checkState === randomState) {
 							state.loggedIn = true;
-							settings.saveDropboxToken(access_token).then(function() {
+							settings.saveAccessToken(accessTokenType, access_token).then(function() {
 								resolve(access_token);
 							});							
 						} else {

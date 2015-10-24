@@ -53,6 +53,9 @@ keepassSettings.config(['$routeProvider', function($routeProvider) {
   }).when('/dropbox', {
     templateUrl: chrome.extension.getURL('/options/partials/choose-dropbox-file.html'),
     controller: 'chooseDropboxFileController'
+  }).when('/onedrive', {
+    templateUrl: chrome.extension.getURL('/options/partials/choose-onedrive-file.html'),
+    controller: 'chooseOneDriveFileController'
   }).when('/advanced', {
     templateUrl: chrome.extension.getURL('/options/partials/advanced.html'),
     controller: 'advancedController'
@@ -62,17 +65,20 @@ keepassSettings.config(['$routeProvider', function($routeProvider) {
 }]);
 
 keepassSettings.factory('passwordFileStoreRegistry', ['googleDrivePasswordFileManager', 
-	'dropboxFileManager',
-	'localChromePasswordFileManager', 
-	'sampleDatabaseFileManager', 
-	function(googleDrivePasswordFileManager, 
-		dropboxFileManager, 
-		localChromePasswordFileManager, 
-		sampleDatabaseFileManager) {
-	return new PasswordFileStoreRegistry(googleDrivePasswordFileManager, 
-		dropboxFileManager, 
-		localChromePasswordFileManager, 
-		sampleDatabaseFileManager);
+  'dropboxFileManager',
+  'oneDriveFileManager',
+  'localChromePasswordFileManager', 
+  'sampleDatabaseFileManager', 
+  function(googleDrivePasswordFileManager, 
+    dropboxFileManager,
+    oneDriveFileManager,
+    localChromePasswordFileManager, 
+    sampleDatabaseFileManager) {
+  return new PasswordFileStoreRegistry(googleDrivePasswordFileManager, 
+    dropboxFileManager,
+    oneDriveFileManager,
+    localChromePasswordFileManager, 
+    sampleDatabaseFileManager);
 }]);
 
 keepassSettings.factory('googleDrivePasswordFileManager', ['$http', '$timeout', function($http, $timeout) {
@@ -85,6 +91,10 @@ keepassSettings.factory('sampleDatabaseFileManager', ['$http', function($http) {
 
 keepassSettings.factory('dropboxFileManager', ['$http', 'settings', function($http, settings) {
 	return new DropboxFileManager($http, settings);
+}]);
+
+keepassSettings.factory('oneDriveFileManager', ['$http', '$q', 'settings', function($http, $q, settings) {
+  return new OneDriveFileManager($http, $q, settings);
 }]);
 
 keepassSettings.factory('localChromePasswordFileManager', [function() {
@@ -124,6 +134,7 @@ keepassSettings.controller('sampleDatabaseController', ['$scope', 'sampleDatabas
 keepassSettings.controller('fileTypeController', ['$scope', '$location', 'passwordFileStoreRegistry', FileTypeController]);
 keepassSettings.controller('docsController', ['$scope', 'googleDrivePasswordFileManager', DocsController]);
 keepassSettings.controller('chooseDropboxFileController', ['$scope', 'dropboxFileManager', ChooseDropboxFileController]);
+keepassSettings.controller('chooseOneDriveFileController', ['$scope', 'oneDriveFileManager', ChooseOneDriveFileController]);
 
 keepassSettings.directive('icon', function() {
   function link(scope, element, attrs) {
