@@ -55,7 +55,7 @@ function OneDriveFileManager ($http, $q, settings) {
     var promise = $q.defer();
 
     var url = 'https://login.live.com/oauth20_authorize.srf' +
-              '?client_id=0000000044169A58' +
+              '?client_id=000000004817355D' +
               '&scope=' + encodeURIComponent('onedrive.readonly') +
               '&response_type=token' +
               '&redirect_uri=' + encodeURIComponent(chrome.identity.getRedirectURL('onedrive'));
