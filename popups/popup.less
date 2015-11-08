@@ -287,44 +287,6 @@ errorMessage {
   .BorderedMessage(@red-bg, 2px);
 }
 
-fileTypes {
-  display: block;
-  margin-bottom: 60px;
-
-  fileType {
-    display: block;
-    height: 70px;
-    margin: 8px;
-    padding: 8px;
-    cursor: pointer;
-    border: solid 1px fadein(@light-grey-bg, 30%);
-    background: @light-grey-bg;
-    text-align: center;
-    .BoxShadowHelper(1);
-    .transition;
-
-    &:hover {
-      .BoxShadowHelper(3);
-      background: @light-blue-bg;
-      border: solid 1px fadein(@light-blue-bg, 30%);
-
-      .icon {
-        -webkit-animation: tada 1s;
-        animation: tada 1s;
-        color: @blue-bg;
-      }
-    }
-
-    .icon {
-      display: block;
-      margin: auto;
-      width: 30px;
-      height: 30px;
-      padding-bottom: 8px;
-    }
-  }
-}
-
 drop-target {
   display: block;
   height: 127px;

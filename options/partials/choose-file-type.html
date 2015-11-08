@@ -7,8 +7,9 @@
 
     <div class="pure-u-1-4" ng-repeat="fm in fileManagers track by $index">
       <fileType ng-click="choose(fm)" ng-mouseenter="setDescription(fm)" ng-mouseleave="clearDescription()">
-        <icon p="{{fm.icon}}"></icon>
-        <span ng-bind="fm.chooseTitle"></span>
+        <icon p="{{::fm.icon}}"></icon>
+        <span ng-bind="::fm.chooseTitle"></span>
+        <span class="deprecated" ng-if="::fm.deprecated">Deprecated</span>
       </fileType>
     </div>
 

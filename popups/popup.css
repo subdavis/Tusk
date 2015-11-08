@@ -256,39 +256,6 @@ errorMessage {
   margin: 4px 0;
   color: rgba(255, 255, 255, 0.9);
 }
-fileTypes {
-  display: block;
-  margin-bottom: 60px;
-}
-fileTypes fileType {
-  display: block;
-  height: 70px;
-  margin: 8px;
-  padding: 8px;
-  cursor: pointer;
-  border: solid 1px #eeeeee;
-  background: #eeeeee;
-  text-align: center;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
-  transition: all 250ms ease 0s;
-}
-fileTypes fileType:hover {
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
-  background: rgba(0, 128, 255, 0.2);
-  border: solid 1px rgba(0, 128, 255, 0.5);
-}
-fileTypes fileType:hover .icon {
-  -webkit-animation: tada 1s;
-  animation: tada 1s;
-  color: rgba(0, 120, 231, 0.8);
-}
-fileTypes fileType .icon {
-  display: block;
-  margin: auto;
-  width: 30px;
-  height: 30px;
-  padding-bottom: 8px;
-}
 drop-target {
   display: block;
   height: 127px;
