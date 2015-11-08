@@ -215,8 +215,6 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry) {
           preventInfinite -= 1;
         }
 
-        //if (Case.constant(currentEntry.title) != "META_INFO") {
-        //meta-info items are not actual password entries
         currentEntry.group = groups.filter(function(grp) {
           return grp.id == currentEntry.groupId;
         })[0];
@@ -234,17 +232,17 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry) {
               position: salsaPosition
             }
           };
-          currentEntry.password = Base64.encode(encPassword);  //not used - just for consistency with KDBX
+          currentEntry.password = Base64.encode(encPassword);  //overwrite the unencrypted password
 
           salsaPosition += passwordBytes.byteLength;
         }
 
         if (!(currentEntry.title == 'Meta-Info' && currentEntry.userName == 'SYSTEM')
         	&& (currentEntry.groupName != 'Backup')
-        	&& (currentEntry.groupName != 'Search Results'))
+        	&& (currentEntry.groupName != 'Search Results')) {
 
           entries.push(currentEntry);
-        //}
+        }
       }
 
       return entries;
@@ -434,6 +432,10 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry) {
           } else if (childNode.nodeName == "String") {
             var key = childNode.getElementsByTagName('Key')[0].textContent;
             key = Case.camel(key);
+            if (key == "key") {
+            	//avoid name conflict when key == "key"
+            	key = "keyAlias";
+            }
             var valNode = childNode.getElementsByTagName('Value')[0];
             var val = valNode.textContent;
             var protectedVal = valNode.hasAttribute('Protected');
