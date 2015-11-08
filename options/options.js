@@ -135,6 +135,8 @@ keepassSettings.controller('fileTypeController', ['$scope', '$location', 'passwo
 keepassSettings.controller('docsController', ['$scope', 'googleDrivePasswordFileManager', DocsController]);
 keepassSettings.controller('chooseDropboxFileController', ['$scope', 'dropboxFileManager', ChooseDropboxFileController]);
 keepassSettings.controller('chooseOneDriveFileController', ['$scope', 'oneDriveFileManager', ChooseOneDriveFileController]);
+keepassSettings.controller('navController', ['$scope', '$location', NavController]);
+
 
 keepassSettings.directive('icon', function() {
   function link(scope, element, attrs) {
