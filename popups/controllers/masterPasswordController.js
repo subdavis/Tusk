@@ -39,7 +39,10 @@ function MasterPasswordController($scope, $routeParams, $location, keepass, loca
 
       if (matches.length) {
         $scope.selectedKeyFile = matches[0];
-        $scope.enterMasterPassword();
+        if ($scope.hidePassword) {
+        	//auto-login
+        	$scope.enterMasterPassword();
+        }
       }
     }
   }).then(function() {
