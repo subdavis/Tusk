@@ -40,7 +40,7 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry) {
     return new Int16Array(buffer)[0] === 256;
   })();
 
-  function getKey(h, masterPassword, fileKey) {
+  function getKey(isKdbx, masterPassword, fileKey) {
     var partPromises = [];
     var SHA = {
       name: "SHA-256"
@@ -59,7 +59,7 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry) {
     }
 
     return Promise.all(partPromises).then(function(parts) {
-      if (h.kdbx || partPromises.length > 1) {
+      if (isKdbx || partPromises.length > 1) {
         //kdbx, or kdb with fileKey + masterPassword, do the SHA a second time
         var compositeKeySource = new Uint8Array(32 * parts.length);
         for (var i = 0; i < parts.length; i++) {
@@ -71,12 +71,18 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry) {
         //kdb with just only fileKey or masterPassword (don't do a second SHA digest in this scenario)
         return partPromises[0];
       }
-
     });
   }
 
-  my.getPasswords = function(masterPassword, keyFileInfo) {
+  my.getMasterKey = function(masterPassword, keyFileInfo) {
     var fileKey = keyFileInfo ? Base64.decode(keyFileInfo.encodedKey) : null;
+    return passwordFileStoreRegistry.getChosenDatabaseFile(settings).then(function(buf) {
+      var h = keepassHeader.readHeader(buf);
+  		return getKey(h.kdbx, masterPassword, fileKey);
+  	});
+  }
+
+  my.getPasswords = function(masterKey) {
     return passwordFileStoreRegistry.getChosenDatabaseFile(settings).then(function(buf) {
       var h = keepassHeader.readHeader(buf);
       if (!h) throw new Error('Failed to read file header');
@@ -92,12 +98,7 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry) {
         iv: h.iv
       };
 
-      var compositeKeyPromise = getKey(h, masterPassword, fileKey);
-
-      return compositeKeyPromise.then(function(masterKey) {
-        //transform master key thousands of times
-        return aes_ecb_encrypt(h.transformSeed, masterKey, h.keyRounds);
-      }).then(function(finalVal) {
+      return aes_ecb_encrypt(h.transformSeed, masterKey, h.keyRounds).then(function(finalVal) {
         //do a final SHA-256 on the transformed key
         return window.crypto.subtle.digest({
           name: "SHA-256"

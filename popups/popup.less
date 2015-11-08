@@ -246,9 +246,19 @@ keyFileName {
   }
 }
 
-pageInfo, compositeKeyPart {
+pageInfo, compositeKeyPart, .compositeKeyPart {
   .BorderedMessage(@light-grey-bg, 2px);
   font-weight: 600;
+
+  &-remember {
+  	padding-top: 8px;
+  	display: block;
+
+  	& input {
+  		margin-right: 4px;
+  		margin-left: 4px;
+  	}
+  }
 }
 
 passwordMatches {

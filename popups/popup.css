@@ -192,7 +192,8 @@ keyFileName div.center {
   text-align: center;
 }
 pageInfo,
-compositeKeyPart {
+compositeKeyPart,
+.compositeKeyPart {
   background: #eeeeee;
   display: block;
   padding: 4px;
@@ -200,6 +201,18 @@ compositeKeyPart {
   margin: 4px 0;
   color: rgba(0, 0, 0, 0.9);
   font-weight: 600;
+}
+pageInfo-remember,
+compositeKeyPart-remember,
+.compositeKeyPart-remember {
+  padding-top: 8px;
+  display: block;
+}
+pageInfo-remember input,
+compositeKeyPart-remember input,
+.compositeKeyPart-remember input {
+  margin-right: 4px;
+  margin-left: 4px;
 }
 passwordMatches {
   display: block;
