@@ -221,6 +221,7 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry) {
           return grp.id == currentEntry.groupId;
         })[0];
         currentEntry.groupName = currentEntry.group.name;
+        currentEntry.keys.push('groupName');
 
         //in-memory-protect the password in the same way as on KDBX
         if (currentEntry.password) {
@@ -408,8 +409,10 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry) {
         if (entryNode.parentNode.nodeName != "History") {
           for (var m = 0; m < entryNode.parentNode.children.length; m++) {
             var groupNode = entryNode.parentNode.children[m];
-            if (groupNode.nodeName == 'Name')
+            if (groupNode.nodeName == 'Name') {
               entry.groupName = groupNode.textContent;
+              entry.keys.push('groupName')
+            }
           }
 
           if (entry.groupName != "Recycle Bin")
