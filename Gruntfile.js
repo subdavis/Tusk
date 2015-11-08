@@ -29,6 +29,7 @@ module.exports = function(grunt) {
           {expand: true, cwd: 'bower_components/json-formatter/dist/', src: 'json-formatter.min.js', dest: 'lib/'},
           {expand: true, cwd: 'bower_components/json-formatter/dist/', src: 'json-formatter.min.css', dest: 'lib/'},
           {expand: true, cwd: 'bower_components/angular/', src: 'angular.min.css', dest: 'lib/'},
+          {expand: true, cwd: 'bower_components/angular/', src: 'angular.min.js', dest: 'lib/'},
           {expand: true, cwd: 'bower_components/angular/', src: 'angular-csp.css', dest: 'lib/'},
           {expand: true, cwd: 'bower_components/angular-animate/', src: 'angular-animate.min.js', dest: 'lib/'},
           {expand: true, cwd: 'bower_components/angular-route/', src: 'angular-route.min.js', dest: 'lib/'},
