@@ -5,6 +5,8 @@ var chrome = {
   },
   runtime: {
   },
+  extension: {
+  },
   tabs: {
     query: function(query, callback) {
       callback([{id: 1}]);
@@ -65,11 +67,10 @@ describe('SecureCache on disk', function() {
       //mock success
       callback("1234sdfsdffds56");
     }
+    chrome.extension.inIncognitoContext = false;
   });
 
   it('should be ready eventually', function() {
-    //(5).should.be.exactly(5).and.be.a.Number;
-    //sinon.stub(chrome.identity, "getAuthToken");
     var cache = new SecureCacheDisk(protectedMemory, null, settings);
     var ready = cache.ready();
 
@@ -93,6 +94,21 @@ describe('SecureCache on disk', function() {
       return cache.get('key1');
     }).then(function(data) {
       data.should.equal('some data');
+    });
+  })
+
+  it('should fallback to in-memory when in incognito', function() {
+  	chrome.extension.inIncognitoContext = true;
+    mockBackgroundPage();
+    var memoryCache = new SecureCacheMemory(protectedMemory);
+
+    var cache = new SecureCacheDisk(protectedMemory, memoryCache, settings);
+    var ready = cache.ready();
+
+    return cache.save('key1', 'some data').then(function() {
+      var m = memory['secureCache.key1'];
+      m.should.not.equal('some data');
+      m.should.not.equal(undefined);
     });
   })
 

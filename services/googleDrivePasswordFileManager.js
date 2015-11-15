@@ -111,7 +111,7 @@ function GoogleDrivePasswordFileManager($http, $timeout) {
   }
 
   function listDatabases() {
-    return getPasswordFiles(true).catch(function(err) {
+    return getPasswordFiles().catch(function(err) {
       return [];
     });
   }
