@@ -116,7 +116,6 @@ function Settings() {
   }
 
   exports.saveDatabaseUsages = function(usages) {
-    //TODO: refactor usages so they can be retrived and saved individually
     return chrome.p.storage.local.set({
       'databaseUsages': usages
     });

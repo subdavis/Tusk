@@ -76,9 +76,9 @@ keepassSettings.factory('passwordFileStoreRegistry', ['googleDrivePasswordFileMa
     sampleDatabaseFileManager) {
   return new PasswordFileStoreRegistry(googleDrivePasswordFileManager, 
     dropboxFileManager,
-    oneDriveFileManager,
-    localChromePasswordFileManager, 
-    sampleDatabaseFileManager);
+    oneDriveFileManager, 
+    sampleDatabaseFileManager,
+    localChromePasswordFileManager);
 }]);
 
 keepassSettings.factory('googleDrivePasswordFileManager', ['$http', '$timeout', function($http, $timeout) {

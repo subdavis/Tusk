@@ -14,7 +14,10 @@ function ChooseFileController($scope, $location, passwordFileStoreRegistry, sett
 	      $scope.databases = $scope.databases.concat(databases);
     	}
     }).then(function() {
-      $scope.$apply();
+    	if(!$scope.$$phase) {
+    		//HACK: some providers are outside of digest
+	      $scope.$apply();
+    	}
     });
   });
 

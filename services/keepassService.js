@@ -40,7 +40,7 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry) {
     return new Int16Array(buffer)[0] === 256;
   })();
 
-  function getKey(h, masterPassword, fileKey) {
+  function getKey(isKdbx, masterPassword, fileKey) {
     var partPromises = [];
     var SHA = {
       name: "SHA-256"
@@ -59,7 +59,7 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry) {
     }
 
     return Promise.all(partPromises).then(function(parts) {
-      if (h.kdbx || partPromises.length > 1) {
+      if (isKdbx || partPromises.length > 1) {
         //kdbx, or kdb with fileKey + masterPassword, do the SHA a second time
         var compositeKeySource = new Uint8Array(32 * parts.length);
         for (var i = 0; i < parts.length; i++) {
@@ -71,12 +71,18 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry) {
         //kdb with just only fileKey or masterPassword (don't do a second SHA digest in this scenario)
         return partPromises[0];
       }
-
     });
   }
 
-  my.getPasswords = function(masterPassword, keyFileInfo) {
+  my.getMasterKey = function(masterPassword, keyFileInfo) {
     var fileKey = keyFileInfo ? Base64.decode(keyFileInfo.encodedKey) : null;
+    return passwordFileStoreRegistry.getChosenDatabaseFile(settings).then(function(buf) {
+      var h = keepassHeader.readHeader(buf);
+  		return getKey(h.kdbx, masterPassword, fileKey);
+  	});
+  }
+
+  my.getPasswords = function(masterKey) {
     return passwordFileStoreRegistry.getChosenDatabaseFile(settings).then(function(buf) {
       var h = keepassHeader.readHeader(buf);
       if (!h) throw new Error('Failed to read file header');
@@ -92,12 +98,7 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry) {
         iv: h.iv
       };
 
-      var compositeKeyPromise = getKey(h, masterPassword, fileKey);
-
-      return compositeKeyPromise.then(function(masterKey) {
-        //transform master key thousands of times
-        return aes_ecb_encrypt(h.transformSeed, masterKey, h.keyRounds);
-      }).then(function(finalVal) {
+      return aes_ecb_encrypt(h.transformSeed, masterKey, h.keyRounds).then(function(finalVal) {
         //do a final SHA-256 on the transformed key
         return window.crypto.subtle.digest({
           name: "SHA-256"
@@ -214,12 +215,11 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry) {
           preventInfinite -= 1;
         }
 
-        //if (Case.constant(currentEntry.title) != "META_INFO") {
-        //meta-info items are not actual password entries
         currentEntry.group = groups.filter(function(grp) {
           return grp.id == currentEntry.groupId;
         })[0];
         currentEntry.groupName = currentEntry.group.name;
+        currentEntry.keys.push('groupName');
 
         //in-memory-protect the password in the same way as on KDBX
         if (currentEntry.password) {
@@ -232,17 +232,17 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry) {
               position: salsaPosition
             }
           };
-          currentEntry.password = Base64.encode(encPassword);  //not used - just for consistency with KDBX
+          currentEntry.password = Base64.encode(encPassword);  //overwrite the unencrypted password
 
           salsaPosition += passwordBytes.byteLength;
         }
 
         if (!(currentEntry.title == 'Meta-Info' && currentEntry.userName == 'SYSTEM')
         	&& (currentEntry.groupName != 'Backup')
-        	&& (currentEntry.groupName != 'Search Results'))
+        	&& (currentEntry.groupName != 'Search Results')) {
 
           entries.push(currentEntry);
-        //}
+        }
       }
 
       return entries;
@@ -407,8 +407,10 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry) {
         if (entryNode.parentNode.nodeName != "History") {
           for (var m = 0; m < entryNode.parentNode.children.length; m++) {
             var groupNode = entryNode.parentNode.children[m];
-            if (groupNode.nodeName == 'Name')
+            if (groupNode.nodeName == 'Name') {
               entry.groupName = groupNode.textContent;
+              entry.keys.push('groupName')
+            }
           }
 
           if (entry.groupName != "Recycle Bin")
@@ -430,6 +432,10 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry) {
           } else if (childNode.nodeName == "String") {
             var key = childNode.getElementsByTagName('Key')[0].textContent;
             key = Case.camel(key);
+            if (key == "key") {
+            	//avoid name conflict when key == "key"
+            	key = "keyAlias";
+            }
             var valNode = childNode.getElementsByTagName('Value')[0];
             var val = valNode.textContent;
             var protectedVal = valNode.hasAttribute('Protected');

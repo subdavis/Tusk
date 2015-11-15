@@ -192,7 +192,8 @@ keyFileName div.center {
   text-align: center;
 }
 pageInfo,
-compositeKeyPart {
+compositeKeyPart,
+.compositeKeyPart {
   background: #eeeeee;
   display: block;
   padding: 4px;
@@ -200,6 +201,18 @@ compositeKeyPart {
   margin: 4px 0;
   color: rgba(0, 0, 0, 0.9);
   font-weight: 600;
+}
+pageInfo-remember,
+compositeKeyPart-remember,
+.compositeKeyPart-remember {
+  padding-top: 8px;
+  display: block;
+}
+pageInfo-remember input,
+compositeKeyPart-remember input,
+.compositeKeyPart-remember input {
+  margin-right: 4px;
+  margin-left: 4px;
 }
 passwordMatches {
   display: block;
@@ -242,39 +255,6 @@ errorMessage {
   border: solid 2px #8b1515;
   margin: 4px 0;
   color: rgba(255, 255, 255, 0.9);
-}
-fileTypes {
-  display: block;
-  margin-bottom: 60px;
-}
-fileTypes fileType {
-  display: block;
-  height: 70px;
-  margin: 8px;
-  padding: 8px;
-  cursor: pointer;
-  border: solid 1px #eeeeee;
-  background: #eeeeee;
-  text-align: center;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
-  transition: all 250ms ease 0s;
-}
-fileTypes fileType:hover {
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
-  background: rgba(0, 128, 255, 0.2);
-  border: solid 1px rgba(0, 128, 255, 0.5);
-}
-fileTypes fileType:hover .icon {
-  -webkit-animation: tada 1s;
-  animation: tada 1s;
-  color: rgba(0, 120, 231, 0.8);
-}
-fileTypes fileType .icon {
-  display: block;
-  margin: auto;
-  width: 30px;
-  height: 30px;
-  padding-bottom: 8px;
 }
 drop-target {
   display: block;
@@ -363,4 +343,42 @@ table.fixed th.json .json-formatter-row {
 table.fixed td.action,
 table.fixed th.action {
   width: 100px;
+}
+fileTypes {
+  display: block;
+  margin-bottom: 60px;
+}
+fileTypes fileType {
+  display: block;
+  height: 70px;
+  margin: 8px;
+  padding: 8px;
+  cursor: pointer;
+  border: solid 1px #eeeeee;
+  background: #eeeeee;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  transition: all 250ms ease 0s;
+}
+fileTypes fileType:hover {
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+  background: rgba(0, 128, 255, 0.2);
+  border: solid 1px rgba(0, 128, 255, 0.5);
+}
+fileTypes fileType:hover .icon {
+  -webkit-animation: tada 1s;
+  animation: tada 1s;
+  color: rgba(0, 120, 231, 0.8);
+}
+fileTypes fileType .icon {
+  display: block;
+  margin: auto;
+  width: 30px;
+  height: 30px;
+  padding-bottom: 8px;
+}
+fileTypes fileType .deprecated {
+  color: rgba(204, 102, 0, 0.5);
+  font-size: smaller;
+  font-weight: 700;
 }

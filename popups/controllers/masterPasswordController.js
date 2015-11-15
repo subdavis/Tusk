@@ -8,6 +8,7 @@ function MasterPasswordController($scope, $routeParams, $location, keepass, loca
   $scope.selectedKeyFile = null;
   $scope.unlockedState = unlockedState;
   $scope.os = {};
+  var passwordKey;
 
   chrome.runtime.getPlatformInfo(function(info) {
     $scope.$apply(function() {
@@ -23,20 +24,26 @@ function MasterPasswordController($scope, $routeParams, $location, keepass, loca
     //tweak UI based on what we know about the database file
     $scope.hidePassword = (usage.requiresPassword === false);
     $scope.hideKeyFile = (usage.requiresKeyfile === false);
+    passwordKey = usage.passwordKey ? Base64.decode(usage.passwordKey): undefined;
+    $scope.rememberedPassword = !!passwordKey;
+    $scope.rememberPassword = $scope.rememberedPassword;
 
-    if (usage.keyFileName) {
+    if ($scope.rememberedPassword) {
+    	// remembered password - autologin
+    	$scope.enterMasterPassword()
+    } else if (usage.keyFileName) {
+    	// get matched key file
       var matches = $scope.keyFiles.filter(function(keyFile) {
         return keyFile.name == usage.keyFileName;
       })
 
       if (matches.length) {
         $scope.selectedKeyFile = matches[0];
+        if ($scope.hidePassword) {
+        	//auto-login
+        	$scope.enterMasterPassword();
+        }
       }
-    }
-
-    if ($scope.hidePassword && $scope.selectedKeyFile) {
-      //key file selected and we have a file key already - auto-unlock
-      $scope.enterMasterPassword();
     }
   }).then(function() {
     $scope.$apply();
@@ -61,6 +68,20 @@ function MasterPasswordController($scope, $routeParams, $location, keepass, loca
     secureCache.clear('streamKey');
   });
 
+  $scope.forgetPassword = function() {
+ 		localStorage.saveCurrentDatabaseUsage({
+      
+    }).then(function() {
+			secureCache.clear('entries');
+			secureCache.clear('streamKey');
+    	$scope.rememberedPassword = false;
+    	$scope.rememberPassword = false;
+    	passwordKey = undefined;
+			unlockedState.clearBackgroundState();
+    	$scope.$apply();
+    }); 	
+  }
+
   //go to the options page to manage key files
   $scope.manageKeyFiles = function() {
     optionsLink.go();
@@ -77,11 +98,22 @@ function MasterPasswordController($scope, $routeParams, $location, keepass, loca
     $scope.clearMessages();
     $scope.busy = true;
 
-    keepass.getPasswords($scope.masterPassword, $scope.selectedKeyFile).then(function(entries) {
+    var passwordKeyPromise;
+    if (!passwordKey) {
+    	passwordKeyPromise = keepass.getMasterKey($scope.masterPassword, $scope.selectedKeyFile)
+    } else {
+			passwordKeyPromise = Promise.resolve(passwordKey);
+		}
+
+		passwordKeyPromise.then(function(newPasswordKey) {
+			passwordKey = newPasswordKey;
+			return keepass.getPasswords(passwordKey);
+		}).then(function(entries) {
       //remember usage for next time:
       localStorage.saveCurrentDatabaseUsage({
         requiresPassword: $scope.masterPassword ? true : false,
         requiresKeyfile: $scope.selectedKeyFile ? true : false,
+        passwordKey: $scope.rememberPassword ? Base64.encode(passwordKey) : undefined,
         keyFileName: $scope.selectedKeyFile ? $scope.selectedKeyFile.name : ""
       });
 

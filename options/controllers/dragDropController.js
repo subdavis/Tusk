@@ -2,10 +2,15 @@
 
 function DragDropController($scope, localChromePasswordFileManager) {
   $scope.files = [];
+  $scope.acknowledgedLimitations = false;
 
   $scope.selectFile = function() {
     document.getElementById('file').click();
   };
+
+  $scope.acknowledgeLimitations = function() {
+  	$scope.acknowledgedLimitations = true;
+  }
 
   $scope.handleDrop = function(filePromises) {
     $scope.errorMessage = "";
