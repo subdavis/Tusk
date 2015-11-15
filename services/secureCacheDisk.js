@@ -50,40 +50,47 @@ function SecureCacheDisk(protectedMemory, secureCacheMemory, settings) {
   };
   var salt = new Uint8Array([0xC9, 0x04, 0xF5, 0x6B, 0xCE, 0x60, 0x66, 0x24, 0xE5, 0xAA, 0xA3, 0x60, 0xDD, 0x8E, 0xDD, 0xE8]);
 
-  var tokenPromise = new Promise(function(resolve, reject) {
-    settings.getDiskCacheFlag().then(function(enabled) {
-      if (!enabled) {
-        reject(new Error('Disk cache is not enabled'));
-        return;
-      }
+  function getTokenPromise() {
+	  return new Promise(function(resolve, reject) {
+	    settings.getDiskCacheFlag().then(function(enabled) {
+	      if (!enabled) {
+	        reject(new Error('Disk cache is not enabled'));
+	        return;
+	      }
 
-      chrome.identity.getAuthToken({interactive: false}, function(token) {
-        if (token) {
-          var encoder = new TextEncoder();
-          var tokenBytes = encoder.encode(token);
+	      if (chrome.extension.inIncognitoContext) {
+	        reject(new Error('Secure cache cannot work in incognito mode'));
+	      	return;
+	      }
 
-          //try PBKDF2 if available:
-          window.crypto.subtle.importKey("raw", tokenBytes, {name: "PBKDF2"}, false, ["deriveKey"]).then(function(key){
-						var wantedKeyType = {"name": "PBKDF2",salt: salt,iterations: 100000,hash: {name: "SHA-256"}};
-						var wantedEncryptType = {name: "AES-CBC", length: 256};
-						return window.crypto.subtle.deriveKey(wantedKeyType, key, wantedEncryptType, false, ["encrypt", "decrypt"]);
-					}).catch(function(err) {
-						//fallback to SHA-256 hash if PBKDF2 not supported (ChromeOS, why???)
-						return window.crypto.subtle.digest({name: 'SHA-256'}, tokenBytes).then(function(hash) {		
-	           	return window.crypto.subtle.importKey("raw", hash, AES, false, ['encrypt', 'decrypt']);		
-          	});
-					}).then(function(aesKey) {
-						resolve(aesKey);
-					});
-        } else {
-          reject(new Error('Failed to get a 3rd party secret, cache not possible.'));
-        }
-      });
-    });
-  });
+	      chrome.identity.getAuthToken({interactive: false}, function(token) {
+	        if (token) {
+	          var encoder = new TextEncoder();
+	          var tokenBytes = encoder.encode(token);
+
+	          //try PBKDF2 if available:
+	          window.crypto.subtle.importKey("raw", tokenBytes, {name: "PBKDF2"}, false, ["deriveKey"]).then(function(key){
+							var wantedKeyType = {"name": "PBKDF2",salt: salt,iterations: 100000,hash: {name: "SHA-256"}};
+							var wantedEncryptType = {name: "AES-CBC", length: 256};
+							return window.crypto.subtle.deriveKey(wantedKeyType, key, wantedEncryptType, false, ["encrypt", "decrypt"]);
+						}).catch(function(err) {
+							//fallback to SHA-256 hash if PBKDF2 not supported (ChromeOS, why???)
+							return window.crypto.subtle.digest({name: 'SHA-256'}, tokenBytes).then(function(hash) {		
+		           	return window.crypto.subtle.importKey("raw", hash, AES, false, ['encrypt', 'decrypt']);		
+	          	});
+						}).then(function(aesKey) {
+							resolve(aesKey);
+						});
+	        } else {
+	          reject(new Error('Failed to get a 3rd party secret, cache not possible.'));
+	        }
+	      });
+	    });
+	  });
+  }
 
   exports.ready = function() {
-    return tokenPromise.then(function() {
+    return getTokenPromise().then(function() {
       return true;
     }).catch(function(err) {
       //can still use memory
@@ -99,7 +106,7 @@ function SecureCacheDisk(protectedMemory, secureCacheMemory, settings) {
     key = 'secureCache.' + key;
     var preppedData = protectedMemory.serialize(data);
     return new Promise(function(resolve, reject) {
-      tokenPromise.then(function(aesKey) {
+      getTokenPromise().then(function(aesKey) {
         var encoder = new TextEncoder();
         return window.crypto.subtle.encrypt(AES, aesKey, encoder.encode(preppedData));
       }).then(function(encData) {
@@ -127,7 +134,7 @@ function SecureCacheDisk(protectedMemory, secureCacheMemory, settings) {
       chrome.storage.local.get(key, function(encSerializedData) {
         var encData = protectedMemory.hydrate(encSerializedData[key]);
 
-        tokenPromise.then(function(aesKey) {
+        getTokenPromise().then(function(aesKey) {
           return window.crypto.subtle.decrypt(AES, aesKey, encData).then(function(decryptedBytes) {
             var decoder = new TextDecoder();
             var serialized = decoder.decode(new Uint8Array(decryptedBytes));

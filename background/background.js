@@ -131,7 +131,8 @@ THE SOFTWARE.
     if (message.m == "autofill") {
       chrome.tabs.executeScript(message.tabId, {
         file: "keepass.js",
-        allFrames: true
+        allFrames: true,
+        runAt: "document_start"
       }, function(result) {
         //script injected
         chrome.tabs.sendMessage(message.tabId, {

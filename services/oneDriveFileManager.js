@@ -80,6 +80,8 @@ function OneDriveFileManager ($http, $q, settings) {
         // token expired
         if (response.status && response.status == 401) {
           return authorize().then(listDatabases);
+        } else {
+        	return [];
         }
       });
 
