@@ -106,8 +106,12 @@ keepassApp.factory('keepassHeader', [function() {
   return new KeepassHeader(pako, localStorage);
 }]);
 
-keepassApp.factory('keepass', ['keepassHeader', 'pako', 'settings', 'passwordFileStoreRegistry', function(keepassHeader, pako, settings, passwordFileStoreRegistry) {
-	return new Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry);
+keepassApp.factory('keepassReference', [function() {
+  return new KeepassReference();
+}]);
+
+keepassApp.factory('keepass', ['keepassHeader', 'pako', 'settings', 'passwordFileStoreRegistry', 'keepassReference', function(keepassHeader, pako, settings, passwordFileStoreRegistry, keepassReference) {
+	return new Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry, keepassReference);
 }]);
 
 keepassApp.factory('unlockedState', ['$interval', '$location', 'keepass', 'protectedMemory', function($interval, $location, keepass, protectedMemory) {

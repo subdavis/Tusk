@@ -29,7 +29,7 @@ THE SOFTWARE.
 /**
  * Service for opening keepass files
  */
-function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry) {
+function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry, keepassReference) {
   var my = {
 
   };
@@ -166,6 +166,20 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry) {
           var entries = parseKdb(decryptedData, h);
           return entries;
         }
+      }).then(function(entries) {
+      	//process references
+      	entries.forEach(function(entry) {
+      		if (entry.keys) {
+	      		entry.keys.forEach(function(key) {
+	      			var fieldRefs = keepassReference.hasReferences(entry[key]);
+	      			if (fieldRefs) {
+	      				entry[key] = keepassReference.processAllReferences(entry[key], entry, entries)
+	      			}
+	      		});
+      		}
+      	})
+
+      	return entries;
       });
     });
   }
@@ -366,7 +380,7 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry) {
   /**
    * Returns the decrypted data from a protected element of a KDBX entry
    */
-  function getDecryptedEntry(protectedData, streamKey) {
+  function getDecryptedEntry(protectedData, streamKey, entries) {
   	if (protectedData === undefined) return "";  //can happen with entries with no password
 
     var iv = [0xE8, 0x30, 0x09, 0x4B, 0x97, 0x20, 0x5D, 0x2A];
@@ -375,7 +389,18 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry) {
 
     salsa.getBytes(protectedData.position);
     var decryptedBytes = new Uint8Array(salsa.decrypt(protectedData.data));
-    return decoder.decode(decryptedBytes);
+    var result = decoder.decode(decryptedBytes);
+
+    if (keepassReference.hasReferences(result)) {
+    	//the decrypted entry is actually a reference to another field
+    	result = keepassReference.resolveProtectedReference(result, entries);
+    	if (result.position !== undefined && result.data) {
+    		//the other field is also protected data
+    		return getDecryptedEntry(result, streamKey);
+    	}
+    }
+
+    return result;
   }
   my.getDecryptedEntry = getDecryptedEntry; //expose the function
 
