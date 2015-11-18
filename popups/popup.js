@@ -110,8 +110,8 @@ keepassApp.factory('keepass', ['keepassHeader', 'pako', 'settings', 'passwordFil
 	return new Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry);
 }]);
 
-keepassApp.factory('unlockedState', ['$interval', '$location', 'keepass', 'protectedMemory', function($interval, $location, keepass, protectedMemory) {
-  return new UnlockedState($interval, $location, keepass, protectedMemory);
+keepassApp.factory('unlockedState', ['$interval', '$location', 'keepass', 'protectedMemory', 'settings', function($interval, $location, keepass, protectedMemory, settings) {
+  return new UnlockedState($interval, $location, keepass, protectedMemory, settings);
 }]);
 
 keepassApp.factory('secureCacheMemory', ['protectedMemory', function(protectedMemory) {

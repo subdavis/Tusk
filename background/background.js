@@ -32,135 +32,184 @@ THE SOFTWARE.
 */
 
 (function(protectedMemory, settings) {
-  if (chrome.extension.inIncognitoContext) {
-    doReplaceRules();
-  } else {
-    chrome.runtime.onInstalled.addListener(doReplaceRules);
-    chrome.runtime.onInstalled.addListener(settings.upgrade);
-  }
+	if (chrome.extension.inIncognitoContext) {
+		doReplaceRules();
+	} else {
+		chrome.runtime.onInstalled.addListener(doReplaceRules);
+		chrome.runtime.onInstalled.addListener(settings.upgrade);
+		chrome.runtime.onStartup.addListener(forgetStuff)
+	}
 
-  function doReplaceRules() {
-    chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
-      var passwordField = {
-        id: "pwdField",
-        conditions: [
-          new chrome.declarativeContent.PageStateMatcher({
-            css: ["input[type='password']"]
-          })
-        ],
-        actions: [
-          new chrome.declarativeContent.ShowPageAction()
-          //new chrome.declarativeContent.RequestContentScript({js: ['keepass.js']})
-        ]
-      };
-      var textField = {
-        id: "textField",
-        conditions: [
-          new chrome.declarativeContent.PageStateMatcher({
-            css: ["input[type='text'], input[type='email'], input:not([type])" ]
-          })
-        ],
-        actions: [
-          new chrome.declarativeContent.ShowPageAction()
-        ]
-      };
-      var iframeLogin = {
-        id: "iframeLogin",
-        conditions: [
-        new chrome.declarativeContent.PageStateMatcher({
-          css: ["iframe[src^='https']"]
-        })
-        ],
-        actions: [
-        new chrome.declarativeContent.ShowPageAction()
-        ]
-      };
-      chrome.declarativeContent.onPageChanged.addRules([passwordField, textField, iframeLogin]);
-    });
-  }
+	function doReplaceRules() {
+		chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
+			var passwordField = {
+				id: "pwdField",
+				conditions: [
+					new chrome.declarativeContent.PageStateMatcher({
+						css: ["input[type='password']"]
+					})
+				],
+				actions: [
+					new chrome.declarativeContent.ShowPageAction()
+					//new chrome.declarativeContent.RequestContentScript({js: ['keepass.js']})
+				]
+			};
+			var textField = {
+				id: "textField",
+				conditions: [
+					new chrome.declarativeContent.PageStateMatcher({
+						css: ["input[type='text'], input[type='email'], input:not([type])"]
+					})
+				],
+				actions: [
+					new chrome.declarativeContent.ShowPageAction()
+				]
+			};
+			var iframeLogin = {
+				id: "iframeLogin",
+				conditions: [
+					new chrome.declarativeContent.PageStateMatcher({
+						css: ["iframe[src^='https']"]
+					})
+				],
+				actions: [
+					new chrome.declarativeContent.ShowPageAction()
+				]
+			};
+			chrome.declarativeContent.onPageChanged.addRules([passwordField, textField, iframeLogin]);
+		});
+	}
 
-  //keep saved state for the popup for as long as we are alive (not long):
-  chrome.runtime.onConnect.addListener(function(port) {
-    //communicate state on this pipe.  each named port gets its own state.
-    port.onMessage.addListener(function(msg) {
-      if (!msg) return;
-      switch(msg.action) {
-        case 'clear':
-          protectedMemory.clearData();
-          break;
-        case 'save':
-          protectedMemory.setData(msg.key, msg.value);
-          break;
-        case 'get':
-          protectedMemory.getData(msg.key).then(function(value) {
-            port.postMessage(value);
-          });
-          break;
-        default:
-          throw new Error('unrecognized action ' + obj.action)
-          break;
-      }
-    });
+	//keep saved state for the popup for as long as we are alive (not long):
+	chrome.runtime.onConnect.addListener(function(port) {
+		//communicate state on this pipe.  each named port gets its own state.
+		port.onMessage.addListener(function(msg) {
+			if (!msg) return;
+			switch (msg.action) {
+				case 'clear':
+					protectedMemory.clearData();
+					break;
+				case 'save':
+					protectedMemory.setData(msg.key, msg.value);
+					break;
+				case 'get':
+					protectedMemory.getData(msg.key).then(function(value) {
+						port.postMessage(value);
+					});
+					break;
+				default:
+					throw new Error('unrecognized action ' + obj.action)
+					break;
+			}
+		});
 
-    port.onDisconnect.addListener(function() {
-      //uncomment below to forget the state when the popup closes
-      //protectedMemory.clearData();
-    })
-  });
+		port.onDisconnect.addListener(function() {
+			//uncomment below to forget the state when the popup closes
+			//protectedMemory.clearData();
+		})
+	});
 
-  function handleMessage(message, sender, sendResponse) {
-    if (!message || !message.m) return; //message format unrecognized
+	function handleMessage(message, sender, sendResponse) {
+		if (!message || !message.m) return; //message format unrecognized
 
-    if (message.m == "requestPermission") {
-      //better to do the request here on the background, because on some platforms
-      //the popup may close prematurely when requesting access
-      chrome.permissions.contains(message.perms, function(alreadyGranted) {
-        if (chrome.runtime.lastError || (alreadyGranted && message.then)) {
-          handleMessage(message.then, sender, sendResponse);
-        } else {
-          //request
-          chrome.permissions.request(message.perms, function(granted) {
-            if (granted && message.then) {
-              handleMessage(message.then, sender, sendResponse);
-            }
-          });
-        }
-      });
-    }
+		if (message.m == "requestPermission") {
+			//better to do the request here on the background, because on some platforms
+			//the popup may close prematurely when requesting access
+			chrome.permissions.contains(message.perms, function(alreadyGranted) {
+				if (chrome.runtime.lastError || (alreadyGranted && message.then)) {
+					handleMessage(message.then, sender, sendResponse);
+				} else {
+					//request
+					chrome.permissions.request(message.perms, function(granted) {
+						if (granted && message.then) {
+							handleMessage(message.then, sender, sendResponse);
+						}
+					});
+				}
+			});
+		}
 
-    if (message.m == "autofill") {
-      chrome.tabs.executeScript(message.tabId, {
-        file: "keepass.js",
-        allFrames: true,
-        runAt: "document_start"
-      }, function(result) {
-        //script injected
-        chrome.tabs.sendMessage(message.tabId, {
-          m: "fillPassword",
-          u: message.u,
-          p: message.p,
-          o: message.o
-        });
-      });
-    }
-  }
+		if (message.m == "autofill") {
+			chrome.tabs.executeScript(message.tabId, {
+				file: "keepass.js",
+				allFrames: true,
+				runAt: "document_start"
+			}, function(result) {
+				//script injected
+				chrome.tabs.sendMessage(message.tabId, {
+					m: "fillPassword",
+					u: message.u,
+					p: message.p,
+					o: message.o
+				});
+			});
+		}
+	}
 
-  //listen for "autofill" message:
-  chrome.runtime.onMessage.addListener(handleMessage);
+	//listen for "autofill" message:
+	chrome.runtime.onMessage.addListener(handleMessage);
 
-  //listen for "clear clipboard" alarm:
-  chrome.alarms.onAlarm.addListener(function(alarm) {
-    if (alarm.name == "clearClipboard") {
-      //clear the clipboard on timer
-      var clearClipboard = function(e) {
-        e.clipboardData.setData('text/plain', "");
-        e.preventDefault();
-        document.removeEventListener('copy', clearClipboard); //don't listen anymore
-      }
+	chrome.alarms.create("forgetStuff", {
+		delayInMinutes: 1,
+		periodInMinutes: 10
+	});
 
-      document.addEventListener('copy', clearClipboard);
-      document.execCommand('copy');
-    }
-  });
+	chrome.alarms.onAlarm.addListener(function(alarm) {
+		if (alarm.name == 'forgetStuff') {
+			forgetStuff()
+		}
+	});
+
+	function forgetStuff() {
+		settings.getAllForgetTimes().then(function(allTimes) {
+			let now = Date.now();
+			let forgottenKeys = [];
+			for (let key in allTimes) {
+				if (allTimes[key] < now) {
+					forgottenKeys.push(key);
+					switch (key) {
+						case 'clearClipboard':
+							clearClipboard();
+							chrome.notifications.create({
+								'type': 'basic',
+								'iconUrl': 'assets/icons/logo_48.png',
+								'title': 'CKP',
+								'message': 'Clipboard cleared'
+							})
+							break;
+						case 'forgetPassword':
+							chrome.notifications.create({
+								'type': 'basic',
+								'iconUrl': 'assets/icons/logo_48.png',
+								'title': 'CKP',
+								'message': 'Remembered password expired'
+							})
+							forgetPassword();
+							break;
+						default:
+							console.log('unrecognized forget key', key);
+					}
+				}
+			}
+
+			//remove stuff
+			settings.clearForgetTimes(forgottenKeys);
+		});
+	}
+
+	function clearClipboard() {
+		var clearClipboard = function(e) {
+			e.clipboardData.setData('text/plain', "");
+			e.preventDefault();
+			document.removeEventListener('copy', clearClipboard); //don't listen anymore
+		}
+
+		document.addEventListener('copy', clearClipboard);
+		document.execCommand('copy');
+	}
+
+	function forgetPassword() {
+		//TODO
+	}
 
 })(new ProtectedMemory(), new Settings());

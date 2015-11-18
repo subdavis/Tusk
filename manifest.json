@@ -55,7 +55,8 @@
 		"clipboardWrite",
 		"identity",
 		"declarativeContent",
-		"alarms"
+		"alarms",
+		"notifications"
 	],
 	"optional_permissions": [
 		"https://*/",
