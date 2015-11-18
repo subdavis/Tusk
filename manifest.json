@@ -1,7 +1,7 @@
 {
 	"name": "CKP - KeePass integration for Chrome™",
 	"short_name": "CKP Extension",
-	"version": "2015.11.8",
+	"version": "2015.11.15",
 	"manifest_version": 2,
 	"minimum_chrome_version": "42",
 
@@ -55,7 +55,8 @@
 		"clipboardWrite",
 		"identity",
 		"declarativeContent",
-		"alarms"
+		"alarms",
+		"notifications"
 	],
 	"optional_permissions": [
 		"https://*/",
