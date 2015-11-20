@@ -245,5 +245,36 @@ function Settings() {
 		});
 	}
 
+  /**
+   * Saves information about how the database was opened, so we can optimize the
+   * UI next time by hiding the irrelevant options and remembering the keyfile
+   */
+  exports.saveCurrentDatabaseUsage = function(usage) {
+    return exports.getCurrentDatabaseChoice().then(function(info) {
+      return exports.getDatabaseUsages().then(function(usages) {
+        var key = info.passwordFile.title + "__" + info.providerKey;
+        usages[key] = usage;
+
+        return exports.saveDatabaseUsages(usages);
+      });
+    });
+  }
+
+  /**
+   * Retrieves information about how the database was opened, so we can optimize the
+   * UI by hiding the irrelevant options and remembering the keyfile
+   */
+  exports.getCurrentDatabaseUsage = function() {
+    return exports.getCurrentDatabaseChoice().then(function(info) {
+      return exports.getDatabaseUsages().then(function(usages) {
+        var key = info.passwordFile.title + "__" + info.providerKey;
+        var usage = usages[key] || {};
+
+        return usage;
+      });
+    })
+  }
+
+
 	return exports;
 }

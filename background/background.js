@@ -156,7 +156,13 @@ THE SOFTWARE.
 
 	chrome.alarms.onAlarm.addListener(function(alarm) {
 		if (alarm.name == 'forgetStuff') {
-			forgetStuff()
+			forgetStuff();
+			return;
+		}
+
+		let notificationClear = alarm.name.match(/^clearNotification-(.*)$/)
+		if (notificationClear.length == 2) {
+			chrome.notifications.clear(notificationClear[1])
 		}
 	});
 
@@ -175,19 +181,27 @@ THE SOFTWARE.
 								'iconUrl': 'assets/icons/logo_48.png',
 								'title': 'CKP',
 								'message': 'Clipboard cleared'
+							}, function(notificationId) {
+								setTimeout(function() {
+									chrome.notifications.clear(notificationId);
+								}, 2000);
 							})
 							break;
 						case 'forgetPassword':
-							chrome.notifications.create({
-								'type': 'basic',
-								'iconUrl': 'assets/icons/logo_48.png',
-								'title': 'CKP',
-								'message': 'Remembered password expired'
+							forgetPassword().then(function() {
+								chrome.notifications.create({
+									'type': 'basic',
+									'iconUrl': 'assets/icons/logo_48.png',
+									'title': 'CKP',
+									'message': 'Remembered password expired'
+								}, function(notificationId) {
+									chrome.alarms.create('clearNotification-'+notificationId, {
+										delayInMinutes: 1
+									});
+								})
 							})
-							forgetPassword();
+							
 							break;
-						default:
-							console.log('unrecognized forget key', key);
 					}
 				}
 			}
@@ -209,7 +223,7 @@ THE SOFTWARE.
 	}
 
 	function forgetPassword() {
-		//TODO
+		return settings.saveCurrentDatabaseUsage({});
 	}
 
 })(new ProtectedMemory(), new Settings());
