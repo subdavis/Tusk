@@ -121,7 +121,7 @@ function MasterPasswordController($scope, $routeParams, $location, keepass, unlo
       });
 
       if ($scope.rememberPeriod) {
-      	settings.setForgetTime('forgetPassword', (Date.now() + (600*$scope.rememberPeriod)))
+      	settings.setForgetTime('forgetPassword', (Date.now() + (60000*$scope.rememberPeriod)))
       } else {
       	//don't clear passwords
       	settings.clearForgetTimes(['forgetPassword']);
