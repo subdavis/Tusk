@@ -160,7 +160,7 @@ THE SOFTWARE.
 			return;
 		}
 
-		let notificationClear = alarm.name.match(/^clearNotification-(.*)$/)
+		var notificationClear = alarm.name.match(/^clearNotification-(.*)$/)
 		if (notificationClear.length == 2) {
 			chrome.notifications.clear(notificationClear[1])
 		}
@@ -168,9 +168,9 @@ THE SOFTWARE.
 
 	function forgetStuff() {
 		settings.getAllForgetTimes().then(function(allTimes) {
-			let now = Date.now();
-			let forgottenKeys = [];
-			for (let key in allTimes) {
+			var now = Date.now();
+			var forgottenKeys = [];
+			for (var key in allTimes) {
 				if (allTimes[key] < now) {
 					forgottenKeys.push(key);
 					switch (key) {

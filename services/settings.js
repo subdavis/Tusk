@@ -190,9 +190,9 @@ function Settings() {
 	 * Sets a time to forget something
 	 */
 	exports.setForgetTime = function(key, time) {
-		let storageKey = 'forgetTimes';
+		var storageKey = 'forgetTimes';
 		return chrome.p.storage.local.get(storageKey).then(function(items) {
-			let forgetTimes = {}
+			var forgetTimes = {}
 			if (items[storageKey]) {
 				forgetTimes = items[storageKey];
 			}
@@ -205,9 +205,9 @@ function Settings() {
 	}
 
 	exports.getForgetTime = function(key) {
-		let storageKey = 'forgetTimes';
+		var storageKey = 'forgetTimes';
 		return chrome.p.storage.local.get(storageKey).then(function(items) {
-			let forgetTimes = {}
+			var forgetTimes = {}
 			if (items[storageKey]) {
 				forgetTimes = items[storageKey];
 			}
@@ -217,9 +217,9 @@ function Settings() {
 	}
 
 	exports.getAllForgetTimes = function() {
-		let storageKey = 'forgetTimes';
+		var storageKey = 'forgetTimes';
 		return chrome.p.storage.local.get(storageKey).then(function(items) {
-			let forgetTimes = {}
+			var forgetTimes = {}
 			if (items[storageKey]) {
 				forgetTimes = items[storageKey];
 			}
@@ -229,9 +229,9 @@ function Settings() {
 	}
 
 	exports.clearForgetTimes = function(keysArray) {
-		let storageKey = 'forgetTimes';
+		var storageKey = 'forgetTimes';
 		return chrome.p.storage.local.get(storageKey).then(function(items) {
-			let forgetTimes = {}
+			var forgetTimes = {}
 			if (items[storageKey]) {
 				forgetTimes = items[storageKey];
 			}
