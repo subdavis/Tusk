@@ -1,6 +1,6 @@
 "use strict";
 
-function MasterPasswordController($scope, $routeParams, $location, keepass, localStorage, unlockedState, secureCache, settings, optionsLink) {
+function MasterPasswordController($scope, $routeParams, $location, keepass, unlockedState, secureCache, settings, optionsLink) {
   $scope.masterPassword = "";
   $scope.busy = false;
   $scope.fileName = decodeURIComponent($routeParams.fileTitle);
@@ -16,10 +16,14 @@ function MasterPasswordController($scope, $routeParams, $location, keepass, loca
     })
   });
 
+  $scope.setRememberPeriod = function(periodInMinutes) {
+  	$scope.rememberPeriod = periodInMinutes;
+  }
+
   settings.getKeyFiles().then(function(keyFiles) {
     $scope.keyFiles = keyFiles;
   }).then(function() {
-    return localStorage.getCurrentDatabaseUsage();
+    return settings.getCurrentDatabaseUsage();
   }).then(function(usage) {
     //tweak UI based on what we know about the database file
     $scope.hidePassword = (usage.requiresPassword === false);
@@ -27,6 +31,7 @@ function MasterPasswordController($scope, $routeParams, $location, keepass, loca
     passwordKey = usage.passwordKey ? Base64.decode(usage.passwordKey): undefined;
     $scope.rememberedPassword = !!passwordKey;
     $scope.rememberPassword = $scope.rememberedPassword;
+    $scope.rememberPeriod = usage.rememberPeriod;
 
     if ($scope.rememberedPassword) {
     	// remembered password - autologin
@@ -69,16 +74,13 @@ function MasterPasswordController($scope, $routeParams, $location, keepass, loca
   });
 
   $scope.forgetPassword = function() {
- 		localStorage.saveCurrentDatabaseUsage({
+ 		settings.saveCurrentDatabaseUsage({
       
     }).then(function() {
 			secureCache.clear('entries');
 			secureCache.clear('streamKey');
-    	$scope.rememberedPassword = false;
-    	$scope.rememberPassword = false;
-    	passwordKey = undefined;
 			unlockedState.clearBackgroundState();
-    	$scope.$apply();
+    	window.close();
     }); 	
   }
 
@@ -110,12 +112,20 @@ function MasterPasswordController($scope, $routeParams, $location, keepass, loca
 			return keepass.getPasswords(passwordKey);
 		}).then(function(entries) {
       //remember usage for next time:
-      localStorage.saveCurrentDatabaseUsage({
+      settings.saveCurrentDatabaseUsage({
         requiresPassword: $scope.masterPassword ? true : false,
         requiresKeyfile: $scope.selectedKeyFile ? true : false,
         passwordKey: $scope.rememberPassword ? Base64.encode(passwordKey) : undefined,
-        keyFileName: $scope.selectedKeyFile ? $scope.selectedKeyFile.name : ""
+        keyFileName: $scope.selectedKeyFile ? $scope.selectedKeyFile.name : "",
+        rememberPeriod: $scope.rememberPeriod
       });
+
+      if ($scope.rememberPeriod) {
+      	settings.setForgetTime('forgetPassword', (Date.now() + (60000*$scope.rememberPeriod)))
+      } else {
+      	//don't clear passwords
+      	settings.clearForgetTimes(['forgetPassword']);
+      }
 
       //show results:
       showResults(entries, keepass.streamKey);
@@ -124,6 +134,7 @@ function MasterPasswordController($scope, $routeParams, $location, keepass, loca
     }).catch(function(err) {
       $scope.errorMessage = err.message || "Incorrect password or key file";
       $scope.busy = false;
+      passwordKey = null;
     }).then(function() {
       $scope.$apply();
     });

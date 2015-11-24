@@ -35,7 +35,8 @@
 	}, 
 	"background": {
 		"scripts": [
-			"lib/base64.js", "lib/chrome-api-promise.js", "services/settings.js", "services/protectedMemory.js", "background/background.js"
+			"lib/base64.js", "lib/chrome-api-promise.js", 
+			"services/settings.js", "services/protectedMemory.js", "background/background.js"
 		],
 		"persistent": false
 	},
@@ -55,7 +56,8 @@
 		"clipboardWrite",
 		"identity",
 		"declarativeContent",
-		"alarms"
+		"alarms",
+		"notifications"
 	],
 	"optional_permissions": [
 		"https://*/",

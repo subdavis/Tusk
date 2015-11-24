@@ -105,10 +105,6 @@ keepassSettings.factory('settings', [function() {
   return new Settings();
 }]);
 
-keepassSettings.factory('localStorage', ['settings', function(settings) {
-	return new LocalStorage(settings);
-}]);
-
 keepassSettings.factory('keyFileParser', [function() {
   return new KeyFileParser();
 }]);
