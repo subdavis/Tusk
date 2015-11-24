@@ -134,6 +134,7 @@ function MasterPasswordController($scope, $routeParams, $location, keepass, unlo
     }).catch(function(err) {
       $scope.errorMessage = err.message || "Incorrect password or key file";
       $scope.busy = false;
+      passwordKey = null;
     }).then(function() {
       $scope.$apply();
     });
