@@ -105,7 +105,7 @@ function UnlockedState($interval, $location, keepass, protectedMemory, settings)
 	//get clear-text password from entry
 	function getPassword(entry) {
 		if (entry.protectedData && entry.protectedData.password)
-			return keepass.getDecryptedEntry(entry.protectedData.password, my.streamKey);
+			return keepass.getDecryptedEntry(entry, entry.protectedData.password, my.streamKey, my.entries);
 		else {
 			//KyPass support - it does not use protectedData for passwords that it adds
 			return entry.password;
@@ -122,8 +122,8 @@ function UnlockedState($interval, $location, keepass, protectedMemory, settings)
 		$location.path('/entry-details/' + entry.id);
 	}
 
-	my.getDecryptedAttribute = function(protectedAttr) {
-		return keepass.getDecryptedEntry(protectedAttr, my.streamKey);
+	my.getDecryptedAttribute = function(entry, protectedAttr) {
+		return keepass.getDecryptedEntry(entry, protectedAttr, my.streamKey, my.entries);
 	}
 
 	//listens for the copy event and does the copy

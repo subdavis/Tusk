@@ -380,7 +380,7 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry, keepa
   /**
    * Returns the decrypted data from a protected element of a KDBX entry
    */
-  function getDecryptedEntry(protectedData, streamKey, entries) {
+  function getDecryptedEntry(currentEntry, protectedData, streamKey, entries) {
   	if (protectedData === undefined) return "";  //can happen with entries with no password
 
     var iv = [0xE8, 0x30, 0x09, 0x4B, 0x97, 0x20, 0x5D, 0x2A];
@@ -393,10 +393,10 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry, keepa
 
     if (keepassReference.hasReferences(result)) {
     	//the decrypted entry is actually a reference to another field
-    	result = keepassReference.resolveProtectedReference(result, entries);
+    	result = keepassReference.resolveReference(result, currentEntry, entries);
     	if (result.position !== undefined && result.data) {
-    		//the other field is also protected data
-    		return getDecryptedEntry(result, streamKey);
+    		//the other field is also protected data, e.g. a reference from a password to another entry's password
+    		return getDecryptedEntry(currentEntry, result, streamKey, entries);
     	}
     }
 

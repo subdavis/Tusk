@@ -1,6 +1,7 @@
 describe('Keepass References', function () {
 
 	// http://keepass.info/help/base/fieldrefs.html
+
 	var refService = KeepassReference();
 	var entry = {
 		id: 1,
@@ -91,7 +92,7 @@ describe('Keepass References', function () {
 			refService.resolveReference('{REF:A@I:2}', entry, entries).should.equal(entry2.url);
 		})
 		it('should resolve wanted password', function() {
-			refService.resolveReference('{REF:P@I:2}', entry, entries).should.equal(entry2.password);
+			refService.resolveReference('{REF:P@I:2}', entry, entries).should.equal(entry2.protectedData.password);
 		})
 		it('should resolve wanted notes', function() {
 			refService.resolveReference('{REF:N@I:2}', entry, entries).should.equal(entry2.notes);

@@ -24,7 +24,7 @@ function EntryDetailsController($scope, $routeParams, $location, unlockedState) 
 	}
 
 	$scope.exposeAttribute = function(attr) {
-		attr.value = unlockedState.getDecryptedAttribute(attr.protectedAttr);
+		attr.value = unlockedState.getDecryptedAttribute($scope.entry, attr.protectedAttr);
 	}
 
 	$scope.goBack = function() {

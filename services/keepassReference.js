@@ -36,10 +36,6 @@ function KeepassReference() {
 		return !!/\{.+\}/.test(fieldValue || '');
 	}
 
-	my.resolveProtectedReference = function(referenceText, allEntries) {
-		
-	}
-	
 	my.processAllReferences = function(fieldValue, currentEntry, allEntries) {
 		var re = /(\{[^\{\}]+\})/g;
 		var expressions = re.exec(fieldValue || '');
@@ -98,7 +94,13 @@ function KeepassReference() {
 				}
 			});
 			if (matches.length) {
-				return matches[0][wantedField] || '';
+				if (matches[0].protectedData && matches[0].protectedData[wantedField]) {
+					//encrypted data - return the data object
+					return matches[0].protectedData[wantedField];
+				} else {
+					//unencrypted data - return a simple string
+					return matches[0][wantedField] || '';
+				}
 			}
 		}
 
