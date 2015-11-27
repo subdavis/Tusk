@@ -33,6 +33,11 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 	if (!message || !message.m)
 	return; //unrecognized message format
 
+	//whitelist some known iframe origin mismatches
+	var whiteListedHostnameMismatches = [
+		{documentOrigin: 'onlinebanking.usbank.com', expectedOrigin: 'www.usbank.com'}
+	]
+
 	if (message.m == "fillPassword") {
 		//user has selected to fill the password
 
@@ -42,7 +47,11 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 		//mismatch, but in that case we will only fill the password on the https.
 		var documentOrigin = parseUrl(document.URL);
 		var expectedOrigin = parseUrl(message.o);
-		if (documentOrigin.hostname !== expectedOrigin.hostname
+		var whiteListed = !!whiteListedHostnameMismatches.filter(function(item) {
+			return item.documentOrigin === documentOrigin.hostname && item.expectedOrigin === expectedOrigin.hostname
+		}).length;
+
+		if ((documentOrigin.hostname !== expectedOrigin.hostname && !whiteListed)
 			|| (documentOrigin.protocol !== expectedOrigin.protocol && documentOrigin.protocol !== 'https:'))
 			return;
 
