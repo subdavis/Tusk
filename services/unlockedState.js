@@ -82,6 +82,7 @@ function UnlockedState($interval, $location, keepass, protectedMemory, settings)
 		my.streamKey = null;
 		my.clipboardStatus = "";
 	}
+	$interval(my.clearBackgroundState, 60000, 1);  //clear backgroundstate after 10 minutes live - we should never be alive that long
 
 	my.autofill = function(entry) {
 		chrome.runtime.sendMessage({

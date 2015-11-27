@@ -190,9 +190,9 @@ function Settings() {
 	 * Sets a time to forget something
 	 */
 	exports.setForgetTime = function(key, time) {
-		let storageKey = 'forgetTimes';
+		var storageKey = 'forgetTimes';
 		return chrome.p.storage.local.get(storageKey).then(function(items) {
-			let forgetTimes = {}
+			var forgetTimes = {}
 			if (items[storageKey]) {
 				forgetTimes = items[storageKey];
 			}
@@ -205,9 +205,9 @@ function Settings() {
 	}
 
 	exports.getForgetTime = function(key) {
-		let storageKey = 'forgetTimes';
+		var storageKey = 'forgetTimes';
 		return chrome.p.storage.local.get(storageKey).then(function(items) {
-			let forgetTimes = {}
+			var forgetTimes = {}
 			if (items[storageKey]) {
 				forgetTimes = items[storageKey];
 			}
@@ -217,9 +217,9 @@ function Settings() {
 	}
 
 	exports.getAllForgetTimes = function() {
-		let storageKey = 'forgetTimes';
+		var storageKey = 'forgetTimes';
 		return chrome.p.storage.local.get(storageKey).then(function(items) {
-			let forgetTimes = {}
+			var forgetTimes = {}
 			if (items[storageKey]) {
 				forgetTimes = items[storageKey];
 			}
@@ -229,9 +229,9 @@ function Settings() {
 	}
 
 	exports.clearForgetTimes = function(keysArray) {
-		let storageKey = 'forgetTimes';
+		var storageKey = 'forgetTimes';
 		return chrome.p.storage.local.get(storageKey).then(function(items) {
-			let forgetTimes = {}
+			var forgetTimes = {}
 			if (items[storageKey]) {
 				forgetTimes = items[storageKey];
 			}
@@ -244,6 +244,37 @@ function Settings() {
 			});
 		});
 	}
+
+  /**
+   * Saves information about how the database was opened, so we can optimize the
+   * UI next time by hiding the irrelevant options and remembering the keyfile
+   */
+  exports.saveCurrentDatabaseUsage = function(usage) {
+    return exports.getCurrentDatabaseChoice().then(function(info) {
+      return exports.getDatabaseUsages().then(function(usages) {
+        var key = info.passwordFile.title + "__" + info.providerKey;
+        usages[key] = usage;
+
+        return exports.saveDatabaseUsages(usages);
+      });
+    });
+  }
+
+  /**
+   * Retrieves information about how the database was opened, so we can optimize the
+   * UI by hiding the irrelevant options and remembering the keyfile
+   */
+  exports.getCurrentDatabaseUsage = function() {
+    return exports.getCurrentDatabaseChoice().then(function(info) {
+      return exports.getDatabaseUsages().then(function(usages) {
+        var key = info.passwordFile.title + "__" + info.providerKey;
+        var usage = usages[key] || {};
+
+        return usage;
+      });
+    })
+  }
+
 
 	return exports;
 }
