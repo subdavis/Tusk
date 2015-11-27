@@ -38,21 +38,16 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 
 		//first check the origins.  This is necessary because we support iframes, and
 		//this script is injected into all, some of which may be malicious.  So we
-		//limit ourselves to the same origin.
-		//
-		//Origin is allowed to mismatch, but only if the password field is already focused  
-		//
-		//Protocol (http vs https) is allowed to
+		//limit ourselves to the same origin.  Protocol (http vs https) is allowed to
 		//mismatch, but in that case we will only fill the password on the https.
 		var documentOrigin = parseUrl(document.URL);
 		var expectedOrigin = parseUrl(message.o);
-		var focusedOnly = documentOrigin.hostname !== expectedOrigin.hostname;
-
-		if (documentOrigin.protocol !== expectedOrigin.protocol && documentOrigin.protocol !== 'https:')
+		if (documentOrigin.hostname !== expectedOrigin.hostname
+			|| (documentOrigin.protocol !== expectedOrigin.protocol && documentOrigin.protocol !== 'https:'))
 			return;
 
 		//passed the origin check - go ahead and fill the password
-		filler.fillPassword(message.u, message.p, focusedOnly);
+		filler.fillPassword(message.u, message.p);
 	}
 
 	function parseUrl(url) {
@@ -81,7 +76,7 @@ var filler = (function() {
 	var lonelyPasswords = [];  //passwords without usernames
 	var priorityPair = null;   //most likely pair of fields.
 
-	function identifyPasswordFields(focusedOnly) {
+	function identifyPasswordFields() {
 		//identify user/password pairs
 		userPasswordPairs = [];
 		lonelyPasswords = [];
@@ -109,11 +104,10 @@ var filler = (function() {
 					//field after the username is the password
 					pair.p = all.eq(focusedIndex + 1);
 				}
-			} 
+			}
 
 			priorityPair = pair;
 		}
-		if (focusedOnly) return;  //iFrame with mismatched domain, we don't allow other algorithms due to security
 
 		//algorithm 2 - based on types of fields and visibility
 		var possibleUserName;
@@ -153,8 +147,8 @@ var filler = (function() {
 		return false;
 	}
 
-	function fillPassword(username, password, focusedOnly) {
-		identifyPasswordFields(focusedOnly);
+	function fillPassword(username, password) {
+		identifyPasswordFields();
 		var filled = false;
 
 		if (priorityPair) {
