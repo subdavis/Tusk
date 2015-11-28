@@ -29,7 +29,7 @@ THE SOFTWARE.
 /**
  * Service for opening keepass files
  */
-function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry, keepassReference) {
+function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry, keepassReference, streamCipher) {
   var my = {
 
   };
@@ -189,10 +189,7 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry, keepa
     return window.crypto.subtle.digest({
       name: "SHA-256"
     }, h.protectedStreamKey).then(function(streamKey) {
-      my.streamKey = streamKey;
-      var iv = [0xE8, 0x30, 0x09, 0x4B, 0x97, 0x20, 0x5D, 0x2A];
-      var salsa = new Salsa20(new Uint8Array(my.streamKey), iv);
-      var salsaPosition = 0;
+    	streamCipher.setKey(streamKey);
 
       var pos = 0;
       var dv = new DataView(buf);
@@ -237,18 +234,15 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry, keepa
 
         //in-memory-protect the password in the same way as on KDBX
         if (currentEntry.password) {
-          var encoder = new TextEncoder();
-          var passwordBytes = encoder.encode(currentEntry.password);
-          var encPassword = salsa.encrypt(new Uint8Array(passwordBytes));
+        	var position = streamCipher.position;
+          var encPassword = streamCipher.encryptString(currentEntry.password);
           currentEntry.protectedData = {
             password: {
               data: encPassword,
-              position: salsaPosition
+              position: position
             }
           };
           currentEntry.password = Base64.encode(encPassword);  //overwrite the unencrypted password
-
-          salsaPosition += passwordBytes.byteLength;
         }
 
         if (!(currentEntry.title == 'Meta-Info' && currentEntry.userName == 'SYSTEM')
@@ -378,40 +372,13 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry, keepa
   }
 
   /**
-   * Returns the decrypted data from a protected element of a KDBX entry
-   */
-  function getDecryptedEntry(currentEntry, protectedData, streamKey, entries) {
-  	if (protectedData === undefined) return "";  //can happen with entries with no password
-
-    var iv = [0xE8, 0x30, 0x09, 0x4B, 0x97, 0x20, 0x5D, 0x2A];
-    var salsa = new Salsa20(new Uint8Array(streamKey || my.streamKey), iv);
-    var decoder = new TextDecoder();
-
-    salsa.getBytes(protectedData.position);
-    var decryptedBytes = new Uint8Array(salsa.decrypt(protectedData.data));
-    var result = decoder.decode(decryptedBytes);
-
-    if (keepassReference.hasReferences(result)) {
-    	//the decrypted entry is actually a reference to another field
-    	result = keepassReference.resolveReference(result, currentEntry, entries);
-    	if (result.position !== undefined && result.data) {
-    		//the other field is also protected data, e.g. a reference from a password to another entry's password
-    		return getDecryptedEntry(currentEntry, result, streamKey, entries);
-    	}
-    }
-
-    return result;
-  }
-  my.getDecryptedEntry = getDecryptedEntry; //expose the function
-
-  /**
    * Parses the KDBX entries xml into an object format
    **/
   function parseXml(xml, protectedStreamKey) {
     return window.crypto.subtle.digest({
       name: "SHA-256"
     }, protectedStreamKey).then(function(streamKey) {
-      my.streamKey = streamKey;
+    	streamCipher.setKey(streamKey);
       var decoder = new TextDecoder();
       var parser = new DOMParser();
       var doc = parser.parseFromString(xml, "text/xml");

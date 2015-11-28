@@ -2,7 +2,17 @@ describe('Keepass References', function () {
 
 	// http://keepass.info/help/base/fieldrefs.html
 
-	var refService = KeepassReference();
+	var streamCipher = {
+		getDecryptedFieldValue: function(currentEntry, fieldName) {
+	  	if (currentEntry.protectedData === undefined || !currentEntry.protectedData[fieldName])
+	  		return currentEntry[fieldName] || "";  //not an encrypted field
+
+			var data = currentEntry.protectedData[fieldName];
+			return data.position + data.encBytes;
+		}
+	}
+
+	var refService = KeepassReference(streamCipher);
 	var entry = {
 		id: 1,
 		title: 'Sample Title',
@@ -92,7 +102,7 @@ describe('Keepass References', function () {
 			refService.resolveReference('{REF:A@I:2}', entry, entries).should.equal(entry2.url);
 		})
 		it('should resolve wanted password', function() {
-			refService.resolveReference('{REF:P@I:2}', entry, entries).should.equal(entry2.protectedData.password);
+			refService.resolveReference('{REF:P@I:2}', entry, entries).should.equal(streamCipher.getDecryptedFieldValue(entry2, 'password'));
 		})
 		it('should resolve wanted notes', function() {
 			refService.resolveReference('{REF:N@I:2}', entry, entries).should.equal(entry2.notes);

@@ -24,18 +24,21 @@ THE SOFTWARE.
 
  */
 
-"use strict";
-
 /**
  * Service for resolving keepass references
  */
-function KeepassReference() {
+function KeepassReference(streamCipher) {
+	"use strict";
+
 	var my = {};
 
 	my.hasReferences = function(fieldValue) {
 		return !!/\{.+\}/.test(fieldValue || '');
 	}
 
+	/*
+	 * Process all references found in fieldValue to their final values
+	 */
 	my.processAllReferences = function(fieldValue, currentEntry, allEntries) {
 		var re = /(\{[^\{\}]+\})/g;
 		var expressions = re.exec(fieldValue || '');
@@ -56,6 +59,11 @@ function KeepassReference() {
 		}
 		
 		return result;
+	}
+
+	my.getFieldValue = function(currentEntry, fieldName, allEntries) {
+		var plainText = streamCipher.getDecryptedFieldValue(currentEntry, fieldName);
+		return my.processAllReferences(plainText, currentEntry, allEntries);
 	}
 
 	function resolveReference(referenceText, currentEntry, allEntries) {
@@ -94,13 +102,7 @@ function KeepassReference() {
 				}
 			});
 			if (matches.length) {
-				if (matches[0].protectedData && matches[0].protectedData[wantedField]) {
-					//encrypted data - return the data object
-					return matches[0].protectedData[wantedField];
-				} else {
-					//unencrypted data - return a simple string
-					return matches[0][wantedField] || '';
-				}
+				return streamCipher.getDecryptedFieldValue(matches[0], wantedField);
 			}
 		}
 

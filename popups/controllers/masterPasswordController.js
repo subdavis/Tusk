@@ -1,6 +1,6 @@
-"use strict";
+function MasterPasswordController($scope, $routeParams, $location, keepass, unlockedState, secureCache, settings, optionsLink, streamCipher) {
+	"use strict";
 
-function MasterPasswordController($scope, $routeParams, $location, keepass, unlockedState, secureCache, settings, optionsLink) {
   $scope.masterPassword = "";
   $scope.busy = false;
   $scope.fileName = decodeURIComponent($routeParams.fileTitle);
@@ -128,7 +128,7 @@ function MasterPasswordController($scope, $routeParams, $location, keepass, unlo
       }
 
       //show results:
-      showResults(entries, keepass.streamKey);
+      showResults(entries, streamCipher.getKey());
 
       $scope.busy = false;
     }).catch(function(err) {
@@ -141,6 +141,8 @@ function MasterPasswordController($scope, $routeParams, $location, keepass, unlo
   };
 
   function showResults(entries, streamKey) {
+    streamCipher.setKey(streamKey);
+
     var siteUrl = parseUrl(unlockedState.url);
     var siteTokens = getValidTokens(siteUrl.hostname + "." + unlockedState.title);
     entries.forEach(function(entry) {
@@ -189,7 +191,6 @@ function MasterPasswordController($scope, $routeParams, $location, keepass, unlo
     if (unlockedState.entries.length == 0) {
       $scope.errorMessage = "No matches found for this site."
     }
-    unlockedState.streamKey = streamKey;
 
     //save longer term (in encrypted storage)
     secureCache.save('entries', entries);

@@ -102,16 +102,20 @@ keepassApp.factory('keepassHeader', ['settings', function(settings) {
   return new KeepassHeader(pako, settings);
 }]);
 
-keepassApp.factory('keepassReference', [function() {
-  return new KeepassReference();
+keepassApp.factory('streamCipher', [function() {
+  return new StreamCipher();
 }]);
 
-keepassApp.factory('keepass', ['keepassHeader', 'pako', 'settings', 'passwordFileStoreRegistry', 'keepassReference', function(keepassHeader, pako, settings, passwordFileStoreRegistry, keepassReference) {
-	return new Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry, keepassReference);
+keepassApp.factory('keepassReference', ['streamCipher', function(streamCipher) {
+  return new KeepassReference(streamCipher);
 }]);
 
-keepassApp.factory('unlockedState', ['$interval', '$location', 'keepass', 'protectedMemory', 'settings', function($interval, $location, keepass, protectedMemory, settings) {
-  return new UnlockedState($interval, $location, keepass, protectedMemory, settings);
+keepassApp.factory('keepass', ['keepassHeader', 'pako', 'settings', 'passwordFileStoreRegistry', 'keepassReference', 'streamCipher', function(keepassHeader, pako, settings, passwordFileStoreRegistry, keepassReference, streamCipher) {
+	return new Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry, keepassReference, streamCipher);
+}]);
+
+keepassApp.factory('unlockedState', ['$interval', '$location', 'keepassReference', 'protectedMemory', 'settings', function($interval, $location, keepassReference, protectedMemory, settings) {
+  return new UnlockedState($interval, $location, keepassReference, protectedMemory, settings);
 }]);
 
 keepassApp.factory('secureCacheMemory', ['protectedMemory', function(protectedMemory) {
@@ -124,8 +128,8 @@ keepassApp.factory('secureCacheDisk', ['protectedMemory', 'secureCacheMemory', '
 
 keepassApp.controller('startupController', ['$scope', '$location', 'settings', 'optionsLink', 'passwordFileStoreRegistry', StartupController]);
 keepassApp.controller('chooseFileController', ['$scope', '$location', 'passwordFileStoreRegistry', 'settings', ChooseFileController]);
-keepassApp.controller('masterPasswordController', ['$scope', '$routeParams', '$location', 'keepass', 'unlockedState', 'secureCacheDisk', 'settings', 'optionsLink', MasterPasswordController]);
-keepassApp.controller('findEntryController', ['$scope', 'unlockedState', 'secureCacheDisk', FindEntryController]);
+keepassApp.controller('masterPasswordController', ['$scope', '$routeParams', '$location', 'keepass', 'unlockedState', 'secureCacheDisk', 'settings', 'optionsLink', 'streamCipher', MasterPasswordController]);
+keepassApp.controller('findEntryController', ['$scope', 'unlockedState', 'secureCacheDisk', 'streamCipher', FindEntryController]);
 keepassApp.controller('entryDetailsController', ['$scope', '$routeParams', '$location', 'unlockedState', EntryDetailsController]);
 keepassApp.controller('settingsLinkController', ['$scope', '$location', 'optionsLink', SettingsLinkController]);
 
