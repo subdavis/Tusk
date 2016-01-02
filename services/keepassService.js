@@ -424,9 +424,9 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry, keepa
           } else if (childNode.nodeName == "String") {
             var key = childNode.getElementsByTagName('Key')[0].textContent;
             key = Case.camel(key);
-            if (key == "key") {
-            	//avoid name conflict when key == "key"
-            	key = "keyAlias";
+            if (key == "keys") {
+            	//avoid name conflict when key == "keys"
+            	key = "keysAlias";
             }
             var valNode = childNode.getElementsByTagName('Value')[0];
             var val = valNode.textContent;
