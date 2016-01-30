@@ -154,6 +154,32 @@ function Settings() {
 		});
 	}
 
+	exports.saveDefaultRememberOptions = function(rememberPassword, rememberPeriod) {
+		if (rememberPassword) {
+			return chrome.p.storage.local.set({
+				'rememberPeriod': rememberPeriod
+			})
+		}
+
+		// clear options
+		return chrome.p.storage.remove('rememberPeriod')
+	}
+
+	exports.getDefaultRememberOptions = function() {
+		return chrome.p.storage.local.get('rememberPeriod').then( items => {
+			if (items.rememberPeriod) {
+				return {
+					rememberPassword: true,
+					rememberPeriod: items.rememberPeriod
+				}
+			} else {
+				return {
+					rememberPassword: false
+				}
+			}
+		})
+	}
+
 	exports.saveLicense = function(license) {
 		return chrome.p.storage.local.set({
 			'license': license
