@@ -130,20 +130,50 @@ THE SOFTWARE.
 		}
 
 		if (message.m == "autofill") {
-			chrome.tabs.executeScript(message.tabId, {
-				file: "keepass.js",
-				allFrames: true,
-				runAt: "document_start"
-			}, function(result) {
-				//script injected
-				chrome.tabs.sendMessage(message.tabId, {
-					m: "fillPassword",
-					u: message.u,
-					p: message.p,
-					o: message.o
+			alreadyInjected(message.tabId).then( injectedAlready => {
+				if (injectedAlready === true) {
+					chrome.tabs.sendMessage(message.tabId, {
+						m: "fillPassword",
+						u: message.u,
+						p: message.p,
+						o: message.o,
+						uca: message.uca
+					});
+
+					return;
+				}
+
+				chrome.tabs.executeScript(message.tabId, {
+					file: "keepass.js",
+					allFrames: true,
+					runAt: "document_start"
+				}, function(result) {
+					//script injected
+					chrome.tabs.sendMessage(message.tabId, {
+						m: "fillPassword",
+						u: message.u,
+						p: message.p,
+						o: message.o,
+						uca: message.uca
+					});
 				});
-			});
+			})
 		}
+	}
+
+	// function to determine if the content script is already injected, so we don't do it twice
+	function alreadyInjected(tabId) {
+		return new Promise( (resolve, reject) => {
+			chrome.tabs.sendMessage(tabId, {m: 'ping'}, response => {
+				if (response) 
+					resolve(true);
+				else {
+					let err = chrome.runtime.lastError;
+					resolve(false); 
+				} 
+			})	
+		})
+		
 	}
 
 	//listen for "autofill" message:

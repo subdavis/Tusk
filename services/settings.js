@@ -301,6 +301,21 @@ function Settings() {
     })
   }
 
+  exports.setUseCredentialApiFlag = function(flagValue) {
+  	if (flagValue) {
+	  	return chrome.p.storage.local.set({
+	  		'useCredentialApi': true
+	  	})
+   	}
+
+   	return chrome.p.storage.local.remove('useCredentialApi');
+  }
+
+  exports.getUseCredentialApiFlag = function() {
+  	return chrome.p.storage.local.get('useCredentialApi').then( items => {
+  		return !!items.useCredentialApi;
+  	})
+  }
 
 	return exports;
 }

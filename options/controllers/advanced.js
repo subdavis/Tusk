@@ -1,16 +1,32 @@
 "use strict";
 
 function AdvancedController($scope, settings, secureCacheDisk) {
+	$scope.flags = {
+		useDiskCache: false,
+		useCredentialApi: false
+	};
+
   settings.getDiskCacheFlag().then(function(flag) {
-    $scope.useDiskCache = flag;
+    $scope.flags.useDiskCache = flag;
     $scope.$apply();
   });
 
+  settings.getUseCredentialApiFlag().then( flag => {
+  	$scope.flags.useCredentialApi = flag;
+  	$scope.$apply();
+  })
+
   $scope.updateDiskCacheFlag = function() {
-    settings.setDiskCacheFlag($scope.useDiskCache);
+    settings.setDiskCacheFlag($scope.flags.useDiskCache);
     if (!$scope.useDiskCache) {
       secureCacheDisk.clear('entries');
       secureCacheDisk.clear('streamKey');
     }
   }
+
+  $scope.updateUseCredentialApiFlag = function() {
+  	settings.setUseCredentialApiFlag($scope.flags.useCredentialApi)
+  }
+
+  $scope.flagEnabled = !!(navigator.credentials)
 }
