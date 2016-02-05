@@ -405,15 +405,19 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry) {
 
         //exclude histories and recycle bin:
         if (entryNode.parentNode.nodeName != "History") {
+        	entry.searchable = true;
           for (var m = 0; m < entryNode.parentNode.children.length; m++) {
             var groupNode = entryNode.parentNode.children[m];
             if (groupNode.nodeName == 'Name') {
               entry.groupName = groupNode.textContent;
               entry.keys.push('groupName')
+            } else if (groupNode.nodeName == 'EnableSearching' && groupNode.textContent == 'false') {
+            	// this group is not searchable
+            	entry.searchable = false;
             }
           }
 
-          if (entry.groupName != "Recycle Bin")
+          if (entry.searchable)
             results.push(entry);
         }
         for (var j = 0; j < entryNode.children.length; j++) {
