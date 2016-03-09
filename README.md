@@ -28,7 +28,7 @@ Tools needed:
 4) If you are editing ```.less``` files then run ```grunt watch``` to compile them when they change.
 
 ## Installing in chrome ##
-To install the code in Chrome, open *More Tools\Extensions*, check the *Developer mode* checkbox.  Click *Load unpacked extension* and browse to the folder where you cloned the code.  
+To install the code in Chrome, open **More Tools\Extensions**, check the **Developer mode** checkbox.  Click **Load unpacked extension** and browse to the folder where you cloned the code.  
 
 You may find the [Chrome Apps & Extensions Developer Tool](https://chrome.google.com/webstore/detail/chrome-apps-extensions-de/ohmmkhmmmpcnpikjeljgnaoabkaalbgc) to be helpful when debugging the background page.
 
