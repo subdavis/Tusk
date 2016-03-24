@@ -30,13 +30,21 @@ THE SOFTWARE.
 */
 
 chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
+	"use strict";
+
 	if (!message || !message.m)
-	return; //unrecognized message format
+		return; //unrecognized message format
 
 	//whitelist some known iframe origin mismatches
 	var whiteListedHostnameMismatches = [
 		{documentOrigin: 'onlinebanking.usbank.com', expectedOrigin: 'www.usbank.com'}
 	]
+
+	if (message.m == 'ping') {
+		// ping, to check if we're injected already
+		sendResponse({'message': 'hi'});
+		return;
+	}
 
 	if (message.m == "fillPassword") {
 		//user has selected to fill the password
@@ -57,6 +65,17 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 
 		//passed the origin check - go ahead and fill the password
 		filler.fillPassword(message.u, message.p);
+
+		if (message.uca && navigator.credentials) {
+			// try to tell Chrome to remember the password
+			let credential = new PasswordCredential({
+				'id': message.u,
+				'password': message.p
+			})
+			navigator.credentials.store(credential).then( results => {
+				console.log(results);
+			});
+		}
 	}
 
 	function parseUrl(url) {

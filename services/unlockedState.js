@@ -85,21 +85,24 @@ function UnlockedState($interval, $location, keepass, protectedMemory, settings)
 	$interval(my.clearBackgroundState, 60000, 1);  //clear backgroundstate after 10 minutes live - we should never be alive that long
 
 	my.autofill = function(entry) {
-		chrome.runtime.sendMessage({
-			m: "requestPermission",
-			perms: {
-				origins: [my.origin]
-			},
-			then: {
-				m: "autofill",
-				tabId: my.tabId,
-				u: entry.userName,
-				p: getPassword(entry),
-				o: my.origin
-			}
-		});
+		settings.getUseCredentialApiFlag().then(useCredentialApi => {
+			chrome.runtime.sendMessage({
+				m: "requestPermission",
+				perms: {
+					origins: [my.origin]
+				},
+				then: {
+					m: "autofill",
+					tabId: my.tabId,
+					u: entry.userName,
+					p: getPassword(entry),
+					o: my.origin,
+					uca: useCredentialApi
+				}
+			});
 
-		window.close(); //close the popup
+			window.close(); //close the popup
+		})
 	}
 
 	//get clear-text password from entry
