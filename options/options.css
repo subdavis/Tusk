@@ -1,4 +1,4 @@
-/*! CKP - KeePass integration for Chrome™, Copyright 2015 Steven Campbell
+/*! CKP - KeePass integration for Chrome™, Copyright 2016 Steven Campbell
     This file is generated.
 */
 .transition {
@@ -71,7 +71,7 @@ filelist ul li,
 passwordMatches ul li,
 keyFiles ul li {
   border: 1px solid #eeeeee;
-  background: #eeeeee;
+  background: #eee;
   padding: 4px;
   margin: 4px 0;
   display: block;
@@ -194,7 +194,7 @@ keyFileName div.center {
 pageInfo,
 compositeKeyPart,
 .compositeKeyPart {
-  background: #eeeeee;
+  background: #eee;
   display: block;
   padding: 4px;
   border: solid 2px #d5d5d5;
@@ -249,7 +249,7 @@ infoMessage {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
 }
 errorMessage {
-  background: #b71c1c;
+  background: #B71C1C;
   display: block;
   padding: 4px;
   border: solid 2px #8b1515;
@@ -355,7 +355,7 @@ fileTypes fileType {
   padding: 8px;
   cursor: pointer;
   border: solid 1px #eeeeee;
-  background: #eeeeee;
+  background: #eee;
   text-align: center;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
   transition: all 250ms ease 0s;
