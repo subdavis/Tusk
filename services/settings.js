@@ -162,7 +162,7 @@ function Settings() {
 		}
 
 		// clear options
-		return chrome.p.storage.remove('rememberPeriod')
+		return chrome.p.storage.local.remove('rememberPeriod')
 	}
 
 	exports.getDefaultRememberOptions = function() {
