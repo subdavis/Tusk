@@ -43,6 +43,7 @@ module.exports = function(grunt) {
           {expand: true, src: 'background/**/*.js', dest:'build/'},
           {expand: true, src: 'services/**/*.js', dest:'build/'},
           {expand: true, src: 'options/**/*.js', dest:'build/'},
+          {expand: true, src: 'lib/**/*.js', dest:'build/'},
           {expand: true, src: ['*.js', '!Gruntfile.js'], dest:'build/'}
           ]
       }
