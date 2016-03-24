@@ -405,15 +405,19 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry) {
 
         //exclude histories and recycle bin:
         if (entryNode.parentNode.nodeName != "History") {
+        	entry.searchable = true;
           for (var m = 0; m < entryNode.parentNode.children.length; m++) {
             var groupNode = entryNode.parentNode.children[m];
             if (groupNode.nodeName == 'Name') {
               entry.groupName = groupNode.textContent;
               entry.keys.push('groupName')
+            } else if (groupNode.nodeName == 'EnableSearching' && groupNode.textContent == 'false') {
+            	// this group is not searchable
+            	entry.searchable = false;
             }
           }
 
-          if (entry.groupName != "Recycle Bin")
+          if (entry.searchable)
             results.push(entry);
         }
         for (var j = 0; j < entryNode.children.length; j++) {
@@ -432,9 +436,9 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry) {
           } else if (childNode.nodeName == "String") {
             var key = childNode.getElementsByTagName('Key')[0].textContent;
             key = Case.camel(key);
-            if (key == "key") {
-            	//avoid name conflict when key == "key"
-            	key = "keyAlias";
+            if (key == "keys") {
+            	//avoid name conflict when key == "keys"
+            	key = "keysAlias";
             }
             var valNode = childNode.getElementsByTagName('Value')[0];
             var val = valNode.textContent;

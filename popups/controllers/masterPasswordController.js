@@ -20,18 +20,27 @@ function MasterPasswordController($scope, $routeParams, $location, keepass, unlo
   	$scope.rememberPeriod = periodInMinutes;
   }
 
-  settings.getKeyFiles().then(function(keyFiles) {
+  settings.getKeyFiles().then(keyFiles => {
     $scope.keyFiles = keyFiles;
+  }).then( () => {
+	  return settings.getDefaultRememberOptions();
+  }).then( rememberOptions => {
+  	$scope.rememberPassword = rememberOptions.rememberPassword;
+  	if (rememberOptions.rememberPassword) {
+  		$scope.rememberPeriod = rememberOptions.rememberPeriod;
+  	}
   }).then(function() {
     return settings.getCurrentDatabaseUsage();
-  }).then(function(usage) {
+  }).then( usage => {
     //tweak UI based on what we know about the database file
     $scope.hidePassword = (usage.requiresPassword === false);
     $scope.hideKeyFile = (usage.requiresKeyfile === false);
     passwordKey = usage.passwordKey ? Base64.decode(usage.passwordKey): undefined;
     $scope.rememberedPassword = !!passwordKey;
-    $scope.rememberPassword = $scope.rememberedPassword;
-    $scope.rememberPeriod = usage.rememberPeriod;
+    if ($scope.rememberedPassword) {
+	    $scope.rememberPassword = true;
+	    $scope.rememberPeriod = usage.rememberPeriod;
+    }
 
     if ($scope.rememberedPassword) {
     	// remembered password - autologin
@@ -119,6 +128,7 @@ function MasterPasswordController($scope, $routeParams, $location, keepass, unlo
         keyFileName: $scope.selectedKeyFile ? $scope.selectedKeyFile.name : "",
         rememberPeriod: $scope.rememberPeriod
       });
+      settings.saveDefaultRememberOptions($scope.rememberPassword, $scope.rememberPeriod);
 
       if ($scope.rememberPeriod) {
       	settings.setForgetTime('forgetPassword', (Date.now() + (60000*$scope.rememberPeriod)))
