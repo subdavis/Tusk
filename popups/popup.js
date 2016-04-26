@@ -54,16 +54,18 @@ keepassApp.factory('pako', function() {
 });
 
 keepassApp.factory('passwordFileStoreRegistry', ['localChromePasswordFileManager', 
-  'dropboxFileManager', 
+  'dropboxFileManager',
+  'webdavFileManager',
   'googleDrivePasswordFileManager', 
   'oneDriveFileManager',
   'sampleDatabaseFileManager', 
   function(localChromePasswordFileManager, 
     dropboxFileManager,
+    webdavFileManager,
     googleDrivePasswordFileManager,
     oneDriveFileManager,
     sampleDatabaseFileManager) {
-  return new PasswordFileStoreRegistry(localChromePasswordFileManager, dropboxFileManager, googleDrivePasswordFileManager, oneDriveFileManager, sampleDatabaseFileManager);
+  return new PasswordFileStoreRegistry(localChromePasswordFileManager, dropboxFileManager, webdavFileManager, googleDrivePasswordFileManager, oneDriveFileManager, sampleDatabaseFileManager);
 }]);
 
 keepassApp.factory('sampleDatabaseFileManager', ['$http', function($http) {
@@ -72,6 +74,10 @@ keepassApp.factory('sampleDatabaseFileManager', ['$http', function($http) {
 
 keepassApp.factory('dropboxFileManager', ['$http', 'settings', function($http, settings) {
 	return new DropboxFileManager($http, settings);
+}]);
+
+keepassApp.factory('webdavFileManager', ['$http', 'settings', function($http, settings) {
+	return new WebdavFileManager($http, settings);
 }]);
 
 keepassApp.factory('googleDrivePasswordFileManager', ['$http', '$timeout', function($http, $timeout) {

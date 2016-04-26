@@ -53,6 +53,9 @@ keepassSettings.config(['$routeProvider', function($routeProvider) {
   }).when('/dropbox', {
     templateUrl: chrome.extension.getURL('/options/partials/choose-dropbox-file.html'),
     controller: 'chooseDropboxFileController'
+  }).when('/webdav', {
+    templateUrl: chrome.extension.getURL('/options/partials/choose-webdav-file.html'),
+    controller: 'chooseWebdavFileController'
   }).when('/onedrive', {
     templateUrl: chrome.extension.getURL('/options/partials/choose-onedrive-file.html'),
     controller: 'chooseOneDriveFileController'
@@ -66,16 +69,19 @@ keepassSettings.config(['$routeProvider', function($routeProvider) {
 
 keepassSettings.factory('passwordFileStoreRegistry', ['googleDrivePasswordFileManager', 
   'dropboxFileManager',
+  'webdavFileManager',
   'oneDriveFileManager',
   'localChromePasswordFileManager', 
   'sampleDatabaseFileManager', 
   function(googleDrivePasswordFileManager, 
     dropboxFileManager,
+    webdavFileManager,
     oneDriveFileManager,
     localChromePasswordFileManager, 
     sampleDatabaseFileManager) {
   return new PasswordFileStoreRegistry(googleDrivePasswordFileManager, 
     dropboxFileManager,
+    webdavFileManager,
     oneDriveFileManager, 
     sampleDatabaseFileManager,
     localChromePasswordFileManager);
@@ -91,6 +97,10 @@ keepassSettings.factory('sampleDatabaseFileManager', ['$http', function($http) {
 
 keepassSettings.factory('dropboxFileManager', ['$http', 'settings', function($http, settings) {
 	return new DropboxFileManager($http, settings);
+}]);
+
+keepassSettings.factory('webdavFileManager', ['$http', 'settings', function($http, settings) {
+	return new WebdavFileManager($http, settings);
 }]);
 
 keepassSettings.factory('oneDriveFileManager', ['$http', '$q', 'settings', function($http, $q, settings) {
@@ -130,6 +140,7 @@ keepassSettings.controller('sampleDatabaseController', ['$scope', 'sampleDatabas
 keepassSettings.controller('fileTypeController', ['$scope', '$location', 'passwordFileStoreRegistry', FileTypeController]);
 keepassSettings.controller('docsController', ['$scope', 'googleDrivePasswordFileManager', DocsController]);
 keepassSettings.controller('chooseDropboxFileController', ['$scope', 'dropboxFileManager', ChooseDropboxFileController]);
+keepassSettings.controller('chooseWebdavFileController', ['$scope', 'webdavFileManager', ChooseWebdavFileController]);
 keepassSettings.controller('chooseOneDriveFileController', ['$scope', 'oneDriveFileManager', ChooseOneDriveFileController]);
 keepassSettings.controller('navController', ['$scope', '$location', NavController]);
 
