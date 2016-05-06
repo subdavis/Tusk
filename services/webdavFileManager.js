@@ -105,7 +105,7 @@ function WebdavFileManager($http, settings) {
 	}
 
 	function ensureOriginPermissions($scope) {
-		var webDavOrigin = [$scope.url.split(/[\\/]/).slice(0, 3).concat(['']).join('/')];
+		var webDavOrigin = [$scope.form.url.split(/[\\/]/).slice(0, 3).concat(['']).join('/')];
 
 		return chrome.p.permissions.contains({origins: webDavOrigin}).then(function () {
 			return true;
@@ -136,13 +136,13 @@ function WebdavFileManager($http, settings) {
 			return new Promise(function (resolve, reject) {
 				var accessToken, auth, rnd;
 
-				auth = btoa($scope.user + ':' + $scope.pass);
+				auth = btoa($scope.form.user + ':' + $scope.form.pass);
 				rnd = Base64.encode(window.crypto.getRandomValues(new Uint8Array(32)));
-				accessToken = rnd.slice(0, 3) + btoa($scope.url + '#' + auth) + rnd.slice(-3);
+				accessToken = rnd.slice(0, 3) + btoa($scope.form.url + '#' + auth) + rnd.slice(-3);
 
 				return $http({
 					method: 'PROPFIND',
-					url: $scope.url,
+					url: $scope.form.url,
 					data: requestData,
 					responseType: 'document',
 					headers: {

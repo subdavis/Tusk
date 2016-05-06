@@ -1,10 +1,10 @@
 <form ng-if="!state.loggedIn" action="#" name="pwd" class="pure-form" ng-show="!unlockedState.entries">
-    <input type="url" class="fill" placeholder="URL to WebDAV" ng-model="url" autofocus title="URL to WebDAV">
-    <input type="text" class="fill" placeholder="Username" ng-model="user" title="Username">
-    <input type="password" class="fill" placeholder="Password" ng-model="pass" title="Password">
+    <input type="url" class="fill" placeholder="URL to WebDAV" ng-model="form.url" autofocus title="URL to WebDAV">
+    <input type="text" class="fill" placeholder="Username" ng-model="form.user" title="Username">
+    <input type="password" class="fill" placeholder="Password" ng-model="form.pass" title="Password">
 </form>
 
-<login ng-if="!state.loggedIn && !busy && url">
+<login ng-if="!state.loggedIn && form.url && !busy">
     <a class="pure-button" ng-click="login()">Login to WebDAV</a>
 </login>
 

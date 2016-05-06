@@ -1,9 +1,11 @@
 function ChooseWebdavFileController($scope, webdavFileManager) {
     'use strict';
 
-    $scope.url = '';
-    $scope.user = '';
-    $scope.pass = '';
+    $scope.form = {
+        url: '',
+        user: '',
+        pass: ''
+    };
     $scope.state = webdavFileManager.state;
 
     $scope.listFiles = function () {
