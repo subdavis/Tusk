@@ -1,0 +1,32 @@
+<fieldset>
+  <legend>Password List</legend>
+  Settings affecting the representation of the password list.
+  <table class="pure-table pure-table-horizontal settings entries">
+    <thead>
+      <tr>
+        <th>Setting</th>
+        <th>Value</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Show entry/group icons</td>
+            <td>
+                <input id="settings-PasswordListIconOption-entry" type="checkbox" name="PasswordListIconOption" ng-model="settings.PasswordListIconOption.entry" ng-change="saveSettings()">
+                <label for="settings-PasswordListIconOption-entry">Entry</label>
+                <input id="settings-PasswordListIconOption-group" type="checkbox" name="PasswordListIconOption" ng-model="settings.PasswordListIconOption.group" ng-change="saveSettings()">
+                <label for="settings-PasswordListIconOption-group">Group</label>
+            </td>
+        </tr>
+        <tr>
+            <td>Show group name</td>
+            <td>
+                <input id="settings-PasswordListGroupOption-show" type="radio" name="PasswordListGroupOption" ng-value="true" ng-model="settings.PasswordListGroupOption" ng-change="saveSettings()">
+                <label for="settings-PasswordListGroupOption-show">Show</label>
+                <input id="settings-PasswordListGroupOption-hide" type="radio" name="PasswordListGroupOption" ng-value="false" ng-model="settings.PasswordListGroupOption" ng-change="saveSettings()">
+                <label for="settings-PasswordListGroupOption-hide">Hide</label>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+</fieldset>

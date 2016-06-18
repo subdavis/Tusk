@@ -124,6 +124,7 @@ keepassApp.controller('masterPasswordController', ['$scope', '$routeParams', '$l
 keepassApp.controller('findEntryController', ['$scope', 'unlockedState', 'secureCacheDisk', FindEntryController]);
 keepassApp.controller('entryDetailsController', ['$scope', '$routeParams', '$location', 'unlockedState', EntryDetailsController]);
 keepassApp.controller('settingsLinkController', ['$scope', '$location', 'optionsLink', SettingsLinkController]);
+keepassApp.controller('passwordListController', ['$scope', 'settings', PasswordListController]);
 
 keepassApp.directive('icon', function() {
   function link(scope, element, attrs) {
