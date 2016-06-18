@@ -134,3 +134,29 @@ fileTypes {
   }
 }
 
+table.settings.entries {
+  table-layout: fixed;
+
+  td, th {
+      overflow-wrap: break-word;
+      text-overflow: ellipsis;
+
+    input[type=radio] {
+      position: relative;
+      left: -1px;
+    }
+
+    input[type=radio] + label {
+      position: relative;
+      left: -2px;
+      padding-right: 1px;
+    }
+
+    input + label {
+      color: black;
+      font-weight: 600;
+      margin-right: 10px;
+      padding: 5px;
+      vertical-align: middle    }
+  }
+}

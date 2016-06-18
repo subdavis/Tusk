@@ -317,5 +317,33 @@ function Settings() {
   	})
   }
 
+
+  exports.setPasswordListIconOption = function(option) {
+    return chrome.p.storage.local.set({
+		'showPasswordListIcon': option
+	})
+  }
+
+  exports.getPasswordListIconOption = function() {
+    return chrome.p.storage.local.get('showPasswordListIcon').then(function(option) {
+		return {
+			entry: option.showPasswordListIcon.entry || false,
+			group: option.showPasswordListIcon.group || false
+		}
+	})
+  }
+
+  exports.setPasswordListGroupOption = function(option) {
+    return chrome.p.storage.local.set({
+		'showPasswordListGroup': option
+	})
+  }
+
+  exports.getPasswordListGroupOption = function() {
+    return chrome.p.storage.local.get('showPasswordListGroup').then(function(option) {
+		return option.showPasswordListGroup || false;
+	})
+  }
+
 	return exports;
 }
