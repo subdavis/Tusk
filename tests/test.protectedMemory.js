@@ -39,7 +39,7 @@ describe('Protected Memory', function() {
 				mem.getData('some key').then(function(value) {
 					eval(value).should.equal('some value');
 				}, function(err) {
-					err.message.should.equal('Unexpected end of input');
+					err.message.should.equal('Unexpected end of JSON input');
 				});
 			});
 		})
@@ -63,7 +63,7 @@ describe('Protected Memory', function() {
 				mem.getData('some key').then(function(value) {
 					(value === undefined).should.be.true
 				}, function(err) {
-					err.message.should.equal('Unexpected end of input');
+					err.message.should.equal('Unexpected end of JSON input');
 				});
 			});
 		})
@@ -147,7 +147,7 @@ describe('Protected Memory', function() {
 			try {
 				mem.deserialize('');
 			} catch (err) {
-				err.message.should.equal('Unexpected end of input');
+				err.message.should.equal('Unexpected end of JSON input');
 			}
 		})
 
@@ -164,7 +164,7 @@ describe('Protected Memory', function() {
 			try {
 				mem.deserialize('');
 			} catch (err) {
-				err.message.should.equal('Unexpected end of input');
+				err.message.should.equal('Unexpected end of JSON input');
 			}
 		})
 
@@ -179,7 +179,7 @@ describe('Protected Memory', function() {
 			try {
 				mem.deserialize('');
 			} catch (err) {
-				err.message.should.equal('Unexpected end of input');
+				err.message.should.equal('Unexpected end of JSON input');
 			}
 		})
 
