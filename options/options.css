@@ -81,6 +81,18 @@ keyFiles ul li {
   text-align: center;
   transition: all 250ms ease 0s;
 }
+filelist ul li.not-selectable,
+passwordMatches ul li.not-selectable,
+keyFiles ul li.not-selectable {
+  cursor: default;
+}
+filelist ul li.not-selectable:hover,
+passwordMatches ul li.not-selectable:hover,
+keyFiles ul li.not-selectable:hover {
+  box-shadow: none;
+  background: #fbfbfb;
+  border-color: #eee;
+}
 filelist ul li:hover,
 passwordMatches ul li:hover,
 keyFiles ul li:hover {

@@ -29,7 +29,6 @@ THE SOFTWARE.
 function LocalChromePasswordFileManager() {
   var exports = {
     key: 'local',
-    deprecated: true,
     routePath: '/drag-drop-file',
     listDatabases: listDatabases,
     getDatabaseChoiceData: getDatabaseChoiceData,

@@ -1,4 +1,4 @@
-<errorMessage ng-if="!acknowledgedLimitations">CKP no longer supports this feature because it cannot work the way that people expect.  Please use one of the alternatives for accessing your database.  If you absolutely have to use this feature then click the button below:
+<errorMessage ng-if="!acknowledgedLimitations">We recommend against storing KeePass databases directly in Chrome storage, because it cannot work the way that people expect.  Please use one of the alternatives for accessing your database.  If you want to use this feature anyway, then click the button below:
 <p>
 <button class="fill" ng-click="acknowledgeLimitations()">I realize that files stored in this way won't update themselves.</button>
 </p>
@@ -8,7 +8,7 @@
   Use the big blue button to upload files from your local or remote filesystem.  A copy of the selected
   file(s) will be stored in Chrome's local storage.
   <br>
-  <a class="pure-button pure-button-primary fill" ng-click="selectFile()">Browse Files</a>
+  <a class="pure-button pure-button-primary fill" ng-click="selectFile()">Upload new or updated files</a>
   <input type="file" style="display:none" id="file" name='file' file-change="handleDrop" multiple />
   <errorMessage ng-show="errorMessage">{{errorMessage}}</errorMessage>
   <fieldset ng-show="files.length">

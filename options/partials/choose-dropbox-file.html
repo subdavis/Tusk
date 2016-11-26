@@ -1,17 +1,20 @@
 
+<infoMessage ng-if="busy">Fetching list of files...</infoMessage>
+<fieldset ng-if="state.loggedIn && files && files.length > 0">
+	<infoMessage >The following files are now accessible, and you will be able to choose one later (when logging into a website).  Unless you have a key file to load, CKP is setup and ready to use!</infoMessage>
+	<files ng-if="state.loggedIn">
+		<filelist>
+		  <ul>
+		    <li ng-repeat="file in files" class="not-selectable">
+		      {{file.title}}
+		    </li>
+		  </ul>
+		</filelist>
+	</files>	
+</fieldset>
 <login ng-if="!state.loggedIn && !busy">
 	<a class="pure-button" ng-click="login()">Login to DropBox</a>
 </login>
 <logout ng-if="state.loggedIn && !busy">
 	<a class="pure-button" ng-click="logout()">Logout of Dropbox</a>
 </logout>
-<infoMessage ng-if="busy">Fetching list of files...</infoMessage>
-<files ng-if="state.loggedIn">
-	<filelist>
-	  <ul>
-	    <li ng-repeat="file in files" ng-click="selectFile(file)">
-	      {{file.title}}
-	    </li>
-	  </ul>
-	</filelist>
-</files>

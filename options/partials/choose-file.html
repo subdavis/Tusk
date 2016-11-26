@@ -12,11 +12,10 @@
   </a>
   <errorMessage ng-show="errorMessage">{{errorMessage}}</errorMessage>
   <fieldset ng-show="authorized() && docs && docs.length">
-    These database will be available to unlock when logging into a website...
-    <br>
+		<infoMessage>The following files are now accessible, and you will be able to choose one later (when logging into a website).  Unless you have a key file to load, CKP is setup and ready to use!</infoMessage>
     <filelist>
       <ul>
-        <li ng-repeat="doc in docs">
+        <li ng-repeat="doc in docs" class="not-selectable">
           {{doc.title}}
         </li>
       </ul>
