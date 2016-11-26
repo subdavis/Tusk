@@ -131,6 +131,15 @@ filelist, passwordMatches, keyFiles {
       text-align: center;
       .transition;
 
+      &.not-selectable {
+      	cursor: default;
+      	&:hover {
+      		box-shadow: none;
+      		background: lighten(@light-grey-bg, 5%);
+      		border-color: @light-grey-bg;
+      	}
+      }
+
       &:hover {
         .BoxShadowHelper(1);
         background: @light-blue-bg;
