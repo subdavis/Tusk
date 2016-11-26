@@ -112,6 +112,19 @@ THE SOFTWARE.
 	function handleMessage(message, sender, sendResponse) {
 		if (!message || !message.m) return; //message format unrecognized
 
+		if (message.m == "showMessage") {
+			chrome.notifications.create({
+				'type': 'basic',
+				'iconUrl': 'assets/icons/logo_48.png',
+				'title': 'CKP',
+				'message': message.text
+			}, function(notificationId) {
+				chrome.alarms.create('clearNotification-'+notificationId, {
+					delayInMinutes: 1
+				});
+			})
+		}
+
 		if (message.m == "requestPermission") {
 			//better to do the request here on the background, because on some platforms
 			//the popup may close prematurely when requesting access
