@@ -176,11 +176,6 @@ table.entries td a:hover,
 table.entries th a:hover {
   color: rgba(0, 67, 129, 0.8);
 }
-table.entries td .copied,
-table.entries th .copied {
-  font-size: smaller;
-  background-color: rgba(100, 220, 100, 0.5);
-}
 statusMessage {
   display: block;
   padding: 4px 0;
