@@ -1,4 +1,4 @@
-/*! CKP - KeePass integration for Chrome™, Copyright 2015 Steven Campbell
+/*! CKP - KeePass integration for Chrome™, Copyright 2016 Steven Campbell
     This file is generated.
 */
 .transition {
@@ -10,7 +10,8 @@ body {
   color: rgba(0, 0, 0, 0.9);
 }
 body {
-  width: 400px;
+  max-width: 600px;
+  min-width: 400px;
   padding: 16px;
   overflow-x: hidden;
   overflow-y: auto;
@@ -71,7 +72,7 @@ filelist ul li,
 passwordMatches ul li,
 keyFiles ul li {
   border: 1px solid #eeeeee;
-  background: #eeeeee;
+  background: #eee;
   padding: 4px;
   margin: 4px 0;
   display: block;
@@ -79,6 +80,18 @@ keyFiles ul li {
   list-style-type: none;
   text-align: center;
   transition: all 250ms ease 0s;
+}
+filelist ul li.not-selectable,
+passwordMatches ul li.not-selectable,
+keyFiles ul li.not-selectable {
+  cursor: default;
+}
+filelist ul li.not-selectable:hover,
+passwordMatches ul li.not-selectable:hover,
+keyFiles ul li.not-selectable:hover {
+  box-shadow: none;
+  background: #fbfbfb;
+  border-color: #eee;
 }
 filelist ul li:hover,
 passwordMatches ul li:hover,
@@ -175,11 +188,6 @@ table.entries td a:hover,
 table.entries th a:hover {
   color: rgba(0, 67, 129, 0.8);
 }
-table.entries td .copied,
-table.entries th .copied {
-  font-size: smaller;
-  background-color: rgba(100, 220, 100, 0.5);
-}
 statusMessage {
   display: block;
   padding: 4px 0;
@@ -194,7 +202,7 @@ keyFileName div.center {
 pageInfo,
 compositeKeyPart,
 .compositeKeyPart {
-  background: #eeeeee;
+  background: #eee;
   display: block;
   padding: 4px;
   border: solid 2px #d5d5d5;
@@ -249,7 +257,7 @@ infoMessage {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
 }
 errorMessage {
-  background: #b71c1c;
+  background: #B71C1C;
   display: block;
   padding: 4px;
   border: solid 2px #8b1515;
@@ -272,4 +280,354 @@ drop-target.over,
   background: rgba(0, 128, 255, 0.2);
   -webkit-animation: pulse 1s infinite;
   animation: pulse 1s infinite;
+}
+.keepass-icon {
+  background-image: url(/assets/icons.png);
+  background-repeat: no-repeat;
+  display: block;
+}
+.keepass-icon.icon-id-00 {
+  background-position: 0 0;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-01 {
+  background-position: -16px 0;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-02 {
+  background-position: -32px 0;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-03 {
+  background-position: -48px 0;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-04 {
+  background-position: -64px 0;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-05 {
+  background-position: -80px 0;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-06 {
+  background-position: -96px 0;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-07 {
+  background-position: -112px 0;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-08 {
+  background-position: 0 -16px;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-09 {
+  background-position: -16px -16px;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-10 {
+  background-position: -32px -16px;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-11 {
+  background-position: -48px -16px;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-12 {
+  background-position: -64px -16px;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-13 {
+  background-position: -80px -16px;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-14 {
+  background-position: -96px -16px;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-15 {
+  background-position: -112px -16px;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-16 {
+  background-position: 0 -32px;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-17 {
+  background-position: -16px -32px;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-18 {
+  background-position: -32px -32px;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-19 {
+  background-position: -48px -32px;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-20 {
+  background-position: -64px -32px;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-21 {
+  background-position: -80px -32px;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-22 {
+  background-position: -96px -32px;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-23 {
+  background-position: -112px -32px;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-24 {
+  background-position: 0 -48px;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-25 {
+  background-position: -16px -48px;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-26 {
+  background-position: -32px -48px;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-27 {
+  background-position: -48px -48px;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-28 {
+  background-position: -64px -48px;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-29 {
+  background-position: -80px -48px;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-30 {
+  background-position: -96px -48px;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-31 {
+  background-position: -112px -48px;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-32 {
+  background-position: 0 -64px;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-33 {
+  background-position: -16px -64px;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-34 {
+  background-position: -32px -64px;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-35 {
+  background-position: -48px -64px;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-36 {
+  background-position: -64px -64px;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-37 {
+  background-position: -80px -64px;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-38 {
+  background-position: -96px -64px;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-39 {
+  background-position: -112px -64px;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-40 {
+  background-position: 0 -80px;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-41 {
+  background-position: -16px -80px;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-42 {
+  background-position: -32px -80px;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-43 {
+  background-position: -48px -80px;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-44 {
+  background-position: -64px -80px;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-45 {
+  background-position: -80px -80px;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-46 {
+  background-position: -96px -80px;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-47 {
+  background-position: -112px -80px;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-48 {
+  background-position: 0 -96px;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-49 {
+  background-position: -16px -96px;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-50 {
+  background-position: -32px -96px;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-51 {
+  background-position: -48px -96px;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-52 {
+  background-position: -64px -96px;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-53 {
+  background-position: -80px -96px;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-54 {
+  background-position: -96px -96px;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-55 {
+  background-position: -112px -96px;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-56 {
+  background-position: 0 -112px;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-57 {
+  background-position: -16px -112px;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-58 {
+  background-position: -32px -112px;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-59 {
+  background-position: -48px -112px;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-60 {
+  background-position: -64px -112px;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-61 {
+  background-position: -80px -112px;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-62 {
+  background-position: -96px -112px;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-63 {
+  background-position: -112px -112px;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-64 {
+  background-position: -128px 0;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-65 {
+  background-position: -128px -16px;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-66 {
+  background-position: -128px -32px;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-67 {
+  background-position: -128px -48px;
+  width: 16px;
+  height: 16px;
+}
+.keepass-icon.icon-id-68 {
+  background-position: -128px -64px;
+  width: 16px;
+  height: 16px;
 }

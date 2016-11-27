@@ -57,8 +57,9 @@ keepassSettings.config(['$routeProvider', function($routeProvider) {
     templateUrl: chrome.extension.getURL('/options/partials/choose-onedrive-file.html'),
     controller: 'chooseOneDriveFileController'
   }).when('/advanced', {
-    templateUrl: chrome.extension.getURL('/options/partials/advanced.html'),
-    controller: 'advancedController'
+    templateUrl: chrome.extension.getURL('/options/partials/advanced.html'), controller: 'advancedController'
+  }).when('/settings', {
+    templateUrl: chrome.extension.getURL('/options/partials/settings.html'), controller: 'settingsController'
   }).otherwise({
     redirectTo: '/startup'
   });
@@ -125,6 +126,7 @@ keepassSettings.controller('startupController', ['$scope', 'settings', StartupCo
 keepassSettings.controller('storedDataController', ['$scope', StoredDataController]);
 keepassSettings.controller('manageKeyFilesController', ['$scope', 'settings', 'keyFileParser', ManageKeyFilesController]);
 keepassSettings.controller('advancedController', ['$scope', 'settings', 'secureCacheDisk', AdvancedController]);
+keepassSettings.controller('settingsController', ['$scope', 'settings', SettingsController]);
 keepassSettings.controller('dragDropController', ['$scope', 'localChromePasswordFileManager', DragDropController]);
 keepassSettings.controller('sampleDatabaseController', ['$scope', 'sampleDatabaseFileManager', SampleDatabaseController]);
 keepassSettings.controller('fileTypeController', ['$scope', '$location', 'passwordFileStoreRegistry', FileTypeController]);

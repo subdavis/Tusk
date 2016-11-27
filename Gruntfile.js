@@ -4,24 +4,24 @@ module.exports = function(grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON('manifest.json'),
     clean: ['build', '<%= pkg.name %>.zip'],
-    uglify: {
-      options: {
-        banner: '/*! <%= pkg.name %>, '
+	  usebanner: {
+	  	banner: {
+	      options: {
+	        position: 'top',
+	        banner: '/*! <%= pkg.name %>, '
           + 'Copyright <%= grunt.template.today("yyyy") %> Steven Campbell\n'
-          + '*/\n',
-        mangle: false,
-        preserveComments: 'some'
-      },
-      target: {
+          + '*/',
+	        linebreak: true
+	      },
         files: [
-          {expand: true, src: 'popups/**/*.js', dest:'build/'},
-          {expand: true, src: 'background/**/*.js', dest:'build/'},
-          {expand: true, src: 'services/**/*.js', dest:'build/'},
-          {expand: true, src: 'options/**/*.js', dest:'build/'},
-          {expand: true, src: ['*.js', '!Gruntfile.js', '!tests/*', '!bower_components/**/*'], dest:'build/'}
+          {expand: true, src: 'popups/**/*.js', cwd:'build/'},
+          {expand: true, src: 'background/**/*.js', cwd:'build/'},
+          {expand: true, src: 'services/**/*.js', cwd:'build/'},
+          {expand: true, src: 'options/**/*.js', cwd:'build/'},
+          {expand: true, src: ['*.js', '!Gruntfile.js', '!tests/*', '!bower_components/**/*'], cwd:'build/'}
           ]
-      }
-    },
+	    }
+	  }, 
     copy: {
       bower: {
         files: [
@@ -35,6 +35,16 @@ module.exports = function(grunt) {
           {expand: true, cwd: 'bower_components/angular-route/', src: 'angular-route.min.js', dest: 'lib/'},
           {expand: true, cwd: 'bower_components/angular-sanitize/', src: 'angular-sanitize.min.js', dest: 'lib/'},
           {expand: true, cwd: 'bower_components/animate.css/', src: 'animate.css', dest: 'lib/'}
+          ]
+      },
+      appjs: {
+        files: [
+          {expand: true, src: 'popups/**/*.js', dest:'build/'},
+          {expand: true, src: 'background/**/*.js', dest:'build/'},
+          {expand: true, src: 'services/**/*.js', dest:'build/'},
+          {expand: true, src: 'options/**/*.js', dest:'build/'},
+          {expand: true, src: 'lib/**/*.js', dest:'build/'},
+          {expand: true, src: ['*.js', '!Gruntfile.js'], dest:'build/'}
           ]
       }
     },
@@ -75,7 +85,6 @@ module.exports = function(grunt) {
       target: {
         files: [
           {expand: true, cwd: 'build/', src: '**/*', dest:'/'},
-          {expand: true, src: 'lib/*.js', dest: '/'},
           {expand: true, src: 'manifest.json', dest: '/'},
           {expand: true, src: 'license.txt', dest: '/'},
           {expand: true, src: 'assets/**/*', dest: '/'}
@@ -94,7 +103,6 @@ module.exports = function(grunt) {
   });
 
   grunt.loadNpmTasks('grunt-contrib-jshint');
-  grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-compress');
   grunt.loadNpmTasks('grunt-contrib-copy');
@@ -102,10 +110,11 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-htmlmin');
   grunt.loadNpmTasks('grunt-contrib-cssmin');
   grunt.loadNpmTasks('grunt-contrib-less');
+	grunt.loadNpmTasks('grunt-banner');
 
   // Default task(s).
   grunt.registerTask('default', ['clean']);
-  grunt.registerTask('package', ['clean', 'copy:bower', 'uglify', 'less', 'cssmin', 'htmlmin', 'compress']);
+  grunt.registerTask('package', ['clean', 'copy:bower', 'copy:appjs', 'usebanner', 'less', 'cssmin', 'htmlmin', 'compress']);
   grunt.registerTask('updatelib', ['copy:bower']);
   //grunt.registerTask('styles', ['watch']);
 

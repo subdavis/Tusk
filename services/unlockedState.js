@@ -83,21 +83,24 @@ function UnlockedState($interval, $location, keepassReference, protectedMemory, 
 	$interval(my.clearBackgroundState, 60000, 1);  //clear backgroundstate after 10 minutes live - we should never be alive that long
 
 	my.autofill = function(entry) {
-		chrome.runtime.sendMessage({
-			m: "requestPermission",
-			perms: {
-				origins: [my.origin]
-			},
-			then: {
-				m: "autofill",
-				tabId: my.tabId,
-				u: entry.userName,
-				p: getPassword(entry),
-				o: my.origin
-			}
-		});
+		settings.getUseCredentialApiFlag().then(useCredentialApi => {
+			chrome.runtime.sendMessage({
+				m: "requestPermission",
+				perms: {
+					origins: [my.origin]
+				},
+				then: {
+					m: "autofill",
+					tabId: my.tabId,
+					u: entry.userName,
+					p: getPassword(entry),
+					o: my.origin,
+					uca: useCredentialApi
+				}
+			});
 
-		window.close(); //close the popup
+			window.close(); //close the popup
+		})
 	}
 
 	//get clear-text password from entry
@@ -107,7 +110,6 @@ function UnlockedState($interval, $location, keepassReference, protectedMemory, 
 
 	my.copyPassword = function(entry) {
 		copyEntry = entry;
-		entry.copied = true;
 		document.execCommand('copy');
 	}
 
@@ -120,7 +122,6 @@ function UnlockedState($interval, $location, keepassReference, protectedMemory, 
 	}
 
 	//listens for the copy event and does the copy
-	var timerInstance;
 	document.addEventListener('copy', function(e) {
 		if (!copyEntry) {
 			return; //listener can get registered multiple times
@@ -140,24 +141,12 @@ function UnlockedState($interval, $location, keepassReference, protectedMemory, 
 			});
 		})
 
-		//actual clipboard clearing occurs on the background task via alarm, this is just for user feedback:
-		my.clipboardStatus = "Copied to clipboard.  Clipboard will clear in 60 seconds."
-		var seconds = 60;
-		if (timerInstance) {
-			//cancel previous timer
-			$interval.cancel(timerInstance)
-		}
+		chrome.runtime.sendMessage({
+			m: "showMessage",
+			text: 'Password copied to clipboard.  Clipboard will clear in 60 seconds.'
+		});
 
-		//do timer to show countdown
-		timerInstance = $interval(function() {
-			seconds -= 1;
-			if (seconds <= 0) {
-				my.clipboardStatus = "Clipboard cleared"
-				$interval.cancel(timerInstance);
-			} else {
-				my.clipboardStatus = "Copied to clipboard.  Clipboard will clear in " + seconds + " seconds."
-			}
-		}, 1000);
+		window.close(); //close the popup
 	});
 
 	function parseUrl(url) {

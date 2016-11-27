@@ -112,6 +112,19 @@ THE SOFTWARE.
 	function handleMessage(message, sender, sendResponse) {
 		if (!message || !message.m) return; //message format unrecognized
 
+		if (message.m == "showMessage") {
+			chrome.notifications.create({
+				'type': 'basic',
+				'iconUrl': 'assets/icons/logo_48.png',
+				'title': 'CKP',
+				'message': message.text
+			}, function(notificationId) {
+				chrome.alarms.create('clearNotification-'+notificationId, {
+					delayInMinutes: 1
+				});
+			})
+		}
+
 		if (message.m == "requestPermission") {
 			//better to do the request here on the background, because on some platforms
 			//the popup may close prematurely when requesting access
@@ -130,20 +143,50 @@ THE SOFTWARE.
 		}
 
 		if (message.m == "autofill") {
-			chrome.tabs.executeScript(message.tabId, {
-				file: "keepass.js",
-				allFrames: true,
-				runAt: "document_start"
-			}, function(result) {
-				//script injected
-				chrome.tabs.sendMessage(message.tabId, {
-					m: "fillPassword",
-					u: message.u,
-					p: message.p,
-					o: message.o
+			alreadyInjected(message.tabId).then( injectedAlready => {
+				if (injectedAlready === true) {
+					chrome.tabs.sendMessage(message.tabId, {
+						m: "fillPassword",
+						u: message.u,
+						p: message.p,
+						o: message.o,
+						uca: message.uca
+					});
+
+					return;
+				}
+
+				chrome.tabs.executeScript(message.tabId, {
+					file: "keepass.js",
+					allFrames: true,
+					runAt: "document_start"
+				}, function(result) {
+					//script injected
+					chrome.tabs.sendMessage(message.tabId, {
+						m: "fillPassword",
+						u: message.u,
+						p: message.p,
+						o: message.o,
+						uca: message.uca
+					});
 				});
-			});
+			})
 		}
+	}
+
+	// function to determine if the content script is already injected, so we don't do it twice
+	function alreadyInjected(tabId) {
+		return new Promise( (resolve, reject) => {
+			chrome.tabs.sendMessage(tabId, {m: 'ping'}, response => {
+				if (response) 
+					resolve(true);
+				else {
+					let err = chrome.runtime.lastError;
+					resolve(false); 
+				} 
+			})	
+		})
+		
 	}
 
 	//listen for "autofill" message:

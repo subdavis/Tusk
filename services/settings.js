@@ -154,6 +154,32 @@ function Settings() {
 		});
 	}
 
+	exports.saveDefaultRememberOptions = function(rememberPassword, rememberPeriod) {
+		if (rememberPassword) {
+			return chrome.p.storage.local.set({
+				'rememberPeriod': rememberPeriod
+			})
+		}
+
+		// clear options
+		return chrome.p.storage.local.remove('rememberPeriod')
+	}
+
+	exports.getDefaultRememberOptions = function() {
+		return chrome.p.storage.local.get('rememberPeriod').then( items => {
+			if (items.rememberPeriod) {
+				return {
+					rememberPassword: true,
+					rememberPeriod: items.rememberPeriod
+				}
+			} else {
+				return {
+					rememberPassword: false
+				}
+			}
+		})
+	}
+
 	exports.saveLicense = function(license) {
 		return chrome.p.storage.local.set({
 			'license': license
@@ -275,6 +301,49 @@ function Settings() {
     })
   }
 
+  exports.setUseCredentialApiFlag = function(flagValue) {
+  	if (flagValue) {
+	  	return chrome.p.storage.local.set({
+	  		'useCredentialApi': true
+	  	})
+   	}
+
+   	return chrome.p.storage.local.remove('useCredentialApi');
+  }
+
+  exports.getUseCredentialApiFlag = function() {
+  	return chrome.p.storage.local.get('useCredentialApi').then( items => {
+  		return !!items.useCredentialApi;
+  	})
+  }
+
+
+  exports.setPasswordListIconOption = function(option) {
+    return chrome.p.storage.local.set({
+		'showPasswordListIcon': option
+	})
+  }
+
+  exports.getPasswordListIconOption = function() {
+    return chrome.p.storage.local.get('showPasswordListIcon').then(function(option) {
+		return {
+			entry: option.showPasswordListIcon.entry || false,
+			group: option.showPasswordListIcon.group || false
+		}
+	})
+  }
+
+  exports.setPasswordListGroupOption = function(option) {
+    return chrome.p.storage.local.set({
+		'showPasswordListGroup': option
+	})
+  }
+
+  exports.getPasswordListGroupOption = function() {
+    return chrome.p.storage.local.get('showPasswordListGroup').then(function(option) {
+		return option.showPasswordListGroup || false;
+	})
+  }
 
 	return exports;
 }

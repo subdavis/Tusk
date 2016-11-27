@@ -231,6 +231,7 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry, keepa
         })[0];
         currentEntry.groupName = currentEntry.group.name;
         currentEntry.keys.push('groupName');
+        currentEntry.groupIconId = currentEntry.group.iconId;
 
         //in-memory-protect the password in the same way as on KDBX
         if (currentEntry.password) {
@@ -340,6 +341,9 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry, keepa
         var decoder = new TextDecoder();
         group.name = decoder.decode(arr);
         break;
+      case 0x0007:
+        group.iconId = dv.getUint32(0, littleEndian);
+        break;
       /*
       case 0x0009:
       	group.flags = dv.getUint32(0, littleEndian);
@@ -397,15 +401,21 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry, keepa
 
         //exclude histories and recycle bin:
         if (entryNode.parentNode.nodeName != "History") {
+        	entry.searchable = true;
           for (var m = 0; m < entryNode.parentNode.children.length; m++) {
             var groupNode = entryNode.parentNode.children[m];
             if (groupNode.nodeName == 'Name') {
               entry.groupName = groupNode.textContent;
               entry.keys.push('groupName')
+            } else if (groupNode.nodeName == 'IconID') {
+              entry.groupIconId = Number(groupNode.textContent);
+            } else if (groupNode.nodeName == 'EnableSearching' && groupNode.textContent == 'false') {
+            	// this group is not searchable
+            	entry.searchable = false;
             }
           }
 
-          if (entry.groupName != "Recycle Bin")
+          if (entry.searchable)
             results.push(entry);
         }
         for (var j = 0; j < entryNode.children.length; j++) {
