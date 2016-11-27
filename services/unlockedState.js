@@ -29,7 +29,7 @@ THE SOFTWARE.
 /**
  * Shared state and methods for an unlocked password file.
  */
-function UnlockedState($interval, $location, keepass, protectedMemory, settings) {
+function UnlockedState($interval, $location, keepassReference, protectedMemory, settings) {
 	var my = {
 		tabId: "", //tab id of current tab
 		url: "", //url of current tab
@@ -37,10 +37,9 @@ function UnlockedState($interval, $location, keepass, protectedMemory, settings)
 		origin: "", //url of current tab without path or querystring
 		sitePermission: false, //true if the extension already has rights to autofill the password
 		entries: null, //filtered password database entries
-		streamKey: null, //key for accessing protected data fields
 		clipboardStatus: "" //status message about clipboard, used when copying password to the clipboard
 	};
-	var streamKey, copyEntry;
+	var copyEntry;
 
 	//determine current url:
 	my.getTabDetails = function() {
@@ -79,7 +78,6 @@ function UnlockedState($interval, $location, keepass, protectedMemory, settings)
 
 	my.clearBackgroundState = function() {
 		my.entries = null;
-		my.streamKey = null;
 		my.clipboardStatus = "";
 	}
 	$interval(my.clearBackgroundState, 60000, 1);  //clear backgroundstate after 10 minutes live - we should never be alive that long
@@ -107,12 +105,7 @@ function UnlockedState($interval, $location, keepass, protectedMemory, settings)
 
 	//get clear-text password from entry
 	function getPassword(entry) {
-		if (entry.protectedData && entry.protectedData.password)
-			return keepass.getDecryptedEntry(entry.protectedData.password, my.streamKey);
-		else {
-			//KyPass support - it does not use protectedData for passwords that it adds
-			return entry.password;
-		}
+		return keepassReference.getFieldValue(entry, 'password', my.entries);
 	}
 
 	my.copyPassword = function(entry) {
@@ -124,8 +117,8 @@ function UnlockedState($interval, $location, keepass, protectedMemory, settings)
 		$location.path('/entry-details/' + entry.id);
 	}
 
-	my.getDecryptedAttribute = function(protectedAttr) {
-		return keepass.getDecryptedEntry(protectedAttr, my.streamKey);
+	my.getDecryptedAttribute = function(entry, attributeName) {
+		return keepassReference.getFieldValue(entry, attributeName, my.entries);
 	}
 
 	//listens for the copy event and does the copy
