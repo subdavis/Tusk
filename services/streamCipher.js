@@ -60,7 +60,7 @@ function StreamCipher() {
     var bytes = encoder.encode(plainText);
     var encBytes = salsa.encrypt(new Uint8Array(bytes));
 
-    my.position += encBytes.byteLength;  //advance the stream position
+    my.position += encBytes.length;  //advance the stream position
 
     return encBytes;
 	}
