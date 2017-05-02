@@ -227,6 +227,11 @@ compositeKeyPart-remember input,
   margin-top: -8px;
   width: 80px;
 }
+#rememberPeriodLength {
+  display: inline-block;
+  margin-top: -5px;
+  float: right;
+}
 passwordMatches {
   display: block;
   max-height: 150px;
