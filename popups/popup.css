@@ -1,4 +1,4 @@
-/*! CKP - KeePass integration for Chrome™, Copyright 2016 Steven Campbell
+/*! CKP - KeePass integration for Chrome™, Copyright 2017 Steven Campbell
     This file is generated.
 */
 .transition {
@@ -219,8 +219,10 @@ compositeKeyPart-remember,
 pageInfo-remember input,
 compositeKeyPart-remember input,
 .compositeKeyPart-remember input {
-  margin-right: 4px;
-  margin-left: 4px;
+  display: inline-block;
+  float: right;
+  margin-top: -8px;
+  width: 80px;
 }
 passwordMatches {
   display: block;
@@ -280,6 +282,32 @@ drop-target.over,
   background: rgba(0, 128, 255, 0.2);
   -webkit-animation: pulse 1s infinite;
   animation: pulse 1s infinite;
+}
+input[type=range] {
+  -webkit-appearance: none;
+  margin: 5px;
+}
+input[type=range]:focus {
+  outline: none;
+}
+input[type=range]::-webkit-slider-runnable-track {
+  height: 6px;
+  cursor: pointer;
+  animate: 0.2s;
+  background: rgba(0, 120, 231, 0.8);
+  border-radius: 1.3px;
+  border: 0.2px solid #010101;
+  margin-top: -2px;
+}
+input[type=range]::-webkit-slider-thumb {
+  border: 1px solid black;
+  height: 18px;
+  width: 10px;
+  border-radius: 2px;
+  background: white;
+  cursor: pointer;
+  -webkit-appearance: none;
+  margin-top: -7px;
 }
 .keepass-icon {
   background-image: url(/assets/icons.png);
