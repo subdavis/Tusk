@@ -16,9 +16,24 @@ function MasterPasswordController($scope, $routeParams, $location, keepass, unlo
     })
   });
 
-  $scope.setRememberPeriod = function(periodInMinutes) {
-  	$scope.rememberPeriod = periodInMinutes;
+  $scope.setRememberPeriod = function() {
+    if ($scope.sliderRememberPeriod == 26){
+      $scope.rememberPeriodText = "Remember forever.";
+      $scope.rememberPassword = true;
+      $scope.rememberPeriod = undefined;
+    
+    } else if ($scope.sliderRememberPeriod == 0){
+      $scope.rememberPeriodText = "Do not remember.";
+      $scope.rememberPassword = false;
+    
+    } else {
+      $scope.rememberPeriodText = "Remember for " + parseInt($scope.sliderRememberPeriod) + " minutes.";
+      $scope.rememberPassword = true;
+      $scope.rememberPeriod = parseInt($scope.sliderRememberPeriod);
+    }
   }
+  $scope.sliderRememberPeriod = 0;
+  $scope.setRememberPeriod();
 
   settings.getKeyFiles().then(keyFiles => {
     $scope.keyFiles = keyFiles;
