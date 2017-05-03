@@ -1,6 +1,8 @@
 @blue-bg: rgba(0, 120, 231, 0.8);
 @yellow-bg: rgba(255, 255, 100, 0.1);
+@yellow-fg: rgba(239, 199, 0, 1);
 @green-bg: rgba(100, 220, 100, 0.5);
+@green-fg: rgba(0, 153, 58, 1);
 @orange-bg: rgba(255, 153, 51, 0.5);
 @red-bg: #B71C1C;
 @light-blue-bg: rgba(0,128,255,0.2);
@@ -11,6 +13,21 @@
 @grey-icon: #444444;
 @blue-icon: lighten(@blue-bg, 30%);
 
+.green {
+  color: @green-fg;
+}
+.warn {
+  color: @yellow-fg;
+}
+.dashicon {
+  margin: 5px;
+  font-size: 30px;
+  max-width: 30px;
+  width: 30px;
+}
+.bold {
+  font-weight: 700;
+}
 .transition {
   transition: all 250ms ease 0s;
 }
@@ -270,6 +287,11 @@ pageInfo, compositeKeyPart, .compositeKeyPart {
   	}
   }
 }
+#rememberPeriodLength{
+  width: 80px;
+  float: right;
+  margin-top: -5px;
+}
 passwordMatches {
   display: block;
   max-height: 150px;
@@ -295,7 +317,18 @@ busyMessage, infoMessage {
 errorMessage {
   .BorderedMessage(@red-bg, 2px);
 }
-
+.dashboard {
+  .BorderedMessage(@light-grey-bg, 2px);
+  display: block;
+}
+dashitem {
+  display : flex;
+  align-items : center;
+}
+dashitem p{
+  margin: 5px;
+  display: inline;
+}
 drop-target {
   display: block;
   height: 127px;
