@@ -27,7 +27,7 @@ function MasterPasswordController($scope, $routeParams, $location, keepass, unlo
       $scope.rememberPassword = false;
     
     } else {
-      $scope.rememberPeriodText = "Remember for " + parseInt($scope.sliderRememberPeriod) + " minutes.";
+      $scope.rememberPeriodText = "Remember for " + parseInt($scope.sliderRememberPeriod) + " hours.";
       $scope.rememberPassword = true;
       $scope.rememberPeriod = parseInt($scope.sliderRememberPeriod);
     }
@@ -146,7 +146,8 @@ function MasterPasswordController($scope, $routeParams, $location, keepass, unlo
       settings.saveDefaultRememberOptions($scope.rememberPassword, $scope.rememberPeriod);
 
       if ($scope.rememberPeriod) {
-      	settings.setForgetTime('forgetPassword', (Date.now() + (60000*$scope.rememberPeriod)))
+        var check_time = 60000*60*$scope.rememberPeriod; // min per hour * milliseconds per min
+      	settings.setForgetTime('forgetPassword', (Date.now() + check_time));
       } else {
       	//don't clear passwords
       	settings.clearForgetTimes(['forgetPassword']);
