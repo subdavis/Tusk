@@ -1,6 +1,21 @@
-/*! CKP - KeePass integration for Chrome™, Copyright 2016 Steven Campbell
+/*! CKP - KeePass integration for Chrome™, Copyright 2017 Steven Campbell
     This file is generated.
 */
+.green {
+  color: #00993a;
+}
+.warn {
+  color: #efc700;
+}
+.dashicon {
+  margin: 5px;
+  font-size: 30px;
+  max-width: 30px;
+  width: 30px;
+}
+.bold {
+  font-weight: 700;
+}
 .transition {
   transition: all 250ms ease 0s;
 }
@@ -223,10 +238,9 @@ compositeKeyPart-remember input,
   margin-left: 4px;
 }
 #rememberPeriodLength {
-  display: inline-block;
   width: 80px;
-  margin-top: -5px;
   float: right;
+  margin-top: -5px;
 }
 passwordMatches {
   display: block;
@@ -269,6 +283,22 @@ errorMessage {
   border: solid 2px #8b1515;
   margin: 4px 0;
   color: rgba(255, 255, 255, 0.9);
+}
+.dashboard {
+  background: #eee;
+  padding: 4px;
+  border: solid 2px #d5d5d5;
+  margin: 4px 0;
+  color: rgba(0, 0, 0, 0.9);
+  display: block;
+}
+dashitem {
+  display: flex;
+  align-items: center;
+}
+dashitem p {
+  margin: 5px;
+  display: inline;
 }
 drop-target {
   display: block;
