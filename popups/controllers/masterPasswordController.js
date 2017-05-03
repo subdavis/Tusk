@@ -42,7 +42,8 @@ function MasterPasswordController($scope, $routeParams, $location, keepass, unlo
   }).then( rememberOptions => {
   	$scope.rememberPassword = rememberOptions.rememberPassword;
   	if (rememberOptions.rememberPassword) {
-  		$scope.rememberPeriod = rememberOptions.rememberPeriod;
+      $scope.sliderRememberPeriod = rememberOptions.rememberPeriod;
+      $scope.setRememberPeriod();
   	}
   }).then(function() {
     return settings.getCurrentDatabaseUsage();
