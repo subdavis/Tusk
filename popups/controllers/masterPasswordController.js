@@ -9,6 +9,15 @@ function MasterPasswordController($scope, $routeParams, $location, keepass, unlo
   $scope.unlockedState = unlockedState;
   $scope.os = {};
   var passwordKey;
+  $scope.slider_options = [
+    {time: 0,  text: "Do not remember"},
+    {time: .5, text: "Remember for 30 min."},
+    {time: 2,  text: "Remember for 2 hours."},
+    {time: 4,  text: "Remember for 4 hours."},
+    {time: 8,  text: "Remember for 8 hours."},
+    {time: 24, text: "Remember for 24 hours."},
+    {time: 25, text: "Remember forever."}
+  ];
 
   chrome.runtime.getPlatformInfo(function(info) {
     $scope.$apply(function() {
@@ -16,23 +25,30 @@ function MasterPasswordController($scope, $routeParams, $location, keepass, unlo
     })
   });
 
+  $scope.setSliderInt = function(time) {
+    for (var i=0; i<$scope.slider_options.length;i++){
+      if ($scope.slider_options[i].time == time)
+        return i;
+    }
+    return -1;
+  }
   $scope.setRememberPeriod = function() {
-    if ($scope.sliderRememberPeriod == 26){
-      $scope.rememberPeriodText = "Remember forever.";
-      $scope.rememberPassword = true;
-      $scope.rememberPeriod = undefined;
-    
-    } else if ($scope.sliderRememberPeriod == 0){
-      $scope.rememberPeriodText = "Do not remember.";
-      $scope.rememberPassword = false;
-    
-    } else {
-      $scope.rememberPeriodText = "Remember for " + parseInt($scope.sliderRememberPeriod) + " hours.";
-      $scope.rememberPassword = true;
-      $scope.rememberPeriod = parseInt($scope.sliderRememberPeriod);
+    var slider_option_index = parseInt($scope.slider_int);
+    if (slider_option_index < $scope.slider_options.length){
+      if (slider_option_index ==  $scope.slider_options.length - 1){
+        $scope.rememberPassword = true;
+        $scope.rememberPeriod = undefined;
+      } else if (slider_option_index > 0){
+        $scope.rememberPassword = true;
+        $scope.rememberPeriod =  $scope.slider_options[slider_option_index].time;
+      } else {
+        $scope.rememberPassword = false;
+        $scope.rememberPeriod = 0;
+      }
+      $scope.rememberPeriodText =  $scope.slider_options[slider_option_index].text;
     }
   }
-  $scope.sliderRememberPeriod = 0;
+  $scope.slider_int = 0;
   $scope.setRememberPeriod();
 
   settings.getKeyFiles().then(keyFiles => {
@@ -42,7 +58,8 @@ function MasterPasswordController($scope, $routeParams, $location, keepass, unlo
   }).then( rememberOptions => {
   	$scope.rememberPassword = rememberOptions.rememberPassword;
   	if (rememberOptions.rememberPassword) {
-      $scope.sliderRememberPeriod = rememberOptions.rememberPeriod;
+      $scope.rememberPeriod = rememberOptions.rememberPeriod;
+      $scope.slider_int = $scope.setSliderInt($scope.rememberPeriod);
       $scope.setRememberPeriod();
   	}
   }).then(function() {
