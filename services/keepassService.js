@@ -270,7 +270,9 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry, keepa
 
     // Expiration not supported.  Mark all entries as unexpired.
     entry.keys.push('expiry');
+    entry.keys.push('is_expired');
     entry.expiry = -1;
+    entry.is_expired = false;
 
     switch (fieldType) {
       case 0x0000:
@@ -438,12 +440,15 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry, keepa
           	entry.keys.push('binaryFiles');  //the actual files are stored elsewhere in the xml, not sure where
           } else if (childNode.nodeName == "Times") { // Check if the node expires.
             entry.keys.push('expiry');
+            entry.keys.push('is_expired');
             var can_expire = childNode.getElementsByTagName('Expires')[0].textContent;
             if (can_expire == "True"){
               var expiry_text = childNode.getElementsByTagName('ExpiryTime')[0].textContent;
               entry.expiry = Date.parse(expiry_text);
+              entry.is_expired = (Date.now() - entry.expiry) > 0  // Both measured in milliseconds
             } else {
               entry.expiry = -1; // never expires.
+              entry.is_expired = false;
             }
           } else if (childNode.nodeName == "String") {
             var key = childNode.getElementsByTagName('Key')[0].textContent;
