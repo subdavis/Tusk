@@ -75,7 +75,6 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry, keepa
   }
 
   my.getMasterKey = function(masterPassword, keyFileInfo) {
-    console.log("getMasterKey");
     var fileKey = keyFileInfo ? Base64.decode(keyFileInfo.encodedKey) : null;
     return passwordFileStoreRegistry.getChosenDatabaseFile(settings).then(function(buf) {
       var h = keepassHeader.readHeader(buf);
