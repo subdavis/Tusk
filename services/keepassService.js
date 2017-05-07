@@ -270,8 +270,7 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry, keepa
 
     // Expiration not supported.  Mark all entries as unexpired.
     entry.keys.push('expiry');
-    entry.keys.push('is_expired');
-    entry.expiry = -1;
+    entry.expiry = "";
     entry.is_expired = false;
 
     switch (fieldType) {
@@ -393,7 +392,7 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry, keepa
       var decoder = new TextDecoder();
       var parser = new DOMParser();
       var doc = parser.parseFromString(xml, "text/xml");
-      console.log(doc);
+      // console.log(doc);
 
       var results = [];
       var entryNodes = doc.evaluate('//Entry', doc, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
@@ -440,14 +439,14 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry, keepa
           	entry.keys.push('binaryFiles');  //the actual files are stored elsewhere in the xml, not sure where
           } else if (childNode.nodeName == "Times") { // Check if the node expires.
             entry.keys.push('expiry');
-            entry.keys.push('is_expired');
             var can_expire = childNode.getElementsByTagName('Expires')[0].textContent;
             if (can_expire == "True"){
               var expiry_text = childNode.getElementsByTagName('ExpiryTime')[0].textContent;
-              entry.expiry = Date.parse(expiry_text);
-              entry.is_expired = (Date.now() - entry.expiry) > 0  // Both measured in milliseconds
+              var expiry_date = Date.parse(expiry_text);
+              entry.expiry = expiry_text;
+              entry.is_expired = (Date.now() - expiry_date) > 0  // Both measured in milliseconds
             } else {
-              entry.expiry = -1; // never expires.
+              entry.expiry = ""; // never expires.
               entry.is_expired = false;
             }
           } else if (childNode.nodeName == "String") {
