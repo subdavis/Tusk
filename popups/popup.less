@@ -263,12 +263,13 @@ pageInfo, compositeKeyPart, .compositeKeyPart {
   	display: block;
 
   	& input {
-  		margin-right: 4px;
-  		margin-left: 4px;
+      display: inline-block;
+      float: right;
+      margin-top: -8px;
+      width: 80px;
   	}
   }
 }
-
 passwordMatches {
   display: block;
   max-height: 150px;
@@ -317,6 +318,33 @@ drop-target {
     background-position: @x @y;
     width: @width;
     height: @height;
+}
+
+input[type=range] {
+  -webkit-appearance: none;
+  margin: 5px;
+}
+input[type=range]:focus {
+  outline: none;
+}
+input[type=range]::-webkit-slider-runnable-track {
+  height: 6px;
+  cursor: pointer;
+  animate: 0.2s;
+  background: @blue-bg;
+  border-radius: 1.3px;
+  border: 0.2px solid #010101;
+  margin-top: -2px;
+}
+input[type=range]::-webkit-slider-thumb {
+  border: 1px solid black;
+  height: 18px;
+  width: 10px;
+  border-radius: 2px;
+  background: white;
+  cursor: pointer;
+  -webkit-appearance: none;
+  margin-top: -7px;
 }
 
 .keepass-icon {
