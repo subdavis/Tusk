@@ -1,7 +1,7 @@
 {
 	"name": "CKP - KeePass integration for Chrome™",
 	"short_name": "CKP Extension",
-	"version": "2016.11.29",
+	"version": "2017.05.27",
 	"manifest_version": 2,
 	"minimum_chrome_version": "48",
 
@@ -32,10 +32,10 @@
 	"options_ui": {
 		"page": "options/options.html",
 		"chrome_style": true
-	}, 
+	},
 	"background": {
 		"scripts": [
-			"lib/base64.js", "lib/chrome-api-promise.js", 
+			"lib/base64.js", "lib/chrome-api-promise.js",
 			"services/settings.js", "services/protectedMemory.js", "background/background.js"
 		],
 		"persistent": false
