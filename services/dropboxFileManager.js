@@ -71,14 +71,14 @@ function DropboxFileManager($http, settings) {
 		});
 	}
 
-	function listDatabases() {
+	function getDatabases(extension) {
 		return getToken().then(function(accessToken) {
 			var req = {
 				method: 'POST',
 				url: 'https://api.dropbox.com/2/files/search',
 				data: {
 					path: '',
-					query: '.kdb',
+					query: extension,
 					start: 0,
 					max_results: 100,
 					mode: 'filename'
@@ -95,6 +95,12 @@ function DropboxFileManager($http, settings) {
 					title: fileInfo.metadata.path_display
 				};
 			});
+		})
+	}
+
+	function listDatabases() {
+		return Promise.all([getDatabases('.kdb'), getDatabases('.kdbx')]).then(function(arrayOfArrays) {
+			return arrayOfArrays[0].concat(arrayOfArrays[1])
 		}).catch(function(response) {
 			if (response.status == 401) {
 				//unauthorized, means the token is bad.  retry with new token.
