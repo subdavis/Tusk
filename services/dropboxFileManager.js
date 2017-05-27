@@ -74,10 +74,14 @@ function DropboxFileManager($http, settings) {
 	function listDatabases() {
 		return getToken().then(function(accessToken) {
 			var req = {
-				method: 'GET', 
-				url: 'https://api.dropbox.com/1/search/auto/',
-				params: {
-					query: '.kdb'
+				method: 'POST',
+				url: 'https://api.dropbox.com/2/files/search',
+				data: {
+					path: '',
+					query: '.kdb',
+					start: 0,
+					max_results: 100,
+					mode: 'filename'
 				},
 				headers: {
 					'Authorization': 'Bearer ' + accessToken
@@ -86,9 +90,9 @@ function DropboxFileManager($http, settings) {
 
 			return $http(req);
 		}).then(function(response) {
-			return response.data.map(function(fileInfo) {
+			return response.data.matches.map(function(fileInfo) {
 				return {
-					title: fileInfo.path
+					title: fileInfo.metadata.path_display
 				};
 			});
 		}).catch(function(response) {
@@ -96,7 +100,7 @@ function DropboxFileManager($http, settings) {
 				//unauthorized, means the token is bad.  retry with new token.
 				return interactiveLogin().then(listDatabases);
 			}
-		});		
+		});
 	}
 
 	//get the minimum information needed to identify this file for future retrieval
@@ -110,11 +114,12 @@ function DropboxFileManager($http, settings) {
 	function getChosenDatabaseFile(dbInfo) {
 		return getToken().then(function(accessToken) {
 			return $http({
-				method: 'GET',
-				url: 'https://api-content.dropbox.com/1/files/auto' + dbInfo.title,
+				method: 'POST',
+				url: 'https://api-content.dropbox.com/2/files/download',
 				responseType: 'arraybuffer',
 				headers: {
-					'Authorization': 'Bearer ' + accessToken
+					'Authorization': 'Bearer ' + accessToken,
+					'Dropbox-API-Arg': '{"path": "' + dbInfo.title + '"}'
 				}
 			})
 		}).then(function(response) {
@@ -153,19 +158,19 @@ function DropboxFileManager($http, settings) {
 				return new_token;
 			});
 		})
-	} 
+	}
 
 	function interactiveLogin() {
 		return ensureOriginPermissions().then(function() {
 			return new Promise(function(resolve, reject) {
 				var randomState = Base64.encode(window.crypto.getRandomValues(new Uint8Array(16)));  //random state, protects against CSRF
-				var authUrl = 'https://www.dropbox.com/1/oauth2/authorize?response_type=token&client_id=6kxu9nd18t4g74m'
+				var authUrl = 'https://www.dropbox.com/oauth2/authorize?response_type=token&client_id=6kxu9nd18t4g74m'
 					+ '&state=' + encodeURIComponent(randomState)
 					+ '&redirect_uri=' + encodeURIComponent(chrome.identity.getRedirectURL('dropbox'))
 					+ '&force_reapprove=false';
 
 				chrome.p.identity.launchWebAuthFlow({'url': authUrl, 'interactive': true}).then(function(redirect_url) {
-					//console.log(redirect_url); 
+					//console.log(redirect_url);
 					var tokenMatches = /access_token=([^&]+)/.exec(redirect_url);
 					var stateMatches = /state=([^&]+)/.exec(redirect_url);
 					var uidMatches = /uid=(\d+)/.exec(redirect_url);
@@ -178,7 +183,7 @@ function DropboxFileManager($http, settings) {
 							state.loggedIn = true;
 							settings.saveAccessToken(accessTokenType, access_token).then(function() {
 								resolve(access_token);
-							});							
+							});
 						} else {
 							//some sort of error or parsing failure
 							reject();
@@ -191,7 +196,7 @@ function DropboxFileManager($http, settings) {
 					}
 				}).catch(function(err) {
 					reject(err);
-				});		
+				});
 			});
 		});
 	}

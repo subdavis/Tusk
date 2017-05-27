@@ -186,6 +186,7 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry, keepa
 
   //parse kdb file:
   function parseKdb(buf, h) {
+
     return window.crypto.subtle.digest({
       name: "SHA-256"
     }, h.protectedStreamKey).then(function(streamKey) {
@@ -266,6 +267,11 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry, keepa
       arr = new Uint8Array(buf, pos, fieldSize - 1);
     }
     var decoder = new TextDecoder();
+
+    // Expiration not supported.  Mark all entries as unexpired.
+    entry.keys.push('expiry');
+    entry.expiry = "";
+    entry.is_expired = false;
 
     switch (fieldType) {
       case 0x0000:
@@ -386,7 +392,7 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry, keepa
       var decoder = new TextDecoder();
       var parser = new DOMParser();
       var doc = parser.parseFromString(xml, "text/xml");
-      //console.log(doc);
+      // console.log(doc);
 
       var results = [];
       var entryNodes = doc.evaluate('//Entry', doc, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
@@ -431,6 +437,18 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry, keepa
           } else if (childNode.nodeName == "Binary") {
           	entry.binaryFiles = childNode.textContent;
           	entry.keys.push('binaryFiles');  //the actual files are stored elsewhere in the xml, not sure where
+          } else if (childNode.nodeName == "Times") { // Check if the node expires.
+            entry.keys.push('expiry');
+            var can_expire = childNode.getElementsByTagName('Expires')[0].textContent;
+            if (can_expire == "True"){
+              var expiry_text = childNode.getElementsByTagName('ExpiryTime')[0].textContent;
+              var expiry_date = Date.parse(expiry_text);
+              entry.expiry = expiry_text;
+              entry.is_expired = (Date.now() - expiry_date) > 0  // Both measured in milliseconds
+            } else {
+              entry.expiry = ""; // never expires.
+              entry.is_expired = false;
+            }
           } else if (childNode.nodeName == "String") {
             var key = childNode.getElementsByTagName('Key')[0].textContent;
             key = Case.camel(key);
