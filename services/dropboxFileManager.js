@@ -119,13 +119,16 @@ function DropboxFileManager($http, settings) {
 	//given minimal file information, retrieve the actual file
 	function getChosenDatabaseFile(dbInfo) {
 		return getToken().then(function(accessToken) {
+			var arg = {
+				"path": dbInfo.title
+			}
 			return $http({
 				method: 'POST',
 				url: 'https://api-content.dropbox.com/2/files/download',
 				responseType: 'arraybuffer',
 				headers: {
 					'Authorization': 'Bearer ' + accessToken,
-					'Dropbox-API-Arg': '{"path": "' + dbInfo.title + '"}'
+					'Dropbox-API-Arg': JSON.stringify(arg)
 				}
 			})
 		}).then(function(response) {
