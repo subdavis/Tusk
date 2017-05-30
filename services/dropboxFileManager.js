@@ -116,6 +116,15 @@ function DropboxFileManager($http, settings) {
 		}
 	}
 
+	function http_header_safe_json(v) {
+		var charsToEncode = /[\u007f-\uffff]/g;
+ 		return JSON.stringify(v).replace(charsToEncode,
+			function(c) {
+				return '\\u' + ('000' + c.charCodeAt(0).toString(16)).slice(-4);
+			}
+	 	);
+	}
+
 	//given minimal file information, retrieve the actual file
 	function getChosenDatabaseFile(dbInfo) {
 		return getToken().then(function(accessToken) {
@@ -128,7 +137,7 @@ function DropboxFileManager($http, settings) {
 				responseType: 'arraybuffer',
 				headers: {
 					'Authorization': 'Bearer ' + accessToken,
-					'Dropbox-API-Arg': JSON.stringify(arg)
+					'Dropbox-API-Arg': http_header_safe_json(arg)
 				}
 			})
 		}).then(function(response) {
