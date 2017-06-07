@@ -104,7 +104,7 @@ function ProtectedMemory() {
     var dataBytes = Base64.decode(serializedData);
     var decoder = new TextDecoder();
     var decoded = decoder.decode(new Uint8Array(dataBytes));
-    var parsed = JSON.parse(decoded)
+    var parsed = JSON.parse(decoded);
     return dePrepData(parsed);
   }
 

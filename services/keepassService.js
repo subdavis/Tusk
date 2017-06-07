@@ -99,9 +99,7 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry, keepa
         var kdbxCreds = jsonCredentialsToKdbx(masterKey);
         return kdbxweb.Kdbx.load(buf, kdbxCreds).then(db => {
           var psk = new Uint8Array(db.header.protectedStreamKey, 0, db.header.protectedStreamKey.length);
-          console.log(db);
           var entries = parseKdbxDb(db.groups);
-          console.log(entries);
           return processReferences(entries);
         });
       } else { // KDB - fallback to doing it all ourselves.
@@ -405,10 +403,10 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry, keepa
             } else {
               entry.keys.push(Case.camel(field));
               entry[Case.camel(field)] = db_entry.fields[field];
-            } 
-          } 
-        } 
-      } 
+            }
+          }
+        }
+      }
     }
     return results;
   }
@@ -474,8 +472,13 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry, keepa
   	return result.join("");
   }
 
+  /*
+   * The following 3 methods are utilities for the KeeWeb protectedValue class.
+   * Because it uses uint8 arrays that are not JSON serializable, we must transform them
+   * in and out of JSON serializable formats for use.
+   */
+
   function protectedValueToJSON(pv){
-    console.log(pv);
     return {
       salt: Array.from(pv._salt),
       value: Array.from(pv._value)
