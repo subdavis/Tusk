@@ -179,7 +179,7 @@ function MasterPasswordController($scope, $routeParams, $location, keepass, unlo
           databaseUsage['passwordKey'] = passwordKey;
         }
         else {
-          databseUsage['passwordKey'] = Base64.encode(passwordKey);
+          databaseUsage['passwordKey'] = Base64.encode(passwordKey);
         }
         settings.saveCurrentDatabaseUsage(databaseUsage);
       }
