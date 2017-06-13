@@ -69,10 +69,14 @@ function MasterPasswordController($scope, $routeParams, $location, keepass, unlo
     //tweak UI based on what we know about the database file
     $scope.hidePassword = (usage.requiresPassword === false);
     $scope.hideKeyFile = (usage.requiresKeyfile === false);
-    if (usage.passwordKey)
-      passwordKey = ("passwordHash" in usage.passwordKey) ? usage.passwordKey : Base64.decode(usage.passwordKey);
-    else
+    if (usage.passwordKey) {
+      if (usage.version >= 3)
+        passwordKey = usage.passwordKey;
+      else
+        passwordKey = Base64.decode(usage.passwordKey);
+    } else {
       passwordKey = undefined;
+    }
     $scope.rememberedPassword = !!passwordKey;
     if ($scope.rememberedPassword) {
 	    $scope.rememberPassword = true;
@@ -157,21 +161,26 @@ function MasterPasswordController($scope, $routeParams, $location, keepass, unlo
 
 		passwordKeyPromise.then(function(newPasswordKey) {
 			passwordKey = newPasswordKey;
-			return keepass.getPasswords(passwordKey);
-		}).then(function(entries) {
+			return keepass.getDecryptedData(passwordKey);
+		}).then(function(decryptedData) {
       //remember usage for next time
+      var entries = decryptedData.entries;
+      var version = decryptedData.version;
       var databaseUsage = {
         requiresPassword: $scope.masterPassword ? true : false,
         requiresKeyfile: $scope.selectedKeyFile ? true : false,
         passwordKey: undefined,
+        version: version,
         keyFileName: $scope.selectedKeyFile ? $scope.selectedKeyFile.name : "",
         rememberPeriod: $scope.rememberPeriod
       }
-      if (typeof passwordKey === "object" && $scope.rememberPassword){
-        databaseUsage['passwordKey'] = passwordKey;
-        settings.saveCurrentDatabaseUsage(databaseUsage);
-      } else if ($scope.rememberPassword) {
-        databseUsage['passwordKey'] = Base64.encode(passwordKey);
+      if ($scope.rememberPassword){
+        if (version >= 3) {
+          databaseUsage['passwordKey'] = passwordKey;
+        }
+        else {
+          databseUsage['passwordKey'] = Base64.encode(passwordKey);
+        }
         settings.saveCurrentDatabaseUsage(databaseUsage);
       }
       settings.saveDefaultRememberOptions($scope.rememberPassword, $scope.rememberPeriod);

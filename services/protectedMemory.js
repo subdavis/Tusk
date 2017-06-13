@@ -98,7 +98,7 @@ function ProtectedMemory() {
   }
 
   function deserialize(serializedData) {
-    if (serializedData === undefined || typeof(serializedData) !== 'string')
+    if (serializedData === undefined || typeof(serializedData) !== 'string' || serializedData === "")
       return undefined;
 
     var dataBytes = Base64.decode(serializedData);

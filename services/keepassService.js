@@ -89,7 +89,8 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry, keepa
   	});
   }
 
-  my.getPasswords = function(masterKey) {
+  my.getDecryptedData = function(masterKey) {
+    var majorVersion;    
     return passwordFileStoreRegistry.getChosenDatabaseFile(settings).then(function(buf) {
       var h = keepassHeader.readHeader(buf);
       if (!h) throw new Error('Failed to read file header');
@@ -100,10 +101,11 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry, keepa
         return kdbxweb.Kdbx.load(buf, kdbxCreds).then(db => {
           var psk = new Uint8Array(db.header.protectedStreamKey, 0, db.header.protectedStreamKey.length);
           var entries = parseKdbxDb(db.groups);
+          majorVersion = db.header.versionMajor;
           return processReferences(entries);
         });
       } else { // KDB - fallback to doing it all ourselves.
-        
+        majorVersion = 2;
         if (h.innerRandomStreamId != 2 && h.innerRandomStreamId != 0) throw new Error('Invalid Stream Key - Salsa20 is supported by this implementation, Arc4 and others not implemented.');
         var encData = new Uint8Array(buf, h.dataStart);
         //console.log("read file header ok.  encrypted data starts at byte " + h.dataStart);
@@ -137,6 +139,11 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry, keepa
           return entries;
         }).then(processReferences(entries));
       }
+    }).then(function(entries){
+      return {
+        entries: entries,
+        version: majorVersion
+      };
     });
   }
 
