@@ -62,7 +62,12 @@ function KeepassReference(streamCipher) {
 	}
 
 	my.getFieldValue = function(currentEntry, fieldName, allEntries) {
-		var plainText = streamCipher.getDecryptedFieldValue(currentEntry, fieldName);
+		// entries are JSON serializable.
+		// Convert back to a keeweb.ProtectedValue for parsing.
+		var keewebProtectedValue = new kdbxweb.ProtectedValue(
+			currentEntry['protectedData'][fieldName].value, 
+			currentEntry['protectedData'][fieldName].salt);
+		var plainText = keewebProtectedValue.getText();
 		return my.processAllReferences(plainText, currentEntry, allEntries);
 	}
 

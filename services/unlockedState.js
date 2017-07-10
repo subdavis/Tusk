@@ -118,7 +118,9 @@ function UnlockedState($interval, $location, keepassReference, protectedMemory, 
 	}
 
 	my.getDecryptedAttribute = function(entry, attributeName) {
-		return keepassReference.getFieldValue(entry, attributeName, my.entries);
+		var pvJSON = entry.protectedData[attributeName];
+		var protectedValue = new kdbxweb.ProtectedValue(pvJSON.value, pvJSON.salt);
+		return protectedValue.getText();
 	}
 
 	//listens for the copy event and does the copy
