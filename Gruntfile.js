@@ -34,7 +34,8 @@ module.exports = function(grunt) {
           {expand: true, cwd: 'bower_components/angular-animate/', src: 'angular-animate.min.js', dest: 'lib/'},
           {expand: true, cwd: 'bower_components/angular-route/', src: 'angular-route.min.js', dest: 'lib/'},
           {expand: true, cwd: 'bower_components/angular-sanitize/', src: 'angular-sanitize.min.js', dest: 'lib/'},
-          {expand: true, cwd: 'bower_components/animate.css/', src: 'animate.css', dest: 'lib/'}
+          {expand: true, cwd: 'bower_components/animate.css/', src: 'animate.css', dest: 'lib/'},
+          {expand: true, cwd: 'bower_components/components-font-awesome/', src:"fonts/*", dest:"build/"}
           ]
       },
       appjs: {
@@ -46,11 +47,6 @@ module.exports = function(grunt) {
           {expand: true, src: 'lib/**/*.js', dest:'build/'},
           {expand: true, src: ['*.js', '!Gruntfile.js'], dest:'build/'}
           ]
-      },
-      fonts: {
-        files : [
-          {expand: true, cwd: 'assets/fonts/', src: '*', dest:'build/fonts/'}
-        ]
       }
     },
     less: {
@@ -119,7 +115,7 @@ module.exports = function(grunt) {
 
   // Default task(s).
   grunt.registerTask('default', ['clean']);
-  grunt.registerTask('package', ['clean', 'copy:bower', 'copy:appjs', 'copy:fonts', 'usebanner', 'less', 'cssmin', 'htmlmin', 'compress']);
+  grunt.registerTask('package', ['clean', 'copy:bower', 'copy:appjs', 'usebanner', 'less', 'cssmin', 'htmlmin', 'compress']);
   grunt.registerTask('updatelib', ['copy:bower']);
   //grunt.registerTask('styles', ['watch']);
 
