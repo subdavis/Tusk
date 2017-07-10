@@ -2580,7 +2580,6 @@ compositeKeyPart-remember input,
 #rememberPeriodLength {
   width: 80px;
   float: right;
-  margin-top: -5px;
 }
 passwordMatches {
   display: block;
