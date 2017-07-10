@@ -2574,7 +2574,6 @@ compositeKeyPart-remember input,
 .compositeKeyPart-remember input {
   display: inline-block;
   float: right;
-  margin-top: -8px;
   width: 80px;
 }
 #rememberPeriodLength {
