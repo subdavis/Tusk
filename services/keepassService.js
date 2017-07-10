@@ -41,37 +41,44 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry, keepa
   })();
 
   function getKey(isKdbx, masterPassword, fileKey) {
-    var partPromises = [];
-    var SHA = {
-      name: "SHA-256"
-    };
+    if (isKdbx){
+      var creds = new kdbxweb.Credentials(kdbxweb.ProtectedValue.fromString(masterPassword), fileKey);
+      return creds.ready.then(()=>{
+        return kdbxCredentialsToJson(creds);
+      });
+    } else {
+      var partPromises = [];
+      var SHA = {
+        name: "SHA-256"
+      };
 
-    if (masterPassword || !fileKey) {
-      var encoder = new TextEncoder();
-      var masterKey = encoder.encode(masterPassword);
+      if (masterPassword || !fileKey) {
+        var encoder = new TextEncoder();
+        var masterKey = encoder.encode(masterPassword);
 
-      var p = window.crypto.subtle.digest(SHA, new Uint8Array(masterKey));
-      partPromises.push(p);
-    }
-
-    if (fileKey) {
-      partPromises.push(Promise.resolve(fileKey));
-    }
-
-    return Promise.all(partPromises).then(function(parts) {
-      if (isKdbx || partPromises.length > 1) {
-        //kdbx, or kdb with fileKey + masterPassword, do the SHA a second time
-        var compositeKeySource = new Uint8Array(32 * parts.length);
-        for (var i = 0; i < parts.length; i++) {
-          compositeKeySource.set(new Uint8Array(parts[i]), i * 32);
-        }
-
-        return window.crypto.subtle.digest(SHA, compositeKeySource);
-      } else {
-        //kdb with just only fileKey or masterPassword (don't do a second SHA digest in this scenario)
-        return partPromises[0];
+        var p = window.crypto.subtle.digest(SHA, new Uint8Array(masterKey));
+        partPromises.push(p);
       }
-    });
+
+      if (fileKey) {
+        partPromises.push(Promise.resolve(fileKey));
+      }
+
+      return Promise.all(partPromises).then(function(parts) {
+        if (partPromises.length > 1) {
+          //kdb with fileKey + masterPassword, do the SHA a second time
+          var compositeKeySource = new Uint8Array(32 * parts.length);
+          for (var i = 0; i < parts.length; i++) {
+            compositeKeySource.set(new Uint8Array(parts[i]), i * 32);
+          }
+
+          return window.crypto.subtle.digest(SHA, compositeKeySource);
+        } else {
+          //kdb with just only fileKey or masterPassword (don't do a second SHA digest in this scenario)
+          return partPromises[0];
+        }
+      });
+    }
   }
 
   my.getMasterKey = function(masterPassword, keyFileInfo) {
@@ -82,107 +89,77 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry, keepa
   	});
   }
 
-  my.getPasswords = function(masterKey) {
+  my.getDecryptedData = function(masterKey) {
+    var majorVersion;    
     return passwordFileStoreRegistry.getChosenDatabaseFile(settings).then(function(buf) {
       var h = keepassHeader.readHeader(buf);
       if (!h) throw new Error('Failed to read file header');
-      if (h.innerRandomStreamId != 2 && h.innerRandomStreamId != 0) throw new Error('Invalid Stream Key - Salsa20 is supported by this implementation, Arc4 and others not implemented.')
 
-      var encData = new Uint8Array(buf, h.dataStart);
-      //console.log("read file header ok.  encrypted data starts at byte " + h.dataStart);
-      var SHA = {
-        name: "SHA-256"
-      };
-      var AES = {
-        name: "AES-CBC",
-        iv: h.iv
-      };
-
-      return aes_ecb_encrypt(h.transformSeed, masterKey, h.keyRounds).then(function(finalVal) {
-        //do a final SHA-256 on the transformed key
-        return window.crypto.subtle.digest({
+      if (h.kdbx){ // KDBX - use kdbxweb library
+        kdbxweb.CryptoEngine.argon2 = argon2;
+        var kdbxCreds = jsonCredentialsToKdbx(masterKey);
+        return kdbxweb.Kdbx.load(buf, kdbxCreds).then(db => {
+          var psk = new Uint8Array(db.header.protectedStreamKey, 0, db.header.protectedStreamKey.length);
+          var entries = parseKdbxDb(db.groups);
+          majorVersion = db.header.versionMajor;
+          return processReferences(entries);
+        });
+      } else { // KDB - fallback to doing it all ourselves.
+        majorVersion = 2;
+        if (h.innerRandomStreamId != 2 && h.innerRandomStreamId != 0) throw new Error('Invalid Stream Key - Salsa20 is supported by this implementation, Arc4 and others not implemented.');
+        var encData = new Uint8Array(buf, h.dataStart);
+        //console.log("read file header ok.  encrypted data starts at byte " + h.dataStart);
+        var SHA = {
           name: "SHA-256"
-        }, finalVal);
-      }).then(function(encMasterKey) {
-        var finalKeySource = new Uint8Array(h.masterSeed.byteLength + 32);
-        finalKeySource.set(h.masterSeed);
-        finalKeySource.set(new Uint8Array(encMasterKey), h.masterSeed.byteLength);
+        };
+        var AES = {
+          name: "AES-CBC",
+          iv: h.iv
+        };
 
-        return window.crypto.subtle.digest(SHA, finalKeySource);
-      }).then(function(finalKeyBeforeImport) {
-        return window.crypto.subtle.importKey("raw", finalKeyBeforeImport, AES, false, ["decrypt"]);
-      }).then(function(finalKey) {
-        return window.crypto.subtle.decrypt(AES, finalKey, encData);
-      }).then(function(decryptedData) {
-        //at this point we probably have successfully decrypted data, just need to double-check:
-        if (h.kdbx) {
-          //kdbx
-          var storedStartBytes = new Uint8Array(decryptedData, 0, 32);
-          for (var i = 0; i < 32; i++) {
-            if (storedStartBytes[i] != h.streamStartBytes[i]) {
-              throw new Error('Decryption succeeded but payload corrupt');
-              return;
-            }
-          }
+        return aes_ecb_encrypt(h.transformSeed, masterKey, h.keyRounds).then(function(finalVal) {
+          //do a final SHA-256 on the transformed key
+          return window.crypto.subtle.digest({
+            name: "SHA-256"
+          }, finalVal);
+        }).then(function(encMasterKey) {
+          var finalKeySource = new Uint8Array(h.masterSeed.byteLength + 32);
+          finalKeySource.set(h.masterSeed);
+          finalKeySource.set(new Uint8Array(encMasterKey), h.masterSeed.byteLength);
 
-          //ok, data decrypted, lets start parsing:
-          var done = false, pos = 32;
-          var blockArray = [], totalDataLength = 0;
-          while (!done) {
-	          var blockHeader = new DataView(decryptedData, pos, 40);
-	          var blockId = blockHeader.getUint32(0, littleEndian);
-	          var blockSize = blockHeader.getUint32(36, littleEndian);
-	          var blockHash = new Uint8Array(decryptedData, pos+4, 32);
-
-	          if (blockSize > 0) {
-		          var block = new Uint8Array(decryptedData, pos+40, blockSize);
-
-		          blockArray.push(block);
-		          totalDataLength += blockSize;
-		          pos += blockSize + 40;
-	          } else {
-	          	//final block is a zero block
-	          	done = true;
-	          }
-          }
-
-          var allBlocks = new Uint8Array(totalDataLength);
-          pos = 0;
-          for (var i=0; i<blockArray.length; i++) {
-          	allBlocks.set(blockArray[i], pos);
-          	pos += blockArray[i].byteLength;
-          }
-
-          if (h.compressionFlags == 1) {
-            allBlocks = pako.inflate(allBlocks);
-          }
-          var decoder = new TextDecoder();
-	        var xml = decoder.decode(allBlocks);
-          var entries = parseXml(xml, h.protectedStreamKey);
-          return entries;
-
-        } else {
+          return window.crypto.subtle.digest(SHA, finalKeySource);
+        }).then(function(finalKeyBeforeImport) {
+          return window.crypto.subtle.importKey("raw", finalKeyBeforeImport, AES, false, ["decrypt"]);
+        }).then(function(finalKey) {
+          return window.crypto.subtle.decrypt(AES, finalKey, encData);
+        }).then(function(decryptedData) {
+          //at this point we probably have successfully decrypted data, just need to double-check:
           //kdb
           var entries = parseKdb(decryptedData, h);
           return entries;
-        }
-      }).then(function(entries) {
-      	//process references
-      	entries.forEach(function(entry) {
-      		if (entry.keys) {
-	      		entry.keys.forEach(function(key) {
-	      			var fieldRefs = keepassReference.hasReferences(entry[key]);
-	      			if (fieldRefs) {
-	      				entry[key] = keepassReference.processAllReferences(entry[key], entry, entries)
-	      			}
-	      		});
-      		}
-      	})
-
-      	return entries;
-      });
+        }).then(processReferences(entries));
+      }
+    }).then(function(entries){
+      return {
+        entries: entries,
+        version: majorVersion
+      };
     });
   }
+
+  function processReferences(entries){
+    entries.forEach(function(entry) {
+      if (entry.keys) {
+        entry.keys.forEach(function(key) {
+          var fieldRefs = keepassReference.hasReferences(entry[key]);
+          if (fieldRefs) {
+            entry[key] = keepassReference.processAllReferences(entry[key], entry, entries)
+          }
+        });
+      }
+    });
+    return entries;
+  } 
 
   //parse kdb file:
   function parseKdb(buf, h) {
@@ -259,6 +236,7 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry, keepa
     });
   }
 
+
   //read KDB entry field
   function readEntryField(fieldType, fieldSize, buf, pos, entry) {
     var dv = new DataView(buf, pos, fieldSize);
@@ -305,7 +283,7 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry, keepa
         entry.notes = decoder.decode(arr);
         entry.keys.push('notes');
         break;
-/*
+    /*
       case 0x0009:
         ent.tCreation = new PwDate(buf, offset);
         break;
@@ -324,7 +302,7 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry, keepa
       case 0x000E:
         ent.setBinaryData(buf, offset, fieldSize);
         break;
-*/
+    */
     }
   }
 
@@ -381,104 +359,63 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry, keepa
     }
   }
 
-  /**
-   * Parses the KDBX entries xml into an object format
+  /*
+   * Takes a kdbxweb group object and transforms it into a list of entries.
    **/
-  function parseXml(xml, protectedStreamKey) {
-    return window.crypto.subtle.digest({
-      name: "SHA-256"
-    }, protectedStreamKey).then(function(streamKey) {
-    	streamCipher.setKey(streamKey);
-      var decoder = new TextDecoder();
-      var parser = new DOMParser();
-      var doc = parser.parseFromString(xml, "text/xml");
-      // console.log(doc);
-
-      var results = [];
-      var entryNodes = doc.evaluate('//Entry', doc, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
-      var protectedPosition = 0;
-      for (var i = 0; i < entryNodes.snapshotLength; i++) {
-        var entryNode = entryNodes.snapshotItem(i);
-        //console.log(entryNode);
+  function parseKdbxDb(groups){
+    var results = [];
+    for (var i = 0; i < groups.length; i++){
+      var group = groups[i]
+      if (group.groups.length > 0){
+        // recursive case for subgroups.
+        results = results.concat(parseKdbxDb(group.groups));
+      }
+      for (var j = 0; j < group.entries.length; j++){
+        var db_entry = group.entries[j];
         var entry = {
           protectedData: {},
           keys: []
         };
-
-        //exclude histories and recycle bin:
-        if (entryNode.parentNode.nodeName != "History") {
-        	entry.searchable = true;
-          for (var m = 0; m < entryNode.parentNode.children.length; m++) {
-            var groupNode = entryNode.parentNode.children[m];
-            if (groupNode.nodeName == 'Name') {
-              entry.groupName = groupNode.textContent;
-              entry.keys.push('groupName')
-            } else if (groupNode.nodeName == 'IconID') {
-              entry.groupIconId = Number(groupNode.textContent);
-            } else if (groupNode.nodeName == 'EnableSearching' && groupNode.textContent == 'false') {
-            	// this group is not searchable
-            	entry.searchable = false;
-            }
-          }
-
-          if (entry.searchable)
-            results.push(entry);
+        // Entry properties defined by the parent group
+        entry.searchable = true;
+        if (group.enableSearching == 'false') //verify
+          entry.searchable = false;
+        entry.groupIconId = group.icon;
+        entry.keys.push("groupName");
+        entry.groupName = group.name;
+        if (entry.searchable)
+          results.push(entry);
+        // Entry properties defined by the entry
+        if (db_entry.uuid){
+          if (db_entry.uuid.empty == false)
+            entry.id = convertArrayToUUID(Base64.decode(db_entry.uuid.id)); 
         }
-        for (var j = 0; j < entryNode.children.length; j++) {
-          var childNode = entryNode.children[j];
-
-          if (childNode.nodeName == "UUID") {
-          	entry.id = convertArrayToUUID(Base64.decode(childNode.textContent));  
-          } else if (childNode.nodeName == "IconID") {
-          	entry.iconId = Number(childNode.textContent);  //integer
-          } else if (childNode.nodeName == "Tags" && childNode.textContent) {
-          	entry.tags = childNode.textContent;
-          	entry.keys.push('tags');
-          } else if (childNode.nodeName == "Binary") {
-          	entry.binaryFiles = childNode.textContent;
-          	entry.keys.push('binaryFiles');  //the actual files are stored elsewhere in the xml, not sure where
-          } else if (childNode.nodeName == "Times") { // Check if the node expires.
-            entry.keys.push('expiry');
-            var can_expire = childNode.getElementsByTagName('Expires')[0].textContent;
-            if (can_expire == "True"){
-              var expiry_text = childNode.getElementsByTagName('ExpiryTime')[0].textContent;
-              var expiry_date = Date.parse(expiry_text);
-              entry.expiry = expiry_text;
-              entry.is_expired = (Date.now() - expiry_date) > 0  // Both measured in milliseconds
+        if (db_entry.icon)
+          entry.iconId = db_entry.icon;
+        if (db_entry.tags.length > 0){ //verify
+          var tagstring = ""
+          for (let k = 0; k < db_entry.tags.length; k++){
+            tagstring += db_entry.tags[k] + ","
+          }
+          entry.tags = tagstring;
+          entry.keys.push('tags');
+        }
+        if (db_entry.fields){
+          var field_keys = Object.keys(db_entry.fields);
+          for (let k = 0; k < field_keys.length; k++){
+            var field = field_keys[k];
+            if (typeof db_entry.fields[field] == "object"){
+              // type = object ? protected value
+              entry.protectedData[Case.camel(field)] = protectedValueToJSON(db_entry.fields[field]);
             } else {
-              entry.expiry = ""; // never expires.
-              entry.is_expired = false;
+              entry.keys.push(Case.camel(field));
+              entry[Case.camel(field)] = db_entry.fields[field];
             }
-          } else if (childNode.nodeName == "String") {
-            var key = childNode.getElementsByTagName('Key')[0].textContent;
-            key = Case.camel(key);
-            if (key == "keys") {
-            	//avoid name conflict when key == "keys"
-            	key = "keysAlias";
-            }
-            var valNode = childNode.getElementsByTagName('Value')[0];
-            var val = valNode.textContent;
-            var protectedVal = valNode.hasAttribute('Protected');
-
-            if (protectedVal) {
-              var encBytes = new Uint8Array(Base64.decode(val));
-              entry.protectedData[key] = {
-                position: protectedPosition,
-                data: encBytes
-              };
-
-              protectedPosition += encBytes.length;
-            } else {
-            	entry.keys.push(key);
-            }
-            entry[key] = val;
           }
         }
       }
-
-      //console.log(results);
-      return results;
-    });
+    }
+    return results;
   }
 
   function aes_ecb_encrypt(rawKey, data, rounds) {
@@ -540,6 +477,35 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry, keepa
   		result[i * 2] = int8Arr[i].toString(16).toUpperCase();
   	}
   	return result.join("");
+  }
+
+  /*
+   * The following 3 methods are utilities for the KeeWeb protectedValue class.
+   * Because it uses uint8 arrays that are not JSON serializable, we must transform them
+   * in and out of JSON serializable formats for use.
+   */
+
+  function protectedValueToJSON(pv){
+    return {
+      salt: Array.from(pv._salt),
+      value: Array.from(pv._value)
+    }
+  }
+
+  function kdbxCredentialsToJson(creds) {
+    var jsonRet = {passwordHash:null, keyFileHash:null};
+    for (var key in jsonRet)
+      if (creds[key])
+        jsonRet[key] = protectedValueToJSON(creds[key]);
+    return jsonRet;
+  }
+
+  function jsonCredentialsToKdbx(jsonCreds){
+    var creds = new kdbxweb.Credentials(null, null);
+    for (var key in jsonCreds)
+      if (jsonCreds[key])
+        creds[key] = new kdbxweb.ProtectedValue(jsonCreds[key].value, jsonCreds[key].salt);
+    return creds;
   }
 
   return my;

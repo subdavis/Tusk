@@ -98,13 +98,13 @@ function ProtectedMemory() {
   }
 
   function deserialize(serializedData) {
-    if (serializedData === undefined || typeof(serializedData) !== 'string')
+    if (serializedData === undefined || typeof(serializedData) !== 'string' || serializedData === "")
       return undefined;
 
     var dataBytes = Base64.decode(serializedData);
     var decoder = new TextDecoder();
     var decoded = decoder.decode(new Uint8Array(dataBytes));
-    var parsed = JSON.parse(decoded)
+    var parsed = JSON.parse(decoded);
     return dePrepData(parsed);
   }
 
