@@ -2354,15 +2354,6 @@
 .transition {
   transition: all 250ms ease 0s;
 }
-.strike {
-  text-decoration: line-through;
-}
-.more-details-icon {
-  font-size: 20px;
-}
-.align-middle > * {
-  vertical-align: middle;
-}
 html,
 body {
   margin: 0;
@@ -2536,16 +2527,28 @@ table.entries th a {
   text-overflow: inherit;
   overflow-wrap: normal;
   font-size: 1em;
+  text-decoration: none;
   font-weight: 600;
-  color: rgba(0, 120, 231, 0.8);
-}
-table.entries td a:visited,
-table.entries th a:visited {
   color: rgba(0, 120, 231, 0.8);
 }
 table.entries td a:hover,
 table.entries th a:hover {
   color: rgba(0, 67, 129, 0.8);
+}
+table.entries td.action-buttons > a,
+table.entries th.action-buttons > a,
+table.entries td.action-buttons > span,
+table.entries th.action-buttons > span {
+  float: right;
+}
+table.entries .strike {
+  text-decoration: line-through;
+}
+table.entries .list-icon {
+  font-size: 20px;
+}
+table.entries .align-middle > * {
+  vertical-align: middle;
 }
 statusMessage {
   display: block;

@@ -15,6 +15,7 @@
 @red-icon: rgba(255, 128, 128, 0.5);
 @grey-icon: #444444;
 @blue-icon: lighten(@blue-bg, 30%);
+@pure-head-grey-bg: #C0C0C0;
 
 .green {
   color: @green-fg;
@@ -31,15 +32,6 @@
 }
 .transition {
   transition: all 250ms ease 0s;
-}
-.strike {
-  text-decoration: line-through;
-}
-.more-details-icon {
-  font-size: 20px;
-}
-.align-middle > * {
-  vertical-align: middle;
 }
 
 .BoxShadowHelper(@level: 1){
@@ -250,17 +242,28 @@ table.entries {
       text-overflow: inherit;
       overflow-wrap: normal;
       font-size: 1em;
+      text-decoration: none;
       font-weight: 600;
       color: @blue-bg;
-
-      &:visited {
-        color: @blue-bg;
-      }
 
       &:hover {
         color: darken(@blue-bg, 20%);
       }
     }
+    &.action-buttons {
+      & > a, & > span {
+        float: right;
+      }
+    }
+  }
+  .strike {
+    text-decoration: line-through;
+  }
+  .list-icon {
+    font-size: 20px; 
+  }
+  .align-middle > * {
+    vertical-align: middle;
   }
 }
 
