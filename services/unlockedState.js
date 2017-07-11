@@ -105,7 +105,7 @@ function UnlockedState($interval, $location, keepassReference, protectedMemory, 
 
 	//get clear-text password from entry
 	function getPassword(entry) {
-		return keepassReference.getFieldValue(entry, 'password', my.entries);
+		let pass = keepassReference.getFieldValue(entry, 'password', my.entries);
 	}
 
 	my.copyPassword = function(entry) {

@@ -30,7 +30,9 @@ THE SOFTWARE.
 function KeepassReference(streamCipher) {
 	"use strict";
 
-	var my = {};
+	var my = {
+		majorVersion: 3 // Defaults to 2, unless told otherwise
+	};
 
 	my.hasReferences = function(fieldValue) {
 		return !!/\{.+\}/.test(fieldValue || '');
@@ -39,7 +41,8 @@ function KeepassReference(streamCipher) {
 	/*
 	 * Process all references found in fieldValue to their final values
 	 */
-	my.processAllReferences = function(fieldValue, currentEntry, allEntries) {
+	my.processAllReferences = function(majorVersion, fieldValue, currentEntry, allEntries) {
+		my.majorVersion = majorVersion; //update the major version if it changed.
 		var re = /(\{[^\{\}]+\})/g;
 		var expressions = re.exec(fieldValue || '');
 		if (!expressions) return fieldValue;  //no references
@@ -61,13 +64,17 @@ function KeepassReference(streamCipher) {
 		return result;
 	}
 
+	my.keewebGetDecryptedFieldValue = function(entry, fieldName){
+		let keewebProtectedValue = new kdbxweb.ProtectedValue(
+			entry['protectedData'][fieldName].value, 
+			entry['protectedData'][fieldName].salt);
+		return keewebProtectedValue.getText();
+	}
+
 	my.getFieldValue = function(currentEntry, fieldName, allEntries) {
 		// entries are JSON serializable.
 		// Convert back to a keeweb.ProtectedValue for parsing.
-		var keewebProtectedValue = new kdbxweb.ProtectedValue(
-			currentEntry['protectedData'][fieldName].value, 
-			currentEntry['protectedData'][fieldName].salt);
-		var plainText = keewebProtectedValue.getText();
+		let plainText = my.keewebGetDecryptedFieldValue(currentEntry, fieldName);
 		return my.processAllReferences(plainText, currentEntry, allEntries);
 	}
 
@@ -107,7 +114,10 @@ function KeepassReference(streamCipher) {
 				}
 			});
 			if (matches.length) {
-				return streamCipher.getDecryptedFieldValue(matches[0], wantedField);
+				if (my.majorVersion >= 3)
+					return my.keewebGetDecryptedFieldValue(matches[0], wantedField);
+				else
+					return streamCipher.getDecryptedFieldValue(matches[0], wantedField);
 			}
 		}
 
