@@ -537,7 +537,8 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry, keepa
   	var int8Arr = new Uint8Array(arr);
   	var result = new Array(int8Arr.byteLength * 2);
   	for (var i=0;i<int8Arr.byteLength;i++) {
-  		result[i * 2] = int8Arr[i].toString(16).toUpperCase();
+      var hexit = int8Arr[i].toString(16).toUpperCase();
+  		result[i * 2] = hexit.length == 2 ? hexit : "0"+hexit;
   	}
   	return result.join("");
   }
