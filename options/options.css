@@ -2357,6 +2357,12 @@
 .strike {
   text-decoration: line-through;
 }
+.more-details-icon {
+  font-size: 20px;
+}
+.align-middle > * {
+  vertical-align: middle;
+}
 html,
 body {
   margin: 0;
