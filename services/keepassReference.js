@@ -65,17 +65,21 @@ function KeepassReference(streamCipher) {
 	}
 
 	my.keewebGetDecryptedFieldValue = function(entry, fieldName){
+		if (entry.protectedData === undefined || !entry.protectedData[fieldName]){
+  			return entry[fieldName] || "";  //not an encrypted field
+		}
 		let keewebProtectedValue = new kdbxweb.ProtectedValue(
-			entry['protectedData'][fieldName].value, 
+			entry['protectedData'][fieldName].value,
 			entry['protectedData'][fieldName].salt);
-		return keewebProtectedValue.getText();
+		let ret =  keewebProtectedValue.getText();
+		return ret;
 	}
 
 	my.getFieldValue = function(currentEntry, fieldName, allEntries) {
 		// entries are JSON serializable.
 		// Convert back to a keeweb.ProtectedValue for parsing.
 		let plainText = my.keewebGetDecryptedFieldValue(currentEntry, fieldName);
-		return my.processAllReferences(plainText, currentEntry, allEntries);
+		return my.processAllReferences(my.majorVersion, plainText, currentEntry, allEntries);
 	}
 
 	function resolveReference(referenceText, currentEntry, allEntries) {
