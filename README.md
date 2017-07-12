@@ -16,8 +16,8 @@ To configure a development environment...
 2) Clone the codebase
 	
     ```
-    git clone https://github.com/perfectapi/CKP.git
-    cd CKP
+    git clone https://github.com/subdavis/CKPX.git
+    cd CKPX
     ```
 
 3) Install the dependencies. 
