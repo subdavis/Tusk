@@ -1,82 +1,100 @@
-<!DOCTYPE html>
-<html lang="en-us">
-  <head>
-    <meta charset="UTF-8">
-    <title>CKP by perfectapi</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
-    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
-    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
-  </head>
-  <body>
-    <section class="page-header">
-      <h1 class="project-name">CKP</h1>
-      <h2 class="project-tagline">Chrome extension for filling usernames &amp; passwords stored in KeePass databases</h2>
-      <a href="https://github.com/perfectapi/CKP" class="btn">View on GitHub</a>
-      <a href="https://github.com/perfectapi/CKP/zipball/master" class="btn">Download .zip</a>
-      <a href="https://github.com/perfectapi/CKP/tarball/master" class="btn">Download .tar.gz</a>
-      <a href="/CKP/privacy" class="btn">Privacy Policy</a>
-    </section>
+<html>
+<head>
+  <title>CKPX - KeePass Integration for Chrome</title>
+  <link rel="icon" href="logo_48.png">
+  <style>
+    body {
+      margin: 40px 0px;
+      line-height: 1.5;
+      color: #444;
+    }
+    p, a, li {
+      font-size: 24px;
+      color: #444;
+    }
+    h1 {
+      font-size: 40px;
+      line-height: 1.0;
+      width: 100%;
+    }
+    .button {
+      font-size: 20px;
+      padding: 10px 30px;
+      margin: 10px 0px;
+      margin-right: 20px;
+      border-radius: 8px;
+      color: black;
+      display: inline-block;
+      font-family: monospace;
+    }
+    .button:hover {
+      font-weight: 700;
+    }
+    img.screenshot {
+      box-shadow: 10px 10px 5px #ccc;
+      /*border: 10px solid #236863;*/
+      border-radius: 10px;
+    }
+    .install {
+      border: 3px solid #0A4600;
+      background-color: #97D38D;
+    }
+    .source {
+      border: 3px solid #236863;
+      background-color: #699D99;
+    }
+    .problem {
+      border: 3px solid #530006;
+      background-color: #CF6870;
+    }
+    .content-container {
+      width: 800px;
+      margin: 0 auto;
+    }
+    .videoWrapper {
+      position: relative;
+      padding-bottom: 56.25%; /* 16:9 */
+      padding-top: 25px;
+      height: 0;
+    }
+    .videoWrapper iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+    @media screen and (max-width: 800px) {
+      .content-container {
+        width: 90%;
+      }
+    }
+  </style>
+</head>
+  <div class="content-container">
+  
+    <h1 id="title"><img src="logo_48.png"> CKPX - KeePass Integration for Chrome</h1>
+    <p>This extension adds KeePass autofill functionality to Google Chrome without compromising security for convenience.</p>
+    <p>CKPX is a fork of <a href="https://github.com/perfectapi/ckp">CKP</a>, and seeks to provide improvements to the UI, better security practices, and KDBX version 4 support.</p>
+    
+    <a class="button install" href="https://chrome.google.com/webstore/detail/redditaccessible/dlpdmegojijbaghnccgdcaahlmcoiipp?hl=en-US&gl=US">Install CKPX From Google Web Store</a>
+    <a class="button source" href="https://github.com/suBDavis/CKPX">Download Source Code</a>
+    <a class="button problem" href="https://github.com/suBDavis/CKPX/issues/new">Report a Problem</a>
 
-    <section class="main-content">
-      <h1>
-<a id="ckp" class="anchor" href="#ckp" aria-hidden="true"><span class="octicon octicon-link"></span></a>CKP</h1>
+<!--     <h1 id="screenshots">Screenshots</h1>
+    <img class="screenshot" src="https://i.imgur.com/FgbSedT.png" alt="Screenshot of reddit slash r slash space" width=100%/>
+    <p>screenshot of /r/space - comments, content, and posts are all in one interface</p>
+    <img class="screenshot" src="https://i.imgur.com/Q1ZQObd.png" alt="Screenshot of sub reddit subscription page slash subreddits slash mine" width=100%/>
+    <p>screenshot of /subreddits/mine - select a subreddit to read from your subscriptions</p>
+ -->
+    <h1 id="contribute">Contribute</h1>
+    <p>CKPX is open source.  We use GitHub for source control, and contributions are welcome.</p>
+    <ul>
+      <li>
+        <a href="https://github.com/suBDavis/CKPX">Clone or Pull Request</a>
+      </li>
+      <li>Contact: brandon <span style="display:none;">GET OUT OF HERE, SPAMMERS!!</span>[at] subdavis [dot] com</li>
+    </ul>
 
-<p>Chrome extension for interacting with KeePass password files.  Still in beta.  Web Store url is <a href="https://chrome.google.com/webstore/detail/lnfepbjehgokldcaljagbmchhnaaogpc">https://chrome.google.com/webstore/detail/lnfepbjehgokldcaljagbmchhnaaogpc</a>.   Give it a try!</p>
-
-<h2>
-<a id="motivation" class="anchor" href="#motivation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Motivation</h2>
-
-<p><a href="http://keepass.info/">KeePass</a> password files work well for me on Windows, but on my Chromebook there were no good options to access them.  </p>
-
-<p>Chrome recently implemented the <a href="http://www.w3.org/TR/WebCryptoAPI/">Web Crypto API</a>, so it became practical to write JavaScript code that could parse a KeePass file.  I decided to utilize those to create the extension that I wished existed - one that lets me control my own passwords in a secure format, is simple to use, and does not require any special permissions (i.e. <strong>no</strong> "Access your browse data on all sites").</p>
-
-<h2>
-<a id="major-features" class="anchor" href="#major-features" aria-hidden="true"><span class="octicon octicon-link"></span></a>Major Features</h2>
-
-<ul>
-<li>Zero permissions required to install</li>
-<li>Works with KeePass v1 (.kdb) and v2 (.kdbx) files, with any combination of key file and master password</li>
-<li>Retrieves KeePass password file from Google Drive or Dropbox</li>
-<li>Smart matching of password entry to website, so that you don't have to manually search for your entry</li>
-<li>Manual searching of entries, for those weird edge cases</li>
-<li>Fills in password on website, no need to copy-paste!  (But if you prefer not to grant permission, you can still use copy-paste)</li>
-<li>Anti-phishing detection - warns if the site is not the one that CKP remembers</li>
-<li>Passwords are always encrypted in memory (except briefly when you actually use them!)</li>
-</ul>
-
-<h2>
-<a id="additional-features" class="anchor" href="#additional-features" aria-hidden="true"><span class="octicon octicon-link"></span></a>Additional features</h2>
-
-<ul>
-<li>Easily switch between multiple password database files</li>
-<li>Automatic unlock of key-only databases</li>
-</ul>
-
-<h2>
-<a id="known-limitations" class="anchor" href="#known-limitations" aria-hidden="true"><span class="octicon octicon-link"></span></a>Known Limitations</h2>
-
-<p>The extension works intermittently in incognito mode.</p>
-
-      <footer class="site-footer">
-        <span class="site-footer-owner"><a href="https://github.com/perfectapi/CKP">CKP</a> is maintained by <a href="https://github.com/perfectapi">perfectapi</a>.</span>
-
-        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
-      </footer>
-
-    </section>
-
-            <script type="text/javascript">
-            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-          </script>
-          <script type="text/javascript">
-            try {
-              var pageTracker = _gat._getTracker("UA-26123362-4");
-            pageTracker._trackPageview();
-            } catch(err) {}
-          </script>
-
-  </body>
+  </div>
 </html>
