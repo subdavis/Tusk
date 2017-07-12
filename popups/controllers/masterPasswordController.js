@@ -24,9 +24,7 @@ function MasterPasswordController($scope, $routeParams, $location, keepass, unlo
       $scope.os[info.os] = true;
     })
   });
-
   $scope.setSliderInt = function(time) {
-    
     for (var i=0; i<$scope.slider_options.length;i++){
       if ($scope.slider_options[i].time === time)
         return i;

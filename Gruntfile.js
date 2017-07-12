@@ -35,7 +35,8 @@ module.exports = function(grunt) {
           {expand: true, cwd: 'bower_components/angular-route/', src: 'angular-route.min.js', dest: 'lib/'},
           {expand: true, cwd: 'bower_components/angular-sanitize/', src: 'angular-sanitize.min.js', dest: 'lib/'},
           {expand: true, cwd: 'bower_components/animate.css/', src: 'animate.css', dest: 'lib/'},
-          {expand: true, cwd: 'bower_components/kdbxweb/dist/', src: 'kdbxweb.js', dest: 'lib/'}
+          {expand: true, cwd: 'bower_components/kdbxweb/dist/', src: 'kdbxweb.js', dest: 'lib/'},
+          {expand: true, cwd: 'bower_components/components-font-awesome/', src:"fonts/*", dest:"build/"}
           ]
       },
       appjs: {
