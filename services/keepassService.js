@@ -102,7 +102,7 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry, keepa
           var psk = new Uint8Array(db.header.protectedStreamKey, 0, db.header.protectedStreamKey.length);
           var entries = parseKdbxDb(db.groups);
           majorVersion = db.header.versionMajor;
-          return processReferences(entries);
+          return processReferences(entries, majorVersion);
         });
       } else { // KDB - fallback to doing it all ourselves.
         majorVersion = 2;
@@ -137,7 +137,7 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry, keepa
           //kdb
           var entries = parseKdb(decryptedData, h);
           return entries;
-        }).then(processReferences(entries));
+        }).then(processReferences(entries, majorVersion));
       }
     }).then(function(entries){
       return {
@@ -147,13 +147,15 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry, keepa
     });
   }
 
-  function processReferences(entries){
+  function processReferences(entries, majorVersion){
+    // In order to fully implement references, majorVersion will need to be known
+    // as there are more capabilities for references in v2+
     entries.forEach(function(entry) {
       if (entry.keys) {
         entry.keys.forEach(function(key) {
           var fieldRefs = keepassReference.hasReferences(entry[key]);
           if (fieldRefs) {
-            entry[key] = keepassReference.processAllReferences(entry[key], entry, entries)
+            entry[key] = keepassReference.processAllReferences(majorVersion, entry[key], entry, entries)
           }
         });
       }
@@ -474,7 +476,8 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry, keepa
   	var int8Arr = new Uint8Array(arr);
   	var result = new Array(int8Arr.byteLength * 2);
   	for (var i=0;i<int8Arr.byteLength;i++) {
-  		result[i * 2] = int8Arr[i].toString(16).toUpperCase();
+      var hexit = int8Arr[i].toString(16).toUpperCase();
+  		result[i * 2] = hexit.length == 2 ? hexit : "0"+hexit;
   	}
   	return result.join("");
   }

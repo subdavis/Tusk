@@ -105,7 +105,7 @@ function UnlockedState($interval, $location, keepassReference, protectedMemory, 
 
 	//get clear-text password from entry
 	function getPassword(entry) {
-		return keepassReference.getFieldValue(entry, 'password', my.entries);
+		return my.getDecryptedAttribute(entry, 'password');
 	}
 
 	my.copyPassword = function(entry) {
@@ -118,9 +118,7 @@ function UnlockedState($interval, $location, keepassReference, protectedMemory, 
 	}
 
 	my.getDecryptedAttribute = function(entry, attributeName) {
-		var pvJSON = entry.protectedData[attributeName];
-		var protectedValue = new kdbxweb.ProtectedValue(pvJSON.value, pvJSON.salt);
-		return protectedValue.getText();
+		return keepassReference.getFieldValue(entry, attributeName, my.entries);
 	}
 
 	//listens for the copy event and does the copy
