@@ -1,4 +1,4 @@
-function MasterPasswordController($scope, $routeParams, $location, keepass, unlockedState, secureCache, settings, optionsLink, streamCipher) {
+function MasterPasswordController($scope, $routeParams, $location, keepass, unlockedState, secureCache, settings, optionsLink) {
 	"use strict";
 
   $scope.masterPassword = "";
@@ -112,15 +112,12 @@ function MasterPasswordController($scope, $routeParams, $location, keepass, unlo
   //get entries from secure cache
   secureCache.get('entries').then(function(entries) {
     if (entries && entries.length) {
-      return secureCache.get('streamKey').then(function(streamKey) {
-        showResults(entries, streamKey);
-        $scope.$apply();
-      })
+      showResults(entries);
+      $scope.$apply();
     }
   }).catch(function(err) {
     //this is fine - it just means the cache expired.  Clear the cache to be sure.
     secureCache.clear('entries');
-    secureCache.clear('streamKey');
   });
 
   $scope.forgetPassword = function() {
@@ -128,7 +125,6 @@ function MasterPasswordController($scope, $routeParams, $location, keepass, unlo
       
     }).then(function() {
 			secureCache.clear('entries');
-			secureCache.clear('streamKey');
 			unlockedState.clearBackgroundState();
     	window.close();
     }); 	
@@ -142,7 +138,6 @@ function MasterPasswordController($scope, $routeParams, $location, keepass, unlo
   $scope.chooseAnotherFile = function() {
     unlockedState.clearBackgroundState();
     secureCache.clear('entries');
-    secureCache.clear('streamKey');
     $location.path('/choose-file');
   }
 
@@ -173,12 +168,7 @@ function MasterPasswordController($scope, $routeParams, $location, keepass, unlo
         rememberPeriod: $scope.rememberPeriod
       }
       if ($scope.rememberPassword){
-        if (version >= 3) {
-          databaseUsage['passwordKey'] = passwordKey;
-        }
-        else {
-          databaseUsage['passwordKey'] = Base64.encode(passwordKey);
-        }
+        databaseUsage['passwordKey'] = passwordKey;
         settings.saveCurrentDatabaseUsage(databaseUsage);
       }
       settings.saveDefaultRememberOptions($scope.rememberPassword, $scope.rememberPeriod);
@@ -190,9 +180,8 @@ function MasterPasswordController($scope, $routeParams, $location, keepass, unlo
       	//don't clear passwords
       	settings.clearForgetTimes(['forgetPassword']);
       }
-
       //show results:
-      showResults(entries, streamCipher.getKey());
+      showResults(entries);
 
       $scope.busy = false;
     }).catch(function(err) {
@@ -204,8 +193,7 @@ function MasterPasswordController($scope, $routeParams, $location, keepass, unlo
     });
   };
 
-  function showResults(entries, streamKey) {
-    streamCipher.setKey(streamKey);
+  function showResults(entries) {
 
     var siteUrl = parseUrl(unlockedState.url);
     var siteTokens = getValidTokens(siteUrl.hostname + "." + unlockedState.title);
@@ -258,7 +246,6 @@ function MasterPasswordController($scope, $routeParams, $location, keepass, unlo
 
     //save longer term (in encrypted storage)
     secureCache.save('entries', entries);
-    secureCache.save('streamKey', streamKey);
   }
 
   $scope.findManually = function() {

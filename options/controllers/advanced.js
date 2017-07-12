@@ -20,7 +20,6 @@ function AdvancedController($scope, settings, secureCacheDisk) {
     settings.setDiskCacheFlag($scope.flags.useDiskCache);
     if (!$scope.useDiskCache) {
       secureCacheDisk.clear('entries');
-      secureCacheDisk.clear('streamKey');
     }
   }
 

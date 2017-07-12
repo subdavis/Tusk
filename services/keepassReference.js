@@ -27,11 +27,11 @@ THE SOFTWARE.
 /**
  * Service for resolving keepass references
  */
-function KeepassReference(streamCipher) {
+function KeepassReference() {
 	"use strict";
 
 	var my = {
-		majorVersion: 3 // Defaults to 2, unless told otherwise
+		majorVersion: 3 // Defaults to 3, unless told otherwise
 	};
 
 	my.hasReferences = function(fieldValue) {
@@ -121,7 +121,7 @@ function KeepassReference(streamCipher) {
 				if (my.majorVersion >= 3)
 					return my.keewebGetDecryptedFieldValue(matches[0], wantedField);
 				else
-					return streamCipher.getDecryptedFieldValue(matches[0], wantedField);
+					throw "Database Version Not Supported";
 			}
 		}
 
