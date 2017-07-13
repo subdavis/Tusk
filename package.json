@@ -1,6 +1,6 @@
 {
-  "name": "CKP",
-  "version": "2015.10.24",
+  "name": "CKPX",
+  "version": "2017.7.13",
   "devDependencies": {
     "grunt": "1.0.0",
     "grunt-banner": "^0.6.0",

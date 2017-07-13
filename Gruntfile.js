@@ -9,7 +9,7 @@ module.exports = function(grunt) {
 	      options: {
 	        position: 'top',
 	        banner: '/*! <%= pkg.name %>, '
-          + 'Copyright <%= grunt.template.today("yyyy") %> Steven Campbell\n'
+          + 'Copyright 2016 Steven Campbell and <%= grunt.template.today("yyyy") %> Brandon Davis\n'
           + '*/',
 	        linebreak: true
 	      },

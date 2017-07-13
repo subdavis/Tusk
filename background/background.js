@@ -116,7 +116,7 @@ THE SOFTWARE.
 			chrome.notifications.create({
 				'type': 'basic',
 				'iconUrl': 'assets/icons/logo_48.png',
-				'title': 'CKP',
+				'title': 'CKPX',
 				'message': message.text
 			}, function(notificationId) {
 				chrome.alarms.create('clearNotification-'+notificationId, {
@@ -222,7 +222,7 @@ THE SOFTWARE.
 							chrome.notifications.create({
 								'type': 'basic',
 								'iconUrl': 'assets/icons/logo_48.png',
-								'title': 'CKP',
+								'title': 'CKPX',
 								'message': 'Clipboard cleared'
 							}, function(notificationId) {
 								setTimeout(function() {
@@ -235,7 +235,7 @@ THE SOFTWARE.
 								chrome.notifications.create({
 									'type': 'basic',
 									'iconUrl': 'assets/icons/logo_48.png',
-									'title': 'CKP',
+									'title': 'CKPX',
 									'message': 'Remembered password expired'
 								}, function(notificationId) {
 									chrome.alarms.create('clearNotification-'+notificationId, {

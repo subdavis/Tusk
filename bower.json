@@ -1,9 +1,9 @@
 {
-  "name": "CKP",
-  "version": "0.0.0",
-  "homepage": "https://github.com/perfectapi/CKP",
+  "name": "CKPX",
+  "version": "0.1.0",
+  "homepage": "https://github.com/perfectapi/CKPX",
   "authors": [
-    "Steve Campbell <steve@perfectapi.com>"
+    "Brandon Davis <brandon@subdavis.com>"
   ],
   "moduleType": [
     "es6"
