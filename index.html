@@ -1,21 +1,40 @@
 <html>
 <head>
-  <title>CKPX - KeePass Integration for Chrome</title>
+  <title>CKPX - Chrome KeePass, Extended</title>
   <link rel="icon" href="logo_48.png">
+  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
   <style>
     body {
       margin: 40px 0px;
       line-height: 1.5;
       color: #444;
+      font-size: 24px;
     }
     p, a, li {
-      font-size: 24px;
       color: #444;
     }
     h1 {
       font-size: 40px;
       line-height: 1.0;
       width: 100%;
+    }
+    table {
+      border-collapse:collapse;
+      width: 100%;
+    }
+    table tr:nth-child(even) {background: #EEE}
+    table tr:nth-child(odd) {background: #FFF}
+    table td, table th {
+      font-size: 20px;
+      margin: 0px;
+      padding: 10px;
+      text-align: center;
+    }
+    table td.feature {
+      text-align: left;
+    }
+    table td i {
+      color: #0A4600;
     }
     .button {
       font-size: 20px;
@@ -79,13 +98,53 @@
 </head>
   <div class="content-container">
   
-    <h1 id="title"><img class='logo' src="logo_48.png"> CKPX - KeePass Integration for Chrome</h1>
+    <h1 id="title"><img class='logo' src="logo_48.png"> CKPX - Chrome KeePass, Extended</h1>
     <p>This extension adds KeePass autofill functionality to Google Chrome without compromising security for convenience.</p>
     <p>CKPX is a fork of <a href="https://github.com/perfectapi/ckp">CKP</a>, and seeks to provide improvements to the UI, better security practices, and KDBX version 4 support.</p>
     
     <a class="button install" href="https://chrome.google.com/webstore/detail/lnfepbjehgokldcaljagbmchhnaaogpc">Install CKP From Google Web Store</a>
     <a class="button source" href="https://github.com/suBDavis/CKPX">Download Source Code</a>
     <a class="button problem" href="https://github.com/suBDavis/CKPX/issues/new">Report a Problem</a>
+
+    <h1 id="features">Features</h1>
+    <table>
+      <tr>
+        <th></th>
+        <th>CKP</th>
+        <th>CKP<bold>X</bold></th>
+      </tr>
+      <tr>
+        <td class="feature">KDBX v4 Support</td>
+        <td></td>
+        <td><i class="fa fa-check-circle" aria-hidden="true"></i></td>
+      </tr>
+      <tr>
+        <td class="feature">Modern UI</td>
+        <td></td>
+        <td><i class="fa fa-check-circle" aria-hidden="true"></i></td>
+      </tr>
+      <tr>
+        <td class="feature">Under Active Development</td>
+        <td></td>
+        <td><i class="fa fa-check-circle" aria-hidden="true"></i></td>
+      </tr>
+      <tr>
+        <td class="feature">Autofill or Copy KeePass Passwords</td>
+        <td><i class="fa fa-check-circle" aria-hidden="true"></i></td>
+        <td><i class="fa fa-check-circle" aria-hidden="true"></i></td>
+      </tr>
+      <tr>
+        <td class="feature">Google Drive, OneDrive, or Dropbox Support</td>
+        <td><i class="fa fa-check-circle" aria-hidden="true"></i></td>
+        <td><i class="fa fa-check-circle" aria-hidden="true"></i></td>
+      </tr>
+      <!-- <tr>
+        <td>Never stores your password on disk</td>
+        <td><i class="fa fa-check-circle" aria-hidden="true"></i></td>
+        <td><i class="fa fa-check-circle" aria-hidden="true"></i></td>
+      </tr> -->
+    </table>
+    <p>A major issue with CKP is currently that your master password can be stored indefinitely <bold>ON DISK</bold> regardless of how long you set for the remember time.  CKPX seeks to re-implement the master password remember feature to be entirely in-memory so that your password could not be recovered from a computer that is powered off.</p>
 
     <h1 id="screenshots">Screenshots</h1>
     <img class="screenshot" src="http://i.imgur.com/jHzWkiD.png" alt="Screenshot of unlocked screen." width=60%/>
