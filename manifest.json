@@ -57,7 +57,9 @@
 		"identity",
 		"declarativeContent",
 		"alarms",
-		"notifications"
+		"notifications",
+		"https://*.googleusercontent.com/",
+		"https://docs.google.com/"
 	],
 	"optional_permissions": [
 		"https://*/",

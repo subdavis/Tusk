@@ -9,12 +9,24 @@ body {
   font-family: Roboto, Arial, Helvetica, sans-serif;
   font-size: 1em;
   overflow-y: auto;
+
+  p {
+    line-height: 1.2em;
+  }
 }
 
 ng-view {
   &.ng-enter {
     -webkit-animation: zoomInLeft 0.3s;
     animation: zoomInLeft 0.3s;
+  }
+}
+
+.standard {
+  list-style-position: inside;
+  padding-left: 8px;
+  li {
+    list-style-type: disc;
   }
 }
 
@@ -47,7 +59,7 @@ keyfiles {
 .menu {
   display: block;
   margin-bottom: 4px;
-  border-bottom: 2px solid @blue-bg;
+  border-bottom: 4px solid lighten(@blue-bg, 20%);;
 
   a {
     text-decoration: none;
@@ -158,5 +170,25 @@ table.settings.entries {
       margin-right: 10px;
       padding: 5px;
       vertical-align: middle    }
+  }
+}
+
+pageinfo {
+  &.shared-link-box {
+    display: -webkit-flex;
+    display: flex;
+    -webkit-align-items: space-between;
+    align-items: space-between;
+    -webkit-justify-content:space-between;
+    justify-content: space-between;
+    -webkit-align-content: stretch;
+    align-content: stretch;
+
+    input {
+      width: 25%;
+    }
+    input#shared-link {
+      width: 48%;
+    }
   }
 }

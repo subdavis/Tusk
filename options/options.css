@@ -672,9 +672,19 @@ body {
   font-size: 1em;
   overflow-y: auto;
 }
+body p {
+  line-height: 1.2em;
+}
 ng-view.ng-enter {
   -webkit-animation: zoomInLeft 0.3s;
   animation: zoomInLeft 0.3s;
+}
+.standard {
+  list-style-position: inside;
+  padding-left: 8px;
+}
+.standard li {
+  list-style-type: disc;
 }
 .pure-form fieldset legend {
   font-style: italic;
@@ -697,7 +707,7 @@ keyfiles li {
 .menu {
   display: block;
   margin-bottom: 4px;
-  border-bottom: 2px solid rgba(0, 120, 231, 0.8);
+  border-bottom: 4px solid rgba(78, 170, 255, 0.8);
 }
 .menu a {
   text-decoration: none;
@@ -797,4 +807,20 @@ table.settings.entries th input + label {
   margin-right: 10px;
   padding: 5px;
   vertical-align: middle;
+}
+pageinfo.shared-link-box {
+  display: -webkit-flex;
+  display: flex;
+  -webkit-align-items: space-between;
+  align-items: space-between;
+  -webkit-justify-content: space-between;
+  justify-content: space-between;
+  -webkit-align-content: stretch;
+  align-content: stretch;
+}
+pageinfo.shared-link-box input {
+  width: 25%;
+}
+pageinfo.shared-link-box input#shared-link {
+  width: 48%;
 }

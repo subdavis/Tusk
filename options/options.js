@@ -44,6 +44,9 @@ keepassSettings.config(['$routeProvider', function($routeProvider) {
   }).when('/choose-file', {
     templateUrl: chrome.extension.getURL('/options/partials/choose-file.html'),
     controller: 'docsController'
+  }).when('/shared-url', {
+    templateUrl: chrome.extension.getURL('/options/partials/shared-url.html'),
+    controller: 'sharedUrlController'
   }).when('/drag-drop-file', {
     templateUrl: chrome.extension.getURL('/options/partials/drag-drop-file.html'),
     controller: 'dragDropController'
@@ -65,17 +68,21 @@ keepassSettings.config(['$routeProvider', function($routeProvider) {
   });
 }]);
 
-keepassSettings.factory('passwordFileStoreRegistry', ['googleDrivePasswordFileManager', 
+keepassSettings.factory('passwordFileStoreRegistry', [
+  'googleDrivePasswordFileManager', 
+  'sharedUrlFileManager',
   'dropboxFileManager',
   'oneDriveFileManager',
   'localChromePasswordFileManager', 
   'sampleDatabaseFileManager', 
   function(googleDrivePasswordFileManager, 
+    sharedUrlFileManager,
     dropboxFileManager,
     oneDriveFileManager,
     localChromePasswordFileManager, 
     sampleDatabaseFileManager) {
   return new PasswordFileStoreRegistry(googleDrivePasswordFileManager, 
+    sharedUrlFileManager,
     dropboxFileManager,
     oneDriveFileManager, 
     sampleDatabaseFileManager,
@@ -84,6 +91,10 @@ keepassSettings.factory('passwordFileStoreRegistry', ['googleDrivePasswordFileMa
 
 keepassSettings.factory('googleDrivePasswordFileManager', ['$http', '$timeout', function($http, $timeout) {
 	return new GoogleDrivePasswordFileManager($http, $timeout);
+}]);
+
+keepassSettings.factory('sharedUrlFileManager', ['$http', '$timeout', function($http, $timeout) {
+  return new SharedUrlFileManager($http, $timeout);
 }]);
 
 keepassSettings.factory('sampleDatabaseFileManager', ['$http', function($http) {
@@ -131,6 +142,7 @@ keepassSettings.controller('dragDropController', ['$scope', 'localChromePassword
 keepassSettings.controller('sampleDatabaseController', ['$scope', 'sampleDatabaseFileManager', SampleDatabaseController]);
 keepassSettings.controller('fileTypeController', ['$scope', '$location', 'passwordFileStoreRegistry', FileTypeController]);
 keepassSettings.controller('docsController', ['$scope', 'googleDrivePasswordFileManager', DocsController]);
+keepassSettings.controller('sharedUrlController', ['$scope', 'sharedUrlFileManager', SharedUrlController]);
 keepassSettings.controller('chooseDropboxFileController', ['$scope', 'dropboxFileManager', ChooseDropboxFileController]);
 keepassSettings.controller('chooseOneDriveFileController', ['$scope', 'oneDriveFileManager', ChooseOneDriveFileController]);
 keepassSettings.controller('navController', ['$scope', '$location', NavController]);

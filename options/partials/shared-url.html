@@ -1,0 +1,27 @@
+<p>The Shared Link Provider will allow you to link a database over http.  Any file with a direct download link will work here.  To check if a link is a direct download, paste it into a browser address bar and verify that a download starts automatically.</p>
+<p>In addition, this provider supports:</p>
+<ul class="standard">
+	<li><a href="https://support.google.com/docs/answer/2494822" target="_blank">Google Drive Shared Links</a></li>
+	<li><a href="https://www.dropbox.com/help/files-folders/view-only-access">Dropbox Shared Links</a></li>
+</ul>
+<br><br>
+<infoMessage ng-if="busy">Waiting on permissions...</infoMessage>
+
+<filelist>
+	<ul>
+		<li ng-repeat="link in links" >
+		  {{link.title}} via {{link.origin}}
+		  <a class="removeFile" title="Remove" ng-click="removeLink(link)">
+        <icon p="icon-times-circle"></icon>
+      </a>
+		</li>
+	</ul>
+</filelist>
+
+<pageInfo class="shared-link-box">
+  <input id="shared-link" type="text" ng-model="currentUrl" placeholder="Shared Link URL"> 
+  <input id="shared-link-name" type="text" ng-model="currentUrlTitle" placeholder="Database Name">
+  <input type='submit' value="Add Shareable Link" ng-click="addLink()">
+</pageInfo>
+
+<errorMessage ng-show="errorMessage">{{errorMessage}}</errorMessage>
