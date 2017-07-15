@@ -25,8 +25,7 @@ THE SOFTWARE.
 */
 
 /**
- * Settings for CKP
- */
+ * Settings for CKPX  */
 function Settings() {
 	"use strict";
 

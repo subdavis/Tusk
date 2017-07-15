@@ -1,7 +1,7 @@
 {
-	"name": "CKPX - KeePass integration for Chrome™",
+	"name": "CKPX - Chrome KeePass, Extended",
 	"short_name": "CKPX Extension",
-	"version": "2017.7.13",
+	"version": "2017.7.15",
 	"manifest_version": 2,
 	"minimum_chrome_version": "48",
 
@@ -11,9 +11,9 @@
 		"48": "assets/icons/logo_48.png"
 	},
 	"incognito": "split",
-	"key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAg6mZuGtDqhMc9rJSd1EUxjGfOvYpGnOt2pGszrKPpJKWrjUiNh8bA1r+VMcarovr0DulASrZ/ifCpr0qgkloD0hKfJZzegLmsMzl8NMJKJy5p6+CFyuXaRsOPY1fCKb4Ia0pbjObqhnuUsuB9KOn+hKfzxqlL/qiRhelrQLr95zneCTAvAgL0jQX9pwRIjwEhR1tuW07rdJNpSOgJreYEJm+xMBgWxIwZn7+OG+M8PyBW2tbuOPLrfEP2XYzj0pzvKnL5IGEzMG8bdtSbzNOQLK7V5gs9AXV4MdzVV81xhw3H6KVvoa+fVTFuJXIS58oL1VdAZpSayqElLJislXTZwIDAQAB",
+	"key":"MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC8Bp2+G3uMQN1r4rmc3bhU5xvSkRpdus9I+141l04xybQ8CwnRI7QbbEMC7iwXFI2KSGKyO1ujO59QS64KFTZXSGDAhjn9fEYQypNJSwsReOjPL6s8WUeEy1ze+IiPLlw1Wz57tO3ELP2LRKxX4xS25oNr89y0aqO4oe9mXafwNfV++HL1kYpQHHCmruogF0mgi09ickWDRFAf7Ys4zHJXz6/+3Lu+a0kETPNj8oyd2vkM6uKdpFwF/DUtAEd1ZcmbGB+bZKlfEX4ZXgs8Ly1WfxLdE4CN7RXxORFY7WOrvAI21uu46kF/sxj+joYS5iOS4ugEjee0oS14eZvgCGCbAgMBAAECggEBAIOYbdacDYA/9biIWjg7xcNGbOaWv8lR8bm2lF0VpJib/xT29Mv3HRsETnJCl4Ef1WAvAUSU3rIEDKB6FzjfV8UG1xBn4TZUQAWIgkUNzJVR9j7rsgDuy2tZmYpEj+8GF2sQjU6vdqmSg3Fxgt2QBPNtqhVn+9QZvrR+Qbt3WQ54wQBrpPng+YcgDjgve1cS/XRJ34e+h+HQUhJ6ND8rL0BSB1pyhLRscL4fueIUemTLZV3eu0dmmOujRkDyYqqPqsx0aVj5VqmGSLbNsj4S1KW0vjvn5XkyO+O6CbAyynd0/IWroueJKPlaTrldzeZfsedvwR3RN9YMlp1tL7LQX2ECgYEA8PRrS5Lj/69jzGi8+q90yXjkyylTpgO+GjzVzSQ1nvJ2JKRgm/Shw76qEYMVDvRmJZkwfsKVmbsoTqtsIg1jfAUPx3yuKB2O0zQ1UgMZrRv7uFjr5m9uLoi29+QoIkdI/3wZ8ejy+79enCk1FCYTGvJ1WqOccWhNAeF5wnuthWcCgYEAx8QlZu+gavK79eIGGO2B5zut/xF1g4XodpGxyqn9pBHepb0mjrRTmAK5z1xl8C6GeRLcEmy9XEb25TXIMAzMcp9YtDPcqQXgEAViAOMmOrph7vkxQtKR/FaMVrQJZgmRSIwIllCUWQxfbSnBy7y/93axgZrL4UiH+5R6UUbitq0CgYBYvw1Ntnp3T9gID4ObKUhwdDCAi2YdvT8lVsbAWdfOBStyb4CNsFpsSCtHa+ozqdx9eKCd73k+N+qunwCiwh+kLBEVvlw+tjRGofIJlM6+LZJW4ZlxNBV22i/ZuZT2mx7Nyp2btdrY0jE8fwjntOZQhICos54JPwst6Cf6c6cDfQKBgBZOarbBzzHiBOcB5BhofPbrDRTMSEj1bO3Aew/cR3xImon7QxDwRd1VgJYNBTz6lP10A6rzBXoGWo9hoAbthu7NqEQG/n7JLyna0AS1WJF6OnFK1htWFAMPTwBnfh0suFJXgKX4PXhsD0PLQ96SJwVk9ZE5TcbMKJMJE1d8CNjJAoGAcYueRoCLvrZzXfRq6VoqJTtoO6PFXznY9+DTFK/9YCZPQq5HRIt/Li0mM2B/tU/3Zc9hawcIW+PvbCgJQMRiQhDYNsO+H40DyRb16hKxbs4+7kV8wVJWitA+QlYN9Sy11DEw20f72D+s7lV/caIs6wjMPwKF0JD6Ao18G+JPCj4=",
 	"oauth2": {
-		"client_id": "252911279862-spv4ks48i07fqbjvd3isorei5au254b5.apps.googleusercontent.com",
+		"client_id": "965112583821-v7rulpbf3dfjkg06rfhqd54qk37lp6l1.apps.googleusercontent.com",
 		"scopes": [
 			"https://www.googleapis.com/auth/drive.readonly",
 			"https://www.googleapis.com/auth/chromewebstore.readonly"
