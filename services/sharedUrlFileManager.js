@@ -43,11 +43,11 @@ function SharedUrlFileManager($http, $timeout) {
   };
 
   function listDatabases() {
-  	let databases = getUrls();
-  	console.log(databases);
-  	if (databases)
-  		return databases;
-  	return [];
+  	return getUrls().then(urls => {
+  		if (urls)
+  			return urls;
+  		return [];
+  	});
   }
 
   //get the minimum information needed to identify this file for future retrieval
@@ -75,7 +75,9 @@ function SharedUrlFileManager($http, $timeout) {
   }
   function getUrls(){
   	return chrome.p.storage.local.get('sharedUrlList').then(results => {
-  		return results.sharedUrlList;
+  		if (results.hasOwnProperty('sharedUrlList'))
+  			return results.sharedUrlList;
+  		return false;
   	});
   }
 
