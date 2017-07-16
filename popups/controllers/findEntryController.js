@@ -1,6 +1,6 @@
 "use strict";
 
-function FindEntryController($scope, unlockedState, secureCache, streamCipher) {
+function FindEntryController($scope, unlockedState, secureCache) {
   $scope.filter = "";
   $scope.unlockedState = unlockedState;
 
@@ -9,10 +9,6 @@ function FindEntryController($scope, unlockedState, secureCache, streamCipher) {
     $scope.allEntries = entries;
     createEntryFilters(entries);
     $scope.$apply();
-  });
-
-  secureCache.get('streamKey').then(function(streamKey) {
-    streamCipher.setKey(streamKey);
   });
 
   $scope.filterKey = function() {

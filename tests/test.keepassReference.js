@@ -12,7 +12,7 @@ describe('Keepass References', function () {
 		}
 	}
 
-	var refService = KeepassReference(streamCipher);
+	var refService = KeepassReference();
 	var entry = {
 		id: 1,
 		title: 'Sample Title',
@@ -52,12 +52,12 @@ describe('Keepass References', function () {
 		url: 'http://keepass.info/3',
 		notes: 'Some notes3',
 		password: 'Some password3',
-		emailAddress: 'something2@keepass.info',
+		emailAddress: 'something3@keepass.info',
 		keys: ['emailAddress'],
 		protectedData: {
 			password: {
 				position: 20,
-				encBytes: 'y'
+				encBytes: 'z'
 			}
 		}
 	};
@@ -66,28 +66,28 @@ describe('Keepass References', function () {
 	describe('Current Entry', function() {
 
 		it('should resolve title', function() {
-			refService.resolveReference('{TITLE}', entry).should.equal(entry.title);
+			refService.resolveReference('{TITLE}', entry, entries).should.equal(entry.title);
 		});
 		it('should resolve username', function() {
-			refService.resolveReference('{USERNAME}', entry).should.equal(entry.userName);
+			refService.resolveReference('{USERNAME}', entry, entries).should.equal(entry.userName);
 		});
 		it('should resolve url', function() {
-			refService.resolveReference('{URL}', entry).should.equal(entry.url);
+			refService.resolveReference('{URL}', entry, entries).should.equal(entry.url);
 		});
 		it('should resolve password', function() {
-			refService.resolveReference('{PASSWORD}', entry).should.equal(entry.password);
+			refService.resolveReference('{PASSWORD}', entry, entries).should.equal(entry.password);
 		});
 		it('should resolve notes', function() {
-			refService.resolveReference('{NOTES}', entry).should.equal(entry.notes);
+			refService.resolveReference('{NOTES}', entry, entries).should.equal(entry.notes);
 		});
 		it('should not be case-sensitive', function() {
-			refService.resolveReference('{notes}', entry).should.equal(entry.notes);
+			refService.resolveReference('{notes}', entry, entries).should.equal(entry.notes);
 		});
 		it('should return the expression back if not able to evaluate', function() {
 			refService.resolveReference('{sdaads}', entry, entries).should.equal('{sdaads}');
 		})
 		it('should support a custom field name', function() {
-			refService.resolveReference('{S:EmailAddress}', entry).should.equal(entry.emailAddress);
+			refService.resolveReference('{S:EmailAddress}', entry, entries).should.equal(entry.emailAddress);
 		})
 	})
 
