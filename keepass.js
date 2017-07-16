@@ -5,9 +5,13 @@ void 0===c?d&&"get"in d&&null!==(e=d.get(a,b))?e:(e=n.find.attr(a,b),null==e?voi
 
 /**
 
-The MIT License (MIT)
+Copyright for portions of CKPX are held by Steven Campbell, 2015 as part of CKP. 
+All other copyright for CKPX are held by Brandon Davis, 2017.
 
-Copyright (c) 2015 Steven Campbell.
+This license covers the CKPX Chrome extension, excluding the individual libraries
+in /lib folder, which have their own copyrights and licenses inside each file.
+
+The MIT License (MIT)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -26,6 +30,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
+
 
 */
 
