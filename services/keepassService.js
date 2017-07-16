@@ -149,6 +149,14 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry, keepa
             }
           }
         }
+        if (db_entry.times){
+          if (db_entry.times.expires){
+            let expiry_date = Date.parse(db_entry.times.expiryTime);
+            entry.expiry = db_entry.times.expiryTime.toString();
+            entry.is_expired = (Date.now() - expiry_date) > 0  // Both measured in milliseconds
+            entry.keys.push("expiry");
+          }
+        }
       }
     }
     return results;
