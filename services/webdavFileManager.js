@@ -91,7 +91,7 @@ function WebdavFileManager($http, settings) {
 
 			return $http({
 				method: 'GET',
-				url: url + dbInfo.title,
+				url: url + "/" + dbInfo.title,
 				responseType: 'arraybuffer',
 				headers: {
 					Authorization: 'Basic ' + auth
@@ -100,6 +100,7 @@ function WebdavFileManager($http, settings) {
 		}).then(function (response) {
 			return response.data;
 		}).catch(function (response) {
+			console.log(response);
 			return response;
 		});
 	}
