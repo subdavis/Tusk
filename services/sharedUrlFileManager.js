@@ -35,7 +35,7 @@ function SharedUrlFileManager($http, $timeout) {
     getChosenDatabaseFile: getChosenDatabaseFile,
     supportedFeatures: ['incognito', 'listDatabases'],
     title: 'Shared Link',
-    icon: 'icon-google',
+    icon: 'icon-link',
     chooseTitle: 'Shared Link',
     chooseDescription: 'Rather than granting full access to your cloud storage provider, get a shared link and paste it in.',
     setUrls: setUrls,
