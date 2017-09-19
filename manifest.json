@@ -1,7 +1,7 @@
 {
 	"name": "CKPX - Chrome KeePass, Extended",
 	"short_name": "CKPX Extension",
-	"version": "2017.9.7",
+	"version": "2017.9.19",
 	"manifest_version": 2,
 	"minimum_chrome_version": "48",
 
@@ -57,12 +57,12 @@
 		"identity",
 		"declarativeContent",
 		"alarms",
-		"notifications"
+		"notifications",
+		"https://accounts.google.com/"
 	],
 	"optional_permissions": [
 		"https://*/",
 		"http://*/",
 		"file:///*/"
 	]
-
 }
