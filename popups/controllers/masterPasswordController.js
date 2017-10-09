@@ -64,6 +64,7 @@ function MasterPasswordController($scope, $routeParams, $location, keepass, unlo
   }).then(function() {
     return settings.getCurrentDatabaseUsage();
   }).then( usage => {
+    console.log("Usage:", usage);
     //tweak UI based on what we know about the database file
     $scope.hidePassword = (usage.requiresPassword === false);
     $scope.hideKeyFile = (usage.requiresKeyfile === false);
@@ -122,7 +123,10 @@ function MasterPasswordController($scope, $routeParams, $location, keepass, unlo
 
   $scope.forgetPassword = function() {
  		settings.saveCurrentDatabaseUsage({
-      
+      requiresKeyfile: $scope.selectedKeyFile ? true : false,
+      version: version,
+      keyFileName: $scope.selectedKeyFile ? $scope.selectedKeyFile.name : "",
+      rememberPeriod: $scope.rememberPeriod
     }).then(function() {
 			secureCache.clear('entries');
 			unlockedState.clearBackgroundState();
@@ -169,8 +173,8 @@ function MasterPasswordController($scope, $routeParams, $location, keepass, unlo
       }
       if ($scope.rememberPassword){
         databaseUsage['passwordKey'] = passwordKey;
-        settings.saveCurrentDatabaseUsage(databaseUsage);
       }
+      settings.saveCurrentDatabaseUsage(databaseUsage);
       settings.saveDefaultRememberOptions($scope.rememberPassword, $scope.rememberPeriod);
 
       if ($scope.rememberPeriod) {
