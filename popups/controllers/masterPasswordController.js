@@ -9,83 +9,168 @@ function MasterPasswordController($scope, $routeParams, $location, keepass, unlo
   $scope.unlockedState = unlockedState;
   $scope.os = {};
   var passwordKey;
-  $scope.slider_options = [
-    {time: 0,  text: "Do not remember"},
-    {time: 30, text: "Remember for 30 min."},
-    {time: 120,  text: "Remember for 2 hours."},
-    {time: 240,  text: "Remember for 4 hours."},
-    {time: 480,  text: "Remember for 8 hours."},
-    {time: 1440, text: "Remember for 24 hours."},
-    {time: undefined, text: "Remember forever."}
-  ];
 
   chrome.runtime.getPlatformInfo(function(info) {
     $scope.$apply(function() {
       $scope.os[info.os] = true;
     })
   });
-  $scope.setSliderInt = function(time) {
-    for (var i=0; i<$scope.slider_options.length;i++){
-      if ($scope.slider_options[i].time === time)
-        return i;
+  
+  $scope.setRememberPeriod = function(time_int) {
+    /**
+     * Args: optional time_int
+     * if 
+     *  time_int is given, derive slider_int
+     * else 
+     *  assume slider_int is alread set.
+     */
+    var slider_options = [
+      {time: 0,  text: "Do not remember"},
+      {time: 30, text: "Remember for 30 min."},
+      {time: 120,  text: "Remember for 2 hours."},
+      {time: 240,  text: "Remember for 4 hours."},
+      {time: 480,  text: "Remember for 8 hours."},
+      {time: 1440, text: "Remember for 24 hours."},
+      {time: undefined, text: "Remember forever."}
+    ];
+
+    var slider_option_index;
+    if (time_int !== undefined) {
+      $scope.slider_int = (t => {
+        for (var i=0; i < slider_options.length; i++){
+          if (slider_options[i].time === t)
+            return i;
+        }
+        return 0;
+      })(time_int);
+      slider_option_index = $scope.slider_int;
+    } else {
+      slider_option_index = parseInt($scope.slider_int);
     }
-    return 0;
-  }
-  $scope.setRememberPeriod = function() {
-    var slider_option_index = parseInt($scope.slider_int);
-    if (slider_option_index < $scope.slider_options.length){
-      if (slider_option_index ==  $scope.slider_options.length - 1){
+    if (slider_option_index < slider_options.length){
+      if (slider_option_index == slider_options.length - 1){
         $scope.rememberPassword = true;
         $scope.rememberPeriod = undefined;
       } else if (slider_option_index > 0){
         $scope.rememberPassword = true;
-        $scope.rememberPeriod =  $scope.slider_options[slider_option_index].time;
+        $scope.rememberPeriod =  slider_options[slider_option_index].time;
       } else {
         $scope.rememberPassword = false;
         $scope.rememberPeriod = 0;
       }
-      $scope.rememberPeriodText =  $scope.slider_options[slider_option_index].text;
+      $scope.rememberPeriodText =  slider_options[slider_option_index].text;
     }
   }
-  $scope.slider_int = 0;
-  $scope.setRememberPeriod();
+
+  $scope.findManually = function() {
+    $location.path('/find-entry');
+  }
+
+  $scope.clearMessages = function() {
+    $scope.errorMessage = "";
+    $scope.successMessage = "";
+    $scope.partialMatchMessage = "";
+  }
+
+  $scope.forgetPassword = function() {
+    settings.saveCurrentDatabaseUsage({
+     requiresKeyfile: $scope.selectedKeyFile ? true : false,
+     keyFileName: $scope.selectedKeyFile ? $scope.selectedKeyFile.name : "",
+     rememberPeriod: $scope.rememberPeriod
+   }).then(function() {
+     secureCache.clear('entries');
+     unlockedState.clearBackgroundState();
+     window.close();
+   }); 	
+  }
+
+  //go to the options page to manage key files
+  $scope.manageKeyFiles = function() {
+    optionsLink.go();
+  }
+
+  $scope.chooseAnotherFile = function() {
+    unlockedState.clearBackgroundState();
+    secureCache.clear('entries');
+    $location.path('/choose-file');
+  }
+
+  $scope.enterMasterPassword = function() {
+    $scope.clearMessages();
+    $scope.busy = true;
+
+    var passwordKeyPromise;
+    if (!passwordKey) {
+      passwordKeyPromise = keepass.getMasterKey($scope.masterPassword, $scope.selectedKeyFile);
+    } else {
+      passwordKeyPromise = Promise.resolve(passwordKey);
+    }
+
+    passwordKeyPromise.then(function(newPasswordKey) {
+      passwordKey = newPasswordKey;
+      return keepass.getDecryptedData(passwordKey);
+    }).then(function(decryptedData) {
+      //remember usage for next time
+      var entries = decryptedData.entries;
+      var version = decryptedData.version;
+      var databaseUsage = {
+        requiresPassword: $scope.masterPassword ? true : false,
+        requiresKeyfile: $scope.selectedKeyFile ? true : false,
+        passwordKey: undefined,
+        version: version,
+        keyFileName: $scope.selectedKeyFile ? $scope.selectedKeyFile.name : "",
+        rememberPeriod: $scope.rememberPeriod
+      }
+      if ($scope.rememberPassword){
+        databaseUsage['passwordKey'] = passwordKey;
+      }
+      settings.saveCurrentDatabaseUsage(databaseUsage);
+      settings.saveDefaultRememberOptions($scope.rememberPassword, $scope.rememberPeriod);
+
+      if ($scope.rememberPeriod) {
+        var check_time = 60000*$scope.rememberPeriod; // milliseconds per min
+        settings.setForgetTime('forgetPassword', (Date.now() + check_time));
+      } else {
+        //don't clear passwords
+        settings.clearForgetTimes(['forgetPassword']);
+      }
+      //show results:
+      showResults(entries);
+
+      $scope.busy = false;
+    }).catch(function(err) {
+      $scope.errorMessage = err.message || "Incorrect password or key file";
+      $scope.busy = false;
+      passwordKey = null;
+    }).then(function() {
+      $scope.$apply();
+    });
+  };
+
+  $scope.setRememberPeriod(0);
 
   settings.getKeyFiles().then(keyFiles => {
     $scope.keyFiles = keyFiles;
   }).then( () => {
 	  return settings.getDefaultRememberOptions();
   }).then( rememberOptions => {
-  	$scope.rememberPassword = rememberOptions.rememberPassword;
-  	if (rememberOptions.rememberPassword) {
-      $scope.rememberPeriod = rememberOptions.rememberPeriod;
-      $scope.slider_int = $scope.setSliderInt($scope.rememberPeriod);
-      $scope.setRememberPeriod();
-  	}
-  }).then(function() {
+    $scope.setRememberPeriod(rememberOptions.rememberPeriod);
+  }).then( () => {
     return settings.getCurrentDatabaseUsage();
   }).then( usage => {
-    console.log("Usage:", usage);
     //tweak UI based on what we know about the database file
     $scope.hidePassword = (usage.requiresPassword === false);
     $scope.hideKeyFile = (usage.requiresKeyfile === false);
     if (usage.passwordKey) {
-      if (usage.version >= 3)
-        passwordKey = usage.passwordKey;
-      else
-        passwordKey = Base64.decode(usage.passwordKey);
+      passwordKey = usage.passwordKey;
+      $scope.rememberedPassword = true;
     } else {
       passwordKey = undefined;
     }
-    $scope.rememberedPassword = !!passwordKey;
-    if ($scope.rememberedPassword) {
-	    $scope.rememberPassword = true;
-	    $scope.rememberPeriod = usage.rememberPeriod;
-      $scope.slider_int = $scope.setSliderInt($scope.rememberPeriod);
-      $scope.setRememberPeriod();
-    }
+    $scope.setRememberPeriod(usage.rememberPeriod);
 
-    if ($scope.rememberedPassword) {
-    	// remembered password - autologin
+    if ($scope.rememberedPassword && !(usage.keyFileName.length > 0)) {
+    	// remembered password without keyfile - autologin
     	$scope.enterMasterPassword()
     } else if (usage.keyFileName) {
     	// get matched key file
@@ -120,82 +205,6 @@ function MasterPasswordController($scope, $routeParams, $location, keepass, unlo
     //this is fine - it just means the cache expired.  Clear the cache to be sure.
     secureCache.clear('entries');
   });
-
-  $scope.forgetPassword = function() {
- 		settings.saveCurrentDatabaseUsage({
-      requiresKeyfile: $scope.selectedKeyFile ? true : false,
-      version: version,
-      keyFileName: $scope.selectedKeyFile ? $scope.selectedKeyFile.name : "",
-      rememberPeriod: $scope.rememberPeriod
-    }).then(function() {
-			secureCache.clear('entries');
-			unlockedState.clearBackgroundState();
-    	window.close();
-    }); 	
-  }
-
-  //go to the options page to manage key files
-  $scope.manageKeyFiles = function() {
-    optionsLink.go();
-  }
-
-  $scope.chooseAnotherFile = function() {
-    unlockedState.clearBackgroundState();
-    secureCache.clear('entries');
-    $location.path('/choose-file');
-  }
-
-  $scope.enterMasterPassword = function() {
-    $scope.clearMessages();
-    $scope.busy = true;
-
-    var passwordKeyPromise;
-    if (!passwordKey) {
-    	passwordKeyPromise = keepass.getMasterKey($scope.masterPassword, $scope.selectedKeyFile);
-    } else {
-			passwordKeyPromise = Promise.resolve(passwordKey);
-		}
-
-		passwordKeyPromise.then(function(newPasswordKey) {
-			passwordKey = newPasswordKey;
-			return keepass.getDecryptedData(passwordKey);
-		}).then(function(decryptedData) {
-      //remember usage for next time
-      var entries = decryptedData.entries;
-      var version = decryptedData.version;
-      var databaseUsage = {
-        requiresPassword: $scope.masterPassword ? true : false,
-        requiresKeyfile: $scope.selectedKeyFile ? true : false,
-        passwordKey: undefined,
-        version: version,
-        keyFileName: $scope.selectedKeyFile ? $scope.selectedKeyFile.name : "",
-        rememberPeriod: $scope.rememberPeriod
-      }
-      if ($scope.rememberPassword){
-        databaseUsage['passwordKey'] = passwordKey;
-      }
-      settings.saveCurrentDatabaseUsage(databaseUsage);
-      settings.saveDefaultRememberOptions($scope.rememberPassword, $scope.rememberPeriod);
-
-      if ($scope.rememberPeriod) {
-        var check_time = 60000*$scope.rememberPeriod; // milliseconds per min
-      	settings.setForgetTime('forgetPassword', (Date.now() + check_time));
-      } else {
-      	//don't clear passwords
-      	settings.clearForgetTimes(['forgetPassword']);
-      }
-      //show results:
-      showResults(entries);
-
-      $scope.busy = false;
-    }).catch(function(err) {
-      $scope.errorMessage = err.message || "Incorrect password or key file";
-      $scope.busy = false;
-      passwordKey = null;
-    }).then(function() {
-      $scope.$apply();
-    });
-  };
 
   function showResults(entries) {
 
@@ -252,16 +261,6 @@ function MasterPasswordController($scope, $routeParams, $location, keepass, unlo
     secureCache.save('entries', entries);
   }
 
-  $scope.findManually = function() {
-    $location.path('/find-entry');
-  }
-
-  $scope.clearMessages = function() {
-    $scope.errorMessage = "";
-    $scope.successMessage = "";
-    $scope.partialMatchMessage = "";
-  }
-
   function getValidTokens(tokenString) {
     if (!tokenString) return [];
 
@@ -287,7 +286,6 @@ function MasterPasswordController($scope, $routeParams, $location, keepass, unlo
     parser.hash;     // => "#hash"
     parser.host;     // => "example.com:3000"
     */
-
     return parser;
   }
 }
