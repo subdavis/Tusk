@@ -71,8 +71,7 @@ function KeepassReference() {
 		let keewebProtectedValue = new kdbxweb.ProtectedValue(
 			entry['protectedData'][fieldName].value,
 			entry['protectedData'][fieldName].salt);
-		let ret =  keewebProtectedValue.getText();
-		return ret;
+		return keewebProtectedValue.getText();
 	}
 
 	my.getFieldValue = function(currentEntry, fieldName, allEntries) {

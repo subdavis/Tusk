@@ -2,16 +2,6 @@ describe('Keepass References', function () {
 
 	// http://keepass.info/help/base/fieldrefs.html
 
-	var streamCipher = {
-		getDecryptedFieldValue: function(currentEntry, fieldName) {
-	  	if (currentEntry.protectedData === undefined || !currentEntry.protectedData[fieldName])
-	  		return currentEntry[fieldName] || "";  //not an encrypted field
-
-			var data = currentEntry.protectedData[fieldName];
-			return data.position + data.encBytes;
-		}
-	}
-
 	var refService = KeepassReference();
 	var entry = {
 		id: 1,
@@ -24,8 +14,8 @@ describe('Keepass References', function () {
 		keys: ['emailAddress'],
 		protectedData: {
 			password: {
-				position: 10,
-				encBytes: 'x'
+				salt: [110, 94, 37, 39, 147, 236, 128, 161],
+				value: [62, 63, 86, 84, 228, 131, 242, 197]
 			}
 		}
 	};
@@ -40,8 +30,8 @@ describe('Keepass References', function () {
 		keys: ['emailAddress'],
 		protectedData: {
 			password: {
-				position: 20,
-				encBytes: 'y'
+				salt: [110, 94, 37, 39, 147, 236, 128, 161],
+				value: [62, 63, 86, 84, 228, 131, 242, 197]
 			}
 		}
 	};
@@ -56,8 +46,8 @@ describe('Keepass References', function () {
 		keys: ['emailAddress'],
 		protectedData: {
 			password: {
-				position: 20,
-				encBytes: 'z'
+				salt: [110, 94, 37, 39, 147, 236, 128, 161],
+				value: [62, 63, 86, 84, 228, 131, 242, 197]
 			}
 		}
 	};
@@ -102,7 +92,7 @@ describe('Keepass References', function () {
 			refService.resolveReference('{REF:A@I:2}', entry, entries).should.equal(entry2.url);
 		})
 		it('should resolve wanted password', function() {
-			refService.resolveReference('{REF:P@I:2}', entry, entries).should.equal(streamCipher.getDecryptedFieldValue(entry2, 'password'));
+			refService.resolveReference('{REF:P@I:2}', entry, entries).should.equal("Password");
 		})
 		it('should resolve wanted notes', function() {
 			refService.resolveReference('{REF:N@I:2}', entry, entries).should.equal(entry2.notes);
@@ -162,25 +152,25 @@ describe('Keepass References', function () {
 
 	describe('interpolating multiple references', function() {
 		it('should work with a simple reference', function() {
-			refService.processAllReferences('{TITLE}', entry, entries).should.equal(entry.title);
+			refService.processAllReferences(3, '{TITLE}', entry, entries).should.equal(entry.title);
 		})
 		it('should work with a reference at the start', function() {
-			refService.processAllReferences('{TITLE} ', entry, entries).should.equal(entry.title + ' ');
+			refService.processAllReferences(3, '{TITLE} ', entry, entries).should.equal(entry.title + ' ');
 		})
 		it('should work with a reference at the end', function() {
-			refService.processAllReferences(' {TITLE}', entry, entries).should.equal(' ' + entry.title);
+			refService.processAllReferences(3, ' {TITLE}', entry, entries).should.equal(' ' + entry.title);
 		})
 		it('should work with a reference in the middle', function() {
-			refService.processAllReferences(' {TITLE} ', entry, entries).should.equal(' ' + entry.title + ' ');
+			refService.processAllReferences(3, ' {TITLE} ', entry, entries).should.equal(' ' + entry.title + ' ');
 		})
 		it('should work with multiple references', function() {
-			refService.processAllReferences(' {TITLE} {TITLE} ', entry, entries).should.equal(' ' + entry.title + ' ' + entry.title + ' ');
+			refService.processAllReferences(3, ' {TITLE} {TITLE} ', entry, entries).should.equal(' ' + entry.title + ' ' + entry.title + ' ');
 		})
 		it('should return the given for no references', function() {
-			refService.processAllReferences('something', entry, entries).should.equal('something');
+			refService.processAllReferences(3, 'something', entry, entries).should.equal('something');
 		})
 		it('should return unrecognized expressions as-is', function() {
-			refService.processAllReferences(' {TITLE} {nothing} ', entry, entries).should.equal(' ' + entry.title + ' {nothing} ');
+			refService.processAllReferences(3, ' {TITLE} {nothing} ', entry, entries).should.equal(' ' + entry.title + ' {nothing} ');
 		})
 	})
 
