@@ -39,6 +39,20 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry, keepa
   })();
 
   my.getMasterKey = function(masterPassword, keyFileInfo) {
+    /**
+     * Validate that one of the following is true:
+     * (password isn't empty OR keyfile isn't empty)
+     * ELSE
+     * (assume password is the empty string)
+     */
+    if (masterPassword === undefined && keyFileInfo === undefined){
+      // Neither keyfile nor password provided.  Assume empty string password.
+      masterPassword = "";
+    } else if (masterPassword === "" && keyFileInfo !== undefined){
+      // Keyfile but empty password provided.  Assume password is unused.
+      // This extension does not support the combo empty string + keyfile.
+      masterPassword = undefined;
+    }
     var fileKey = keyFileInfo ? Base64.decode(keyFileInfo.encodedKey) : null;
     return passwordFileStoreRegistry.getChosenDatabaseFile(settings).then(function(buf) {
       var h = keepassHeader.readHeader(buf);
