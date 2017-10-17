@@ -1,7 +1,7 @@
 {
-	"name": "CKP - KeePass integration for Chrome™",
-	"short_name": "CKP Extension",
-	"version": "2017.5.30",
+	"name": "CKPX - Chrome KeePass, Extended",
+	"short_name": "CKPX Extension",
+	"version": "2017.10.15",
 	"manifest_version": 2,
 	"minimum_chrome_version": "48",
 
@@ -11,9 +11,9 @@
 		"48": "assets/icons/logo_48.png"
 	},
 	"incognito": "split",
-	"key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAg6mZuGtDqhMc9rJSd1EUxjGfOvYpGnOt2pGszrKPpJKWrjUiNh8bA1r+VMcarovr0DulASrZ/ifCpr0qgkloD0hKfJZzegLmsMzl8NMJKJy5p6+CFyuXaRsOPY1fCKb4Ia0pbjObqhnuUsuB9KOn+hKfzxqlL/qiRhelrQLr95zneCTAvAgL0jQX9pwRIjwEhR1tuW07rdJNpSOgJreYEJm+xMBgWxIwZn7+OG+M8PyBW2tbuOPLrfEP2XYzj0pzvKnL5IGEzMG8bdtSbzNOQLK7V5gs9AXV4MdzVV81xhw3H6KVvoa+fVTFuJXIS58oL1VdAZpSayqElLJislXTZwIDAQAB",
+	"key":"MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAhoF/A6nYIxSHW2AekTQRJga9QodwEJBTeAA5r0tW9djrTHY3Ei0FdnUE1FrH2Hx03tsj4RjXMWDHtsqMg4REJdFNzndsRKWvliGomXtxE8XByawJf/NGx0/imAtVBrHc846D/Bn4q1dRaRauqkPMKgpcHoPeg+uLTBIfAn5qPgLlvLLqNSKRg6zGYkm0iBYFiyLd1cqWjsDrVhant90W5rE7qmGQPXZudkc2ejtijuMJL4CF9BeQXOVv/9a0XzAwNbArSr+zHnNOicZPyeEnT7mujFDvLRzXvi7OPW+8mdEsm3AeagKZ6bGUuqyzwxs8XlysWqJsXBoX6tjZCGGVpQIDAQAB",
 	"oauth2": {
-		"client_id": "252911279862-spv4ks48i07fqbjvd3isorei5au254b5.apps.googleusercontent.com",
+		"client_id": "965112583821-v7rulpbf3dfjkg06rfhqd54qk37lp6l1.apps.googleusercontent.com",
 		"scopes": [
 			"https://www.googleapis.com/auth/drive.readonly",
 			"https://www.googleapis.com/auth/chromewebstore.readonly"
@@ -64,5 +64,4 @@
 		"http://*/",
 		"file:///*/"
 	]
-
 }

@@ -182,13 +182,13 @@ function DropboxFileManager($http, settings) {
 		return ensureOriginPermissions().then(function() {
 			return new Promise(function(resolve, reject) {
 				var randomState = Base64.encode(window.crypto.getRandomValues(new Uint8Array(16)));  //random state, protects against CSRF
-				var authUrl = 'https://www.dropbox.com/oauth2/authorize?response_type=token&client_id=6kxu9nd18t4g74m'
+				var authUrl = 'https://www.dropbox.com/oauth2/authorize?response_type=token&client_id=lau0eigo4cfthqz'
 					+ '&state=' + encodeURIComponent(randomState)
 					+ '&redirect_uri=' + encodeURIComponent(chrome.identity.getRedirectURL('dropbox'))
 					+ '&force_reapprove=false';
-
+				console.log("BeforeLaunch", authUrl);
 				chrome.p.identity.launchWebAuthFlow({'url': authUrl, 'interactive': true}).then(function(redirect_url) {
-					//console.log(redirect_url);
+					console.log("After", redirect_url);
 					var tokenMatches = /access_token=([^&]+)/.exec(redirect_url);
 					var stateMatches = /state=([^&]+)/.exec(redirect_url);
 					var uidMatches = /uid=(\d+)/.exec(redirect_url);
@@ -213,6 +213,7 @@ function DropboxFileManager($http, settings) {
 						console.log(redirect_url);
 					}
 				}).catch(function(err) {
+					console.error(err);
 					reject(err);
 				});
 			});

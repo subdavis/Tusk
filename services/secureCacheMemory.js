@@ -53,7 +53,7 @@ function SecureCacheMemory(protectedMemory) {
     active: true,
     currentWindow: true
   }, function(tabs) {
-    if (tabs && tabs.length) {
+    if (tabs !== undefined && tabs.length > 0) {
       var port = chrome.runtime.connect({
         name: "tab" + tabs[0].id
       });

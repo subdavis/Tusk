@@ -9,7 +9,7 @@ module.exports = function(grunt) {
 	      options: {
 	        position: 'top',
 	        banner: '/*! <%= pkg.name %>, '
-          + 'Copyright <%= grunt.template.today("yyyy") %> Steven Campbell\n'
+          + 'Copyright 2016 Steven Campbell and <%= grunt.template.today("yyyy") %> Brandon Davis\n'
           + '*/',
 	        linebreak: true
 	      },
@@ -34,7 +34,9 @@ module.exports = function(grunt) {
           {expand: true, cwd: 'bower_components/angular-animate/', src: 'angular-animate.min.js', dest: 'lib/'},
           {expand: true, cwd: 'bower_components/angular-route/', src: 'angular-route.min.js', dest: 'lib/'},
           {expand: true, cwd: 'bower_components/angular-sanitize/', src: 'angular-sanitize.min.js', dest: 'lib/'},
-          {expand: true, cwd: 'bower_components/animate.css/', src: 'animate.css', dest: 'lib/'}
+          {expand: true, cwd: 'bower_components/animate.css/', src: 'animate.css', dest: 'lib/'},
+          {expand: true, cwd: 'bower_components/kdbxweb/dist/', src: 'kdbxweb.js', dest: 'lib/'},
+          {expand: true, cwd: 'bower_components/components-font-awesome/', src:"fonts/*", dest:"./"}
           ]
       },
       appjs: {
@@ -44,6 +46,7 @@ module.exports = function(grunt) {
           {expand: true, src: 'services/**/*.js', dest:'build/'},
           {expand: true, src: 'options/**/*.js', dest:'build/'},
           {expand: true, src: 'lib/**/*.js', dest:'build/'},
+          {expand: true, src: 'fonts/*', dest:'build/'},
           {expand: true, src: ['*.js', '!Gruntfile.js'], dest:'build/'}
           ]
       }

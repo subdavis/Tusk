@@ -55,15 +55,17 @@ keepassApp.factory('pako', function() {
 
 keepassApp.factory('passwordFileStoreRegistry', ['localChromePasswordFileManager', 
   'dropboxFileManager', 
-  'googleDrivePasswordFileManager', 
+  'googleDrivePasswordFileManager',
+  'sharedUrlFileManager',  
   'oneDriveFileManager',
   'sampleDatabaseFileManager', 
   function(localChromePasswordFileManager, 
     dropboxFileManager,
     googleDrivePasswordFileManager,
+    sharedUrlFileManager,
     oneDriveFileManager,
     sampleDatabaseFileManager) {
-  return new PasswordFileStoreRegistry(localChromePasswordFileManager, dropboxFileManager, googleDrivePasswordFileManager, oneDriveFileManager, sampleDatabaseFileManager);
+  return new PasswordFileStoreRegistry(localChromePasswordFileManager, dropboxFileManager, googleDrivePasswordFileManager, sharedUrlFileManager, oneDriveFileManager, sampleDatabaseFileManager);
 }]);
 
 keepassApp.factory('sampleDatabaseFileManager', ['$http', function($http) {
@@ -76,6 +78,10 @@ keepassApp.factory('dropboxFileManager', ['$http', 'settings', function($http, s
 
 keepassApp.factory('googleDrivePasswordFileManager', ['$http', '$timeout', function($http, $timeout) {
 	return new GoogleDrivePasswordFileManager($http, $timeout);
+}]);
+
+keepassApp.factory('sharedUrlFileManager', ['$http', '$timeout', function($http, $timeout) {
+  return new SharedUrlFileManager($http, $timeout);
 }]);
 
 keepassApp.factory('oneDriveFileManager', ['$http', '$q', 'settings', function($http, $q, settings) {
@@ -102,16 +108,12 @@ keepassApp.factory('keepassHeader', ['settings', function(settings) {
   return new KeepassHeader(pako, settings);
 }]);
 
-keepassApp.factory('streamCipher', [function() {
-  return new StreamCipher();
+keepassApp.factory('keepassReference', [function() {
+  return new KeepassReference();
 }]);
 
-keepassApp.factory('keepassReference', ['streamCipher', function(streamCipher) {
-  return new KeepassReference(streamCipher);
-}]);
-
-keepassApp.factory('keepass', ['keepassHeader', 'pako', 'settings', 'passwordFileStoreRegistry', 'keepassReference', 'streamCipher', function(keepassHeader, pako, settings, passwordFileStoreRegistry, keepassReference, streamCipher) {
-	return new Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry, keepassReference, streamCipher);
+keepassApp.factory('keepass', ['keepassHeader', 'pako', 'settings', 'passwordFileStoreRegistry', 'keepassReference', function(keepassHeader, pako, settings, passwordFileStoreRegistry, keepassReference) {
+	return new Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry, keepassReference);
 }]);
 
 keepassApp.factory('unlockedState', ['$interval', '$location', 'keepassReference', 'protectedMemory', 'settings', function($interval, $location, keepassReference, protectedMemory, settings) {
@@ -128,8 +130,8 @@ keepassApp.factory('secureCacheDisk', ['protectedMemory', 'secureCacheMemory', '
 
 keepassApp.controller('startupController', ['$scope', '$location', 'settings', 'optionsLink', 'passwordFileStoreRegistry', StartupController]);
 keepassApp.controller('chooseFileController', ['$scope', '$location', 'passwordFileStoreRegistry', 'settings', ChooseFileController]);
-keepassApp.controller('masterPasswordController', ['$scope', '$routeParams', '$location', 'keepass', 'unlockedState', 'secureCacheDisk', 'settings', 'optionsLink', 'streamCipher', MasterPasswordController]);
-keepassApp.controller('findEntryController', ['$scope', 'unlockedState', 'secureCacheDisk', 'streamCipher', FindEntryController]);
+keepassApp.controller('masterPasswordController', ['$scope', '$routeParams', '$location', 'keepass', 'unlockedState', 'secureCacheDisk', 'settings', 'optionsLink', MasterPasswordController]);
+keepassApp.controller('findEntryController', ['$scope', 'unlockedState', 'secureCacheDisk', FindEntryController]);
 keepassApp.controller('entryDetailsController', ['$scope', '$routeParams', '$location', 'unlockedState', EntryDetailsController]);
 keepassApp.controller('settingsLinkController', ['$scope', '$location', 'optionsLink', SettingsLinkController]);
 keepassApp.controller('passwordListController', ['$scope', 'settings', PasswordListController]);

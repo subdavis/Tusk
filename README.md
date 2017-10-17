@@ -1,34 +1,45 @@
-# CKP
-Chrome extension for interacting with KeePass password file. Web Store url is https://chrome.google.com/webstore/detail/lnfepbjehgokldcaljagbmchhnaaogpc.   Give it a try!
+# CKPX
 
-More info available at http://perfectapi.github.io/CKP/
+Chrome extension for interacting with KeePass password file.
+
+Due to the inactivity of [CKP](https://github.com/perfectapi/CKP), CKPX now exists as an independent fork.  The name CKPX was chosen as homage to KeePassX, an independent derivative of KeePass.
 
 ## Running or Updating the code locally
-If you want to hack on the code...
 
-Tools needed:
-* [Node.Js](http://nodejs.org/) - prerequisite for other dev tools
-* [Grunt.js](gruntjs.com) - for less/css processing, packaging, and copying libs to the lib folder
-* [Bower](http://bower.io/) - for dependencies (libraries)
+To configure a development environment...
 
-1) Clone the codebase 
+1) Aquire the necessary tools:
+    * [Node.Js](http://nodejs.org/) - prerequisite for other dev tools
+    * [Grunt.js](gruntjs.com) - for less/css processing, packaging, and copying libs to the lib folder
+    * [Bower](http://bower.io/) - for dependencies (libraries)
 
-    git clone https://github.com/perfectapi/CKP.git
-    cd CKP
+2) Clone the codebase
+	
+    ```
+    git clone https://github.com/subdavis/CKPX.git
+    cd CKPX
+    ```
 
-2) Install the dependencies. 
+3) Install the dependencies. 
 
+    ```
     npm install
     bower install 
+    ```
 
-3) Copy the dependencies to their lib location.  
+4) Copy the dependencies to their lib location.  
 
+    ```
     grunt updatelib
+    ```
 
-4) If you are editing ```.less``` files then run ```grunt watch``` to compile them when they change.
+5) If you are editing ```.less``` files then run ```grunt watch``` to compile them when they change.
 
 ## Installing in chrome ##
-To install the code in Chrome, open **More Tools\Extensions**, check the **Developer mode** checkbox.  Click **Load unpacked extension** and browse to the folder where you cloned the code.  
+
+Install the latest stable version from [Chorme Web Store](https://chrome.google.com/webstore/detail/fmhmiaejopepamlcjkncpgpdjichnecm).
+
+To install the code manually in Chrome, open **More Tools\Extensions**, check the **Developer mode** checkbox.  Click **Load unpacked extension** and browse to the folder where you cloned the code.  
 
 You may find the [Chrome Apps & Extensions Developer Tool](https://chrome.google.com/webstore/detail/chrome-apps-extensions-de/ohmmkhmmmpcnpikjeljgnaoabkaalbgc) to be helpful when debugging the background page.
 

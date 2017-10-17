@@ -1,6 +1,11 @@
+@import "../bower_components/components-font-awesome/less/font-awesome.less";
+@fa-font-path: "../fonts";
+
 @blue-bg: rgba(0, 120, 231, 0.8);
 @yellow-bg: rgba(255, 255, 100, 0.1);
+@yellow-fg: rgba(239, 199, 0, 1);
 @green-bg: rgba(100, 220, 100, 0.5);
+@green-fg: rgba(0, 153, 58, 1);
 @orange-bg: rgba(255, 153, 51, 0.5);
 @red-bg: #B71C1C;
 @light-blue-bg: rgba(0,128,255,0.2);
@@ -10,12 +15,23 @@
 @red-icon: rgba(255, 128, 128, 0.5);
 @grey-icon: #444444;
 @blue-icon: lighten(@blue-bg, 30%);
+@pure-head-grey-bg: #C0C0C0;
 
+.green {
+  color: @green-fg;
+}
+.warn {
+  color: @yellow-fg;
+}
+.fa-container {
+  margin: 5px;
+  width: 30px;
+}
+.bold {
+  font-weight: 700;
+}
 .transition {
   transition: all 250ms ease 0s;
-}
-.strike {
-  text-decoration: line-through;
 }
 
 .BoxShadowHelper(@level: 1){
@@ -226,17 +242,28 @@ table.entries {
       text-overflow: inherit;
       overflow-wrap: normal;
       font-size: 1em;
+      text-decoration: none;
       font-weight: 600;
       color: @blue-bg;
-
-      &:visited {
-        color: @blue-bg;
-      }
 
       &:hover {
         color: darken(@blue-bg, 20%);
       }
     }
+    &.action-buttons {
+      & > a, & > span {
+        float: right;
+      }
+    }
+  }
+  .strike {
+    text-decoration: line-through;
+  }
+  .list-icon {
+    font-size: 20px; 
+  }
+  .align-middle > * {
+    vertical-align: middle;
   }
 }
 
@@ -265,10 +292,13 @@ pageInfo, compositeKeyPart, .compositeKeyPart {
   	& input {
       display: inline-block;
       float: right;
-      margin-top: -8px;
       width: 80px;
   	}
   }
+}
+#rememberPeriodLength{
+  width: 80px;
+  float: right;
 }
 passwordMatches {
   display: block;
@@ -295,7 +325,18 @@ busyMessage, infoMessage {
 errorMessage {
   .BorderedMessage(@red-bg, 2px);
 }
-
+.dashboard {
+  .BorderedMessage(@light-grey-bg, 2px);
+  display: block;
+}
+dashitem {
+  display : flex;
+  align-items : center;
+}
+dashitem p{
+  margin: 4px;
+  display: inline;
+}
 drop-target {
   display: block;
   height: 127px;

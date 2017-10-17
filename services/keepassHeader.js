@@ -58,7 +58,7 @@ function KeepassHeader() {
     }
 
     if (h.sigKeePassType == DBSIG_KDBX || h.sigKeePassType == DBSIG_KDBX_ALPHA) {
-      readKdbxHeader(buf, 8, h);
+      h.kdbx = true;
     } else {
       readKdbHeader(buf, 8, h);
     }

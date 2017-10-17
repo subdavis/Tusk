@@ -5,14 +5,14 @@
     Chrome will ask you to allow this extension to access the Google Drive websites, and Google Drive will ask you to allow this extension to read your files.
     <br><br>
   </div>
-  <pageInfo ng-show="requestingUrl">CKP needs to access https://www.googleapis.com/ and https://accounts.google.com/ in order to continue.  Please press "Allow"" on the dialog.</pageInfo>
-  <pageInfo ng-show="requestingDriveAccess">CKP needs to view the files in your Google Drive in order to continue.  Please press "Accept" on the dialog.</pageInfo>
+  <pageInfo ng-show="requestingUrl">CKPX needs to access https://www.googleapis.com/ and https://accounts.google.com/ in order to continue.  Please press "Allow"" on the dialog.</pageInfo>
+  <pageInfo ng-show="requestingDriveAccess">CKPX needs to view the files in your Google Drive in order to continue.  Please press "Accept" on the dialog.</pageInfo>
   <a class="pure-button fill pure-button-primary" ng-hide="authorized() || refreshing" ng-click="authorize()">
     <icon p="icon-google"></icon>Authorize
   </a>
   <errorMessage ng-show="errorMessage">{{errorMessage}}</errorMessage>
   <fieldset ng-show="authorized() && docs && docs.length">
-		<infoMessage>The following files are now accessible, and you will be able to choose one later (when logging into a website).  Unless you have a key file to load, CKP is setup and ready to use!</infoMessage>
+		<infoMessage>The following files are now accessible, and you will be able to choose one later (when logging into a website).  Unless you have a key file to load, CKPX is setup and ready to use!</infoMessage>
     <filelist>
       <ul>
         <li ng-repeat="doc in docs" class="not-selectable">
@@ -21,11 +21,11 @@
       </ul>
     </filelist>
   </fieldset>
-  <errorMessage ng-show="!refreshing && authorized() && (docs == null || docs.length == 0)">CKP has accessed your drive but could not find any password files. Ensure your .kdbx or .kdb file is in your google drive.</errorMessage>
+  <errorMessage ng-show="!refreshing && authorized() && (docs == null || docs.length == 0)">CKPX has accessed your drive but could not find any password files. Ensure your .kdbx or .kdb file is in your google drive.</errorMessage>
   <button class="pure-button" ng-click="refresh()" ng-show="authorized()" title="Refresh the list to see new files">
     <icon p="icon-google"></icon>Refresh
   </button>
-  <button class="pure-button" ng-show="authorized()" ng-click="logout()" title="Remove CKP permission to access Google Drive.">
+  <button class="pure-button" ng-show="authorized()" ng-click="logout()" title="Remove CKPX permission to access Google Drive.">
     <icon p="icon-lock"></icon>Deauthorize
   </button>
 </docs>

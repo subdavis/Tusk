@@ -2,17 +2,7 @@ describe('Keepass References', function () {
 
 	// http://keepass.info/help/base/fieldrefs.html
 
-	var streamCipher = {
-		getDecryptedFieldValue: function(currentEntry, fieldName) {
-	  	if (currentEntry.protectedData === undefined || !currentEntry.protectedData[fieldName])
-	  		return currentEntry[fieldName] || "";  //not an encrypted field
-
-			var data = currentEntry.protectedData[fieldName];
-			return data.position + data.encBytes;
-		}
-	}
-
-	var refService = KeepassReference(streamCipher);
+	var refService = KeepassReference();
 	var entry = {
 		id: 1,
 		title: 'Sample Title',
@@ -24,8 +14,8 @@ describe('Keepass References', function () {
 		keys: ['emailAddress'],
 		protectedData: {
 			password: {
-				position: 10,
-				encBytes: 'x'
+				salt: [110, 94, 37, 39, 147, 236, 128, 161],
+				value: [62, 63, 86, 84, 228, 131, 242, 197]
 			}
 		}
 	};
@@ -40,8 +30,8 @@ describe('Keepass References', function () {
 		keys: ['emailAddress'],
 		protectedData: {
 			password: {
-				position: 20,
-				encBytes: 'y'
+				salt: [110, 94, 37, 39, 147, 236, 128, 161],
+				value: [62, 63, 86, 84, 228, 131, 242, 197]
 			}
 		}
 	};
@@ -52,12 +42,12 @@ describe('Keepass References', function () {
 		url: 'http://keepass.info/3',
 		notes: 'Some notes3',
 		password: 'Some password3',
-		emailAddress: 'something2@keepass.info',
+		emailAddress: 'something3@keepass.info',
 		keys: ['emailAddress'],
 		protectedData: {
 			password: {
-				position: 20,
-				encBytes: 'y'
+				salt: [110, 94, 37, 39, 147, 236, 128, 161],
+				value: [62, 63, 86, 84, 228, 131, 242, 197]
 			}
 		}
 	};
@@ -66,28 +56,28 @@ describe('Keepass References', function () {
 	describe('Current Entry', function() {
 
 		it('should resolve title', function() {
-			refService.resolveReference('{TITLE}', entry).should.equal(entry.title);
+			refService.resolveReference('{TITLE}', entry, entries).should.equal(entry.title);
 		});
 		it('should resolve username', function() {
-			refService.resolveReference('{USERNAME}', entry).should.equal(entry.userName);
+			refService.resolveReference('{USERNAME}', entry, entries).should.equal(entry.userName);
 		});
 		it('should resolve url', function() {
-			refService.resolveReference('{URL}', entry).should.equal(entry.url);
+			refService.resolveReference('{URL}', entry, entries).should.equal(entry.url);
 		});
 		it('should resolve password', function() {
-			refService.resolveReference('{PASSWORD}', entry).should.equal(entry.password);
+			refService.resolveReference('{PASSWORD}', entry, entries).should.equal(entry.password);
 		});
 		it('should resolve notes', function() {
-			refService.resolveReference('{NOTES}', entry).should.equal(entry.notes);
+			refService.resolveReference('{NOTES}', entry, entries).should.equal(entry.notes);
 		});
 		it('should not be case-sensitive', function() {
-			refService.resolveReference('{notes}', entry).should.equal(entry.notes);
+			refService.resolveReference('{notes}', entry, entries).should.equal(entry.notes);
 		});
 		it('should return the expression back if not able to evaluate', function() {
 			refService.resolveReference('{sdaads}', entry, entries).should.equal('{sdaads}');
 		})
 		it('should support a custom field name', function() {
-			refService.resolveReference('{S:EmailAddress}', entry).should.equal(entry.emailAddress);
+			refService.resolveReference('{S:EmailAddress}', entry, entries).should.equal(entry.emailAddress);
 		})
 	})
 
@@ -102,7 +92,7 @@ describe('Keepass References', function () {
 			refService.resolveReference('{REF:A@I:2}', entry, entries).should.equal(entry2.url);
 		})
 		it('should resolve wanted password', function() {
-			refService.resolveReference('{REF:P@I:2}', entry, entries).should.equal(streamCipher.getDecryptedFieldValue(entry2, 'password'));
+			refService.resolveReference('{REF:P@I:2}', entry, entries).should.equal("Password");
 		})
 		it('should resolve wanted notes', function() {
 			refService.resolveReference('{REF:N@I:2}', entry, entries).should.equal(entry2.notes);
@@ -162,25 +152,25 @@ describe('Keepass References', function () {
 
 	describe('interpolating multiple references', function() {
 		it('should work with a simple reference', function() {
-			refService.processAllReferences('{TITLE}', entry, entries).should.equal(entry.title);
+			refService.processAllReferences(3, '{TITLE}', entry, entries).should.equal(entry.title);
 		})
 		it('should work with a reference at the start', function() {
-			refService.processAllReferences('{TITLE} ', entry, entries).should.equal(entry.title + ' ');
+			refService.processAllReferences(3, '{TITLE} ', entry, entries).should.equal(entry.title + ' ');
 		})
 		it('should work with a reference at the end', function() {
-			refService.processAllReferences(' {TITLE}', entry, entries).should.equal(' ' + entry.title);
+			refService.processAllReferences(3, ' {TITLE}', entry, entries).should.equal(' ' + entry.title);
 		})
 		it('should work with a reference in the middle', function() {
-			refService.processAllReferences(' {TITLE} ', entry, entries).should.equal(' ' + entry.title + ' ');
+			refService.processAllReferences(3, ' {TITLE} ', entry, entries).should.equal(' ' + entry.title + ' ');
 		})
 		it('should work with multiple references', function() {
-			refService.processAllReferences(' {TITLE} {TITLE} ', entry, entries).should.equal(' ' + entry.title + ' ' + entry.title + ' ');
+			refService.processAllReferences(3, ' {TITLE} {TITLE} ', entry, entries).should.equal(' ' + entry.title + ' ' + entry.title + ' ');
 		})
 		it('should return the given for no references', function() {
-			refService.processAllReferences('something', entry, entries).should.equal('something');
+			refService.processAllReferences(3, 'something', entry, entries).should.equal('something');
 		})
 		it('should return unrecognized expressions as-is', function() {
-			refService.processAllReferences(' {TITLE} {nothing} ', entry, entries).should.equal(' ' + entry.title + ' {nothing} ');
+			refService.processAllReferences(3, ' {TITLE} {nothing} ', entry, entries).should.equal(' ' + entry.title + ' {nothing} ');
 		})
 	})
 

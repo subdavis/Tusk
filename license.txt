@@ -1,9 +1,10 @@
-This license covers the CKP Chrome extension, excluding the individual libraries
+Copyright for portions of CKPX are held by Steven Campbell, 2015 as part of CKP. 
+All other copyright for CKPX are held by Brandon Davis, 2017.
+
+This license covers the CKPX Chrome extension, excluding the individual libraries
 in /lib folder, which have their own copyrights and licenses inside each file.
 
 The MIT License (MIT)
-
-Copyright (c) 2015 Steven Campbell.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
