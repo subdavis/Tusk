@@ -33,32 +33,20 @@ function Settings() {
 
 	//upgrade old settings.  Called on install.
 	exports.upgrade = function() {
-		//move key files out of usages into key file section
+		//Upgrade is not backward compatible.  Wipe usage.
 		exports.getDatabaseUsages().then(function(usages) {
-			for (var usageKey in usages) {
-				var usage = usages[usageKey];
-				if (usage.keyFileName && usage.fileKeyBase64) {
-					exports.addKeyFile(usage.keyFileName, Base64.decode(usage.fileKeyBase64));
-				}
-				usage.fileKeyBase64 = undefined;
-				usage.forgetKeyFile = undefined;
+			for (let usageKey in usages) {
+				let usage = usages[usageKey]
+				usages[usageKey] = {
+					// do data translations...
+					passwordKey: usage.passwordKey,
+					requiresKeyfile: usage.requiresKeyFile,
+					requiresPassword: usage.requiresPassword,
+					version: usage.version,
+					keyFileName: usage.keyFileName
+				};
 			}
-
-			exports.saveDatabaseUsages(usages);
-		});
-
-		//change the way we store currently selected database
-		chrome.p.storage.local.get(['passwordFile', 'providerKey']).then(function(items) {
-			if (items.passwordFile && items.providerKey) {
-				chrome.p.storage.local.set({
-					'selectedDatabase': {
-						'providerKey': items.providerKey,
-						'passwordFile': items.passwordFile
-					}
-				}).then(function() {
-					chrome.p.storage.local.remove(['passwordFile', 'providerKey']);
-				})
-			}
+			// exports.saveDatabaseUsages(usages);
 		});
 	}
 
@@ -173,7 +161,8 @@ function Settings() {
 				}
 			} else {
 				return {
-					rememberPassword: false
+					rememberPassword: false,
+					rememberPeriod: 0
 				}
 			}
 		})

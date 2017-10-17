@@ -13,5 +13,8 @@
     "grunt-contrib-less": "^1.4.0",
     "grunt-contrib-watch": "^1.0.0",
     "karma": "^0.12.31"
+  },
+  "scripts": {
+    "test": "./node_modules/jshint/bin/jshint"
   }
 }

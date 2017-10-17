@@ -16,12 +16,9 @@ function MasterPasswordController($scope, $routeParams, $location, keepass, unlo
   });
   
   $scope.setRememberPeriod = function(time_int) {
-    /**
-     * Args: optional time_int
-     * if 
-     *  time_int is given, derive slider_int
-     * else 
-     *  assume slider_int is alread set.
+    /* Args: optional time_int
+     * if time_int is given, derive slider_int
+     * else assume slider_int is alread set.
      */
     let slider_options = [
       {time: 0,  text: "Do not remember"},
@@ -117,7 +114,7 @@ function MasterPasswordController($scope, $routeParams, $location, keepass, unlo
       settings.saveCurrentDatabaseUsage(databaseUsage);
       settings.saveDefaultRememberOptions($scope.rememberPassword, $scope.rememberPeriod);
 
-      if ($scope.rememberPeriod) {
+      if ($scope.rememberPeriod > 0) {
         let check_time = 60000*$scope.rememberPeriod; // milliseconds per min
         settings.setForgetTime('forgetPassword', (Date.now() + check_time));
       } else {
@@ -151,20 +148,19 @@ function MasterPasswordController($scope, $routeParams, $location, keepass, unlo
     $scope.rememberedPassword = (usage.passwordKey !== undefined);
     $scope.setRememberPeriod(usage.rememberPeriod);
 
-    if ($scope.rememberedPassword === true) {
-    	// remembered password - autologin
+    if (usage.passwordKey !== undefined && usage.requiresKeyfile === false) {
+    	//autologin if we know the password and there is no keyfile.
     	$scope.enterMasterPassword(usage.passwordKey);
     } else if (usage.keyFileName !== undefined) {
     	// get matched key file
       let matches = $scope.keyFiles.filter(function(keyFile) {
         return keyFile.name == usage.keyFileName;
       })
-
       if (matches.length >= 1) {
         $scope.selectedKeyFile = matches[0];
-        if ($scope.hidePassword) {
-        	//auto-login
-        	$scope.enterMasterPassword();
+        if ($scope.hidePassword === true || usage.passwordKey !== undefined) {
+          // auto-login if we know there is no password OR we know the password already.
+        	$scope.enterMasterPassword(usage.passwordKey)
         }
       }
     }
@@ -254,20 +250,9 @@ function MasterPasswordController($scope, $routeParams, $location, keepass, unlo
   function parseUrl(url) {
     if (url && !url.indexOf('http') == 0)
       url = 'http://' + url;
-
     //from https://gist.github.com/jlong/2428561
     var parser = document.createElement('a');
     parser.href = url;
-
-    /*
-    parser.protocol; // => "http:"
-    parser.hostname; // => "example.com"
-    parser.port;     // => "3000"
-    parser.pathname; // => "/pathname/"
-    parser.search;   // => "?search=test"
-    parser.hash;     // => "#hash"
-    parser.host;     // => "example.com:3000"
-    */
     return parser;
   }
 }
