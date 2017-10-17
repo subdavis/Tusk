@@ -5,10 +5,9 @@ function MasterPasswordController($scope, $routeParams, $location, keepass, unlo
   $scope.busy = false;
   $scope.fileName = decodeURIComponent($routeParams.fileTitle);
   $scope.providerKey = $routeParams.providerKey;
-  $scope.selectedKeyFile = null;
+  $scope.selectedKeyFile;
   $scope.unlockedState = unlockedState;
   $scope.os = {};
-  var passwordKey;
 
   chrome.runtime.getPlatformInfo(function(info) {
     $scope.$apply(function() {
@@ -17,27 +16,24 @@ function MasterPasswordController($scope, $routeParams, $location, keepass, unlo
   });
   
   $scope.setRememberPeriod = function(time_int) {
-    /**
-     * Args: optional time_int
-     * if 
-     *  time_int is given, derive slider_int
-     * else 
-     *  assume slider_int is alread set.
+    /* Args: optional time_int
+     * if time_int is given, derive slider_int
+     * else assume slider_int is alread set.
      */
-    var slider_options = [
+    let slider_options = [
       {time: 0,  text: "Do not remember"},
       {time: 30, text: "Remember for 30 min."},
       {time: 120,  text: "Remember for 2 hours."},
       {time: 240,  text: "Remember for 4 hours."},
       {time: 480,  text: "Remember for 8 hours."},
       {time: 1440, text: "Remember for 24 hours."},
-      {time: undefined, text: "Remember forever."}
+      {time: -1, text: "Remember forever."}
     ];
 
-    var slider_option_index;
+    let slider_option_index;
     if (time_int !== undefined) {
       $scope.slider_int = (t => {
-        for (var i=0; i < slider_options.length; i++){
+        for (let i=0; i < slider_options.length; i++){
           if (slider_options[i].time === t)
             return i;
         }
@@ -48,17 +44,9 @@ function MasterPasswordController($scope, $routeParams, $location, keepass, unlo
       slider_option_index = parseInt($scope.slider_int);
     }
     if (slider_option_index < slider_options.length){
-      if (slider_option_index == slider_options.length - 1){
-        $scope.rememberPassword = true;
-        $scope.rememberPeriod = undefined;
-      } else if (slider_option_index > 0){
-        $scope.rememberPassword = true;
-        $scope.rememberPeriod =  slider_options[slider_option_index].time;
-      } else {
-        $scope.rememberPassword = false;
-        $scope.rememberPeriod = 0;
-      }
-      $scope.rememberPeriodText =  slider_options[slider_option_index].text;
+      $scope.rememberPassword = slider_option_index > 0 ? true : false;
+      $scope.rememberPeriod = slider_options[slider_option_index].time;
+      $scope.rememberPeriodText = slider_options[slider_option_index].text;
     }
   }
 
@@ -75,7 +63,7 @@ function MasterPasswordController($scope, $routeParams, $location, keepass, unlo
   $scope.forgetPassword = function() {
     settings.saveCurrentDatabaseUsage({
      requiresKeyfile: $scope.selectedKeyFile ? true : false,
-     keyFileName: $scope.selectedKeyFile ? $scope.selectedKeyFile.name : "",
+     keyFileName: $scope.selectedKeyFile ? $scope.selectedKeyFile.name : undefined,
      rememberPeriod: $scope.rememberPeriod
    }).then(function() {
      secureCache.clear('entries');
@@ -95,40 +83,39 @@ function MasterPasswordController($scope, $routeParams, $location, keepass, unlo
     $location.path('/choose-file');
   }
 
-  $scope.enterMasterPassword = function() {
+  $scope.enterMasterPassword = function(passwordKey) {
     $scope.clearMessages();
     $scope.busy = true;
 
-    var passwordKeyPromise;
-    if (!passwordKey) {
+    let passwordKeyPromise;
+    if (passwordKey === undefined)
       passwordKeyPromise = keepass.getMasterKey($scope.masterPassword, $scope.selectedKeyFile);
-    } else {
+    else
       passwordKeyPromise = Promise.resolve(passwordKey);
-    }
 
     passwordKeyPromise.then(function(newPasswordKey) {
       passwordKey = newPasswordKey;
       return keepass.getDecryptedData(passwordKey);
     }).then(function(decryptedData) {
       //remember usage for next time
-      var entries = decryptedData.entries;
-      var version = decryptedData.version;
-      var databaseUsage = {
-        requiresPassword: $scope.masterPassword ? true : false,
-        requiresKeyfile: $scope.selectedKeyFile ? true : false,
+      let entries = decryptedData.entries;
+      let version = decryptedData.version;
+      let databaseUsage = {
+        requiresPassword: $scope.masterPassword !== "" ? true : false,
+        requiresKeyfile: $scope.selectedKeyFile !== undefined ? true : false,
         passwordKey: undefined,
         version: version,
-        keyFileName: $scope.selectedKeyFile ? $scope.selectedKeyFile.name : "",
+        keyFileName: $scope.selectedKeyFile !== undefined ? $scope.selectedKeyFile.name : undefined,
         rememberPeriod: $scope.rememberPeriod
       }
-      if ($scope.rememberPassword){
+      if ($scope.rememberPassword === true){
         databaseUsage['passwordKey'] = passwordKey;
       }
       settings.saveCurrentDatabaseUsage(databaseUsage);
       settings.saveDefaultRememberOptions($scope.rememberPassword, $scope.rememberPeriod);
 
-      if ($scope.rememberPeriod) {
-        var check_time = 60000*$scope.rememberPeriod; // milliseconds per min
+      if ($scope.rememberPeriod > 0) {
+        let check_time = 60000*$scope.rememberPeriod; // milliseconds per min
         settings.setForgetTime('forgetPassword', (Date.now() + check_time));
       } else {
         //don't clear passwords
@@ -136,7 +123,6 @@ function MasterPasswordController($scope, $routeParams, $location, keepass, unlo
       }
       //show results:
       showResults(entries);
-
       $scope.busy = false;
     }).catch(function(err) {
       $scope.errorMessage = err.message || "Incorrect password or key file";
@@ -146,8 +132,6 @@ function MasterPasswordController($scope, $routeParams, $location, keepass, unlo
       $scope.$apply();
     });
   };
-
-  $scope.setRememberPeriod(0);
 
   settings.getKeyFiles().then(keyFiles => {
     $scope.keyFiles = keyFiles;
@@ -161,28 +145,22 @@ function MasterPasswordController($scope, $routeParams, $location, keepass, unlo
     //tweak UI based on what we know about the database file
     $scope.hidePassword = (usage.requiresPassword === false);
     $scope.hideKeyFile = (usage.requiresKeyfile === false);
-    if (usage.passwordKey) {
-      passwordKey = usage.passwordKey;
-      $scope.rememberedPassword = true;
-    } else {
-      passwordKey = undefined;
-    }
+    $scope.rememberedPassword = (usage.passwordKey !== undefined);
     $scope.setRememberPeriod(usage.rememberPeriod);
 
-    if ($scope.rememberedPassword && !(usage.keyFileName.length > 0)) {
-    	// remembered password without keyfile - autologin
-    	$scope.enterMasterPassword()
-    } else if (usage.keyFileName) {
+    if (usage.passwordKey !== undefined && usage.requiresKeyfile === false) {
+    	//autologin if we know the password and there is no keyfile.
+    	$scope.enterMasterPassword(usage.passwordKey);
+    } else if (usage.keyFileName !== undefined) {
     	// get matched key file
-      var matches = $scope.keyFiles.filter(function(keyFile) {
+      let matches = $scope.keyFiles.filter(function(keyFile) {
         return keyFile.name == usage.keyFileName;
       })
-
-      if (matches.length) {
+      if (matches.length >= 1) {
         $scope.selectedKeyFile = matches[0];
-        if ($scope.hidePassword) {
-        	//auto-login
-        	$scope.enterMasterPassword();
+        if ($scope.hidePassword === true || usage.passwordKey !== undefined) {
+          // auto-login if we know there is no password OR we know the password already.
+        	$scope.enterMasterPassword(usage.passwordKey)
         }
       }
     }
@@ -272,20 +250,9 @@ function MasterPasswordController($scope, $routeParams, $location, keepass, unlo
   function parseUrl(url) {
     if (url && !url.indexOf('http') == 0)
       url = 'http://' + url;
-
     //from https://gist.github.com/jlong/2428561
     var parser = document.createElement('a');
     parser.href = url;
-
-    /*
-    parser.protocol; // => "http:"
-    parser.hostname; // => "example.com"
-    parser.port;     // => "3000"
-    parser.pathname; // => "/pathname/"
-    parser.search;   // => "?search=test"
-    parser.hash;     // => "#hash"
-    parser.host;     // => "example.com:3000"
-    */
     return parser;
   }
 }
