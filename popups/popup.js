@@ -26,7 +26,7 @@ THE SOFTWARE.
 
 "use strict";
 
-var keepassApp = angular.module('keepassApp', ['ngAnimate', 'ngRoute', 'ngSanitize']);
+var keepassApp = angular.module('keepassApp', ['ngAnimate', 'ngRoute', 'ngSanitize', 'cfp.hotkeys']);
 
 keepassApp.config(['$routeProvider', function($routeProvider) {
   $routeProvider.when('/choose-file', {
@@ -134,7 +134,7 @@ keepassApp.controller('masterPasswordController', ['$scope', '$routeParams', '$l
 keepassApp.controller('findEntryController', ['$scope', 'unlockedState', 'secureCacheDisk', FindEntryController]);
 keepassApp.controller('entryDetailsController', ['$scope', '$routeParams', '$location', 'unlockedState', EntryDetailsController]);
 keepassApp.controller('settingsLinkController', ['$scope', '$location', 'optionsLink', SettingsLinkController]);
-keepassApp.controller('passwordListController', ['$scope', 'settings', PasswordListController]);
+keepassApp.controller('passwordListController', ['$scope', '$element', 'settings', 'unlockedState', 'hotkeys', PasswordListController]);
 
 keepassApp.directive('icon', function() {
   function link(scope, element, attrs) {
@@ -296,6 +296,33 @@ keepassApp.directive('autoFocus', function($timeout) {
         }
     };
 });
+
+keepassApp.directive('autoScroll', function() {
+  return {
+    restrict: 'A',
+    scope: {
+      callback: '&autoScroll',
+    },
+    link: linkAutoScroll,
+  }
+
+  function linkAutoScroll(scope, element, attrs) {
+    var highlighted = element[0]
+    scope.$watch('callback()', function(value) {
+      if (value) {
+        var scrollPos = document.body.scrollTop
+        var windowHeight = document.body.clientHeight
+        var box = highlighted.getBoundingClientRect()
+        var offset = 30
+        if (box.top < 0) {
+          document.body.scrollTop += box.top - offset
+        } else if (box.top + box.height > windowHeight) {
+          document.body.scrollTop += box.top + box.height + offset - windowHeight
+        }
+      }
+    })
+  }
+})
 
 //http://stackoverflow.com/questions/12393703/how-to-include-one-partials-into-other-without-creating-a-new-scope
 keepassApp.directive('staticInclude', function($http, $templateCache, $compile) {
