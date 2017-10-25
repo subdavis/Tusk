@@ -307,3 +307,9 @@ keepassApp.directive('staticInclude', function($http, $templateCache, $compile) 
 		});
 	};
 });
+
+angular.element(document).ready(function() {
+	setTimeout(function() {
+		angular.bootstrap(document, ['keepassApp']);
+	}, 0);
+});
