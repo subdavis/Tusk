@@ -30,7 +30,8 @@
     "sinonjs": "~1.10.2",
     "angular-sanitize": "~1.4",
     "kdbxweb": "keeweb/kdbxweb#1.0.1",
-    "components-font-awesome": "^4.7.0"
+    "components-font-awesome": "^4.7.0",
+    "angular-hotkeys": "chieffancypants/angular-hotkeys#^1.7.0"
   },
   "devDependencies": {
     "angular-mocks": "~1.4"
