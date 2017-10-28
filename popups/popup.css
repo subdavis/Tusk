@@ -2550,6 +2550,12 @@ table.entries .list-icon {
 table.entries .align-middle > * {
   vertical-align: middle;
 }
+.hotkey {
+  color: rgba(78, 170, 255, 0.8);
+}
+tr.highlighted {
+  background-color: #fffbcc;
+}
 statusMessage {
   display: block;
   padding: 4px 0;
