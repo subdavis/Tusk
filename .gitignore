@@ -78,3 +78,5 @@ npm-debug.log
 bower_components/
 *.sublime-workspace
 .sublime-grunt.cache
+
+*.travis.yml

@@ -18,7 +18,7 @@ function PasswordListController($scope, $element, settings, unlockedState, hotke
 
 	hotkeys.bindTo($scope)
 		.add({
-			combo: 'down',
+			combo: ['down', 'tab'],
 			description: 'Next entry',
 			callback: nextEntry,
 		})
