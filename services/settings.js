@@ -259,79 +259,79 @@ function Settings() {
 		});
 	}
 
-  /**
-   * Saves information about how the database was opened, so we can optimize the
-   * UI next time by hiding the irrelevant options and remembering the keyfile
-   */
-  exports.saveCurrentDatabaseUsage = function(usage) {
-    return exports.getCurrentDatabaseChoice().then(function(info) {
-      return exports.getDatabaseUsages().then(function(usages) {
-        var key = info.passwordFile.title + "__" + info.providerKey;
-        usages[key] = usage;
+	/**
+	 * Saves information about how the database was opened, so we can optimize the
+	 * UI next time by hiding the irrelevant options and remembering the keyfile
+	 */
+	exports.saveCurrentDatabaseUsage = function(usage) {
+		return exports.getCurrentDatabaseChoice().then(function(info) {
+			return exports.getDatabaseUsages().then(function(usages) {
+				var key = info.passwordFile.title + "__" + info.providerKey;
+				usages[key] = usage;
 
-        return exports.saveDatabaseUsages(usages);
-      });
-    });
-  }
+				return exports.saveDatabaseUsages(usages);
+			});
+		});
+	}
 
-  /**
-   * Retrieves information about how the database was opened, so we can optimize the
-   * UI by hiding the irrelevant options and remembering the keyfile
-   */
-  exports.getCurrentDatabaseUsage = function() {
-    return exports.getCurrentDatabaseChoice().then(function(info) {
-      return exports.getDatabaseUsages().then(function(usages) {
-        var key = info.passwordFile.title + "__" + info.providerKey;
-        var usage = usages[key] || {};
+	/**
+	 * Retrieves information about how the database was opened, so we can optimize the
+	 * UI by hiding the irrelevant options and remembering the keyfile
+	 */
+	exports.getCurrentDatabaseUsage = function() {
+		return exports.getCurrentDatabaseChoice().then(function(info) {
+			return exports.getDatabaseUsages().then(function(usages) {
+				var key = info.passwordFile.title + "__" + info.providerKey;
+				var usage = usages[key] || {};
 
-        return usage;
-      });
-    })
-  }
+				return usage;
+			});
+		})
+	}
 
-  exports.setUseCredentialApiFlag = function(flagValue) {
-  	if (flagValue) {
-	  	return chrome.p.storage.local.set({
-	  		'useCredentialApi': true
-	  	})
-   	}
-
-   	return chrome.p.storage.local.remove('useCredentialApi');
-  }
-
-  exports.getUseCredentialApiFlag = function() {
-  	return chrome.p.storage.local.get('useCredentialApi').then( items => {
-  		return !!items.useCredentialApi;
-  	})
-  }
-
-
-  exports.setPasswordListIconOption = function(option) {
-    return chrome.p.storage.local.set({
-		'showPasswordListIcon': option
-	})
-  }
-
-  exports.getPasswordListIconOption = function() {
-    return chrome.p.storage.local.get('showPasswordListIcon').then(function(option) {
-		return {
-			entry: option.showPasswordListIcon.entry || false,
-			group: option.showPasswordListIcon.group || false
+	exports.setUseCredentialApiFlag = function(flagValue) {
+		if (flagValue) {
+			return chrome.p.storage.local.set({
+				'useCredentialApi': true
+			})
 		}
-	})
-  }
 
-  exports.setPasswordListGroupOption = function(option) {
-    return chrome.p.storage.local.set({
-		'showPasswordListGroup': option
-	})
-  }
+		return chrome.p.storage.local.remove('useCredentialApi');
+	}
 
-  exports.getPasswordListGroupOption = function() {
-    return chrome.p.storage.local.get('showPasswordListGroup').then(function(option) {
-		return option.showPasswordListGroup || false;
-	})
-  }
+	exports.getUseCredentialApiFlag = function() {
+		return chrome.p.storage.local.get('useCredentialApi').then( items => {
+			return !!items.useCredentialApi;
+		})
+	}
+
+
+	exports.setPasswordListIconOption = function(option) {
+		return chrome.p.storage.local.set({
+			'showPasswordListIcon': option
+		})
+	}
+
+	exports.getPasswordListIconOption = function() {
+		return chrome.p.storage.local.get('showPasswordListIcon').then(function(option) {
+			let result = option.showPasswordListIcon || {};
+			result.entry = result.entry || false;
+			result.group = result.group || false;
+			return result;
+		})
+	}
+
+	exports.setPasswordListGroupOption = function(option) {
+		return chrome.p.storage.local.set({
+			'showPasswordListGroup': option
+		})
+	}
+
+	exports.getPasswordListGroupOption = function() {
+		return chrome.p.storage.local.get('showPasswordListGroup').then(function(option) {
+			return option.showPasswordListGroup || false;
+		})
+	}
 
 	return exports;
 }
