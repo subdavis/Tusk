@@ -46,12 +46,12 @@
 
 <body class="pure-form">
   <nav class="menu" ng-controller="navController">
-    <a class="menu-item" ng-class="{selected: isActive('/startup')}" href="#startup?stay=1">Introduction</a>
-    <a class="menu-item" ng-class="{selected: isActive('/databases') || isActive('/dropbox') || isActive('/choose-file') || isActive('/drag-drop-file') || isActive('/sample-database')}" href="#databases">KeePass Databases</a>
-    <a class="menu-item" ng-class="{selected: isActive('/keyFiles')}" href="#keyFiles">Key Files</a>
-    <a class="menu-item" ng-class="{selected: isActive('/advanced')}" href="#advanced">Advanced Options</a>
-    <a class="menu-item" ng-class="{selected: isActive('/settings')}" href="#settings">Settings</a>
-    <a class="menu-item" ng-class="{selected: isActive('/storedData')}" href="#storedData">Stored Data</a>
+    <a class="menu-item" ng-class="{selected: isActive('/startup')}" href="#!startup?stay=1">Introduction</a>
+    <a class="menu-item" ng-class="{selected: isActive('/databases') || isActive('/dropbox') || isActive('/choose-file') || isActive('/drag-drop-file') || isActive('/sample-database')}" href="#!databases">KeePass Databases</a>
+    <a class="menu-item" ng-class="{selected: isActive('/keyFiles')}" href="#!keyFiles">Key Files</a>
+    <a class="menu-item" ng-class="{selected: isActive('/advanced')}" href="#!advanced">Advanced Options</a>
+    <a class="menu-item" ng-class="{selected: isActive('/settings')}" href="#!settings">Settings</a>
+    <a class="menu-item" ng-class="{selected: isActive('/storedData')}" href="#!storedData">Stored Data</a>
   </nav>
   <ng-view></ng-view>
 

@@ -266,7 +266,15 @@ THE SOFTWARE.
 	}
 
 	function forgetPassword() {
-		return settings.saveCurrentDatabaseUsage({});
+		return settings
+			.getCurrentDatabaseUsage()
+			.then(usage => {
+				return settings.saveCurrentDatabaseUsage({
+					requiresKeyfile: usage.requiresKeyfile,
+		 			keyFileName: usage.keyFileName,
+		 			rememberPeriod: usage.rememberPeriod
+				});
+			});
 	}
 
 })(new ProtectedMemory(), new Settings());

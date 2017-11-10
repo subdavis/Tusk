@@ -56,7 +56,6 @@ function MasterPasswordController($scope, $routeParams, $location, keepass, unlo
 
   $scope.clearMessages = function() {
     $scope.errorMessage = "";
-    $scope.successMessage = "";
     $scope.partialMatchMessage = "";
   }
 
