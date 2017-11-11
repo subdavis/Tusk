@@ -11,34 +11,15 @@
 		"48": "assets/icons/logo_48.png"
 	},
 	"incognito": "split",
-	"key":"MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAhoF/A6nYIxSHW2AekTQRJga9QodwEJBTeAA5r0tW9djrTHY3Ei0FdnUE1FrH2Hx03tsj4RjXMWDHtsqMg4REJdFNzndsRKWvliGomXtxE8XByawJf/NGx0/imAtVBrHc846D/Bn4q1dRaRauqkPMKgpcHoPeg+uLTBIfAn5qPgLlvLLqNSKRg6zGYkm0iBYFiyLd1cqWjsDrVhant90W5rE7qmGQPXZudkc2ejtijuMJL4CF9BeQXOVv/9a0XzAwNbArSr+zHnNOicZPyeEnT7mujFDvLRzXvi7OPW+8mdEsm3AeagKZ6bGUuqyzwxs8XlysWqJsXBoX6tjZCGGVpQIDAQAB",
-	"oauth2": {
-		"client_id": "965112583821-v7rulpbf3dfjkg06rfhqd54qk37lp6l1.apps.googleusercontent.com",
-		"scopes": [
-			"https://www.googleapis.com/auth/drive.readonly",
-			"https://www.googleapis.com/auth/chromewebstore.readonly"
-		]
+	"browser_action": {
+		"default_icon": "assets/icons/logo_38.png",
+		"default_popup": "popup.html",
+    "default_title": "CKP"
 	},
-
-	"page_action": {
-		"default_icon": {
-			"19": "assets/icons/logo_19.png",
-			"38": "assets/icons/logo_38.png"
-		},
-		"default_title": "Input field detected.  Click here or press Ctrl-Shift-Space to access your KeePass passwords.",
-		"default_popup": "popups/popup.html"
-	},
-	"options_page": "options/options.html",
+	"options_page": "options.html",
 	"options_ui": {
-		"page": "options/options.html",
-		"chrome_style": true
-	},
-	"background": {
-		"scripts": [
-			"lib/base64.js", "lib/chrome-api-promise.js",
-			"services/settings.js", "services/protectedMemory.js", "background/background.js"
-		],
-		"persistent": false
+		"page": "options.html",
+		"chrome_style": false
 	},
 	"commands": {
 		"_execute_page_action": {
