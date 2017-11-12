@@ -27,7 +27,7 @@ THE SOFTWARE.
 /**
  * Service for resolving keepass references
  */
-function KeepassReference() {
+module.exports = function KeepassReference() {
 	"use strict";
 
 	var my = {

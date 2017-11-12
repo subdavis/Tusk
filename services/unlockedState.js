@@ -29,7 +29,7 @@ THE SOFTWARE.
 /**
  * Shared state and methods for an unlocked password file.
  */
-function UnlockedState($interval, $location, keepassReference, protectedMemory, settings) {
+module.exports = function UnlockedState($router, chromePromise, keepassReference, protectedMemory, settings) {
 	var my = {
 		tabId: "", //tab id of current tab
 		url: "", //url of current tab
@@ -57,7 +57,7 @@ function UnlockedState($interval, $location, keepassReference, protectedMemory, 
 					var parsedUrl = parseUrl(tabs[0].url);
 					my.origin = parsedUrl.protocol + '//' + parsedUrl.hostname + '/';
 
-					chrome.p.permissions.contains({
+					chromePromise.permissions.contains({
 						origins: [my.origin]
 					})
 						.then(function() {
@@ -80,7 +80,7 @@ function UnlockedState($interval, $location, keepassReference, protectedMemory, 
 		my.entries = null;
 		my.clipboardStatus = "";
 	}
-	$interval(my.clearBackgroundState, 60000, 1);  //clear backgroundstate after 10 minutes live - we should never be alive that long
+	setTimeout(my.clearBackgroundState, 60000);  //clear backgroundstate after 10 minutes live - we should never be alive that long
 
 	my.autofill = function(entry) {
 		settings.getUseCredentialApiFlag().then(useCredentialApi => {
@@ -114,7 +114,7 @@ function UnlockedState($interval, $location, keepassReference, protectedMemory, 
 	}
 
 	my.gotoDetails = function(entry) {
-		$location.path('/entry-details/' + entry.id);
+		$router.route('/entry-details/' + entry.id);
 	}
 
 	my.getDecryptedAttribute = function(entry, attributeName) {

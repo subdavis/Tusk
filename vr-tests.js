@@ -9,7 +9,7 @@ let a = new vr([
 ])
 
 console.log(a.parse('/asdf'))
-console.log(a.parse('/baz'))
+console.log(a.parse('/bing'))
 console.log(a.parse('/bing/boooooom'))
 console.log(a.parse('/bing/biff/billyyy'))
 console.log(a.parse('/that/be/cray'))

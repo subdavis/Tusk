@@ -1,7 +1,7 @@
 "use strict";
 
 //simple service to link to the options page
-function OptionsLink() {
+module.exports = function OptionsLink() {
   var exports = {
     go: go
   }

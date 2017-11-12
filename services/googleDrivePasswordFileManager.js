@@ -24,7 +24,7 @@ THE SOFTWARE.
 
  */
 
-function GoogleDrivePasswordFileManager($http, $timeout) {
+module.exports = function GoogleDrivePasswordFileManager($http, $timeout, chromePromise) {
 	"use strict";
   
   var exports = {
@@ -91,11 +91,11 @@ function GoogleDrivePasswordFileManager($http, $timeout) {
     ];
 
     return new Promise(function(resolve, reject) {
-      chrome.permissions.contains({origins: origins}, function(alreadyGranted) {
+      chromePromiseermissions.contains({origins: origins}, function(alreadyGranted) {
         if (alreadyGranted) {
           resolve();
         } else {
-          chrome.permissions.request({origins: origins}, function(granted) {
+          chromePromiseermissions.request({origins: origins}, function(granted) {
             // The callback argument will be true if the user granted the permissions.
             if (granted) {
               resolve();

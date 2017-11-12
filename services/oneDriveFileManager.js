@@ -26,7 +26,7 @@ THE SOFTWARE.
 
 "use strict";
 
-function OneDriveFileManager ($http, $q, settings) {
+module.exports = function OneDriveFileManager ($http, $q, settings, chromePromise) {
   var accessTokenType = 'onedrive';
 
   var exports = {
@@ -60,7 +60,7 @@ function OneDriveFileManager ($http, $q, settings) {
               '&response_type=token' +
               '&redirect_uri=' + encodeURIComponent(chrome.identity.getRedirectURL('onedrive'));
 
-    var promise = chrome.p.identity.launchWebAuthFlow({url: url, interactive: true}).then(function (redirectUrl) {
+    var promise = chromePromise.identity.launchWebAuthFlow({url: url, interactive: true}).then(function (redirectUrl) {
       var authInfo = parseAuthInfoFromUrl(redirectUrl);
       if (authInfo === null) {
         return Promise.reject('Failed to extract authentication information from redirect url');
@@ -186,7 +186,7 @@ function OneDriveFileManager ($http, $q, settings) {
 
   function revokeAuth () {
     settings.saveAccessToken(accessTokenType, null);
-    var promise = chrome.p.identity.launchWebAuthFlow({url: 'https://login.live.com/oauth20_logout.srf'});
+    var promise = chromePromise.identity.launchWebAuthFlow({url: 'https://login.live.com/oauth20_logout.srf'});
     return $q.when(promise);
   }
 

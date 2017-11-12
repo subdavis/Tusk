@@ -26,7 +26,7 @@ THE SOFTWARE.
 
 "use strict";
 
-function SampleDatabaseFileManager($http) {
+module.exports = function SampleDatabaseFileManager($http, chromePromise) {
   var exports = {
     key: 'sample',
     routePath: '/sample-database',
@@ -75,13 +75,13 @@ function SampleDatabaseFileManager($http) {
 
   function setActive(flag) {
     if (flag)
-      return chrome.p.storage.local.set({'useSampleDatabase': true});
+      return chromePromise.storage.local.set({'useSampleDatabase': true});
     else
-      return chrome.p.storage.local.remove('useSampleDatabase');
+      return chromePromise.storage.local.remove('useSampleDatabase');
   }
 
   function getActive() {
-    return chrome.p.storage.local.get('useSampleDatabase').then(function(results) {
+    return chromePromise.storage.local.get('useSampleDatabase').then(function(results) {
       return !!results.useSampleDatabase;
     });
   }

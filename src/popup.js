@@ -1,3 +1,5 @@
+"use strict";
+
 // Vue Components
 import Vue from 'vue'
 import Popup from './Popup.vue'
@@ -52,7 +54,7 @@ import sampleDatabaseFileManager from '$services/sampleDatabaseFileManager'
 
 // Set up routes
 Vue.prototype.$router = new VirtualRouter([
-  '/unlock',
+  '/unlock/:database',
   '/foo'
 ])
 

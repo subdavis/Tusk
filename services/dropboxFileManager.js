@@ -26,7 +26,7 @@ THE SOFTWARE.
 
 "use strict";
 
-function DropboxFileManager($http, settings) {
+module.exports = function DropboxFileManager($http, settings, chromePromise) {
 	var accessTokenType = 'dropbox';
 
 	var state = {
@@ -154,10 +154,10 @@ function DropboxFileManager($http, settings) {
 
 	function ensureOriginPermissions() {
 		var dropboxOrigins = ['https://*.dropbox.com/'];
-		return chrome.p.permissions.contains({origins: dropboxOrigins}).then(function() {
+		return chromePromise.permissions.contains({origins: dropboxOrigins}).then(function() {
 			return true;
 		}).catch(function() {
-			return chrome.p.permissions.request({origins: dropboxOrigins}).then(function() {
+			return chromePromise.permissions.request({origins: dropboxOrigins}).then(function() {
 				return true;
 			}).catch(function(err) {
 				return false;
@@ -187,7 +187,7 @@ function DropboxFileManager($http, settings) {
 					+ '&redirect_uri=' + encodeURIComponent(chrome.identity.getRedirectURL('dropbox'))
 					+ '&force_reapprove=false';
 				console.log("BeforeLaunch", authUrl);
-				chrome.p.identity.launchWebAuthFlow({'url': authUrl, 'interactive': true}).then(function(redirect_url) {
+				chromePromise.identity.launchWebAuthFlow({'url': authUrl, 'interactive': true}).then(function(redirect_url) {
 					console.log("After", redirect_url);
 					var tokenMatches = /access_token=([^&]+)/.exec(redirect_url);
 					var stateMatches = /state=([^&]+)/.exec(redirect_url);

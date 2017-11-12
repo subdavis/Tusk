@@ -29,7 +29,7 @@ THE SOFTWARE.
 /**
  * Service for opening keepass files
  */
-function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry, keepassReference) {
+module.exports = function Keepass(kdbxweb, argon2, keepassHeader, pako, settings, passwordFileStoreRegistry, keepassReference) {
   var my = {};
 
   var littleEndian = (function() {
@@ -44,7 +44,7 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry, keepa
      * (password isn't empty OR keyfile isn't empty)
      * ELSE
      * (assume password is the empty string)
-     */
+     */ 
     if (masterPassword === undefined && keyFileInfo === undefined){
       // Neither keyfile nor password provided.  Assume empty string password.
       masterPassword = "";

@@ -37,7 +37,7 @@ THE SOFTWARE.
  * Max storage time is 40 minutes, which is the expected TTL of the secret.  You
  * can see details of the expiry time in chrome://identity-internals/
  */
-function SecureCacheDisk(protectedMemory, secureCacheMemory, settings) {
+module.exports = function SecureCacheDisk(protectedMemory, secureCacheMemory, settings) {
   var exports = {
     save: set,
     get: get,

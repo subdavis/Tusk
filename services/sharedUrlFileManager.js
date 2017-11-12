@@ -26,7 +26,7 @@ THE SOFTWARE.
 
 "use strict";
 
-function SharedUrlFileManager($http, $timeout) {
+module.exports = function SharedUrlFileManager($http, chromePromise) {
   var exports = {
     key: 'shared-url',
     routePath: '/shared-url',
@@ -69,12 +69,12 @@ function SharedUrlFileManager($http, $timeout) {
 
   function setUrls(urls){
   	if(urls)
-  	  return chrome.p.storage.local.set({'sharedUrlList': urls});
+  	  return chromePromise.storage.local.set({'sharedUrlList': urls});
   	else
-  	  return chrome.p.storage.local.remove('sharedUrlList');
+  	  return chromePromise.storage.local.remove('sharedUrlList');
   }
   function getUrls(){
-  	return chrome.p.storage.local.get('sharedUrlList').then(results => {
+  	return chromePromise.storage.local.get('sharedUrlList').then(results => {
   		if (results.hasOwnProperty('sharedUrlList'))
   			return results.sharedUrlList;
   		return false;

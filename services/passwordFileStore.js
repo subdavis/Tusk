@@ -30,7 +30,7 @@ THE SOFTWARE.
  * Provides a container for various storage mechanisms (aka FileManagers)that can be injected,
  * so that the rest of the code can be independent of specifics.
 **/
-function PasswordFileStoreRegistry() {
+module.exports = function PasswordFileStoreRegistry() {
   var exports = {
     listFileManagers: listFileManagers,
     getChosenDatabaseFile: getChosenDatabaseFile

@@ -26,7 +26,7 @@ THE SOFTWARE.
 
 "use strict";
 
-function LocalChromePasswordFileManager() {
+module.exports = function LocalChromePasswordFileManager(chromePromise) {
   var exports = {
     key: 'local',
     routePath: '/drag-drop-file',
@@ -48,7 +48,7 @@ function LocalChromePasswordFileManager() {
   var savingLocks = [];  //prevent reading while an async save is ongoing
   function listDatabases() {
     return Promise.all(savingLocks).then(function() {
-      return chrome.p.storage.local.get('passwordFiles')
+      return chromePromise.storage.local.get('passwordFiles')
     }).then(function(result) {
       var files = result.passwordFiles || [];
 
@@ -100,7 +100,7 @@ function LocalChromePasswordFileManager() {
         existingFiles[index] = db;
       }
 
-      return chrome.p.storage.local.set({'passwordFiles': existingFiles});
+      return chromePromise.storage.local.set({'passwordFiles': existingFiles});
     });
 
     savingLocks.push(p);  //ensure that a future read has to wait for the write to complete
@@ -115,9 +115,9 @@ function LocalChromePasswordFileManager() {
       });
 
       if (databases.length)
-        return chrome.p.storage.local.set({'passwordFiles': databases});
+        return chromePromise.storage.local.set({'passwordFiles': databases});
       else
-        return chrome.p.storage.local.remove('passwordFiles');
+        return chromePromise.storage.local.remove('passwordFiles');
     });
   }
 

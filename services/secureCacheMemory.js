@@ -29,7 +29,7 @@ THE SOFTWARE.
 /**
  * Storage in background page memory.
  */
-function SecureCacheMemory(protectedMemory) {
+module.exports = function SecureCacheMemory(protectedMemory) {
   var exports = {}
 
   var awaiting = [];

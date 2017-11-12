@@ -26,7 +26,7 @@ THE SOFTWARE.
 
 "use strict";
 
-function KeepassHeader() {
+module.exports = function KeepassHeader() {
   var my = {
     readHeader: readHeader
   };
