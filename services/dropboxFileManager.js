@@ -99,8 +99,8 @@ function DropboxFileManager($http, settings) {
 	}
 
 	function listDatabases() {
-		return Promise.all([getDatabases('.kdb'), getDatabases('.kdbx')]).then(function(arrayOfArrays) {
-			return arrayOfArrays[0].concat(arrayOfArrays[1])
+		return getDatabases('.kdbx').then(databases => {
+			return databases
 		}).catch(function(response) {
 			if (response.status == 401) {
 				//unauthorized, means the token is bad.  retry with new token.
@@ -154,15 +154,15 @@ function DropboxFileManager($http, settings) {
 
 	function ensureOriginPermissions() {
 		var dropboxOrigins = ['https://*.dropbox.com/'];
-		return chrome.p.permissions.contains({origins: dropboxOrigins}).then(function() {
-			return true;
-		}).catch(function() {
-			return chrome.p.permissions.request({origins: dropboxOrigins}).then(function() {
-				return true;
-			}).catch(function(err) {
-				return false;
-			})
-		});
+		return chrome.p.permissions
+			.contains({origins: dropboxOrigins})
+			.then(nil => { return true })
+			.catch(err => {
+				return chrome.p.permissions
+					.request({origins: dropboxOrigins})
+					.then(nil => { return true; })
+					.catch(err =>{ return false; })
+			});
 	}
 
 	function getToken() {
@@ -179,7 +179,7 @@ function DropboxFileManager($http, settings) {
 	}
 
 	function interactiveLogin() {
-		return ensureOriginPermissions().then(function() {
+		return ensureOriginPermissions().then(ensured => {
 			return new Promise(function(resolve, reject) {
 				var randomState = Base64.encode(window.crypto.getRandomValues(new Uint8Array(16)));  //random state, protects against CSRF
 				var authUrl = 'https://www.dropbox.com/oauth2/authorize?response_type=token&client_id=lau0eigo4cfthqz'
