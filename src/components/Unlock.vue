@@ -10,14 +10,13 @@
 </template>
 
 <script>
-"use strict";
 import InfoCluster from '@/components/InfoCluster'
-import kdbxweb from '$bwr/kdbxweb/dist/kdbxweb.js'
 
-// keepass, unlockedState, secureCache, settings, optionsLink
 export default {
   props: {
-    unlockedstate: Object
+    unlockedState: Object,
+    secureCache: Object,
+    settings: Object
   },
   data () {
     return {}

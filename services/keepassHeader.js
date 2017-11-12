@@ -25,8 +25,9 @@ THE SOFTWARE.
 */
 
 "use strict";
+import pako from '$bwr/pako/dist/pako.min.js'
 
-module.exports = function KeepassHeader() {
+function KeepassHeader() {
   var my = {
     readHeader: readHeader
   };
@@ -170,3 +171,5 @@ module.exports = function KeepassHeader() {
 
   return my;
 }
+
+export { KeepassHeader }

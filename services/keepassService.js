@@ -25,11 +25,15 @@ THE SOFTWARE.
  */
 
 "use strict";
-
 /**
  * Service for opening keepass files
  */
-module.exports = function Keepass(kdbxweb, argon2, keepassHeader, pako, settings, passwordFileStoreRegistry, keepassReference) {
+import Base64 from '$lib/base64.js'
+import pako from '$bwr/pako/dist/pako.min.js'
+import kdbxweb from '$bwr/kdbxweb/dist/kdbxweb.js'
+import argon2 from '$lib/argon2.js'
+
+function KeepassService(keepassHeader, settings, passwordFileStoreRegistry, keepassReference) {
   var my = {};
 
   var littleEndian = (function() {
@@ -217,3 +221,5 @@ module.exports = function Keepass(kdbxweb, argon2, keepassHeader, pako, settings
 
   return my;
 }
+
+export { KeepassService }

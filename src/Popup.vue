@@ -1,22 +1,24 @@
 <template>
   <div id="app">
     <!-- Router View -->
-    <unlock id="/unlock/:database" :unlockedstate="services.unlockedState"></unlock>
+    <unlock id="/unlock/:provider/:title" 
+      :unlocked-state="services.unlockedState" 
+      :secure-cache="services.secureCache" 
+      :settings="services.settings"></unlock>
+    <startup id="/" 
+      :settings="services.settings"
+      :password-file-store-registry="services.passwordFileStoreRegistry"></startup>
   </div>
 </template>
 
 <script>
-'use strict'
-import pako from '$bwr/pako/dist/pako.min.js'
-import kdbxweb from '$bwr/kdbxweb/dist/kdbxweb.js'
-import argon2 from '$lib/argon2.js'
-import Unlock from '@/components/Unlock'
+// Singletons
 import ChromePromiseApi from '$lib/chrome-api-promise.js'
 import Settings from '$services/settings.js'
 import ProtectedMemory from '$services/protectedMemory.js'
-import KeepassHeader from '$services/keepassHeader.js'
+import { KeepassHeader } from '$services/keepassHeader.js'
 import KeepassReference from '$services/keepassReference.js'
-import KeepassService from '$services/keepassService.js'
+import { KeepassService } from '$services/keepassService.js'
 import UnlockedState from '$services/unlockedState.js'
 import SecureCacheMemory from '$services/secureCacheMemory.js'
 import SecureCacheDisk from '$services/secureCacheDisk.js'
@@ -28,11 +30,16 @@ import DropboxFileManager from '$services/dropboxFileManager.js'
 import OneDriveFileManager from '$services/oneDriveFileManager.js'
 import SharedUrlFileManager from '$services/sharedUrlFileManager.js'
 import SampleDatabaseFileManager from '$services/sampleDatabaseFileManager.js'
+// Components
+import Unlock from '@/components/Unlock'
+import Startup from '@/components/Startup'
 
 const chromePromiseApi = ChromePromiseApi()
 const settings = new Settings(chromePromiseApi)
 const protectedMemory = new ProtectedMemory()
-const keepassHeader = new KeepassHeader(pako, settings)
+const secureCacheMemory = new SecureCacheMemory(protectedMemory)
+const secureCacheDisk = new SecureCacheDisk(protectedMemory, secureCacheMemory, settings)
+const keepassHeader = new KeepassHeader(settings)
 const keepassReference = new KeepassReference()
 const $http = function(){}
 const $q = function(){}
@@ -46,17 +53,19 @@ const oneDriveFileManager = new OneDriveFileManager($http, $q, settings, chromeP
 const sampleDatabaseFileManager = new SampleDatabaseFileManager($http, chromePromiseApi)
 
 const passwordFileStoreRegistry = new PasswordFileStore(localChromePasswordFileManager, dropboxFileManager, googleDrivePasswordFileManager, sharedUrlFileManager, oneDriveFileManager, sampleDatabaseFileManager)
-const keepassService = new KeepassService(kdbxweb, argon2, keepassHeader, pako, settings, passwordFileStoreRegistry, keepassReference)
+const keepassService = new KeepassService(keepassHeader, settings, passwordFileStoreRegistry, keepassReference)
 
 export default {
   name: 'app',
   components: {
-    Unlock
+    Unlock,
+    Startup
   },
   data () {
     return {
-      services: {
+      services: { // The services exposed to UI components.
         settings: settings,
+        secureCache: secureCacheDisk,
         passwordFileStoreRegistry: passwordFileStoreRegistry,
         keepassService: keepassService,
         unlockedState: new UnlockedState(this.$router, keepassReference, protectedMemory, settings)
@@ -64,12 +73,7 @@ export default {
     }
   },
   mounted: function () {
-    this.$router.route('/unlock')
-    settings
-      .getCurrentDatabaseUsage()
-      .then(usage => {
-        console.log(usage)
-      })
+    this.$router.route('/')
   }
 }
 </script>
