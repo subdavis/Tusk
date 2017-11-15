@@ -28,9 +28,11 @@ THE SOFTWARE.
 /**
  * Service for opening keepass files
  */
-import Base64 from '$lib/base64.js'
-import pako from '$bwr/pako/dist/pako.min.js'
-import kdbxweb from '$bwr/kdbxweb/dist/kdbxweb.js'
+let Case = require('case'),
+    Base64 = require('base64-arraybuffer'),
+    pako = require('pako'),
+    kdbxweb = require('kdbxweb')
+
 import argon2 from '$lib/argon2.js'
 
 function KeepassService(keepassHeader, settings, passwordFileStoreRegistry, keepassReference) {

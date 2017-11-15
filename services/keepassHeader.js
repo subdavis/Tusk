@@ -28,6 +28,7 @@ THE SOFTWARE.
 import pako from '$bwr/pako/dist/pako.min.js'
 
 function KeepassHeader() {
+
   var my = {
     readHeader: readHeader
   };

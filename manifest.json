@@ -18,6 +18,12 @@
 			"https://www.googleapis.com/auth/chromewebstore.readonly"
 		]
 	},
+	"background": {
+		"scripts": [
+			"dist/background.build.js"
+		],
+		"persistent": false
+	},
 	"incognito": "split",
 	"browser_action": {
 		"default_icon": "assets/icons/logo_38.png",

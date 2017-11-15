@@ -26,7 +26,9 @@ THE SOFTWARE.
 
 "use strict";
 
-module.exports = function OneDriveFileManager ($http, $q, settings, chromePromise) {
+import axios from '$bwr/axios/dist/axios.min.js'
+
+function OneDriveFileManager ($q, settings, chromePromise) {
   var accessTokenType = 'onedrive';
 
   var exports = {
@@ -73,7 +75,7 @@ module.exports = function OneDriveFileManager ($http, $q, settings, chromePromis
   }
 
   function listDatabases () {
-    var promise = getToken()
+    return getToken()
       .then(searchFiles)
       .then(filterFiles)
       .catch(function (response) {
@@ -84,8 +86,6 @@ module.exports = function OneDriveFileManager ($http, $q, settings, chromePromis
         	return [];
         }
       });
-
-    return $q.when(promise);
   }
 
   function searchFiles (token) {
@@ -93,7 +93,15 @@ module.exports = function OneDriveFileManager ($http, $q, settings, chromePromis
     var query = encodeURIComponent('kdb');
     var filter = encodeURIComponent('file ne null');
     var url = 'https://api.onedrive.com/v1.0/drive/root/view.search?q=' + query + '&filter=' + filter;
-    return $http({ method: 'GET', url: url, headers: { Authorization: 'Bearer ' + token }});
+    return axios({ 
+      method: 'GET', 
+      url: url, 
+      headers: { 
+        Authorization: 'Bearer ' + token 
+      }
+    }).then( response => {
+      return response;
+    });
   }
 
   function filterFiles (response) {
@@ -174,7 +182,7 @@ module.exports = function OneDriveFileManager ($http, $q, settings, chromePromis
 
   function loadFile (dbInfo, token) {
     var id = encodeURIComponent(dbInfo.id);
-    return $http({
+    return axios({
       method: 'GET',
       url: dbInfo.url,
       responseType: 'arraybuffer',
@@ -201,3 +209,5 @@ module.exports = function OneDriveFileManager ($http, $q, settings, chromePromis
 
   return exports;
 }
+
+export { OneDriveFileManager }

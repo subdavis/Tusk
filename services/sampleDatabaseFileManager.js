@@ -26,7 +26,9 @@ THE SOFTWARE.
 
 "use strict";
 
-module.exports = function SampleDatabaseFileManager($http, chromePromise) {
+import axios from '$bwr/axios/dist/axios.min.js'
+
+function SampleDatabaseFileManager(chromePromise) {
   var exports = {
     key: 'sample',
     routePath: '/sample-database',
@@ -63,11 +65,10 @@ module.exports = function SampleDatabaseFileManager($http, chromePromise) {
 
   //given minimal file information, retrieve the actual file
   function getChosenDatabaseFile(dbInfo) {
-    return $http({
+    return axios({
       method: 'GET',
       url: chrome.extension.getURL('/assets/Sample123.kdbx'),
-      responseType: 'arraybuffer',
-      cache: true
+      responseType: 'arraybuffer'
     }).then(function(response) {
       return response.data;
     });
@@ -88,3 +89,5 @@ module.exports = function SampleDatabaseFileManager($http, chromePromise) {
 
   return exports;
 }
+
+export { SampleDatabaseFileManager }

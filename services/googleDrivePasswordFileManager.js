@@ -23,8 +23,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
  */
+import axios from '$bwr/axios/dist/axios.min.js'
 
-module.exports = function GoogleDrivePasswordFileManager($http, $timeout, chromePromise) {
+function GoogleDrivePasswordFileManager(chromePromise) {
 	"use strict";
   
   var exports = {
@@ -53,7 +54,11 @@ module.exports = function GoogleDrivePasswordFileManager($http, $timeout, chrome
   function revokeAuth() {
     if (accessToken) {
       var url = 'https://accounts.google.com/o/oauth2/revoke?token=' + accessToken
-      return $http.get(url, {responseType: 'jsonp'}).then(function(response) {
+      return axios({
+        url: url, 
+        responseType: 'jsonp'
+      }).then(function(response) {
+        // TODO: Handle revoke failed.
         return removeCachedAuthToken();
       });
   	} else {
@@ -171,25 +176,25 @@ module.exports = function GoogleDrivePasswordFileManager($http, $timeout, chrome
       if (optionalResponseType)
         request.responseType = optionalResponseType;
 
-      return $http(request);
-    }).then(function(response) {
-      return response.data;
-    }).catch(function(response) {
-      if (response.status == 401 && attempt < 2) {
-        return removeCachedAuthToken().then(function() {
-          return sendAuthorizedGoogleDriveGet(url, optionalResponseType, attempt + 1);
+      return axios(request)
+        .then(response => { return response.data })
+        .catch(response => {
+          if (response.status == 401 && attempt < 2) {
+            return removeCachedAuthToken().then(function() {
+              return sendAuthorizedGoogleDriveGet(url, optionalResponseType, attempt + 1);
+            });
+          } else if (response.status == 403 && attempt < rateLimits.length) {
+            //rate limited, retry
+          	var message = (optionalResponseType == 'arraybuffer') ? new Uint8Array(response.data) : response.data;
+            console.log('403, retrying', url, response.statusText, message);
+            return setTimeout(function() {
+            	return sendAuthorizedGoogleDriveGet(url, optionalResponseType, attempt + 1);
+            }, rateLimits[attempt] + Math.floor(Math.random() * 1000));
+          } else {
+            console.log('failed to fetch', url, accessToken, response);
+            throw new Error("Request to retrieve files from drive failed - " + (response.statusText || response.message))
+          }
         });
-      } else if (response.status == 403 && attempt < rateLimits.length) {
-        //rate limited, retry
-      	var message = (optionalResponseType == 'arraybuffer') ? new Uint8Array(response.data) : response.data;
-        console.log('403, retrying', url, response.statusText, message);
-        return $timeout(function() {
-        	return sendAuthorizedGoogleDriveGet(url, optionalResponseType, attempt + 1);
-        }, rateLimits[attempt] + Math.floor(Math.random() * 1000));
-      } else {
-        console.log('failed to fetch', url, accessToken, response);
-        throw new Error("Request to retrieve files from drive failed - " + (response.statusText || response.message))
-      }
     });
   }
 
@@ -221,3 +226,5 @@ module.exports = function GoogleDrivePasswordFileManager($http, $timeout, chrome
 
   return exports;
 }
+
+export { GoogleDrivePasswordFileManager }

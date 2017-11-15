@@ -28,7 +28,8 @@
     "kdbxweb": "keeweb/kdbxweb#1.0.1",
     "components-font-awesome": "^4.7.0",
     "pako": "^1.0.6",
-    "argon2-browser": "^1.1.0"
+    "argon2-browser": "^1.1.0",
+    "axios": "^0.17.1"
   },
   "devDependencies": {}
 }

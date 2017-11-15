@@ -30,6 +30,7 @@ Icon
 
 # chrome web-store assets
 store/
+dist/
 
 # Thumbnails
 ._*

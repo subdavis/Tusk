@@ -26,7 +26,9 @@ THE SOFTWARE.
 
 "use strict";
 
-module.exports = function DropboxFileManager($http, settings, chromePromise) {
+import axios from '$bwr/axios/dist/axios.min.js'
+
+function DropboxFileManager(settings, chromePromise) {
 	var accessTokenType = 'dropbox';
 
 	var state = {
@@ -73,8 +75,8 @@ module.exports = function DropboxFileManager($http, settings, chromePromise) {
 
 	function getDatabases(extension) {
 		return getToken().then(function(accessToken) {
-			var req = {
-				method: 'POST',
+			return axios({
+				method: 'post',
 				url: 'https://api.dropbox.com/2/files/search',
 				data: {
 					path: '',
@@ -86,22 +88,18 @@ module.exports = function DropboxFileManager($http, settings, chromePromise) {
 				headers: {
 					'Authorization': 'Bearer ' + accessToken
 				}
-			};
-
-			return $http(req);
-		}).then(function(response) {
-			return response.data.matches.map(function(fileInfo) {
-				return {
-					title: fileInfo.metadata.path_display
-				};
-			});
+			}).then(response => {
+				return response.data.matches.map(function(fileInfo) {
+					return {
+						title: fileInfo.metadata.path_display
+					};
+				});
+			})
 		})
 	}
 
 	function listDatabases() {
-		return Promise.all([getDatabases('.kdb'), getDatabases('.kdbx')]).then(function(arrayOfArrays) {
-			return arrayOfArrays[0].concat(arrayOfArrays[1])
-		}).catch(function(response) {
+		return getDatabases('.kdbx').catch(response => {
 			if (response.status == 401) {
 				//unauthorized, means the token is bad.  retry with new token.
 				return interactiveLogin().then(listDatabases);
@@ -131,24 +129,24 @@ module.exports = function DropboxFileManager($http, settings, chromePromise) {
 			var arg = {
 				"path": dbInfo.title
 			}
-			return $http({
-				method: 'POST',
+			return axios({
+				method: 'post',
 				url: 'https://api-content.dropbox.com/2/files/download',
 				responseType: 'arraybuffer',
 				headers: {
 					'Authorization': 'Bearer ' + accessToken,
 					'Dropbox-API-Arg': http_header_safe_json(arg)
 				}
-			})
-		}).then(function(response) {
-			return response.data;
-		}).catch(function(response) {
-			if (response.status == 401) {
-				//unauthorized, means the token is bad.  retry with new token.
-				return interactiveLogin().then(function() {
-					return getChosenDatabaseFile(dbInfo);
-				});
-			}
+			}).then(function(response) {
+				return response.data;
+			}).catch(function(response) {
+				if (response.status == 401) {
+					//unauthorized, means the token is bad.  retry with new token.
+					return interactiveLogin().then(function() {
+						return getChosenDatabaseFile(dbInfo);
+					});
+				}
+			});
 		});
 	}
 
@@ -222,3 +220,5 @@ module.exports = function DropboxFileManager($http, settings, chromePromise) {
 
 	return exports;
 }
+
+export { DropboxFileManager }

@@ -10,7 +10,12 @@
     "build": "cross-env NODE_ENV=production webpack --progress --hide-modules"
   },
   "dependencies": {
+    "base64-arraybuffer": "^0.1.5",
+    "case": "^1.5.4",
+    "kdbxweb": "^1.0.2",
+    "pako": "^1.0.6",
     "vue": "^2.4.4",
+    "vue-router": "^3.0.1",
     "xmldom": "^0.1.27"
   },
   "browserslist": [

@@ -23,13 +23,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 */
-
+let Base64 = require('base64-arraybuffer')
+import ChromePromise from '$lib/chrome-api-promise.js'
 /**
  * Settings for CKPX  */
-module.exports = function Settings(chromePromise) {
+function Settings() {
 	"use strict";
 
 	var exports = {}
+	var chromePromise = ChromePromise()
 
 	//upgrade old settings.  Called on install.
 	exports.upgrade = function() {
@@ -142,8 +144,8 @@ module.exports = function Settings(chromePromise) {
 		});
 	}
 
-	exports.saveDefaultRememberOptions = function(rememberPassword, rememberPeriod) {
-		if (rememberPassword) {
+	exports.saveDefaultRememberOptions = function(rememberPeriod) {
+		if (rememberPeriod !== 0) {
 			return chromePromise.storage.local.set({
 				'rememberPeriod': rememberPeriod
 			})
@@ -336,3 +338,5 @@ module.exports = function Settings(chromePromise) {
 
 	return exports;
 }
+
+export { Settings }

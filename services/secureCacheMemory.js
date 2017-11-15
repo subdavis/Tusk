@@ -57,7 +57,7 @@ module.exports = function SecureCacheMemory(protectedMemory) {
       var port = chrome.runtime.connect({
         name: "tab" + tabs[0].id
       });
-
+      console.log(port)
       notifyReady(port);
     }
   });
@@ -69,6 +69,9 @@ module.exports = function SecureCacheMemory(protectedMemory) {
       var notifier = awaiting.shift();
       notifier(savedState); //notify others
     });
+    port.onDisconnect.addListener(function(p) {
+      console.log(p)
+    })
   });
 
   //wake up the background page and get a pipe to send/receive messages:
@@ -89,6 +92,7 @@ module.exports = function SecureCacheMemory(protectedMemory) {
 
   exports.clear = function() {
     return ready.then(function(port) {
+      console.log(port)
       port.postMessage({
         action: 'clear'
       });

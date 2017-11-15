@@ -4,7 +4,8 @@ var webpack = require('webpack')
 module.exports = {
   entry: {
     'popup': './src/popup.js',
-    'options': './src/options.js'
+    'options': './src/options.js',
+    'background': './background/background.js'
   },
   output: {
     path: path.resolve(__dirname, './dist'),
@@ -89,8 +90,7 @@ module.exports = {
   },
   performance: {
     hints: false
-  },
-  devtool: '#source-map'
+  }
 }
 
 if (process.env.NODE_ENV === 'production') {

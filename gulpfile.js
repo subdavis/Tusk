@@ -13,5 +13,5 @@ gulp.task('webpack', function() {
 });
 
 gulp.task('watch', ['webpack'], function() {
-	gulp.watch(['src/**/*.js', 'src/**/*.vue', 'lib/**/*.js', 'services/**/*.js'], ['webpack']);
+	gulp.watch(['src/**/*.js', 'src/**/*.vue', 'lib/**/*.js', 'services/**/*.js', 'background/*.js'], ['webpack']);
 });

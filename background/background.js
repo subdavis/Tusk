@@ -31,7 +31,10 @@ THE SOFTWARE.
   (they will be lost)
 */
 
-(function(protectedMemory, settings) {
+import ProtectedMemory from '$services/protectedMemory.js'
+import { Settings } from '$services/settings.js'
+
+function Background(protectedMemory, settings) {
 	if (chrome.extension.inIncognitoContext) {
 		doReplaceRules();
 	} else {
@@ -277,4 +280,6 @@ THE SOFTWARE.
 			});
 	}
 
-})(new ProtectedMemory(), new Settings());
+}
+
+Background(new ProtectedMemory(), new Settings())

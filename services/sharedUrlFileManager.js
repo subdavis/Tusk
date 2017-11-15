@@ -26,7 +26,9 @@ THE SOFTWARE.
 
 "use strict";
 
-module.exports = function SharedUrlFileManager($http, chromePromise) {
+import axios from '$bwr/axios/dist/axios.min.js'
+
+function SharedUrlFileManager(chromePromise) {
   var exports = {
     key: 'shared-url',
     routePath: '/shared-url',
@@ -57,7 +59,7 @@ module.exports = function SharedUrlFileManager($http, chromePromise) {
 
   //given minimal file information, retrieve the actual file
   function getChosenDatabaseFile(dbInfo, attempt) {
-		return $http({
+		return axios({
       method: 'GET',
       url: dbInfo.direct_link,
       responseType: 'arraybuffer',
@@ -83,3 +85,5 @@ module.exports = function SharedUrlFileManager($http, chromePromise) {
 
   return exports;
 }
+
+export { SharedUrlFileManager }
