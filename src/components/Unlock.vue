@@ -2,11 +2,11 @@
   <div>
   	<info-cluster
       :messages="messages"></info-cluster>
-    <entry-list
-      :entries="[]"
+    <div v-if="busy" class="spinner">Busy!</div>
+    <entry-list v-show="!busy"
+      :entries="entries"
       :priority-entries="unlockedState.entries"></entry-list>
-  	<div id="masterPasswordGroup">
-      <div v-if="busy" class="spinner">Busy!</div>
+  	<div id="masterPasswordGroup" v-show="!busy && !isUnlocked">
       <input type="text" id="masterPassword" v-bind="masterPassword">
   		<select v-model="selectedKeyFile" id="keyFileDropdown">
         <option value="null">-- No Keyfile --</option>
@@ -38,12 +38,16 @@ export default {
       masterPassword: "",
       keyFiles: [],  // list of all available
       selectedKeyFile: undefined, // chosen keyfile object
-      rememberPeriod: 0 // in minutes. default: do not remember
+      rememberPeriod: 0, // in minutes. default: do not remember
+      entries: []
     } 
   },
   computed: {
     rememberPassword: function () {
       return this.rememberPeriod !== 0
+    },
+    isUnlocked: function () {
+      return this.unlockedState.entries !== null
     }
   },
   components: {
@@ -227,7 +231,7 @@ export default {
         showResults(entries)
     }).catch(err => {
       //this is fine - it just means the cache expired.  Clear the cache to be sure.
-      secureCache.clear('entries')
+      this.secureCache.clear('entries')
     })
   }
 }
