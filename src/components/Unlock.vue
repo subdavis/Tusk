@@ -1,12 +1,16 @@
 <template>
   <div>
-  	<info-cluster
-      :messages="messages"></info-cluster>
     <div v-if="busy" class="spinner">Busy!</div>
-    <entry-list v-show="!busy"
-      :entries="entries"
-      :priority-entries="unlockedState.entries"></entry-list>
-  	<div id="masterPasswordGroup" v-show="!busy && !isUnlocked">
+
+    <entry-list v-if="!busy"
+      :priority-entries="unlockedState.entries"
+      :entries="allEntries"></entry-list>
+    
+    <div v-show="!busy && isUnlocked">
+      <button v-on:click=""></button>
+    </div>
+  	
+    <div id="masterPasswordGroup" v-if="!busy && !isUnlocked">
       <input type="text" id="masterPassword" v-bind="masterPassword">
   		<select v-model="selectedKeyFile" id="keyFileDropdown">
         <option value="null">-- No Keyfile --</option>
@@ -15,6 +19,8 @@
   		<button v-on:click="unlock">Unlock</button>
       <button v-on:click="chooseAnotherFile">Choose Another Database</button>
     </div>
+
+    <div v-show="isUnlocked"></div>
   </div>
 </template>
 
@@ -39,7 +45,7 @@ export default {
       keyFiles: [],  // list of all available
       selectedKeyFile: undefined, // chosen keyfile object
       rememberPeriod: 0, // in minutes. default: do not remember
-      entries: []
+      allEntries: []
     } 
   },
   computed: {
@@ -125,6 +131,8 @@ export default {
       let title = this.unlockedState.title
       let siteTokens = getValidTokens(siteUrl.hostname + '.' + this.unlockedState.title)
       rankEntries(entries, siteUrl, title, siteTokens) // in-place
+
+      this.allEntries = entries
 
       //save short term (in-memory) filtered results
       this.unlockedState.entries = entries.filter(function(entry) {
@@ -238,8 +246,12 @@ export default {
 </script>
 
 <style lang="scss">
-input, select, button {
-	width: 100%;
-	margin: 10px 0px 0px 0px;
+@import "../styles/settings.scss";
+
+#masterPasswordGroup {
+  input, select, button {
+    width: 100%;
+    margin: 10px 0px 0px 0px;
+  }  
 }
 </style>

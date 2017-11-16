@@ -1,4 +1,5 @@
 var path = require('path')
+var ExtractTextPlugin = require("extract-text-webpack-plugin")
 var webpack = require('webpack')
 
 module.exports = {
@@ -9,18 +10,11 @@ module.exports = {
   },
   output: {
     path: path.resolve(__dirname, './dist'),
-    publicPath: 'dist/',
+    publicPath: '/dist/',
     filename: '[name].build.js'
   },
   module: {
     rules: [
-      {
-        test: /\.css$/,
-        use: [
-          'vue-style-loader',
-          'css-loader'
-        ],
-      },
       {
         test: /\.scss$/,
         use: [
@@ -70,6 +64,17 @@ module.exports = {
         options: {
           name: '[name].[ext]?[hash]'
         }
+      },
+      {
+          test: /\.css$/,
+          use: ExtractTextPlugin.extract({
+              fallback: "style-loader",
+              use: "css-loader"
+          })
+      },
+      {
+          test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
+          loader: 'url-loader?limit=10000',
       }
     ]
   },
@@ -90,7 +95,10 @@ module.exports = {
   },
   performance: {
     hints: false
-  }
+  },
+  plugins: [
+      new ExtractTextPlugin("styles.css"),
+  ]
 }
 
 if (process.env.NODE_ENV === 'production') {

@@ -95,8 +95,9 @@ export default {
 </script>
 
 <style lang="scss">
+@import "./styles/settings.scss";
 #main {
-  width: 450px;
+  width: 400px;
   margin: 0px auto;
   color: #2c3e50;
 }

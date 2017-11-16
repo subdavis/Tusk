@@ -29,7 +29,8 @@
     "components-font-awesome": "^4.7.0",
     "pako": "^1.0.6",
     "argon2-browser": "^1.1.0",
-    "axios": "^0.17.1"
+    "axios": "^0.17.1",
+    "font-awesome": "fontawesome#^4.7.0"
   },
   "devDependencies": {}
 }
