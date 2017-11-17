@@ -2,23 +2,25 @@
   <div>
     <div class="search">
       <i class="fa fa-search"></i>
-      <input ref="searchbox" type='search' v-bind="searchTerm" placeholder="search..." />
+      <input ref="searchbox" type='search' v-model="searchTerm" placeholder="search entire database..." />
     </div>
-    <div class="entries" v-if="priorityEntries">
-      <entry-list-item v-for="entry in priorityEntries" 
-        :key="entry.id"
-        :user="entry.userName"
-        :url="entry.url"
-        :title="entry.title">
-      </entry-list-item>
-    </div>
-    <div class="entries" v-else-if="entries.length > 0">
-      <entry-list-item v-for="entry in entries" 
-        :key="entry.id"
-        :user="entry.userName"
-        :url="entry.url"
-        :title="entry.title">
-      </entry-list-item>
+    <div class="entries">
+      <div v-if="priorityEntries && searchTerm.length == 0">
+        <entry-list-item v-for="entry in priorityEntries" 
+          :key="entry.id"
+          :user="entry.userName"
+          :url="entry.url"
+          :title="entry.title">
+        </entry-list-item>
+      </div>
+      <div v-if="filteredEntries && searchTerm.length">
+        <entry-list-item v-for="entry in filteredEntries" 
+          :key="entry.id"
+          :user="entry.userName"
+          :url="entry.url"
+          :title="entry.title">
+        </entry-list-item>
+      </div>
     </div>
   </div>
 </template>
@@ -29,26 +31,67 @@ import EntryListItem from '@/components/EntryListItem'
 export default {
   props: {
     priorityEntries: Array,
-    entries: Array
+    allEntries: Array
+  },
+  watch: {
+    searchTerm: function (val) {
+      if (val.length)
+        this.filteredEntries = this.allEntries.filter(entry => {
+          let result = entry.filterKey.indexOf(val.toLocaleLowerCase())
+          return (result > -1) 
+        })
+    }
   },
   components: {
     EntryListItem
   },
   data () {
     return {
-      searchTerm: ""
+      searchTerm: "",
+      filteredEntries: this.allEntries
+    }
+  },
+  methods: {
+    collectFilters (data, collector) {
+      if (data === null || data === undefined)
+        return data
+      if (data.constructor == ArrayBuffer || data.constructor == Uint8Array)
+        return null
+      else if (typeof (data) === 'string')
+        collector.push(data.toLocaleLowerCase())
+      else if (data.constructor == Array)
+        for(var i=0; i<data.length; i++)
+          this.collectFilters(data[i], collector)
+      else
+        for(var prop in data)
+          this.collectFilters(data[prop], collector)
+    },
+    createEntryFilters (entries) {
+      entries.forEach(entry => {
+        var filters = new Array()
+        this.collectFilters(entry, filters)
+        entry.filterKey = filters.join(" ")
+      })
     }
   },
   mounted () {
+    // Autofocus
     this.$nextTick(function() {
       this.$refs.searchbox.focus();
     })
+
+    this.createEntryFilters(this.allEntries);
   }
 }
 </script>
 
 <style lang="scss">
 @import "../styles/settings.scss";
+
+.entries {
+  max-height: 450px;
+  overflow-y: auto;
+}
 
 .search {
 
@@ -57,15 +100,16 @@ export default {
   box-sizing: border-box;
   display: flex;
   align-items: center;
-  border-bottom: 1px solid $dark-gray;
+  border-bottom: 1px solid $light-gray;
   
   input {
     float: right;
     width: 96%;
     border: 0px;
     padding: 0px;
-    padding-left: 5px;
-    font-size: 22px;
+    padding-left: 10px;
+    font-size: 18px;
+    background-color: $background-color;
   }
   input:focus  {
     outline:none;

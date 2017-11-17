@@ -1,17 +1,15 @@
 <template>
   <div>
-    <div v-if="busy" class="spinner">Busy!</div>
-
-    <entry-list v-if="!busy"
-      :priority-entries="unlockedState.entries"
-      :entries="allEntries"></entry-list>
-    
-    <div v-show="!busy && isUnlocked">
-      <button v-on:click=""></button>
+    <div v-if="busy" class="spinner">
+      <spinner size="medium" :message='"Unlocking " + databaseFileName'></spinner>
     </div>
+
+    <entry-list v-if="!busy && isUnlocked()"
+      :priority-entries="unlockedState.cache.priorityEntries"
+      :all-entries="unlockedState.cache.allEntries"></entry-list>
   	
-    <div id="masterPasswordGroup" v-if="!busy && !isUnlocked">
-      <input type="text" id="masterPassword" v-bind="masterPassword">
+    <div id="masterPasswordGroup" v-if="!busy && !isUnlocked()">
+      <input type="password" id="masterPassword" v-bind="masterPassword">
   		<select v-model="selectedKeyFile" id="keyFileDropdown">
         <option value="null">-- No Keyfile --</option>
   			<option v-for="kf in keyFiles" value="kf">No keyfile</option>
@@ -20,13 +18,14 @@
       <button v-on:click="chooseAnotherFile">Choose Another Database</button>
     </div>
 
-    <div v-show="isUnlocked"></div>
+    <div v-show="isUnlocked()"></div>
   </div>
 </template>
 
 <script>
 import InfoCluster from '@/components/InfoCluster'
 import EntryList from '@/components/EntryList'
+import Spinner from 'vue-simple-spinner'
 
 export default {
   props: {
@@ -45,26 +44,27 @@ export default {
       keyFiles: [],  // list of all available
       selectedKeyFile: undefined, // chosen keyfile object
       rememberPeriod: 0, // in minutes. default: do not remember
-      allEntries: []
+      databaseFileName: "",
     } 
   },
   computed: {
     rememberPassword: function () {
       return this.rememberPeriod !== 0
-    },
-    isUnlocked: function () {
-      return this.unlockedState.entries !== null
     }
   },
   components: {
   	InfoCluster,
-    EntryList
+    EntryList,
+    Spinner
   },
   methods: {
     chooseAnotherFile () {
       this.unlockedState.clearBackgroundState()
       this.secureCache.clear('entries')
       this.$router.route('/choose')
+    },
+    isUnlocked: function () {
+      return this.unlockedState.cache.allEntries !== undefined
     },
     forgetPassword () {
       this.settings.saveCurrentDatabaseUsage({
@@ -74,6 +74,7 @@ export default {
       }).then(function () {
         this.secureCache.clear('entries')
         this.unlockedState.clearBackgroundState()
+        this.unlockedState.clearCache() // new
         window.close()
       })
     },
@@ -132,29 +133,35 @@ export default {
       let siteTokens = getValidTokens(siteUrl.hostname + '.' + this.unlockedState.title)
       rankEntries(entries, siteUrl, title, siteTokens) // in-place
 
-      this.allEntries = entries
+      let allEntries = entries
+      let priorityEntries = entries
 
       //save short term (in-memory) filtered results
-      this.unlockedState.entries = entries.filter(function(entry) {
+      priorityEntries = entries.filter(function(entry) {
         return (entry.matchRank >= 100)
       });
-      if (this.unlockedState.entries.length == 0) {
-        this.unlockedState.entries = entries.filter(function(entry) {
+      if (priorityEntries.length == 0) {
+        priorityEntries = entries.filter(function(entry) {
           return (entry.matchRank > 0.8 && !entry.URL); //a good match for an entry without a url
         });
       }
-      if (this.unlockedState.entries.length == 0) {
-        this.unlockedState.entries = entries.filter(function(entry) {
+      if (priorityEntries.length == 0) {
+        priorityEntries = entries.filter(function(entry) {
           return (entry.matchRank >= 0.4);
         });
 
-        if (this.unlockedState.entries.length) {
-          this.messages['partialMatch'] = "No close matches, showing " + this.unlockedState.entries.length + " partial matches.";
+        if (priorityEntries.length) {
+          this.messages['partialMatch'] = "No close matches, showing " + priorityEntries.length + " partial matches.";
         }
       }
-      if (this.unlockedState.entries.length == 0) {
+      if (priorityEntries.length == 0) {
         this.messages['error'] = "No matches found for this site."
       }
+
+      // Cache in memory 
+      this.unlockedState.cacheSet('allEntries', allEntries)
+      this.unlockedState.cacheSet('priorityEntries', priorityEntries)
+      this.$forceUpdate()
       //save longer term (in encrypted storage)
       this.secureCache.save('entries', entries);
     },
@@ -191,15 +198,14 @@ export default {
             // don't clear passwords
             this.settings.clearForgetTimes(['forgetPassword'])
           }
-          console.log(entries)
           this.showResults(entries)
           this.busy = false
-        })/*.catch(err => {
+        }).catch(err => {
           let errmsg = err.message || "Incorrect password or keyfile"
           console.error(errmsg)
           this.messages['error'] = errmsg
           this.busy = false
-        })*/
+        })
       })
     }
   },
@@ -241,6 +247,9 @@ export default {
       //this is fine - it just means the cache expired.  Clear the cache to be sure.
       this.secureCache.clear('entries')
     })
+
+    //set knowlege from the URL
+    this.databaseFileName = decodeURIComponent(this.$router.getRoute().title)
   }
 }
 </script>
@@ -252,6 +261,10 @@ export default {
   input, select, button {
     width: 100%;
     margin: 10px 0px 0px 0px;
+    box-sizing: border-box;
   }  
+}
+.spinner {
+  padding: $wall-padding;
 }
 </style>

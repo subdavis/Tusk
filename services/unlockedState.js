@@ -37,9 +37,11 @@ module.exports = function UnlockedState($router, chromePromise, keepassReference
 		origin: "", //url of current tab without path or querystring
 		sitePermission: false, //true if the extension already has rights to autofill the password
 		entries: null, //filtered password database entries
+		cache: {}, // a secure cache that refreshes when values are SET.
 		clipboardStatus: "" //status message about clipboard, used when copying password to the clipboard
 	};
 	var copyEntry;
+	var cacheTimeoutId;
 
 	//determine current url:
 	my.getTabDetails = function() {
@@ -76,11 +78,37 @@ module.exports = function UnlockedState($router, chromePromise, keepassReference
 		});
 	};
 
+	my.clearCache = function() {
+		// Destroys an object in memory.
+		function destroy(obj) {
+		    for(var prop in obj){
+		        var property = obj[prop];
+		        if(property != null && typeof(property) == 'object') {
+		            destroy(property);
+		        }
+		        else {
+		            obj[prop] = null;
+		        }
+		    }
+		}
+		destroy(my.cache)
+		my.cache = {}
+	}
+	cacheTimeoutId = setTimeout(my.clearCache, 60000);
+
+	my.cacheSet = function (key, val) {
+		// Refresh cache
+		clearTimeout(cacheTimeoutId)
+		cacheTimeoutId = setTimeout(my.clearCache, 60000);
+
+		my.cache[key] = val;
+	}
+
 	my.clearBackgroundState = function() {
 		my.entries = null;
 		my.clipboardStatus = "";
 	}
-	setTimeout(my.clearBackgroundState, 60000);  //clear backgroundstate after 10 minutes live - we should never be alive that long
+	setTimeout(my.clearBackgroundState, 60000);  //clear backgroundstate after 1 minutes live - we should never be alive that long
 
 	my.autofill = function(entry) {
 		settings.getUseCredentialApiFlag().then(useCredentialApi => {
