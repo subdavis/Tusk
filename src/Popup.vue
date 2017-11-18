@@ -115,4 +115,29 @@ body {
   margin: 0px;
   width: 100%;
 }
+
+.box-bar {
+  
+  width: 100%;
+  box-sizing: border-box;
+  padding: $wall-padding;
+  border-bottom: 1px solid $light-gray;
+  font-size: 18px;
+  
+  &.button {
+    background-color: $background-color;    
+
+    &:hover {
+      cursor:pointer;
+    }
+  }
+
+  &.small {
+    font-size: 12px;
+  }
+
+  &.error {
+    background-color: $light-red;
+  }
+}
 </style>

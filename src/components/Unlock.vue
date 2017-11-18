@@ -1,39 +1,62 @@
 <template>
   <div>
+    <!-- Busy Spinner -->
     <div v-if="busy" class="spinner">
       <spinner size="medium" :message='"Unlocking " + databaseFileName'></spinner>
     </div>
-
+    <!-- Entry List -->
     <entry-list v-if="!busy && isUnlocked()"
       :priority-entries="unlockedState.cache.priorityEntries"
       :all-entries="unlockedState.cache.allEntries"></entry-list>
-  	
-    <div id="masterPasswordGroup" v-if="!busy && !isUnlocked()">
+    <!-- Unlock input group -->
+    <div id="masterPasswordGroup" v-if="!busy && !isUnlocked()">     
+
+      <div class="box-bar button small">
+        <span><b>{{ databaseFileName }}</b> ( click to change <i class="fa fa-database" aria-hidden="true"></i> )</span>
+      </div>
+      <div class="box-bar error small" v-show="messages.error">
+        {{ messages.error }}
+      </div>
       
-      <div class="unlockLogo">
+      <div class="unlockLogo stack-item">
         <img src="../assets/logo.png">
         <span>CKPX</span>
       </div>
       
       <form v-on:submit="clickUnlock">
-        <input 
-          type="password" 
-          id="masterPassword" 
-          v-model="masterPassword" 
-          placeholder="master password"
-          ref="masterPassword">
-  <!--   		<select v-model="selectedKeyFile" id="keyFileDropdown">
-          <option value="null">-- No Keyfile --</option>
-    			<option v-for="kf in keyFiles" value="kf">No keyfile</option>
-    		</select> -->
-    		
-        <button id="unlock-button" v-on:click="clickUnlock">Unlock</button>
+        
+        <div class="stack-item">
+          <input 
+            type="password" 
+            id="masterPassword" 
+            v-model="masterPassword" 
+            placeholder="master password"
+            ref="masterPassword">
+        </div>
+        
+        <div class="stack-item">
+          <div id="select-keyfile" class="selectable" @click="keyFilePicker = !keyFilePicker">
+          <i class="fa fa-key" aria-hidden="true"></i>
+          {{ selectedKeyFileName }}</div>
+        </div>
+        
+        <div class="stack-item keyfile-picker" v-if="keyFilePicker">
+          <transition name="keyfile-picker">
+            <div>
+              <span class="selectable" v-for="(kf, kf_index) in keyFiles" :keyfile-index="kf_index">
+                <i class="fa fa-file" aria-hidden="true"></i>
+                {{ kf.name }}</span>
+              <span><i class="fa fa-wrench" aria-hidden="true"></i> Manage Keyfiles</span>
+            </div>
+          </transition>
+        </div>
+        
+        <div class="stack-item">
+          <button id="unlock-button" class="selectable" v-on:click="clickUnlock">Unlock Database</button>
+        </div>
       </form>
-      <button v-on:click="chooseAnotherFile">Choose Another Database</button>
-    
-    </div>
 
-    <div v-show="isUnlocked()"></div>
+    </div>
   </div>
 </template>
 
@@ -60,11 +83,18 @@ export default {
       selectedKeyFile: undefined, // chosen keyfile object
       rememberPeriod: 0, // in minutes. default: do not remember
       databaseFileName: "",
+      keyFilePicker: false,
+      appVersion: chrome.runtime.getManifest().version
     } 
   },
   computed: {
     rememberPassword: function () {
       return this.rememberPeriod !== 0
+    },
+    selectedKeyFileName: function () {
+      if (this.selectedKeyFile !== undefined)
+        return this.selectedKeyFile.name
+      return "No keyfile selected.  Click to choose."
     }
   },
   components: {
@@ -282,16 +312,20 @@ export default {
 <style lang="scss">
 @import "../styles/settings.scss";
 
-#masterPasswordGroup {
+.selectable:hover {
+  cursor: pointer;
+}
+
+.stack-item {
   box-sizing: border-box;
   width: 100%;
-  padding: $wall-padding;
+}
 
-  button {
-    &:hover {
-      cursor: pointer;
-    }
-  }
+.small-stack-item {
+  font-size: 12px;
+}
+
+#masterPasswordGroup {
 
   #unlock-button {
     background-color: $green;
@@ -301,15 +335,46 @@ export default {
     }
   }
 
+  .keyfile-picker {
+    background-color: $light-background-color;
+    box-sizing: border-box;
+    transition: all .2s linear;
+    max-height: 100px;
+    opacity: 1;
+    border-top: 1px solid $light-gray;
+    border-bottom: 1px solid $light-gray;
+    padding: 5px $wall-padding;
+    margin: 5px 0px;
+
+    &.keyfile-picker-enter, &.keyfile-picker-leave-to {
+      max-height: 0px;
+      opacity: 0;
+    }
+  }
+
+  #select-keyfile {
+    margin: 0px $wall-padding;
+    margin-bottom: 5px;
+
+    i {
+      font-size: 14px;
+    }
+
+    &:hover {
+      opacity: .7;
+    }
+  }
+
   input, select, button {
     width: 100%;
-    margin-bottom: $wall-padding;
+    margin: 5px 0px;
     box-sizing: border-box;
 
     font-size: 18px;
     padding: 5px 15px;
-    border-radius: 4px;
-    border: 1px solid $light-gray;
+    border-top: 1px solid $light-gray;
+    border-bottom: 1px solid $light-gray;
+    border-width: 1px 0px;
 
     &:focus {
       outline: none;
