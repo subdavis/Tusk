@@ -8,17 +8,13 @@
       <div v-if="priorityEntries && searchTerm.length == 0">
         <entry-list-item v-for="entry in priorityEntries" 
           :key="entry.id"
-          :user="entry.userName"
-          :url="entry.url"
-          :title="entry.title">
+          :entry="entry">
         </entry-list-item>
       </div>
       <div v-if="filteredEntries && searchTerm.length">
         <entry-list-item v-for="entry in filteredEntries" 
           :key="entry.id"
-          :user="entry.userName"
-          :url="entry.url"
-          :title="entry.title">
+          :entry="entry">
         </entry-list-item>
       </div>
     </div>

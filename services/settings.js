@@ -53,7 +53,6 @@ function Settings() {
 	}
 
 	exports.getKeyFiles = function() {
-		console.log(chromePromise.storage)
 		return chromePromise.storage.local.get(['keyFiles']).then(function(items) {
 			return items.keyFiles || [];
 		});

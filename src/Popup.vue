@@ -1,16 +1,20 @@
 <template>
-  <div id="main">
+  <div id="router-view">
     <!-- Router View -->
-    <startup id="/" v-if="show.startup.val"
+    <startup id="/" v-if="show.startup.visible"
       :settings="services.settings"
       :password-file-store-registry="services.passwordFileStoreRegistry"></startup>
-    <file-picker id="/choose" v-if="show.filePicker.val" 
+    <file-picker id="/choose" v-if="show.filePicker.visible" 
       :password-file-store-registry="services.passwordFileStoreRegistry"></file-picker>
-    <unlock id="/unlock/:provider/:title" v-if="show.unlock.val"
+    <unlock id="/unlock/:provider/:title" v-if="show.unlock.visible"
       :unlocked-state="services.unlockedState" 
       :secure-cache="services.secureCache" 
       :settings="services.settings"
       :keepass-service="services.keepassService"></unlock>
+    <entry-details id="/entry-details/:entryId" v-if="show.entryDetails.visible"
+      :unlocked-state="services.unlockedState"
+      :settings="services.settings"></entry-details>
+    <!-- End Router View -->
   </div>
 </template>
 
@@ -37,6 +41,7 @@ import { SampleDatabaseFileManager } from '$services/sampleDatabaseFileManager.j
 import Unlock from '@/components/Unlock'
 import Startup from '@/components/Startup'
 import FilePicker from '@/components/FilePicker'
+import EntryDetails from '@/components/EntryDetails'
 
 const chromePromiseApi = ChromePromiseApi()
 const settings = new Settings()
@@ -63,7 +68,8 @@ export default {
   components: {
     Unlock,
     Startup,
-    FilePicker
+    FilePicker,
+    EntryDetails
   },
   data () {
     return {
@@ -76,9 +82,10 @@ export default {
         unlockedState: new UnlockedState(this.$router, chromePromiseApi, keepassReference, protectedMemory, settings)
       },
       show: {
-        unlock: { val: false },
-        startup: { val: false },
-        filePicker: { val: false }
+        unlock: { visible: false },
+        startup: { visible: false },
+        filePicker: { visible: false },
+        entryDetails: { visble: false }
       }
     }
   },
@@ -87,7 +94,8 @@ export default {
     this.$router.registerRoutes([
       { route: '/', var: this.show.startup },
       { route: '/choose', var: this.show.filePicker },
-      { route: '/unlock/:provider/:title', var:this.show.unlock }
+      { route: '/unlock/:provider/:title', var: this.show.unlock },
+      { route: '/entry-details/:entryId', var: this.show.entryDetails }
     ])
     this.$router.route('/')
   }
@@ -96,10 +104,10 @@ export default {
 
 <style lang="scss">
 @import "./styles/settings.scss";
-#main {
+#router-view {
   width: 400px;
   margin: 0px auto;
-  color: #2c3e50;
+  color: $text-color;
   background-color: $background-color;
 }
 

@@ -9,13 +9,28 @@
       :all-entries="unlockedState.cache.allEntries"></entry-list>
   	
     <div id="masterPasswordGroup" v-if="!busy && !isUnlocked()">
-      <input type="password" id="masterPassword" v-bind="masterPassword">
-  		<select v-model="selectedKeyFile" id="keyFileDropdown">
-        <option value="null">-- No Keyfile --</option>
-  			<option v-for="kf in keyFiles" value="kf">No keyfile</option>
-  		</select>
-  		<button v-on:click="unlock">Unlock</button>
+      
+      <div class="unlockLogo">
+        <img src="../assets/logo.png">
+        <span>CKPX</span>
+      </div>
+      
+      <form v-on:submit="clickUnlock">
+        <input 
+          type="password" 
+          id="masterPassword" 
+          v-model="masterPassword" 
+          placeholder="master password"
+          ref="masterPassword">
+  <!--   		<select v-model="selectedKeyFile" id="keyFileDropdown">
+          <option value="null">-- No Keyfile --</option>
+    			<option v-for="kf in keyFiles" value="kf">No keyfile</option>
+    		</select> -->
+    		
+        <button id="unlock-button" v-on:click="clickUnlock">Unlock</button>
+      </form>
       <button v-on:click="chooseAnotherFile">Choose Another Database</button>
+    
     </div>
 
     <div v-show="isUnlocked()"></div>
@@ -165,6 +180,10 @@ export default {
       //save longer term (in encrypted storage)
       this.secureCache.save('entries', entries);
     },
+    clickUnlock (event) {
+      event.preventDefault()
+      this.unlock()
+    },
     unlock (passwordKey) {
       this.busy = true
       let passwordKeyPromise;
@@ -172,6 +191,7 @@ export default {
         passwordKeyPromise = this.keepassService.getMasterKey(this.masterPassword, this.selectedKeyFile)
       else
         passwordKeyPromise = Promise.resolve(passwordKey)
+
       let keyFileName = (this.selectedKeyFile !== undefined) 
         ? this.selectedKeyFile.name 
         : undefined
@@ -210,43 +230,48 @@ export default {
     }
   },
   mounted () {
-    // This is run when Unlock module starts...
-    this.settings.getKeyFiles().then(keyFiles => {
-      this.keyFiles = keyFiles
-      return this.settings.getDefaultRememberOptions()
-    }).then( rememberOptions => {
-      this.rememberPeriod = rememberOptions.rememberPeriod
-      return this.settings.getCurrentDatabaseUsage()
-    }).then( usage => {
-      // tweak UI based on what we know about the db file
-      this.hidePassword = (usage.requiresPassword === false)
-      this.hideKeyFile = (usage.requiresKeyfile === false)
-      this.rememberedPassword = (usage.passwordKey !== undefined)
-      this.rememberPeriod = usage.rememberPeriod
+    
+    this.$nextTick(function() {
+      this.$refs.masterPassword.focus();
+    })
 
-      if (usage.passwordKey !== undefined && usage.requiresKeyfile === false) {
-        this.unlock(usage.passwordKey) // Autologin if no keyfile
-      } else if (usage.keyFileName !== undefined) { 
-        let matches = this.keyFiles.filter(kf => {
-          return kf.name === usage.keyFileName
-        })
-        if (matches.length > 0) {
-          this.selectedKeyFile = matches[0]
-          if (this.hidePassword === true || usage.passwordKey !== undefined)
-            this.unlock(usage.passwordKey)
+    if (!this.isUnlocked()) {
+      this.settings.getKeyFiles().then(keyFiles => {
+        this.keyFiles = keyFiles
+        return this.settings.getDefaultRememberOptions()
+      }).then( rememberOptions => {
+        this.rememberPeriod = rememberOptions.rememberPeriod
+        return this.settings.getCurrentDatabaseUsage()
+      }).then( usage => {
+        // tweak UI based on what we know about the db file
+        this.hidePassword = (usage.requiresPassword === false)
+        this.hideKeyFile = (usage.requiresKeyfile === false)
+        this.rememberedPassword = (usage.passwordKey !== undefined)
+        this.rememberPeriod = usage.rememberPeriod
+
+        if (usage.passwordKey !== undefined && usage.requiresKeyfile === false) {
+          this.unlock(usage.passwordKey) // Autologin if no keyfile
+        } else if (usage.keyFileName !== undefined) { 
+          let matches = this.keyFiles.filter(kf => {
+            return kf.name === usage.keyFileName
+          })
+          if (matches.length > 0) {
+            this.selectedKeyFile = matches[0]
+            if (this.hidePassword === true || usage.passwordKey !== undefined)
+              this.unlock(usage.passwordKey)
+          }
         }
-      }
-    })
-
-    // modify unlockedState internal state
-    this.unlockedState.getTabDetails()
-    this.secureCache.get('entries').then(entries => {
-      if (entries && entries.length > 0)
-        showResults(entries)
-    }).catch(err => {
-      //this is fine - it just means the cache expired.  Clear the cache to be sure.
-      this.secureCache.clear('entries')
-    })
+      })
+      // modify unlockedState internal state
+      this.unlockedState.getTabDetails()
+      this.secureCache.get('entries').then(entries => {
+        if (entries && entries.length > 0)
+          showResults(entries)
+      }).catch(err => {
+        //this is fine - it just means the cache expired.  Clear the cache to be sure.
+        this.secureCache.clear('entries')
+      })
+    }
 
     //set knowlege from the URL
     this.databaseFileName = decodeURIComponent(this.$router.getRoute().title)
@@ -258,13 +283,53 @@ export default {
 @import "../styles/settings.scss";
 
 #masterPasswordGroup {
+  box-sizing: border-box;
+  width: 100%;
+  padding: $wall-padding;
+
+  button {
+    &:hover {
+      cursor: pointer;
+    }
+  }
+
+  #unlock-button {
+    background-color: $green;
+
+    &:hover {
+      background-color: $light-green;
+    }
+  }
+
   input, select, button {
     width: 100%;
-    margin: 10px 0px 0px 0px;
+    margin-bottom: $wall-padding;
     box-sizing: border-box;
-  }  
+
+    font-size: 18px;
+    padding: 5px 15px;
+    border-radius: 4px;
+    border: 1px solid $light-gray;
+
+    &:focus {
+      outline: none;
+    }
+  }
 }
 .spinner {
   padding: $wall-padding;
+}
+
+.unlockLogo {
+  font-weight: 700;
+  font-size: 20px;
+  text-align: center;
+  padding: 20px 0px;
+
+  img {
+    width: 48px;
+    height: 48px;
+    vertical-align: middle;
+  }
 }
 </style>
