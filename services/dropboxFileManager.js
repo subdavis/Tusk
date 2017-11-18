@@ -177,7 +177,7 @@ function DropboxFileManager(settings, chromePromise) {
 	}
 
 	function interactiveLogin() {
-		return ensureOriginPermissions().then(function() {
+		return ensureOriginPermissions().then(ensured => {
 			return new Promise(function(resolve, reject) {
 				var randomState = Base64.encode(window.crypto.getRandomValues(new Uint8Array(16)));  //random state, protects against CSRF
 				var authUrl = 'https://www.dropbox.com/oauth2/authorize?response_type=token&client_id=lau0eigo4cfthqz'
