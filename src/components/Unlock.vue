@@ -57,6 +57,18 @@
       </form>
 
     </div>
+
+    <div class="box-bar medium between" v-show="!busy">
+      <span class="selectable">
+        <i class="fa fa-cog" aria-hidden="true"></i> Settings</span>
+      <span class="selectable" v-if="isUnlocked()" @click="forgetPassword()">
+        <i class="fa fa-lock" aria-hidden="true" ></i> Lock Database</span>
+      <span class="selectable" v-else>
+        <i class="fa fa-times-circle" aria-hidden="true"></i> Close Window</span>
+      <span class="selectable">
+        <i class="fa fa-info-circle" aria-hidden="true"></i> v{{ appVersion }}</span>
+    </div>
+
   </div>
 </template>
 
@@ -64,6 +76,7 @@
 import InfoCluster from '@/components/InfoCluster'
 import EntryList from '@/components/EntryList'
 import Spinner from 'vue-simple-spinner'
+import PopupFooter from '@/components/PopupFooter'
 
 export default {
   props: {
@@ -85,7 +98,7 @@ export default {
       databaseFileName: "",
       keyFilePicker: false,
       appVersion: chrome.runtime.getManifest().version
-    } 
+    }
   },
   computed: {
     rememberPassword: function () {
@@ -100,7 +113,8 @@ export default {
   components: {
   	InfoCluster,
     EntryList,
-    Spinner
+    Spinner,
+    PopupFooter
   },
   methods: {
     chooseAnotherFile () {
@@ -116,7 +130,7 @@ export default {
         requiresKeyfile: this.selectedKeyFile ? true : false,
         keyFileName: this.selectedKeyFile ? this.selectedKeyFile.name : undefined,
         rememberPeriod: this.rememberPeriod
-      }).then(function () {
+      }).then(nil => {
         this.secureCache.clear('entries')
         this.unlockedState.clearBackgroundState()
         this.unlockedState.clearCache() // new

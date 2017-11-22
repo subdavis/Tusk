@@ -3,9 +3,9 @@
     <go-back :message="'go back'"></go-back>
   	<div 
       v-for="(db, index) in databases" 
-      class="box-bar small selectable" 
+      class="box-bar small selectable chooseFile" 
       @click="selectDatabase(index)">
-      <span>{{ db.title }}</span> 
+      <span><svg class="icon" viewBox="0 0 1 1"><use v-bind="{'xlink:href':'#'+db.provider.icon}"/></svg> {{ db.title }}</span> 
     </div>
   </div>
 </template>
@@ -56,4 +56,16 @@ export default {
 
 <style lang="scss">
 @import "../styles/settings.scss";
+
+.chooseFile {
+  svg {
+    width: 18px;
+  }
+
+  line-height: 20px;
+
+  span {
+    vertical-align: middle;
+  }
+}
 </style>

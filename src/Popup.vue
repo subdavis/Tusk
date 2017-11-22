@@ -1,5 +1,7 @@
 <template>
   <div id="router-view">
+    <!-- SVG Defs -->
+    <svg-defs></svg-defs>
     <!-- Router View -->
     <startup id="/" v-if="show.startup.visible"
       :settings="services.settings"
@@ -43,6 +45,7 @@ import Unlock from '@/components/Unlock'
 import Startup from '@/components/Startup'
 import FilePicker from '@/components/FilePicker'
 import EntryDetails from '@/components/EntryDetails'
+import SvgDefs from '@/components/SvgDefs'
 
 const chromePromiseApi = ChromePromiseApi()
 const settings = new Settings()
@@ -70,7 +73,8 @@ export default {
     Unlock,
     Startup,
     FilePicker,
-    EntryDetails
+    EntryDetails,
+    SvgDefs
   },
   data () {
     return {

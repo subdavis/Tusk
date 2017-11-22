@@ -38,4 +38,9 @@
     background-color: $light-background-color;
     border-bottom: 0px;
   }
+
+  &.between {
+    justify-content: space-between;
+    display: flex;
+  }
 }
