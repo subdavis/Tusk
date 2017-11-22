@@ -1,0 +1,41 @@
+@import "./settings.scss";
+
+.selectable {
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.error {
+  background-color: $light-red;
+}
+
+.warn {
+  background-color: $warn-yellow;
+}
+
+.box-bar {
+  
+  width: 100%;
+  box-sizing: border-box;
+  padding: $wall-padding;
+  border-bottom: 1px solid $light-gray;
+  font-size: 18px;
+  
+  &.button {
+    background-color: $background-color;
+  }
+
+  &.small {
+    font-size: 12px;
+  }
+
+  &.medium {
+    font-size: 14px;
+  }
+
+  &.plain {
+    background-color: $light-background-color;
+    border-bottom: 0px;
+  }
+}

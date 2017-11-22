@@ -5,7 +5,8 @@
       :settings="services.settings"
       :password-file-store-registry="services.passwordFileStoreRegistry"></startup>
     <file-picker id="/choose" v-if="show.filePicker.visible" 
-      :password-file-store-registry="services.passwordFileStoreRegistry"></file-picker>
+      :password-file-store-registry="services.passwordFileStoreRegistry"
+      :settings="services.settings"></file-picker>
     <unlock id="/unlock/:provider/:title" v-if="show.unlock.visible"
       :unlocked-state="services.unlockedState" 
       :secure-cache="services.secureCache" 
@@ -103,7 +104,8 @@ export default {
 </script>
 
 <style lang="scss">
-@import "./styles/settings.scss";
+@import "./styles/shared.scss";
+
 #router-view {
   width: 400px;
   margin: 0px auto;
@@ -114,30 +116,5 @@ export default {
 body {
   margin: 0px;
   width: 100%;
-}
-
-.box-bar {
-  
-  width: 100%;
-  box-sizing: border-box;
-  padding: $wall-padding;
-  border-bottom: 1px solid $light-gray;
-  font-size: 18px;
-  
-  &.button {
-    background-color: $background-color;    
-
-    &:hover {
-      cursor:pointer;
-    }
-  }
-
-  &.small {
-    font-size: 12px;
-  }
-
-  &.error {
-    background-color: $light-red;
-  }
 }
 </style>

@@ -2,13 +2,16 @@
   <div class="box-bar button">
     <span class="go-back" v-on:click="$router.goBack">
       <i class="fa fa-long-arrow-left" aria-hidden="true"></i>
-      back to entry list
+      {{ message }}
     </span>
   </div>
 </template>
 
 <script>
 export default {
+	props: {
+		message: String
+	}
 }
 </script>
 

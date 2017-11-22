@@ -1,20 +1,42 @@
 <template>
   <div>
-  	<p>File Picker</p>
-  	<p v-for="db in databases">
-  		{{db.title}}
-  	</p>
+    <go-back :message="'go back'"></go-back>
+  	<div 
+      v-for="(db, index) in databases" 
+      class="box-bar small selectable" 
+      @click="selectDatabase(index)">
+      <span>{{ db.title }}</span> 
+    </div>
   </div>
 </template>
 
 <script>
+import GoBack from '@/components/GoBack'
+
 export default {
 	props: {
-    passwordFileStoreRegistry: Object
+    passwordFileStoreRegistry: Object,
+    settings: Object
 	},
+  components: {
+    GoBack
+  },
   data () {
     return {
     	databases: []
+    }
+  },
+  methods: {
+    selectDatabase (i) {
+      if (i !== undefined){
+        let database = this.databases[i]
+        let info = database.provider.getDatabaseChoiceData(database);
+        this.settings.saveCurrentDatabaseChoice(info, database.provider).then(nil => {
+          this.$router.route('/unlock/' + database.provider.key + '/' + encodeURIComponent(database.title))
+        })
+      } else {
+        // TODO
+      }
     }
   },
   mounted () {

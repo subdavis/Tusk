@@ -11,7 +11,7 @@
     <!-- Unlock input group -->
     <div id="masterPasswordGroup" v-if="!busy && !isUnlocked()">     
 
-      <div class="box-bar button small">
+      <div class="box-bar small selectable" @click="$router.route('/choose')">
         <span><b>{{ databaseFileName }}</b> ( click to change <i class="fa fa-database" aria-hidden="true"></i> )</span>
       </div>
       <div class="box-bar error small" v-show="messages.error">

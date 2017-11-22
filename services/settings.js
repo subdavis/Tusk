@@ -122,12 +122,20 @@ function Settings() {
 	}
 
 	exports.saveCurrentDatabaseChoice = function(passwordFile, provider) {
-		passwordFile = angular.copy(passwordFile);
-		passwordFile.data = undefined; //don't save the data with the choice
+		let shallowCopy = function (obj) { 
+			let clone = {}
+		  clone.prototype = obj.prototype
+		  Object.keys(obj).forEach(property => {
+		  	clone[property] = obj[property];
+		  })
+		  return clone
+		}
+		let passwordFileClone = shallowCopy(passwordFile)
+		passwordFileClone.data = undefined; //don't save the data with the choice
 
 		return chromePromise.storage.local.set({
 			'selectedDatabase': {
-				'passwordFile': passwordFile,
+				'passwordFile': passwordFileClone,
 				'providerKey': provider.key
 			}
 		});
