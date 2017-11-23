@@ -1,6 +1,6 @@
 <template>
   <div>
-    <go-back></go-back>
+    <go-back :message="'back to entry list'"></go-back>
     <div class="all-attributes">
       <div class="attribute-box" v-for="attr in attributes">
         <span class="attribute-title">{{ attr.key }}</span>

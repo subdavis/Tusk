@@ -1,9 +1,19 @@
 @import "./settings.scss";
 
 .selectable {
+  transition: all .3s ease;
   &:hover {
     cursor: pointer;
   }
+
+  &.flair:hover {
+    padding-left: 15px;
+  }
+}
+
+.stack-item {
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .error {
@@ -27,10 +37,12 @@
   }
 
   &.small {
+    padding: 6px $wall-padding;
     font-size: 12px;
   }
 
   &.medium {
+    padding: 8px $wall-padding;
     font-size: 14px;
   }
 

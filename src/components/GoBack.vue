@@ -1,6 +1,6 @@
 <template>
-  <div class="box-bar selectable">
-    <span v-on:click="$router.goBack">
+  <div class="box-bar selectable" v-on:click="$router.goBack">
+    <span>
       <i class="fa fa-long-arrow-left" aria-hidden="true"></i>
       {{ message }}
     </span>

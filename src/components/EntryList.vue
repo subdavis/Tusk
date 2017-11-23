@@ -4,6 +4,7 @@
       <i class="fa fa-search"></i>
       <input ref="searchbox" type='search' v-model="searchTerm" placeholder="search entire database..." />
     </div>
+    <messenger :messages="messages"></messenger>
     <div class="entries">
       <div v-if="priorityEntries && searchTerm.length == 0">
         <entry-list-item v-for="entry in priorityEntries" 
@@ -23,11 +24,13 @@
 
 <script>
 import EntryListItem from '@/components/EntryListItem'
+import Messenger from '@/components/Messenger'
 
 export default {
   props: {
     priorityEntries: Array,
-    allEntries: Array
+    allEntries: Array,
+    messages: Object
   },
   watch: {
     searchTerm: function (val) {
@@ -39,7 +42,8 @@ export default {
     }
   },
   components: {
-    EntryListItem
+    EntryListItem,
+    Messenger
   },
   data () {
     return {

@@ -6,16 +6,18 @@
     </div>
     <!-- Entry List -->
     <entry-list v-if="!busy && isUnlocked()"
+      :messages="unlockedMessages"
       :priority-entries="unlockedState.cache.priorityEntries"
       :all-entries="unlockedState.cache.allEntries"></entry-list>
+
+    <!-- General Messenger -->
+    <messenger :messages="generalMessages" v-show="!busy"></messenger>
+    
     <!-- Unlock input group -->
     <div id="masterPasswordGroup" v-if="!busy && !isUnlocked()">     
 
       <div class="box-bar small selectable" @click="$router.route('/choose')">
         <span><b>{{ databaseFileName }}</b> ( click to change <i class="fa fa-database" aria-hidden="true"></i> )</span>
-      </div>
-      <div class="box-bar error small" v-show="messages.error">
-        {{ messages.error }}
       </div>
       
       <div class="unlockLogo stack-item">
@@ -46,7 +48,7 @@
               <span class="selectable" v-for="(kf, kf_index) in keyFiles" :keyfile-index="kf_index">
                 <i class="fa fa-file" aria-hidden="true"></i>
                 {{ kf.name }}</span>
-              <span><i class="fa fa-wrench" aria-hidden="true"></i> Manage Keyfiles</span>
+              <span class="selectable"><i class="fa fa-wrench" aria-hidden="true"></i> Manage Keyfiles</span>
             </div>
           </transition>
         </div>
@@ -58,12 +60,13 @@
 
     </div>
 
-    <div class="box-bar medium between" v-show="!busy">
+    <!-- Footer -->
+    <div class="box-bar medium between footer" v-show="!busy">
       <span class="selectable">
         <i class="fa fa-cog" aria-hidden="true"></i> Settings</span>
       <span class="selectable" v-if="isUnlocked()" @click="forgetPassword()">
         <i class="fa fa-lock" aria-hidden="true" ></i> Lock Database</span>
-      <span class="selectable" v-else>
+      <span class="selectable" v-else @click="closeWindow">
         <i class="fa fa-times-circle" aria-hidden="true"></i> Close Window</span>
       <span class="selectable">
         <i class="fa fa-info-circle" aria-hidden="true"></i> v{{ appVersion }}</span>
@@ -76,7 +79,7 @@
 import InfoCluster from '@/components/InfoCluster'
 import EntryList from '@/components/EntryList'
 import Spinner from 'vue-simple-spinner'
-import PopupFooter from '@/components/PopupFooter'
+import Messenger from '@/components/Messenger'
 
 export default {
   props: {
@@ -86,10 +89,23 @@ export default {
     settings: Object,
     keepassService: Object
   },
+  components: {
+    InfoCluster,
+    EntryList,
+    Spinner,
+    Messenger
+  },
   data () {
     return {
       /* UI state data */
-      messages: {}, // for InfoCluster
+      unlockedMessages: {
+        warn: "",
+        error: ""
+      },
+      generalMessages: {
+        warn: "",
+        error: ""
+      },
       busy: false,
       masterPassword: "",
       keyFiles: [],  // list of all available
@@ -110,13 +126,10 @@ export default {
       return "No keyfile selected.  Click to choose."
     }
   },
-  components: {
-  	InfoCluster,
-    EntryList,
-    Spinner,
-    PopupFooter
-  },
   methods: {
+    closeWindow (event) {
+      window.close()
+    },
     chooseAnotherFile () {
       this.unlockedState.clearBackgroundState()
       this.secureCache.clear('entries')
@@ -134,11 +147,7 @@ export default {
         this.secureCache.clear('entries')
         this.unlockedState.clearBackgroundState()
         this.unlockedState.clearCache() // new
-        window.close()
       })
-    },
-    showAllEntries () {
-      this.$router.route('/all-entries')
     },
     showResults (entries) {
 
@@ -210,11 +219,11 @@ export default {
         });
 
         if (priorityEntries.length) {
-          this.messages['partialMatch'] = "No close matches, showing " + priorityEntries.length + " partial matches.";
+          this.unlockedMessages['warn'] = "No close matches, showing " + priorityEntries.length + " partial matches.";
         }
       }
       if (priorityEntries.length == 0) {
-        this.messages['error'] = "No matches found for this site."
+        this.unlockedMessages['error'] = "No matches found for this site."
       }
 
       // Cache in memory 
@@ -267,7 +276,7 @@ export default {
         }).catch(err => {
           let errmsg = err.message || "Incorrect password or keyfile"
           console.error(errmsg)
-          this.messages['error'] = errmsg
+          this.generalMessages['error'] = errmsg
           this.busy = false
         })
       })
@@ -326,19 +335,6 @@ export default {
 <style lang="scss">
 @import "../styles/settings.scss";
 
-.selectable:hover {
-  cursor: pointer;
-}
-
-.stack-item {
-  box-sizing: border-box;
-  width: 100%;
-}
-
-.small-stack-item {
-  font-size: 12px;
-}
-
 #masterPasswordGroup {
 
   #unlock-button {
@@ -353,7 +349,7 @@ export default {
     background-color: $light-background-color;
     box-sizing: border-box;
     transition: all .2s linear;
-    max-height: 100px;
+    max-height: 50px;
     opacity: 1;
     border-top: 1px solid $light-gray;
     border-bottom: 1px solid $light-gray;
@@ -363,6 +359,10 @@ export default {
     &.keyfile-picker-enter, &.keyfile-picker-leave-to {
       max-height: 0px;
       opacity: 0;
+    }
+
+    span:hover {
+      padding-left: 8px;
     }
   }
 
@@ -410,5 +410,16 @@ export default {
     height: 48px;
     vertical-align: middle;
   }
+}
+
+.footer span {
+
+  padding: 2px 4px;
+  border-radius: 3px;
+
+  &:hover {
+    background-color: $dark-background-color;
+  }
+  
 }
 </style>
