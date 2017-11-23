@@ -33,7 +33,7 @@
 	"options_page": "options.html",
 	"options_ui": {
 		"page": "options.html",
-		"chrome_style": false
+		"chrome_style": true
 	},
 	"commands": {
 		"_execute_page_action": {

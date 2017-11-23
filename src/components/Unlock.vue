@@ -239,6 +239,7 @@ export default {
     },
     unlock (passwordKey) {
       this.busy = true
+      this.generalMessages.error = ""
       let passwordKeyPromise;
       if (passwordKey === undefined)
         passwordKeyPromise = this.keepassService.getMasterKey(this.masterPassword, this.selectedKeyFile)

@@ -97,7 +97,11 @@ module.exports = {
     hints: false
   },
   plugins: [
-      new ExtractTextPlugin("styles.css"),
+      new ExtractTextPlugin({
+        filename:  (getPath) => {
+          return getPath('css/[name].css');
+        }
+      }),
   ]
 }
 

@@ -79,7 +79,6 @@ export default {
     this.$nextTick(function() {
       this.$refs.searchbox.focus();
     })
-
     this.createEntryFilters(this.allEntries);
   }
 }

@@ -1,7 +1,17 @@
-import Vue from 'vue'
-import Options from './Options.vue'
+"use strict";
 
-new Vue({
+require('font-awesome/css/font-awesome.css')
+require('purecss')
+
+// Vue Components
+import Vue from 'vue'
+import Popup from './Options.vue'
+import VirtualRouter from '$lib/virtual-router.js'
+
+// Set up routes
+Vue.prototype.$router = new VirtualRouter()
+
+new Vue({ 
   el: '#app',
-  render: h => h(Options)
+  render: h => h(Popup)
 })
