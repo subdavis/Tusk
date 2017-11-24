@@ -1,6 +1,6 @@
 "use strict";
 
-require('font-awesome/css/font-awesome.css')
+// require('font-awesome/css/font-awesome.css')
 
 // Vue Components
 import Vue from 'vue'

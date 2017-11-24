@@ -176,43 +176,45 @@ function DropboxFileManager(settings, chromePromise) {
 		})
 	}
 
-	function interactiveLogin() {
+	async function interactiveLogin() {
 		return ensureOriginPermissions().then(ensured => {
 			return new Promise(function(resolve, reject) {
-				var randomState = Base64.encode(window.crypto.getRandomValues(new Uint8Array(16)));  //random state, protects against CSRF
-				var authUrl = 'https://www.dropbox.com/oauth2/authorize?response_type=token&client_id=lau0eigo4cfthqz'
-					+ '&state=' + encodeURIComponent(randomState)
-					+ '&redirect_uri=' + encodeURIComponent(chrome.identity.getRedirectURL('dropbox'))
-					+ '&force_reapprove=false';
-				console.log("BeforeLaunch", authUrl);
-				chromePromise.identity.launchWebAuthFlow({'url': authUrl, 'interactive': true}).then(function(redirect_url) {
-					console.log("After", redirect_url);
-					var tokenMatches = /access_token=([^&]+)/.exec(redirect_url);
-					var stateMatches = /state=([^&]+)/.exec(redirect_url);
-					var uidMatches = /uid=(\d+)/.exec(redirect_url);
+				chromePromise.runtime.getManifest().then(manifest => {
+					var randomState = Base64.encode(window.crypto.getRandomValues(new Uint8Array(16)));  //random state, protects against CSRF
+					var authUrl = 'https://www.dropbox.com/oauth2/authorize?response_type=token&client_id=' + manifest.static_data.dropbox.client_id;
+						+ '&state=' + encodeURIComponent(randomState)
+						+ '&redirect_uri=' + encodeURIComponent(chrome.identity.getRedirectURL('dropbox'))
+						+ '&force_reapprove=false';
+					console.log("BeforeLaunch", authUrl);
+					chromePromise.identity.launchWebAuthFlow({'url': authUrl, 'interactive': true}).then(function(redirect_url) {
+						console.log("After", redirect_url);
+						var tokenMatches = /access_token=([^&]+)/.exec(redirect_url);
+						var stateMatches = /state=([^&]+)/.exec(redirect_url);
+						var uidMatches = /uid=(\d+)/.exec(redirect_url);
 
-					if (tokenMatches && stateMatches && uidMatches) {
-						var access_token = tokenMatches[1];
-						var checkState = decodeURIComponent(decodeURIComponent(stateMatches[1]));  //I have no idea why it is double-encoded
-						var uid = uidMatches[1];
-						if (checkState === randomState) {
-							state.loggedIn = true;
-							settings.saveAccessToken(accessTokenType, access_token).then(function() {
-								resolve(access_token);
-							});
+						if (tokenMatches && stateMatches && uidMatches) {
+							var access_token = tokenMatches[1];
+							var checkState = decodeURIComponent(decodeURIComponent(stateMatches[1]));  //I have no idea why it is double-encoded
+							var uid = uidMatches[1];
+							if (checkState === randomState) {
+								state.loggedIn = true;
+								settings.saveAccessToken(accessTokenType, access_token).then(function() {
+									resolve(access_token);
+								});
+							} else {
+								//some sort of error or parsing failure
+								reject();
+								console.log(redirect_url);
+							}
 						} else {
-							//some sort of error or parsing failure
-							reject();
+							//some sort of error
+							reject()
 							console.log(redirect_url);
 						}
-					} else {
-						//some sort of error
-						reject()
-						console.log(redirect_url);
-					}
-				}).catch(function(err) {
-					console.error(err);
-					reject(err);
+					}).catch(function(err) {
+						console.error(err);
+						reject(err);
+					});
 				});
 			});
 		});

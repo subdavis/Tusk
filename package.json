@@ -14,11 +14,9 @@
     "case": "^1.5.4",
     "font-awesome": "^4.7.0",
     "kdbxweb": "^1.0.2",
+    "materialize-css": "^0.100.2",
     "pako": "^1.0.6",
-    "purecss": "^1.0.0",
-    "purecss-sass": "^1.0.0",
     "vue": "^2.4.4",
-    "vue-router": "^3.0.1",
     "vue-simple-spinner": "^1.2.8",
     "xmldom": "^0.1.27"
   },

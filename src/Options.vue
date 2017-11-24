@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <options-navbar class="box-bar" :routes="routes"></options-navbar>
+  <div id="main">
+    <options-navbar :routes="routes"></options-navbar>
     <!-- Router View -->
     <options-startup id="/" v-if="show.startup.visible"></options-startup>
     <manage-databases id="/manage/databases" v-if="show.manageDatabases.visible"></manage-databases>
@@ -10,6 +10,26 @@
 </template>
 
 <script>
+// Singletons
+import ChromePromiseApi from '$lib/chrome-api-promise.js'
+import { Settings } from '$services/settings.js'
+import ProtectedMemory from '$services/protectedMemory.js'
+import { KeepassHeader } from '$services/keepassHeader.js'
+import KeepassReference from '$services/keepassReference.js'
+import { KeepassService } from '$services/keepassService.js'
+import UnlockedState from '$services/unlockedState.js'
+import SecureCacheMemory from '$services/secureCacheMemory.js'
+import SecureCacheDisk from '$services/secureCacheDisk.js'
+import PasswordFileStore from '$services/passwordFileStore.js'
+import { KeyFileParser } from '$services/keyFileParser.js'
+// File Managers
+import LocalChromePasswordFileManager from '$services/localChromePasswordFileManager.js'
+import { GoogleDrivePasswordFileManager } from '$services/googleDrivePasswordFileManager.js'
+import { DropboxFileManager } from '$services/dropboxFileManager.js'
+import { OneDriveFileManager } from '$services/oneDriveFileManager.js'
+import { SharedUrlFileManager } from '$services/sharedUrlFileManager.js'
+import { SampleDatabaseFileManager } from '$services/sampleDatabaseFileManager.js'
+// Components
 import OptionsNavbar from '@/components/Navbar'
 import OptionsStartup from '@/components/OptionsStartup'
 import ManageDatabases from '@/components/ManageDatabases'
@@ -61,10 +81,16 @@ export default {
       }
     ])
     this.routes = this.$router.routes // HACK since Vue doesn't notice changes in 
+    this.$router.route('/')
   }
 }
 </script>
 
 <style lang="scss">
 @import './styles/options.scss';
+
+#main {
+  width: 800px;
+  height: 520px;
+}
 </style>

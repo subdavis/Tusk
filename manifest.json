@@ -4,7 +4,6 @@
 	"version": "2017.11.12",
 	"manifest_version": 2,
 	"minimum_chrome_version": "48",
-
 	"description": "Readonly KeePass password database integration for Chrome™",
 	"icons": {
 		"16": "assets/icons/logo_16.png",
@@ -33,7 +32,7 @@
 	"options_page": "options.html",
 	"options_ui": {
 		"page": "options.html",
-		"chrome_style": true
+		"chrome_style": false
 	},
 	"commands": {
 		"_execute_page_action": {
@@ -50,7 +49,6 @@
 		"storage",
 		"clipboardWrite",
 		"identity",
-		"declarativeContent",
 		"alarms",
 		"notifications"
 	],
@@ -58,5 +56,13 @@
 		"https://*/",
 		"http://*/",
 		"file:///*/"
-	]
+	],
+	"static_data": {
+		"dropbox" : {
+			"client_id": "lau0eigo4cfthqz"
+		},
+		"onedrive" : {
+			"client_id" : ""
+		}
+	}
 }

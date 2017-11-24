@@ -1,2 +1,22 @@
 @import './shared.scss';
 @import './pure-offsets.scss';
+
+nav {
+  background-color: $blue;
+}
+
+.content-body {
+	padding: $options-wall-padding;
+
+	p {
+		font-size: 14px;
+	}
+
+	a.btn {
+		background-color: $blue;
+	}
+
+	h3 {
+		margin: .6rem 0 .6rem 0
+	}
+}

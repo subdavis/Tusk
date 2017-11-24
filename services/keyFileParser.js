@@ -29,7 +29,7 @@ THE SOFTWARE.
 /**
  * Parses a KeePass key file
  */
-module.exports = function KeyFileParser() {
+function KeyFileParser() {
   var exports = {
 
   };
@@ -85,3 +85,5 @@ module.exports = function KeyFileParser() {
 
   return exports;
 }
+
+export { KeyFileParser }
