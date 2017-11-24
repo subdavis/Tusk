@@ -1,7 +1,7 @@
 "use strict";
 
-// require('font-awesome/css/font-awesome.css')
-// require('materialize-css/dist/css/materialize.css')
+require('font-awesome/css/font-awesome.css')
+require('materialize-css/dist/css/materialize.css')
 
 // Vue Components
 import Vue from 'vue'

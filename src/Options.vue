@@ -1,11 +1,14 @@
 <template>
   <div id="main">
-    <options-navbar :routes="routes"></options-navbar>
+    <options-navbar
+      :routes="routes"></options-navbar>
     <!-- Router View -->
-    <options-startup id="/" v-if="show.startup.visible"></options-startup>
-    <manage-databases id="/manage/databases" v-if="show.manageDatabases.visible"></manage-databases>
-    <manage-keyfiles id="/manage/keyfiles" v-if="show.manageKeyfiles.visible"></manage-keyfiles>
-    <advanced-settings id="/advanced" v-if="show.advanced.visible"></advanced-settings>
+    <options-startup id="/" v-if="show.startup.visible" class="content-body"
+      :settings="services.settings"
+      :dropbox-file-manager="services.dropboxFileManager"></options-startup>
+    <manage-databases id="/manage/databases" v-if="show.manageDatabases.visible" class="content-body"></manage-databases>
+    <manage-keyfiles id="/manage/keyfiles" v-if="show.manageKeyfiles.visible" class="content-body"></manage-keyfiles>
+    <advanced-settings id="/advanced" v-if="show.advanced.visible" class="content-body"></advanced-settings>
   </div>
 </template>
 
@@ -14,16 +17,12 @@
 import ChromePromiseApi from '$lib/chrome-api-promise.js'
 import { Settings } from '$services/settings.js'
 import ProtectedMemory from '$services/protectedMemory.js'
-import { KeepassHeader } from '$services/keepassHeader.js'
-import KeepassReference from '$services/keepassReference.js'
-import { KeepassService } from '$services/keepassService.js'
-import UnlockedState from '$services/unlockedState.js'
 import SecureCacheMemory from '$services/secureCacheMemory.js'
 import SecureCacheDisk from '$services/secureCacheDisk.js'
 import PasswordFileStore from '$services/passwordFileStore.js'
 import { KeyFileParser } from '$services/keyFileParser.js'
 // File Managers
-import LocalChromePasswordFileManager from '$services/localChromePasswordFileManager.js'
+import { LocalChromePasswordFileManager } from '$services/localChromePasswordFileManager.js'
 import { GoogleDrivePasswordFileManager } from '$services/googleDrivePasswordFileManager.js'
 import { DropboxFileManager } from '$services/dropboxFileManager.js'
 import { OneDriveFileManager } from '$services/oneDriveFileManager.js'
@@ -35,6 +34,22 @@ import OptionsStartup from '@/components/OptionsStartup'
 import ManageDatabases from '@/components/ManageDatabases'
 import ManageKeyfiles from '@/components/ManageKeyfiles'
 import AdvancedSettings from '@/components/AdvancedSettings'
+
+const settings = new Settings()
+const protectedMemory = new ProtectedMemory()
+const secureCacheMemory = new SecureCacheMemory(protectedMemory)
+const secureCacheDisk = new SecureCacheDisk(protectedMemory, secureCacheMemory, settings)
+const $q = function(){} // TODO: wtf is this for.
+
+// File Managers
+const localChromePasswordFileManager = new LocalChromePasswordFileManager()
+const dropboxFileManager = new DropboxFileManager(settings)
+const googleDrivePasswordFileManager = new GoogleDrivePasswordFileManager()
+const sharedUrlFileManager = new SharedUrlFileManager()
+const oneDriveFileManager = new OneDriveFileManager($q, settings)
+const sampleDatabaseFileManager = new SampleDatabaseFileManager()
+
+const passwordFileStoreRegistry = new PasswordFileStore(localChromePasswordFileManager, dropboxFileManager, googleDrivePasswordFileManager, sharedUrlFileManager, sampleDatabaseFileManager)
 
 export default {
   name: 'app',
@@ -48,6 +63,10 @@ export default {
   data () {
     return {
       routes: [],
+      services: {
+        settings,
+        dropboxFileManager
+      },
       show: {
         startup: { visible: false },
         manageDatabases: { visible: false },
@@ -91,6 +110,6 @@ export default {
 
 #main {
   width: 800px;
-  height: 520px;
+  height: 542px;
 }
 </style>

@@ -27,8 +27,11 @@ THE SOFTWARE.
 "use strict";
 
 import axios from '$bwr/axios/dist/axios.min.js'
+import { ChromePromiseApi } from '$lib/chrome-api-promise.js'
 
-function OneDriveFileManager ($q, settings, chromePromise) {
+const chromePromise = ChromePromiseApi()
+
+function OneDriveFileManager ($q, settings) {
   var accessTokenType = 'onedrive';
 
   var exports = {

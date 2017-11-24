@@ -26,7 +26,11 @@ THE SOFTWARE.
 
 "use strict";
 
-module.exports = function LocalChromePasswordFileManager(chromePromise) {
+import { ChromePromiseApi } from '$lib/chrome-api-promise.js'
+
+const chromePromise = ChromePromiseApi()
+
+function LocalChromePasswordFileManager() {
   var exports = {
     key: 'local',
     routePath: '/drag-drop-file',
@@ -123,3 +127,5 @@ module.exports = function LocalChromePasswordFileManager(chromePromise) {
 
   return exports;
 }
+
+export { LocalChromePasswordFileManager }

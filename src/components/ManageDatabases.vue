@@ -8,7 +8,7 @@
 import OauthProvider from '@/components/OauthProvider'
 export default {
 	props: {
-		dropboxFileManager: Object
+		dropboxFileManager: Function
 	},
 	components: {
 		OauthProvider

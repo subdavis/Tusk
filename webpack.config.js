@@ -97,11 +97,11 @@ module.exports = {
     hints: false
   },
   plugins: [
-      new ExtractTextPlugin({
-        filename:  (getPath) => {
-          return getPath('css/[name].css');
-        }
-      }),
+    new ExtractTextPlugin({
+      filename:  (getPath) => {
+        return getPath('css/[name].css').replace('css', 'css');
+      }
+    }),
   ]
 }
 

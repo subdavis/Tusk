@@ -24,8 +24,11 @@ THE SOFTWARE.
 
  */
 import axios from '$bwr/axios/dist/axios.min.js'
+import { ChromePromiseApi } from '$lib/chrome-api-promise.js'
 
-function GoogleDrivePasswordFileManager(chromePromise) {
+const chromePromise = ChromePromiseApi()
+
+function GoogleDrivePasswordFileManager() {
 	"use strict";
   
   var exports = {

@@ -26,10 +26,14 @@ THE SOFTWARE.
 
 "use strict";
 
+import { ChromePromiseApi } from '$lib/chrome-api-promise.js'
+
+const chromePromise = ChromePromiseApi()
+
 /**
  * Shared state and methods for an unlocked password file.
  */
-module.exports = function UnlockedState($router, chromePromise, keepassReference, protectedMemory, settings) {
+function UnlockedState($router, keepassReference, protectedMemory, settings) {
 	var my = {
 		tabId: "", //tab id of current tab
 		url: "", //url of current tab
@@ -197,3 +201,5 @@ module.exports = function UnlockedState($router, chromePromise, keepassReference
 
 	return my;
 }
+
+export { UnlockedState }

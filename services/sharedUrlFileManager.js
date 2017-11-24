@@ -27,8 +27,11 @@ THE SOFTWARE.
 "use strict";
 
 import axios from '$bwr/axios/dist/axios.min.js'
+import { ChromePromiseApi } from '$lib/chrome-api-promise.js'
 
-function SharedUrlFileManager(chromePromise) {
+const chromePromise = ChromePromiseApi()
+
+function SharedUrlFileManager() {
   var exports = {
     key: 'shared-url',
     routePath: '/shared-url',

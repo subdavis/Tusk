@@ -27,8 +27,11 @@ THE SOFTWARE.
 "use strict";
 
 import axios from '$bwr/axios/dist/axios.min.js'
+import { ChromePromiseApi } from '$lib/chrome-api-promise.js'
 
-function SampleDatabaseFileManager(chromePromise) {
+const chromePromise = ChromePromiseApi()
+
+function SampleDatabaseFileManager() {
   var exports = {
     key: 'sample',
     routePath: '/sample-database',

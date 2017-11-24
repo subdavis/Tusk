@@ -5,7 +5,6 @@
 </template>
 
 <script>
-'use strict'
 export default {
   props: {
     settings: Object,

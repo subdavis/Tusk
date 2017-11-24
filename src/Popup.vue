@@ -23,18 +23,17 @@
 
 <script>
 // Singletons
-import ChromePromiseApi from '$lib/chrome-api-promise.js'
 import { Settings } from '$services/settings.js'
 import ProtectedMemory from '$services/protectedMemory.js'
 import { KeepassHeader } from '$services/keepassHeader.js'
 import KeepassReference from '$services/keepassReference.js'
 import { KeepassService } from '$services/keepassService.js'
-import UnlockedState from '$services/unlockedState.js'
+import { UnlockedState } from '$services/unlockedState.js'
 import SecureCacheMemory from '$services/secureCacheMemory.js'
 import SecureCacheDisk from '$services/secureCacheDisk.js'
 import PasswordFileStore from '$services/passwordFileStore.js'
 // File Managers
-import LocalChromePasswordFileManager from '$services/localChromePasswordFileManager.js'
+import { LocalChromePasswordFileManager } from '$services/localChromePasswordFileManager.js'
 import { GoogleDrivePasswordFileManager } from '$services/googleDrivePasswordFileManager.js'
 import { DropboxFileManager } from '$services/dropboxFileManager.js'
 import { OneDriveFileManager } from '$services/oneDriveFileManager.js'
@@ -47,7 +46,6 @@ import FilePicker from '@/components/FilePicker'
 import EntryDetails from '@/components/EntryDetails'
 import SvgDefs from '@/components/SvgDefs'
 
-const chromePromiseApi = ChromePromiseApi()
 const settings = new Settings()
 const protectedMemory = new ProtectedMemory()
 const secureCacheMemory = new SecureCacheMemory(protectedMemory)
@@ -57,12 +55,12 @@ const keepassReference = new KeepassReference()
 const $q = function(){} // TODO: wtf is this for.
 
 // File Managers
-const localChromePasswordFileManager = new LocalChromePasswordFileManager(chromePromiseApi)
-const dropboxFileManager = new DropboxFileManager(settings, chromePromiseApi)
-const googleDrivePasswordFileManager = new GoogleDrivePasswordFileManager(chromePromiseApi)
-const sharedUrlFileManager = new SharedUrlFileManager(chromePromiseApi)
-const oneDriveFileManager = new OneDriveFileManager($q, settings, chromePromiseApi)
-const sampleDatabaseFileManager = new SampleDatabaseFileManager(chromePromiseApi)
+const localChromePasswordFileManager = new LocalChromePasswordFileManager()
+const dropboxFileManager = new DropboxFileManager(settings)
+const googleDrivePasswordFileManager = new GoogleDrivePasswordFileManager()
+const sharedUrlFileManager = new SharedUrlFileManager()
+const oneDriveFileManager = new OneDriveFileManager($q, settings)
+const sampleDatabaseFileManager = new SampleDatabaseFileManager()
 
 const passwordFileStoreRegistry = new PasswordFileStore(localChromePasswordFileManager, dropboxFileManager, googleDrivePasswordFileManager, sharedUrlFileManager, sampleDatabaseFileManager)
 const keepassService = new KeepassService(keepassHeader, settings, passwordFileStoreRegistry, keepassReference)
@@ -84,7 +82,7 @@ export default {
         secureCache: secureCacheDisk,
         passwordFileStoreRegistry,
         keepassService,
-        unlockedState: new UnlockedState(this.$router, chromePromiseApi, keepassReference, protectedMemory, settings)
+        unlockedState: new UnlockedState(this.$router, keepassReference, protectedMemory, settings)
       },
       show: {
         unlock: { visible: false },

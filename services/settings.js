@@ -24,14 +24,15 @@ THE SOFTWARE.
 
 */
 let Base64 = require('base64-arraybuffer')
-import ChromePromise from '$lib/chrome-api-promise.js'
+import { ChromePromiseApi } from '$lib/chrome-api-promise.js'
+
+const chromePromise = ChromePromiseApi()
 /**
  * Settings for CKPX  */
 function Settings() {
 	"use strict";
 
 	var exports = {}
-	var chromePromise = ChromePromise()
 
 	//upgrade old settings.  Called on install.
 	exports.upgrade = function() {

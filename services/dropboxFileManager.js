@@ -27,8 +27,11 @@ THE SOFTWARE.
 "use strict";
 
 import axios from '$bwr/axios/dist/axios.min.js'
+import { ChromePromiseApi } from '$lib/chrome-api-promise.js'
 
-function DropboxFileManager(settings, chromePromise) {
+const chromePromise = ChromePromiseApi()
+
+function DropboxFileManager(settings) {
 	var accessTokenType = 'dropbox';
 
 	var state = {
@@ -176,7 +179,7 @@ function DropboxFileManager(settings, chromePromise) {
 		})
 	}
 
-	async function interactiveLogin() {
+	function interactiveLogin() {
 		return ensureOriginPermissions().then(ensured => {
 			return new Promise(function(resolve, reject) {
 				chromePromise.runtime.getManifest().then(manifest => {
