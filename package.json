@@ -10,9 +10,11 @@
     "build": "cross-env NODE_ENV=production webpack --progress --hide-modules"
   },
   "dependencies": {
+    "axios": "^0.17.1",
     "base64-arraybuffer": "^0.1.5",
     "case": "^1.5.4",
     "font-awesome": "^4.7.0",
+    "json-formatter": "^0.1.0",
     "kdbxweb": "^1.0.2",
     "materialize-css": "^0.100.2",
     "pako": "^1.0.6",
