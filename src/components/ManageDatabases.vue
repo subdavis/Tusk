@@ -1,11 +1,13 @@
 <template>
   <div>
+  	<div class="box-bar about roomy">
+			<p>CKPX requires that you enable at least one of these cloud storage providers to sync your keepass database with.  In order to use CKPX, you must already have the keepass database in your cloud storage provider.</p>
+			<a class="waves-effect waves-light btn">Help me choose</a>
+			<a class="waves-effect waves-light btn">I haven't made a keepass database yet.</a>
+		</div>
 		<oauth-provider :provider-manager="dropboxFileManager"></oauth-provider>
 		<oauth-provider :provider-manager="googleDriveManager"></oauth-provider>
 		<oauth-provider :provider-manager="onedriveManager"></oauth-provider>
-		<div class="box-bar roomy about">
-			<p>CKPX requires that you enable at least one of these cloud storage providers to sync your keepass database with.</p>
-		</div>
   </div>
 </template>
 
@@ -39,7 +41,5 @@ export default {
 }
 
 div.about {
-	background-color: $background-color;
-	border-bottom: 0px;
 }
 </style>

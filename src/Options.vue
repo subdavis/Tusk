@@ -116,5 +116,7 @@ export default {
 #main {
   width: 800px;
   height: 542px;
+
+  background-color: $background-color;
 }
 </style>

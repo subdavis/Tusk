@@ -15,6 +15,10 @@ p {
 
 a.btn {
 	background-color: $blue;
+
+	&:hover {
+		opacity: .6;
+	}
 }
 
 h3 {

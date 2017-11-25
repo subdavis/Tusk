@@ -1,5 +1,5 @@
 <template>
-  <div class="box-bar roomy">
+  <div class="box-bar roomy database-manager">
   	<div class="between">
 	  	<div class="title">{{ providerManager.title }}</div>
 	  	<div>
@@ -61,7 +61,9 @@ export default {
 
 <style lang="scss">
 @import "../styles/settings.scss";
-
+.database-manager {
+	background-color: $light-background-color;
+}
 .chip {
 	height: 24px;
 	line-height: 24px;
