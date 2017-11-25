@@ -2,22 +2,24 @@
   <div class="box-bar roomy database-manager">
   	<div class="between">
 	  	<div class="title">{{ providerManager.title }}</div>
-	  	<div>
+	  	<div v-if="!busy">
 	  		<div class="switch">
 			    <label>
-			      Disabled
-			      <input type="checkbox" v-model="loggedIn">
+			      {{ loggedIn ? 'Enabled' : 'Disabled' }}
+			      <input type="checkbox" v-model="loggedIn" @click="toggleLogin">
 			      <span class="lever"></span>
-			      Enabled
 			    </label>
 			  </div>
 			</div>
+			<spinner v-else size="medium" message="Loading..."></spinner>
 		</div>
 		<div v-for="db in databases" class="chip">{{ db.title }}</div>
   </div>
 </template>
 
 <script>
+import Spinner from 'vue-simple-spinner'
+
 export default {
 	data () {
 		return {
@@ -26,10 +28,8 @@ export default {
 			loggedIn: false
 		}
 	},
-	watch: {
-		loggedIn: function (newLoggedIn){
-
-		}
+	components: {
+		Spinner
 	},
 	props: {
 		/* The providerManager implements the following that return promises...
@@ -45,12 +45,27 @@ export default {
 			this.busy = true
 			this.providerManager.listDatabases().then(databases => {
 				this.databases = databases
-				this.loggedIn = true
-				this.busy = false
+				this.providerManager.isLoggedIn().then(loggedIn => {
+					this.loggedIn = loggedIn
+					this.busy = false
+				})
 			}).catch(err => {
 				console.error(err)
 				this.busy = false
 			})
+		},
+		toggleLogin (event) {
+			// A click means the state is settled...
+			this.busy = true
+			if (this.loggedIn){
+				this.providerManager.logout().then(nil => {
+					this.populate()
+				})
+			} else {
+				this.providerManager.login().then(nil => {
+					this.populate()
+				})
+			}
 		}
 	},
 	mounted () {

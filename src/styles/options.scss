@@ -17,7 +17,8 @@ a.btn {
 	background-color: $blue;
 
 	&:hover {
-		opacity: .6;
+		background-color: $blue;
+		opacity: .7;
 	}
 }
 

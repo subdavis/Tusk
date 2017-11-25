@@ -42,8 +42,8 @@ function GoogleDrivePasswordFileManager() {
     icon: 'icon-google',
     chooseTitle: 'Google Drive',
     chooseDescription: 'Access password files stored on your Google Drive.  The file(s) will be fetched from Google Drive each time they are used.',
-    interactiveRequestAuth: interactiveRequestAuth,
-    revokeAuth: revokeAuth,
+    login: interactiveRequestAuth,
+    logout: revokeAuth,
     isLoggedIn: isAuthorized,
     ensureGoogleUrlPermissions: ensureGoogleUrlPermissions
   };
@@ -55,18 +55,23 @@ function GoogleDrivePasswordFileManager() {
 
   //revoke the oauth2 token on the oauth2 server
   function revokeAuth() {
-    if (accessToken) {
-      var url = 'https://accounts.google.com/o/oauth2/revoke?token=' + accessToken
-      return axios({
-        url: url, 
-        responseType: 'jsonp'
-      }).then(function(response) {
-        // TODO: Handle revoke failed.
-        return removeCachedAuthToken();
-      });
-  	} else {
-  	  return Promise.resolve();
-  	}
+    return ensureGoogleUrlPermissions().then(function() {
+      if (accessToken) {
+        var url = 'https://accounts.google.com/o/oauth2/revoke?token=' + accessToken
+        return axios({
+          url: url, 
+          responseType: 'jsonp'
+        }).then(function(response) {
+          return removeCachedAuthToken();
+        }).catch(err => {
+          // Assume the request failed because the token was already bad...
+          console.error(err)
+          return removeCachedAuthToken();
+        })
+      } else {
+        return Promise.resolve();
+      }
+    })
   }
 
   //remove chrome's cached copy of the oauth2 token
@@ -100,22 +105,11 @@ function GoogleDrivePasswordFileManager() {
       "https://*.googleusercontent.com/"
     ];
 
-    return new Promise(function(resolve, reject) {
-      chromePromiseermissions.contains({origins: origins}, function(alreadyGranted) {
-        if (alreadyGranted) {
-          resolve();
-        } else {
-          chromePromiseermissions.request({origins: origins}, function(granted) {
-            // The callback argument will be true if the user granted the permissions.
-            if (granted) {
-              resolve();
-            } else {
-            	var err = chrome.runtime.lastError;
-            	console.log(err);
-              reject(new Error('User denied access to google docs urls'));
-            }
-          });
-        }
+    return chromePromise.permissions.contains({origins: origins}).catch(function() {
+      return chromePromise.permissions.request({origins: origins}).catch( function() {
+        var err = chrome.runtime.lastError;
+        console.log(err);
+        reject(new Error('User denied access to google docs urls'));
       });
     });
   }

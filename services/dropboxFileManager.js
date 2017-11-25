@@ -73,9 +73,9 @@ function DropboxFileManager(settings) {
 	}
 
 	function isLoggedIn () {
-		return new Promise((resolve, reject) => {
-			resolve(state.loggedIn)
-		});
+		return settings.getAccessToken(accessTokenType).then(stored_token => {
+			return !!stored_token
+		})
 	}
 
 	function logout() {
@@ -191,7 +191,6 @@ function DropboxFileManager(settings) {
 		return ensureOriginPermissions().then(ensured => {
 			return new Promise(function(resolve, reject) {
 				chromePromise.runtime.getManifest().then(manifest => {
-					console.log(manifest)
 					var randomState = Base64.encode(window.crypto.getRandomValues(new Uint8Array(16)));  //random state, protects against CSRF
 					var authUrl = 'https://www.dropbox.com/oauth2/authorize?response_type=token&client_id=' + manifest.static_data.dropbox.client_id
 						+ '&state=' + encodeURIComponent(randomState)
