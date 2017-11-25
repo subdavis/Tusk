@@ -25,7 +25,7 @@ THE SOFTWARE.
 */
 
 "use strict";
-import pako from '$bwr/pako/dist/pako.min.js'
+import pako from 'pako/dist/pako.min.js'
 
 function KeepassHeader() {
 

@@ -26,7 +26,7 @@ THE SOFTWARE.
 
 "use strict";
 
-import axios from '$bwr/axios/dist/axios.min.js'
+import axios from 'axios/dist/axios.min.js'
 import { ChromePromiseApi } from '$lib/chrome-api-promise.js'
 
 const chromePromise = ChromePromiseApi()
@@ -47,7 +47,7 @@ function OneDriveFileManager ($q, settings) {
     chooseDescription: 'Access password files stored on OneDrive.  Files will be retrieved from OneDrive each time they are used.',
     authorize: authorize,
     revokeAuth: revokeAuth,
-    isAuthorized: isAuthorized
+    isLoggedIn: isAuthorized
   };
 
   function isAuthorized () {

@@ -4,6 +4,7 @@
     <div v-if="busy" class="spinner">
       <spinner size="medium" :message='"Unlocking " + databaseFileName'></spinner>
     </div>
+
     <!-- Entry List -->
     <entry-list v-if="!busy && isUnlocked()"
       :messages="unlockedMessages"

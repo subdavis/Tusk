@@ -11,6 +11,12 @@
   }
 }
 
+.between {
+  width: 100%;
+  justify-content: space-between;
+  display: flex;
+}
+
 .stack-item {
   box-sizing: border-box;
   width: 100%;
@@ -36,6 +42,10 @@
     background-color: $background-color;
   }
 
+  &.roomy {
+    padding: $wall-padding $options-wall-padding;
+  }
+
   &.small {
     padding: 6px $wall-padding;
     font-size: 12px;
@@ -49,10 +59,5 @@
   &.plain {
     background-color: $light-background-color;
     border-bottom: 0px;
-  }
-
-  &.between {
-    justify-content: space-between;
-    display: flex;
   }
 }

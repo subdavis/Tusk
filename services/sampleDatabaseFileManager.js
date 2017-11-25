@@ -26,7 +26,7 @@ THE SOFTWARE.
 
 "use strict";
 
-import axios from '$bwr/axios/dist/axios.min.js'
+import axios from 'axios/dist/axios.min.js'
 import { ChromePromiseApi } from '$lib/chrome-api-promise.js'
 
 const chromePromise = ChromePromiseApi()

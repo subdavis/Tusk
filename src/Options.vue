@@ -4,9 +4,12 @@
       :routes="routes"></options-navbar>
     <!-- Router View -->
     <options-startup id="/" v-if="show.startup.visible" class="content-body"
-      :settings="services.settings"
-      :dropbox-file-manager="services.dropboxFileManager"></options-startup>
-    <manage-databases id="/manage/databases" v-if="show.manageDatabases.visible" class="content-body"></manage-databases>
+      :settings="services.settings"></options-startup>
+    <manage-databases id="/manage/databases" 
+      v-if="show.manageDatabases.visible"
+      :dropbox-file-manager="services.dropboxFileManager"
+      :google-drive-manager="services.googleDrivePasswordFileManager"
+      :onedrive-manager="services.oneDriveFileManager"></manage-databases>
     <manage-keyfiles id="/manage/keyfiles" v-if="show.manageKeyfiles.visible" class="content-body"></manage-keyfiles>
     <advanced-settings id="/advanced" v-if="show.advanced.visible" class="content-body"></advanced-settings>
   </div>
@@ -65,7 +68,9 @@ export default {
       routes: [],
       services: {
         settings,
-        dropboxFileManager
+        dropboxFileManager,
+        googleDrivePasswordFileManager,
+        oneDriveFileManager,
       },
       show: {
         startup: { visible: false },

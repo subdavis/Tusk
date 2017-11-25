@@ -1,12 +1,19 @@
 <template>
-  <div class="box-bar plain">
-  	<div class="switch">
-	    <label>
-	      Disabled
-	      <input type="checkbox">
-	      <span class="lever"></span>
-	    </label>
-	  </div>
+  <div class="box-bar roomy">
+  	<div class="between">
+	  	<div class="title">{{ providerManager.title }}</div>
+	  	<div>
+	  		<div class="switch">
+			    <label>
+			      Disabled
+			      <input type="checkbox" v-model="loggedIn">
+			      <span class="lever"></span>
+			      Enabled
+			    </label>
+			  </div>
+			</div>
+		</div>
+		<div v-for="db in databases" class="chip">{{ db.title }}</div>
   </div>
 </template>
 
@@ -19,6 +26,11 @@ export default {
 			loggedIn: false
 		}
 	},
+	watch: {
+		loggedIn: function (newLoggedIn){
+
+		}
+	},
 	props: {
 		/* The providerManager implements the following that return promises...
 		 * isLoggedIn()
@@ -29,16 +41,11 @@ export default {
 		providerManager: Object 
 	},
 	methods: {
-		login () {
-
-		},
-		logout () {
-
-		},
 		populate () {
 			this.busy = true
 			this.providerManager.listDatabases().then(databases => {
 				this.databases = databases
+				this.loggedIn = true
 				this.busy = false
 			}).catch(err => {
 				console.error(err)
@@ -47,18 +54,17 @@ export default {
 		}
 	},
 	mounted () {
-		this.busy = true
-		this.providerManager.isLoggedIn(loggedIn => {
-			this.loggedIn = loggedIn
-			if (loggedIn)
-				this.populate()
-			else
-				this.busy = false
-		});
+		this.populate()
 	}
 }
 </script>
 
 <style lang="scss">
 @import "../styles/settings.scss";
+
+.chip {
+	height: 24px;
+	line-height: 24px;
+	font-size: 11px;
+}
 </style>

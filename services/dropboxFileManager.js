@@ -26,7 +26,8 @@ THE SOFTWARE.
 
 "use strict";
 
-import axios from '$bwr/axios/dist/axios.min.js'
+import axios from 'axios/dist/axios.min.js'
+let Base64 = require('base64-arraybuffer')
 import { ChromePromiseApi } from '$lib/chrome-api-promise.js'
 
 const chromePromise = ChromePromiseApi()
@@ -52,6 +53,7 @@ function DropboxFileManager(settings) {
 		ensureOriginPermissions: ensureOriginPermissions,
 		state: state,
 		login: login,
+		isLoggedIn: isLoggedIn,
 		logout: logout
 	};
 
@@ -68,6 +70,12 @@ function DropboxFileManager(settings) {
 
 	function login() {
 		return listDatabases();
+	}
+
+	function isLoggedIn () {
+		return new Promise((resolve, reject) => {
+			resolve(state.loggedIn)
+		});
 	}
 
 	function logout() {
@@ -183,8 +191,9 @@ function DropboxFileManager(settings) {
 		return ensureOriginPermissions().then(ensured => {
 			return new Promise(function(resolve, reject) {
 				chromePromise.runtime.getManifest().then(manifest => {
+					console.log(manifest)
 					var randomState = Base64.encode(window.crypto.getRandomValues(new Uint8Array(16)));  //random state, protects against CSRF
-					var authUrl = 'https://www.dropbox.com/oauth2/authorize?response_type=token&client_id=' + manifest.static_data.dropbox.client_id;
+					var authUrl = 'https://www.dropbox.com/oauth2/authorize?response_type=token&client_id=' + manifest.static_data.dropbox.client_id
 						+ '&state=' + encodeURIComponent(randomState)
 						+ '&redirect_uri=' + encodeURIComponent(chrome.identity.getRedirectURL('dropbox'))
 						+ '&force_reapprove=false';

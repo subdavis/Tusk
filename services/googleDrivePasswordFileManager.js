@@ -23,7 +23,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
  */
-import axios from '$bwr/axios/dist/axios.min.js'
+import axios from 'axios/dist/axios.min.js'
 import { ChromePromiseApi } from '$lib/chrome-api-promise.js'
 
 const chromePromise = ChromePromiseApi()
@@ -44,7 +44,7 @@ function GoogleDrivePasswordFileManager() {
     chooseDescription: 'Access password files stored on your Google Drive.  The file(s) will be fetched from Google Drive each time they are used.',
     interactiveRequestAuth: interactiveRequestAuth,
     revokeAuth: revokeAuth,
-    isAuthorized: isAuthorized,
+    isLoggedIn: isAuthorized,
     ensureGoogleUrlPermissions: ensureGoogleUrlPermissions
   };
 
@@ -88,7 +88,9 @@ function GoogleDrivePasswordFileManager() {
   }
 
   function isAuthorized() {
-    return accessToken ? true : false;
+    return new Promise((resolve, reject) => {
+      return resolve(accessToken ? true : false);
+    });
   }
 
   function ensureGoogleUrlPermissions() {
