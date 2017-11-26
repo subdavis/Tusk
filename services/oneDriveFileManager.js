@@ -50,6 +50,19 @@ function OneDriveFileManager (settings) {
     isLoggedIn: isAuthorized
   };
 
+  function ensureOriginPermissions() {
+    var dropboxOrigins = ['https://login.live.com/'];
+    return chromePromise.permissions.contains({origins: dropboxOrigins}).then(function() {
+      return true;
+    }).catch(function() {
+      return chromePromise.permissions.request({origins: dropboxOrigins}).then(function() {
+        return true;
+      }).catch(function(err) {
+        return false;
+      })
+    });
+  }
+
   function isAuthorized () {
     return settings.getAccessToken(accessTokenType).then(function (token) {
       return token != null;
@@ -199,8 +212,18 @@ function OneDriveFileManager (settings) {
   }
 
   function revokeAuth () {
-    settings.saveAccessToken(accessTokenType, null);
-    return chromePromise.identity.launchWebAuthFlow({url: 'https://login.live.com/oauth20_logout.srf'});
+    return ensureOriginPermissions().then(nil => {
+      return axios.get('https://login.live.com/oauth20_logout.srf?client_id=f4c55645-3f43-4f8e-a7d2-ec167b416f1d')
+      .then(response => {
+        if (response.status == 200){
+          settings.saveAccessToken(accessTokenType, null);
+          console.info("You have logged out of OneDrive")
+          return;
+        } else {
+          console.error("Could not log out of Onedrive, ", response)
+        }
+      })
+    })
   }
 
   function getToken () {
