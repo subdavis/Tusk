@@ -287,7 +287,9 @@ export default {
   mounted () {
     
     this.$nextTick(function() {
-      this.$refs.masterPassword.focus();
+      let mp = this.$refs.masterPassword;
+      if (mp !== undefined)
+        mp.focus()
     })
 
     if (!this.isUnlocked()) {

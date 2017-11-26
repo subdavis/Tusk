@@ -1,7 +1,8 @@
 <template>
   <div id="main">
     <options-navbar
-      :routes="routes"></options-navbar>
+      :routes="routes"
+      :initial-tab="initialTab"></options-navbar>
     <!-- Router View -->
     <options-startup id="/" v-if="show.startup.visible" class="content-body"
       :settings="services.settings"></options-startup>
@@ -42,17 +43,16 @@ const settings = new Settings()
 const protectedMemory = new ProtectedMemory()
 const secureCacheMemory = new SecureCacheMemory(protectedMemory)
 const secureCacheDisk = new SecureCacheDisk(protectedMemory, secureCacheMemory, settings)
-const $q = function(){} // TODO: wtf is this for.
 
 // File Managers
 const localChromePasswordFileManager = new LocalChromePasswordFileManager()
 const dropboxFileManager = new DropboxFileManager(settings)
 const googleDrivePasswordFileManager = new GoogleDrivePasswordFileManager()
 const sharedUrlFileManager = new SharedUrlFileManager()
-const oneDriveFileManager = new OneDriveFileManager($q, settings)
+const oneDriveFileManager = new OneDriveFileManager(settings)
 const sampleDatabaseFileManager = new SampleDatabaseFileManager()
 
-const passwordFileStoreRegistry = new PasswordFileStore(localChromePasswordFileManager, dropboxFileManager, googleDrivePasswordFileManager, sharedUrlFileManager, sampleDatabaseFileManager)
+const passwordFileStoreRegistry = new PasswordFileStore(localChromePasswordFileManager, dropboxFileManager, googleDrivePasswordFileManager, sharedUrlFileManager, sampleDatabaseFileManager, oneDriveFileManager)
 
 export default {
   name: 'app',
@@ -66,6 +66,7 @@ export default {
   data () {
     return {
       routes: [],
+      initialTab: "/", // The tab to start on.
       services: {
         settings,
         dropboxFileManager,
@@ -105,7 +106,7 @@ export default {
       }
     ])
     this.routes = this.$router.routes // HACK since Vue doesn't notice changes in 
-    this.$router.route('/')
+    this.$router.route(this.initialTab)
   }
 }
 </script>

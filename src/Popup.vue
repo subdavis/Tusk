@@ -52,17 +52,16 @@ const secureCacheMemory = new SecureCacheMemory(protectedMemory)
 const secureCacheDisk = new SecureCacheDisk(protectedMemory, secureCacheMemory, settings)
 const keepassHeader = new KeepassHeader(settings)
 const keepassReference = new KeepassReference()
-const $q = function(){} // TODO: wtf is this for.
 
 // File Managers
 const localChromePasswordFileManager = new LocalChromePasswordFileManager()
 const dropboxFileManager = new DropboxFileManager(settings)
 const googleDrivePasswordFileManager = new GoogleDrivePasswordFileManager()
 const sharedUrlFileManager = new SharedUrlFileManager()
-const oneDriveFileManager = new OneDriveFileManager($q, settings)
+const oneDriveFileManager = new OneDriveFileManager(settings)
 const sampleDatabaseFileManager = new SampleDatabaseFileManager()
 
-const passwordFileStoreRegistry = new PasswordFileStore(localChromePasswordFileManager, dropboxFileManager, googleDrivePasswordFileManager, sharedUrlFileManager, sampleDatabaseFileManager)
+const passwordFileStoreRegistry = new PasswordFileStore(localChromePasswordFileManager, dropboxFileManager, googleDrivePasswordFileManager, sharedUrlFileManager, sampleDatabaseFileManager, oneDriveFileManager)
 const keepassService = new KeepassService(keepassHeader, settings, passwordFileStoreRegistry, keepassReference)
 
 export default {

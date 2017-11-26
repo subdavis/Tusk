@@ -2,8 +2,8 @@
 	<nav class="nav-extended">
     <div class="nav-content">
       <ul class="tabs tabs-transparent">
-        <li v-for="route in routes" class="tab">
-        	<a href="#" @click="$router.route(route.route)">{{ route.name }}</a>
+        <li v-for="route in routes" class="tab" v-bind:class="{ active: (activeTab == route.route) }">
+        	<a href="#" @click="setRoute(route.route)">{{ route.name }}</a>
         </li>
       </ul>
     </div>
@@ -16,8 +16,20 @@
 <script>
 export default {
 	props: {
-		routes: Array
-	}
+		routes: Array,
+    initialTab: String
+	},
+  data () {
+    return {
+      activeTab: this.initialTab
+    }
+  },
+  methods: {
+    setRoute (path) {
+      this.activeTab = path
+      this.$router.route(path)
+    }
+  }
 }
 </script>
 
@@ -25,5 +37,8 @@ export default {
 @import "../styles/settings.scss";
 
 #navbar {
+  li.active {
+    border-bottom: 3px solid $background-color;
+  }
 }
 </style>

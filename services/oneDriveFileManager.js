@@ -31,7 +31,7 @@ import { ChromePromiseApi } from '$lib/chrome-api-promise.js'
 
 const chromePromise = ChromePromiseApi()
 
-function OneDriveFileManager ($q, settings) {
+function OneDriveFileManager (settings) {
   var accessTokenType = 'onedrive';
 
   var exports = {
@@ -45,8 +45,8 @@ function OneDriveFileManager ($q, settings) {
     icon: 'icon-onedrive',
     chooseTitle: 'OneDrive',
     chooseDescription: 'Access password files stored on OneDrive.  Files will be retrieved from OneDrive each time they are used.',
-    authorize: authorize,
-    revokeAuth: revokeAuth,
+    login: authorize,
+    logout: revokeAuth,
     isLoggedIn: isAuthorized
   };
 
@@ -57,24 +57,27 @@ function OneDriveFileManager ($q, settings) {
   }
 
   function authorize () {
-    var promise = $q.defer();
-
+    var resolve, reject;
+    let returnPromise = new Promise((resolvep, rejectp) => {
+      resolve = resolvep;
+      reject = rejectp;
+    })
     var url = 'https://login.live.com/oauth20_authorize.srf' +
-              '?client_id=f4c55645-3f43-4f8e-a7d2-ec167b416f1d' +
-              '&scope=' + encodeURIComponent('onedrive.readonly') +
-              '&response_type=token' +
-              '&redirect_uri=' + encodeURIComponent(chrome.identity.getRedirectURL('onedrive'));
+            '?client_id=f4c55645-3f43-4f8e-a7d2-ec167b416f1d' +
+            '&scope=' + encodeURIComponent('onedrive.readonly') +
+            '&response_type=token' +
+            '&redirect_uri=' + encodeURIComponent(chrome.identity.getRedirectURL('onedrive'));
 
-    var promise = chromePromise.identity.launchWebAuthFlow({url: url, interactive: true}).then(function (redirectUrl) {
+    chromePromise.identity.launchWebAuthFlow({url: url, interactive: true}).then(function (redirectUrl) {
       var authInfo = parseAuthInfoFromUrl(redirectUrl);
       if (authInfo === null) {
-        return Promise.reject('Failed to extract authentication information from redirect url');
+        reject('Failed to extract authentication information from redirect url');
+      } else {
+        settings.saveAccessToken(accessTokenType, authInfo.access_token);
+        resolve();
       }
-
-      settings.saveAccessToken(accessTokenType, authInfo.access_token);
-      return Promise.resolve();
     });
-    return $q.when(promise);
+    return returnPromise;
   }
 
   function listDatabases () {
@@ -197,8 +200,7 @@ function OneDriveFileManager ($q, settings) {
 
   function revokeAuth () {
     settings.saveAccessToken(accessTokenType, null);
-    var promise = chromePromise.identity.launchWebAuthFlow({url: 'https://login.live.com/oauth20_logout.srf'});
-    return $q.when(promise);
+    return chromePromise.identity.launchWebAuthFlow({url: 'https://login.live.com/oauth20_logout.srf'});
   }
 
   function getToken () {

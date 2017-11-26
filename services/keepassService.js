@@ -33,7 +33,7 @@ let Case = require('case'),
     pako = require('pako'),
     kdbxweb = require('kdbxweb')
 
-import argon2 from '$lib/argon2.js'
+import { argon2 } from '$lib/argon2.js'
 
 function KeepassService(keepassHeader, settings, passwordFileStoreRegistry, keepassReference) {
   var my = {};

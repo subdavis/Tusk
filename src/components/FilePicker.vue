@@ -41,6 +41,7 @@ export default {
   },
   mounted () {
   	this.passwordFileStoreRegistry.listFileManagers('listDatabases').forEach(provider => {
+      console.log(provider)
 	    provider.listDatabases().then(databases => {
 	    	if (databases && databases.length) {
 		      databases.forEach(database => {
