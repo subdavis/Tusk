@@ -59,7 +59,4 @@ export default {
 		background-color: $light-green;
 	}	
 }
-
-div.about {
-}
 </style>

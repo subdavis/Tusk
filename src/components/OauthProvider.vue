@@ -2,7 +2,7 @@
   <div class="box-bar roomy database-manager">
   	<div class="between">
 	  	<div class="title">
-	  		<span>{{ providerManager.chooseTitle }}</span>
+	  		<span><svg class="icon" viewBox="0 0 1 1"><use v-bind="{'xlink:href':'#'+providerManager.icon}"/></svg> {{ providerManager.chooseTitle }}</span>
 	  		<span v-for="db in databases" class="chip">{{ db.title }}</span>
 	  	</div>
 	  	<div>
@@ -45,6 +45,7 @@ export default {
 	},
 	methods: {
 		populate () {
+			// TODO: deal with the race condition here....
 			this.busy = true
 			this.providerManager.listDatabases().then(databases => {
 				this.databases = databases
@@ -58,16 +59,19 @@ export default {
 			})
 		},
 		toggleLogin (event) {
-			// A click means the state is settled...
-			this.busy = true
-			if (this.loggedIn){
-				this.providerManager.logout().then(nil => {
-					this.populate()
-				})
+			if (!this.busy){
+				if (this.loggedIn){
+					this.providerManager.logout().then(nil => {
+						this.populate()
+					})
+				} else {
+					this.providerManager.login().then(nil => {
+						this.populate()
+					})
+				}
 			} else {
-				this.providerManager.login().then(nil => {
-					this.populate()
-				})
+				// wait for state to settle...
+				console.error("Wait for toggle state to settle before changing enable/disable")
 			}
 		}
 	},
@@ -81,20 +85,25 @@ export default {
 @import "../styles/settings.scss";
 .database-manager {
 	background-color: $light-background-color;
-}
-.chip {
-	height: 24px;
-	line-height: 24px;
-	font-size: 11px;
-}
-.description {
-	font-size: 12px;
-	font-color: $dark-background-color;
-}
-.switch {
-	min-width: 120px;
-}
-.between {
-	line-height: 36px;
+
+	svg {
+    width: 18px;
+    vertical-align: middle;
+  }
+  .chip {
+		height: 24px;
+		line-height: 24px;
+		font-size: 11px;
+	}
+	.description {
+		font-size: 12px;
+		font-color: $dark-background-color;
+	}
+	.switch {
+		min-width: 120px;
+	}
+	.between {
+		line-height: 36px;
+	}
 }
 </style>

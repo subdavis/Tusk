@@ -1,5 +1,6 @@
 <template>
   <div id="main">
+    <svg-defs></svg-defs>
     <options-navbar
       :routes="routes"
       :initial-tab="initialTab"></options-navbar>
@@ -13,7 +14,9 @@
         :google-drive-manager="services.googleDrivePasswordFileManager"
         :onedrive-manager="services.oneDriveFileManager"
         :sample-manager="services.sampleDatabaseFileManager"></manage-databases>
-      <manage-keyfiles id="/manage/keyfiles" v-if="show.manageKeyfiles.visible" class="content-body"></manage-keyfiles>
+      <manage-keyfiles id="/manage/keyfiles" 
+        v-if="show.manageKeyfiles.visible"
+        :settings="services.settings"></manage-keyfiles>
       <advanced-settings id="/advanced" v-if="show.advanced.visible" class="content-body"></advanced-settings>
     </div>
   </div>
@@ -41,6 +44,7 @@ import OptionsStartup from '@/components/OptionsStartup'
 import ManageDatabases from '@/components/ManageDatabases'
 import ManageKeyfiles from '@/components/ManageKeyfiles'
 import AdvancedSettings from '@/components/AdvancedSettings'
+import SvgDefs from '@/components/SvgDefs'
 
 const settings = new Settings()
 const protectedMemory = new ProtectedMemory()
@@ -64,7 +68,8 @@ export default {
     OptionsStartup,
     ManageDatabases,
     ManageKeyfiles,
-    AdvancedSettings
+    AdvancedSettings,
+    SvgDefs
   },
   data () {
     return {

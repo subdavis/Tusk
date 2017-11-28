@@ -70,7 +70,6 @@ function OneDriveFileManager (settings) {
   }
 
   function authorize () {
-    console.log("Wooo")
     var resolve, reject;
     let returnPromise = new Promise((resolvep, rejectp) => {
       resolve = resolvep;
@@ -101,7 +100,6 @@ function OneDriveFileManager (settings) {
   }
 
   function searchFiles (token) {
-    console.log('searchFiles', token)
     // there is no proper way of searching for file-extensions right now (?), so we search for files containing kdb and filter ourselves afterwards
     var query = encodeURIComponent('kdb');
     var filter = encodeURIComponent('file ne null');
@@ -113,7 +111,6 @@ function OneDriveFileManager (settings) {
         Authorization: 'Bearer ' + token 
       }
     }).catch(function (error) {
-      console.log("CASE initiated", error)
       // token expired
       if (error.response.status && error.response.status == 401) {
         return authorize()
