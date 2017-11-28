@@ -70,6 +70,7 @@ function OneDriveFileManager (settings) {
   }
 
   function authorize () {
+    console.log("Wooo")
     var resolve, reject;
     let returnPromise = new Promise((resolvep, rejectp) => {
       resolve = resolvep;
@@ -96,18 +97,11 @@ function OneDriveFileManager (settings) {
   function listDatabases () {
     return getToken()
       .then(searchFiles)
-      .then(filterFiles)
-      .catch(function (response) {
-        // token expired
-        if (response.status && response.status == 401) {
-          return authorize().then(listDatabases);
-        } else {
-        	return [];
-        }
-      });
+      .then(filterFiles);
   }
 
   function searchFiles (token) {
+    console.log('searchFiles', token)
     // there is no proper way of searching for file-extensions right now (?), so we search for files containing kdb and filter ourselves afterwards
     var query = encodeURIComponent('kdb');
     var filter = encodeURIComponent('file ne null');
@@ -118,12 +112,23 @@ function OneDriveFileManager (settings) {
       headers: { 
         Authorization: 'Bearer ' + token 
       }
-    }).then( response => {
-      return response;
-    });
+    }).catch(function (error) {
+      console.log("CASE initiated", error)
+      // token expired
+      if (error.response.status && error.response.status == 401) {
+        return authorize()
+          .then(getToken)
+          .then(searchFiles)
+      } else {
+        console.error(error);
+      }
+    })
   }
 
   function filterFiles (response) {
+    if (!response) {
+      return Promise.reject('Unable to get a response from OneDrive');
+    }
     if (!response.data.value) {
       return Promise.reject('Unexpected response from OneDrive API');
     }

@@ -102,7 +102,8 @@ module.exports = {
         return getPath('css/[name].css').replace('css', 'css');
       }
     }),
-  ]
+  ],
+  devtool: "#source-map"
 }
 
 if (process.env.NODE_ENV === 'production') {

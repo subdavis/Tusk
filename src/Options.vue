@@ -4,15 +4,18 @@
       :routes="routes"
       :initial-tab="initialTab"></options-navbar>
     <!-- Router View -->
-    <options-startup id="/" v-if="show.startup.visible" class="content-body"
-      :settings="services.settings"></options-startup>
-    <manage-databases id="/manage/databases" 
-      v-if="show.manageDatabases.visible"
-      :dropbox-file-manager="services.dropboxFileManager"
-      :google-drive-manager="services.googleDrivePasswordFileManager"
-      :onedrive-manager="services.oneDriveFileManager"></manage-databases>
-    <manage-keyfiles id="/manage/keyfiles" v-if="show.manageKeyfiles.visible" class="content-body"></manage-keyfiles>
-    <advanced-settings id="/advanced" v-if="show.advanced.visible" class="content-body"></advanced-settings>
+    <div id="overflowbox">
+      <options-startup id="/" v-if="show.startup.visible" class="content-body"
+        :settings="services.settings"></options-startup>
+      <manage-databases id="/manage/databases" 
+        v-if="show.manageDatabases.visible"
+        :dropbox-file-manager="services.dropboxFileManager"
+        :google-drive-manager="services.googleDrivePasswordFileManager"
+        :onedrive-manager="services.oneDriveFileManager"
+        :sample-manager="services.sampleDatabaseFileManager"></manage-databases>
+      <manage-keyfiles id="/manage/keyfiles" v-if="show.manageKeyfiles.visible" class="content-body"></manage-keyfiles>
+      <advanced-settings id="/advanced" v-if="show.advanced.visible" class="content-body"></advanced-settings>
+    </div>
   </div>
 </template>
 
@@ -72,6 +75,7 @@ export default {
         dropboxFileManager,
         googleDrivePasswordFileManager,
         oneDriveFileManager,
+        sampleDatabaseFileManager
       },
       show: {
         startup: { visible: false },
@@ -115,9 +119,12 @@ export default {
 @import './styles/options.scss';
 
 #main {
-  width: 800px;
-  height: 542px;
-
   background-color: $background-color;
+}
+
+#overflowbox {
+  width: 800px;
+  height: 490px;
+  overflow-y: auto;
 }
 </style>

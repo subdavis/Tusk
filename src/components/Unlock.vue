@@ -46,7 +46,7 @@
         <div class="stack-item keyfile-picker" v-if="keyFilePicker">
           <transition name="keyfile-picker">
             <div>
-              <span class="selectable" v-for="(kf, kf_index) in keyFiles" :keyfile-index="kf_index">
+              <span class="selectable" v-for="(kf, kf_index) in keyFiles" :keyfile-index="kf_index" @click="chooseKeyFile(kf_index)">
                 <i class="fa fa-file" aria-hidden="true"></i>
                 {{ kf.name }}</span>
               <span class="selectable"><i class="fa fa-wrench" aria-hidden="true"></i> Manage Keyfiles</span>
@@ -130,6 +130,13 @@ export default {
   methods: {
     closeWindow (event) {
       window.close()
+    },
+    chooseKeyFile (index) {
+      if (index >= 0)
+        this.selectedKeyFile = this.keyFiles[index]
+      else
+        console.log("GOTO options")
+      this.keyFilePicker = false
     },
     chooseAnotherFile () {
       this.unlockedState.clearBackgroundState()
@@ -353,7 +360,8 @@ export default {
     background-color: $light-background-color;
     box-sizing: border-box;
     transition: all .2s linear;
-    max-height: 50px;
+    max-height: 200px;
+    overflow-y: auto;
     opacity: 1;
     border-top: 1px solid $light-gray;
     border-bottom: 1px solid $light-gray;
@@ -365,8 +373,13 @@ export default {
       opacity: 0;
     }
 
-    span:hover {
-      padding-left: 8px;
+    span {
+      display: block;
+      padding: 2px 0px;
+
+      &:hover {
+        padding-left: 5px;
+      }
     }
   }
 

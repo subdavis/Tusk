@@ -6,13 +6,14 @@
 			<a class="waves-effect waves-light btn" @click="tabRouter.route('/help/me/choose')">Help me choose</a>
 			<a class="waves-effect waves-light btn" @click="tabRouter.route('/new/user')">I haven't made a keepass database yet.</a>
 
-			<p id="/help/me/choose" v-show="show.help.visible">If you're unsure which to pick, the developers recommend <b>Dropbox</b>r. It is easy to use and widely supported by other Keepass apps, such as <a href="https://play.google.com/store/apps/details?id=keepass2android.keepass2android&hl=en">Keepass2Android</a> for iOS or <a href="https://itunes.apple.com/us/app/keepass-touch/id966759076?mt=8">KeepassTouch</a>.</p>
+			<p id="/help/me/choose" v-show="show.help.visible">If you're unsure which to pick, the developers recommend <b>Dropbox</b>. It is easy to use and widely supported by other Keepass apps, such as <a href="https://play.google.com/store/apps/details?id=keepass2android.keepass2android&hl=en">Keepass2Android</a> for iOS or <a href="https://itunes.apple.com/us/app/keepass-touch/id966759076?mt=8">KeepassTouch</a>.</p>
 			
 			<p id="/new/user" v-show="show.newUser.visible">If you've never used keepass before, you will be prompted to create a new database when you open the popup window <i>after</i> you enable one of the cloud providers below. Most people keep all their passwords in a single database, so you should only need to do this once.</p>
 		</div>
 		<oauth-provider :provider-manager="dropboxFileManager"></oauth-provider>
 		<oauth-provider :provider-manager="googleDriveManager"></oauth-provider>
 		<oauth-provider :provider-manager="onedriveManager"></oauth-provider>
+		<oauth-provider :provider-manager="sampleManager"></oauth-provider>
   </div>
 </template>
 
@@ -23,7 +24,8 @@ export default {
 	props: {
 		dropboxFileManager: Object,
 		googleDriveManager: Object,
-		onedriveManager: Object
+		onedriveManager: Object,
+		sampleManager: Object
 	},
 	components: {
 		OauthProvider

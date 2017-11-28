@@ -1,19 +1,22 @@
 <template>
   <div class="box-bar roomy database-manager">
   	<div class="between">
-	  	<div class="title">{{ providerManager.title }}</div>
-	  	<div v-if="!busy">
+	  	<div class="title">
+	  		<span>{{ providerManager.chooseTitle }}</span>
+	  		<span v-for="db in databases" class="chip">{{ db.title }}</span>
+	  	</div>
+	  	<div>
 	  		<div class="switch">
 			    <label>
-			      {{ loggedIn ? 'Enabled' : 'Disabled' }}
-			      <input type="checkbox" v-model="loggedIn" @click="toggleLogin">
+			      {{ busy ? 'busy' : (loggedIn ? 'Enabled' : 'Disabled') }}
+			      <input :disabled="busy" type="checkbox" v-model="loggedIn" @click="toggleLogin">
 			      <span class="lever"></span>
 			    </label>
 			  </div>
 			</div>
-			<spinner v-else size="medium" message="Loading..."></spinner>
+			<!-- <spinner v-else size="medium"></spinner> -->
 		</div>
-		<div v-for="db in databases" class="chip">{{ db.title }}</div>
+		<div class="description">{{ providerManager.chooseDescription }}</div>
   </div>
 </template>
 
@@ -83,5 +86,15 @@ export default {
 	height: 24px;
 	line-height: 24px;
 	font-size: 11px;
+}
+.description {
+	font-size: 12px;
+	font-color: $dark-background-color;
+}
+.switch {
+	min-width: 120px;
+}
+.between {
+	line-height: 36px;
 }
 </style>

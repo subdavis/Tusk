@@ -44,8 +44,19 @@ function SampleDatabaseFileManager() {
     chooseTitle: 'Sample Database',
     chooseDescription: 'Sample database that you can use to try out the functionality.  The master password is 123.',
     getActive: getActive,
-    setActive: setActive
+    setActive: setActive,
+    login: login,   // Implement the "oauth" interface
+    logout: logout, // implement the "oauth" interface
+    isLoggedIn: getActive
   };
+
+  function login() {
+    return setActive(true)
+  }
+
+  function logout() {
+    return setActive(false)
+  }
 
   function listDatabases() {
     return getActive().then(function(flag) {
