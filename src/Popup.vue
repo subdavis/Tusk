@@ -12,6 +12,7 @@
     <unlock id="/unlock/:provider/:title" v-if="show.unlock.visible"
       :unlocked-state="services.unlockedState" 
       :secure-cache="services.secureCache" 
+      :options-link="services.optionsLink"
       :settings="services.settings"
       :keepass-service="services.keepassService"></unlock>
     <entry-details id="/entry-details/:entryId" v-if="show.entryDetails.visible"
@@ -32,6 +33,7 @@ import { UnlockedState } from '$services/unlockedState.js'
 import SecureCacheMemory from '$services/secureCacheMemory.js'
 import SecureCacheDisk from '$services/secureCacheDisk.js'
 import PasswordFileStore from '$services/passwordFileStore.js'
+import OptionsLink from '$services/optionsLink.js'
 // File Managers
 import { LocalChromePasswordFileManager } from '$services/localChromePasswordFileManager.js'
 import { GoogleDrivePasswordFileManager } from '$services/googleDrivePasswordFileManager.js'
@@ -47,6 +49,7 @@ import EntryDetails from '@/components/EntryDetails'
 import SvgDefs from '@/components/SvgDefs'
 
 const settings = new Settings()
+const optionsLink = new OptionsLink()
 const protectedMemory = new ProtectedMemory()
 const secureCacheMemory = new SecureCacheMemory(protectedMemory)
 const secureCacheDisk = new SecureCacheDisk(protectedMemory, secureCacheMemory, settings)
@@ -81,6 +84,7 @@ export default {
         secureCache: secureCacheDisk,
         passwordFileStoreRegistry,
         keepassService,
+        optionsLink,
         unlockedState: new UnlockedState(this.$router, keepassReference, protectedMemory, settings)
       },
       show: {

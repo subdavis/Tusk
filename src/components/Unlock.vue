@@ -52,6 +52,20 @@
             </div>
           </transition>
         </div>
+
+        <div class="box-bar small plain remember-period-picker">
+          <span>
+            <label for="rememberPeriodLength">
+              <span>{{rememberPeriodText}} (slide to choose)</span></label>
+            <input id="rememberPeriodLength" 
+              type="range" 
+              min="0" 
+              :max="slider_options.length - 1" 
+              step="1" 
+              v-model="slider_int" 
+              v-on:input="setRememberPeriod(undefined)"/>
+          </span>
+        </div>
         
         <div class="stack-item">
           <button id="unlock-button" class="selectable" v-on:click="clickUnlock">Unlock Database</button>
@@ -62,7 +76,7 @@
 
     <!-- Footer -->
     <div class="box-bar medium between footer" v-show="!busy">
-      <span class="selectable">
+      <span class="selectable" @click="OptionsLink.go">
         <i class="fa fa-cog" aria-hidden="true"></i> Settings</span>
       <span class="selectable" v-if="isUnlocked()" @click="forgetPassword()">
         <i class="fa fa-lock" aria-hidden="true" ></i> Lock Database</span>
@@ -87,7 +101,8 @@ export default {
     unlockedState: Object,
     secureCache: Object,
     settings: Object,
-    keepassService: Object
+    keepassService: Object,
+    OptionsLink: Object
   },
   components: {
     InfoCluster,
@@ -111,9 +126,20 @@ export default {
       keyFiles: [],  // list of all available
       selectedKeyFile: undefined, // chosen keyfile object
       rememberPeriod: 0, // in minutes. default: do not remember
+      rememberPeriodText: "",
       databaseFileName: "",
       keyFilePicker: false,
-      appVersion: chrome.runtime.getManifest().version
+      appVersion: chrome.runtime.getManifest().version,
+      slider_options: [
+        {time: 0,  text: "Do not remember"},
+        {time: 30, text: "Remember for 30 min."},
+        {time: 120,  text: "Remember for 2 hours."},
+        {time: 240,  text: "Remember for 4 hours."},
+        {time: 480,  text: "Remember for 8 hours."},
+        {time: 1440, text: "Remember for 24 hours."},
+        {time: -1, text: "Remember forever."}
+      ],
+      slider_int: 0
     }
   },
   computed: {
@@ -123,7 +149,7 @@ export default {
     selectedKeyFileName: function () {
       if (this.selectedKeyFile !== undefined)
         return this.selectedKeyFile.name
-      return "No keyfile selected.  Click to choose."
+      return "No keyfile selected.  (click to change)"
     }
   },
   watch: {
@@ -135,6 +161,29 @@ export default {
     }
   },
   methods: {
+    setRememberPeriod (time_int) {
+      /* Args: optional time_int
+       * if time_int is given, derive slider_int
+       * else assume slider_int is alread set.
+       */
+      let slider_option_index;
+      if (time_int !== undefined) {
+        this.slider_int = (t => {
+          for (let i=0; i < this.slider_options.length; i++){
+            if (this.slider_options[i].time === t)
+              return i;
+          }
+          return 0;
+        })(time_int);
+        slider_option_index = this.slider_int;
+      } else {
+        slider_option_index = parseInt(this.slider_int);
+      }
+      if (slider_option_index < this.slider_options.length){
+        this.rememberPeriod = this.slider_options[slider_option_index].time;
+        this.rememberPeriodText =this.slider_options[slider_option_index].text;
+      }
+    },
     closeWindow (event) {
       window.close()
     },
@@ -311,14 +360,14 @@ export default {
         this.keyFiles = keyFiles
         return this.settings.getDefaultRememberOptions()
       }).then( rememberOptions => {
-        this.rememberPeriod = rememberOptions.rememberPeriod
+        this.setRememberPeriod(rememberOptions.rememberPeriod)
         return this.settings.getCurrentDatabaseUsage()
       }).then( usage => {
         // tweak UI based on what we know about the db file
         this.hidePassword = (usage.requiresPassword === false)
         this.hideKeyFile = (usage.requiresKeyfile === false)
         this.rememberedPassword = (usage.passwordKey !== undefined)
-        this.rememberPeriod = usage.rememberPeriod
+        this.setRememberPeriod(usage.rememberPeriod)
 
         if (usage.passwordKey !== undefined && usage.requiresKeyfile === false) {
           this.unlock(usage.passwordKey) // Autologin if no keyfile
@@ -356,10 +405,10 @@ export default {
 #masterPasswordGroup {
 
   #unlock-button {
-    background-color: $green;
+    background-color: $blue;
 
     &:hover {
-      background-color: $light-green;
+      opacity: .7;
     }
   }
 
@@ -403,7 +452,12 @@ export default {
     }
   }
 
-  input, select, button {
+  #rememberPeriodLength{
+    width: 80px;
+    float: left;
+  }
+
+  input[type=password], select, button {
     width: 100%;
     margin: 5px 0px;
     box-sizing: border-box;
@@ -417,6 +471,35 @@ export default {
     &:focus {
       outline: none;
     }
+  }
+
+
+  input[type=range] {
+    -webkit-appearance: none;
+    margin: 5px;
+    margin-left: 0px;
+  }
+  input[type=range]:focus {
+    outline: none;
+  }
+  input[type=range]::-webkit-slider-runnable-track {
+    height: 6px;
+    cursor: pointer;
+    animate: 0.2s;
+    background: $blue;
+    border-radius: 1.3px;
+    border: 0.2px solid #010101;
+    margin-top: -2px;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    border: 1px solid black;
+    height: 18px;
+    width: 10px;
+    border-radius: 2px;
+    background: white;
+    cursor: pointer;
+    -webkit-appearance: none;
+    margin-top: -7px;
   }
 }
 .spinner {
