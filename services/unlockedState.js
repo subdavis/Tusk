@@ -131,7 +131,7 @@ function UnlockedState($router, keepassReference, protectedMemory, settings) {
 				}
 			});
 
-			window.close(); //close the popup
+			// window.close(); //close the popup
 		})
 	}
 

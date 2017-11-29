@@ -8,9 +8,6 @@
       </ul>
     </div>
   </nav>
-<!--   <div class="box-bar medium between" id="navbar">
-  	<span class="selectable menu-option" v-for="route in routes">{{ route.name }}</span>
-  </div> -->
 </template>
 
 <script>

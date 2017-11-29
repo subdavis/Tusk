@@ -27,7 +27,9 @@ THE SOFTWARE.
 /**
  * Service for resolving keepass references
  */
-module.exports = function KeepassReference() {
+const kdbxweb = require('kdbxweb')
+
+function KeepassReference() {
 	"use strict";
 
 	var my = {
@@ -145,3 +147,5 @@ module.exports = function KeepassReference() {
 
 	return my;
 }
+
+export { KeepassReference }

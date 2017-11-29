@@ -8,8 +8,7 @@
     <!-- Entry List -->
     <entry-list v-if="!busy && isUnlocked()"
       :messages="unlockedMessages"
-      :priority-entries="unlockedState.cache.priorityEntries"
-      :all-entries="unlockedState.cache.allEntries"></entry-list>
+      :unlocked-state="unlockedState"></entry-list>
 
     <!-- General Messenger -->
     <messenger :messages="generalMessages" v-show="!busy"></messenger>

@@ -6,7 +6,8 @@ module.exports = {
   entry: {
     'popup': './src/popup.js',
     'options': './src/options.js',
-    'background': './background/background.js'
+    'background': './background/background.js',
+    'inject': './inject.js'
   },
   output: {
     path: path.resolve(__dirname, './dist'),

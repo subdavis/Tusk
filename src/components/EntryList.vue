@@ -9,13 +9,15 @@
       <div v-if="priorityEntries && searchTerm.length == 0">
         <entry-list-item v-for="entry in priorityEntries" 
           :key="entry.id"
-          :entry="entry">
+          :entry="entry"
+          :unlocked-state="unlockedState">
         </entry-list-item>
       </div>
       <div v-if="filteredEntries && searchTerm.length">
         <entry-list-item v-for="entry in filteredEntries" 
           :key="entry.id"
-          :entry="entry">
+          :entry="entry"
+          :unlocked-state="unlockedState">
         </entry-list-item>
       </div>
     </div>
@@ -28,9 +30,8 @@ import Messenger from '@/components/Messenger'
 
 export default {
   props: {
-    priorityEntries: Array,
-    allEntries: Array,
-    messages: Object
+    messages: Object,
+    unlockedState: Object
   },
   watch: {
     searchTerm: function (val) {
@@ -48,7 +49,9 @@ export default {
   data () {
     return {
       searchTerm: "",
-      filteredEntries: this.allEntries
+      filteredEntries: this.unlockedState.cache.allEntries,
+      priorityEntries: this.unlockedState.cache.priorityEntries,
+      allEntries: this.unlockedState.cache.allEntries
     }
   },
   methods: {

@@ -1,5 +1,5 @@
 <template>
-  <div class="entry-list-item" v-on:click="details">
+  <div class="entry-list-item between" v-on:click="details">
     <div class="text-info" v-bind:class="{ strike: entry.is_expired }">
       <span class="header">{{ header }}</span>
       <br>
@@ -8,11 +8,11 @@
       </span>
     </div>
     <div class="buttons">
-      <span class="fa-stack autofill" v-on:click="autofill">
+      <span class="fa-stack copy" v-on:click="copy">
         <i class="fa fa-circle fa-stack-2x"></i>
         <i class="fa fa-clipboard fa-stack-1x fa-inverse"></i>
       </span>
-      <span class="fa-stack copy" v-on:click="copy">
+      <span class="fa-stack autofill" v-on:click="autofill">
         <i class="fa fa-circle fa-stack-2x"></i>
         <i class="fa fa-magic fa-stack-1x fa-inverse"></i>
       </span>
@@ -23,7 +23,8 @@
 <script>
 export default {
   props: {
-    entry: Object
+    entry: Object,
+    unlockedState: Object
   },
   computed: {
     header: function() {
@@ -39,10 +40,12 @@ export default {
     autofill (e) {
       e.stopPropagation()
       console.log("autofill")
+      this.unlockedState.autofill(this.entry);
     },
     copy (e) {
       e.stopPropagation()
       console.log("copy")
+      this.unlockedState.copyPassword(this.entry);
     },
     parseUrl(url) {
       url = url.indexOf('http') < 0 ? 'http://' + url : url
@@ -61,11 +64,10 @@ export default {
   transition: all .3s ease;
 	width: 100%;
 	padding: 10px $wall-padding;
+  box-sizing: border-box;
   border-bottom: 1px solid $light-gray;
   background-color: #FFF;
   display: flex;
-  justify-content: space-between;
-  box-sizing: border-box;
 
   .header {
     font-size: 16px;
@@ -74,15 +76,12 @@ export default {
     font-size: 12px;
   }
 
-  .text-info {
-    width: 78%;
-  }
   .buttons {
     font-size: 18px;
     display:flex;
     justify-content: space-between;
     box-sizing: border-box;
-    width: 22%;
+    min-width: 80px;
   }
   .copy, .autofill {
     opacity: .2;

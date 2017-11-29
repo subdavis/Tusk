@@ -54,7 +54,7 @@ function Background(protectedMemory, settings) {
 				],
 				actions: [
 					new chrome.declarativeContent.ShowPageAction()
-					//new chrome.declarativeContent.RequestContentScript({js: ['keepass.js']})
+					//new chrome.declarativeContent.RequestContentScript({js: ['inject.js']})
 				]
 			};
 			var textField = {
@@ -155,16 +155,15 @@ function Background(protectedMemory, settings) {
 						o: message.o,
 						uca: message.uca
 					});
-
 					return;
 				}
-
 				chrome.tabs.executeScript(message.tabId, {
-					file: "keepass.js",
+					file: "/dist/inject.build.js",
 					allFrames: true,
 					runAt: "document_start"
 				}, function(result) {
 					//script injected
+					console.log("injected")
 					chrome.tabs.sendMessage(message.tabId, {
 						m: "fillPassword",
 						u: message.u,

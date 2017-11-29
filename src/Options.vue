@@ -16,7 +16,8 @@
         :sample-manager="services.sampleDatabaseFileManager"></manage-databases>
       <manage-keyfiles id="/manage/keyfiles" 
         v-if="show.manageKeyfiles.visible"
-        :settings="services.settings"></manage-keyfiles>
+        :settings="services.settings"
+        :key-file-parser="services.keyFileParser"></manage-keyfiles>
       <advanced-settings id="/advanced" v-if="show.advanced.visible" class="content-body"></advanced-settings>
     </div>
   </div>
@@ -50,6 +51,7 @@ const settings = new Settings()
 const protectedMemory = new ProtectedMemory()
 const secureCacheMemory = new SecureCacheMemory(protectedMemory)
 const secureCacheDisk = new SecureCacheDisk(protectedMemory, secureCacheMemory, settings)
+const keyFileParser = new KeyFileParser()
 
 // File Managers
 const localChromePasswordFileManager = new LocalChromePasswordFileManager()
@@ -80,7 +82,8 @@ export default {
         dropboxFileManager,
         googleDrivePasswordFileManager,
         oneDriveFileManager,
-        sampleDatabaseFileManager
+        sampleDatabaseFileManager,
+        keyFileParser
       },
       show: {
         startup: { visible: false },
