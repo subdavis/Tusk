@@ -4,7 +4,7 @@
       <i class="fa fa-search"></i>
       <input ref="searchbox" type='search' v-model="searchTerm" placeholder="search entire database..." />
     </div>
-    <messenger :messages="messages"></messenger>
+    <messenger :messages="allMessages"></messenger>
     <div class="entries">
       <div v-if="priorityEntries && searchTerm.length == 0">
         <entry-list-item v-for="entry in priorityEntries" 
@@ -35,11 +35,13 @@ export default {
   },
   watch: {
     searchTerm: function (val) {
-      if (val.length)
+      this.unlockedState.cacheSet('searchFilter', val) // Causes cache refresh
+      if (val.length){
         this.filteredEntries = this.allEntries.filter(entry => {
           let result = entry.filterKey.indexOf(val.toLocaleLowerCase())
           return (result > -1) 
         })
+      }
     }
   },
   components: {
@@ -51,7 +53,8 @@ export default {
       searchTerm: "",
       filteredEntries: this.unlockedState.cache.allEntries,
       priorityEntries: this.unlockedState.cache.priorityEntries,
-      allEntries: this.unlockedState.cache.allEntries
+      allEntries: this.unlockedState.cache.allEntries,
+      allMessages: this.messages
     }
   },
   methods: {
@@ -83,6 +86,13 @@ export default {
       this.$refs.searchbox.focus();
     })
     this.createEntryFilters(this.allEntries);
+    // Restore the search term if needed
+    let st = this.unlockedState.cache.searchFilter
+    if (st !== undefined)
+      this.searchTerm = st
+    let um = this.unlockedState.cache.unlockedMessages
+    if (um !== undefined)
+      this.allMessages = um
   }
 }
 </script>
@@ -91,7 +101,8 @@ export default {
 @import "../styles/settings.scss";
 
 .entries {
-  max-height: 450px;
+  border-bottom: 2px solid $light-gray;
+  height: 400px;
   overflow-y: auto;
 }
 
@@ -102,7 +113,7 @@ export default {
   box-sizing: border-box;
   display: flex;
   align-items: center;
-  border-bottom: 1px solid $light-gray;
+  border-bottom: 2px solid $light-gray;
   
   input {
     float: right;

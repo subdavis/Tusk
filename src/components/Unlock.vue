@@ -126,6 +126,14 @@ export default {
       return "No keyfile selected.  Click to choose."
     }
   },
+  watch: {
+    unlockedMessages: {
+      handler (newval) {
+        this.unlockedState.cacheSet('unlockedMessages', newval)
+      },
+      deep: true
+    }
+  },
   methods: {
     closeWindow (event) {
       window.close()

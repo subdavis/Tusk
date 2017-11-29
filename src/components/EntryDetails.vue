@@ -3,10 +3,20 @@
     <go-back :message="'back to entry list'"></go-back>
     <div class="all-attributes">
       <div class="attribute-box" v-for="attr in attributes">
+        
         <span class="attribute-title">{{ attr.key }}</span>
         <br>
         <pre v-if="attr.key == 'notes'" class="attribute-value">{{ attr.value }}</pre>
-        <span v-else class="attribute-value">{{ attr.value }}</span>
+        
+        <div>
+          <span v-if="attr.protected && attr.isHidden"  @click="exposeAttribute(attr)">
+            <i class="fa fa-eye" aria-hidden="true"></i></span>
+          <span v-else-if="attr.protected && !attr.isHidden" @click="hideAttribute(attr)">
+            <i class="fa fa-eye-slash" aria-hidden="true"></i></span>
+          
+          <span v-if="attr.key !== 'notes'" class="attribute-value">{{ attr.value }}</span>
+        </div>
+      
       </div>
     </div>
   </div>
@@ -25,12 +35,18 @@ export default {
   },
   data () {
     return {
-      attributes: []
+      attributes: [],
+      hiddenValue: '••••••••••'
     }
   },
   methods: {
     exposeAttribute (attr) {
-      attr.value = unlockedState.getDecryptedAttribute(this.entry, attr.key)
+      attr.value = this.unlockedState.getDecryptedAttribute(this.entry, attr.key)
+      attr.isHidden = false
+    },
+    hideAttribute (attr) {
+      attr.value = this.hiddenValue;
+      attr.isHidden = true
     }
   },
   mounted () {
@@ -50,9 +66,10 @@ export default {
     for (var protectedKey in this.entry.protectedData) {
       this.attributes.push({
         'key': protectedKey,
-        'value': '',
+        'value': this.hiddenValue,
+        'isHidden': true,
         'protected': true,
-        'protectedAttr': this.entry.protectedData['protectedKey']
+        'protectedAttr': this.entry.protectedData[protectedKey]
       })
     }
   }

@@ -97,6 +97,7 @@ function UnlockedState($router, keepassReference, protectedMemory, settings) {
 		}
 		destroy(my.cache)
 		my.cache = {}
+		window.close()
 	}
 	cacheTimeoutId = setTimeout(my.clearCache, 60000);
 
