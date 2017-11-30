@@ -7,7 +7,7 @@
   }
 
   &.flair:hover {
-    padding-left: 15px;
+    padding-left: 20px;
   }
 }
 
@@ -34,7 +34,7 @@
   
   width: 100%;
   box-sizing: border-box;
-  padding: $wall-padding;
+  padding: 8px $wall-padding;
   border-bottom: 2px solid $light-gray;
   font-size: 18px;
   

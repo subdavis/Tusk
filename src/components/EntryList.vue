@@ -109,7 +109,7 @@ export default {
 .search {
 
   width: 100%;
-  padding: $wall-padding;
+  padding: 8px $wall-padding;
   box-sizing: border-box;
   display: flex;
   align-items: center;

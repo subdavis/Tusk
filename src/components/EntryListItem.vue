@@ -1,5 +1,5 @@
 <template>
-  <div class="entry-list-item between" v-on:click="details">
+  <div class="entry-list-item selectable between flair" v-on:click="details">
     <div class="text-info" v-bind:class="{ strike: entry.is_expired }">
       <span class="header">{{ header }}</span>
       <br>
@@ -93,11 +93,5 @@ export default {
 
 .strike {
   text-decoration: line-through;
-}
-
-.entry-list-item:hover {
-  color: black;
-  padding-left: 15px;
-  cursor: pointer;
 }
 </style>

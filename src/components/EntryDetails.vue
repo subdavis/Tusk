@@ -6,15 +6,17 @@
         
         <span class="attribute-title">{{ attr.key }}</span>
         <br>
-        <pre v-if="attr.key == 'notes'" class="attribute-value">{{ attr.value }}</pre>
-        
-        <div>
-          <span v-if="attr.protected && attr.isHidden"  @click="exposeAttribute(attr)">
-            <i class="fa fa-eye" aria-hidden="true"></i></span>
-          <span v-else-if="attr.protected && !attr.isHidden" @click="hideAttribute(attr)">
-            <i class="fa fa-eye-slash" aria-hidden="true"></i></span>
-          
-          <span v-if="attr.key !== 'notes'" class="attribute-value">{{ attr.value }}</span>
+        <pre  v-if="attr.key == 'notes'" class="attribute-value">{{ attr.value }}</pre>
+        <span v-else-if="!attr.protected" class="attribute-value" >{{ attr.value }}</span>
+        <div  v-else>         
+          <span v-if="attr.key !== 'notes'" class="attribute-value protected" 
+            @click="toggleAttribute(attr)">
+            <i v-if="attr.protected && attr.isHidden" 
+              class="fa fa-eye-slash" aria-hidden="true"></i>
+            <i v-else-if="attr.protected && !attr.isHidden"
+              class="fa fa-eye" aria-hidden="true"></i>
+            {{ attr.value }}
+            </span>
         </div>
       
       </div>
@@ -47,6 +49,12 @@ export default {
     hideAttribute (attr) {
       attr.value = this.hiddenValue;
       attr.isHidden = true
+    },
+    toggleAttribute (attr) {
+      if (attr.isHidden)
+        this.exposeAttribute(attr)
+      else
+        this.hideAttribute(attr)
     }
   },
   mounted () {
@@ -85,7 +93,7 @@ export default {
 }
 .attribute-box {
   box-sizing: border-box;
-  padding: $wall-padding;
+  padding: 8px $wall-padding;
   font-size: 16px;
   background-color: $light-background-color;
 }
@@ -96,5 +104,10 @@ export default {
 }
 .attribute-value {
   font-family: "DejaVu Sans", Arial, sans-serif;
+
+  &.protected:hover {
+    outline: $light-gray solid 2px;
+    outline-offset: 1px;
+  }
 }
 </style>

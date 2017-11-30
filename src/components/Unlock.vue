@@ -440,7 +440,7 @@ export default {
   }
 
   #select-keyfile {
-    padding: $wall-padding;
+    padding: 8px $wall-padding;
     background-color: $light-background-color;
     border-bottom: 1px solid $light-gray;
 
@@ -477,12 +477,12 @@ export default {
     width: 100%;
     border-top: 1px solid $light-gray;
     border-bottom: 1px solid $light-gray;
-    margin: 5px 0px;
+    margin: 0px;
     box-sizing: border-box;
   }
 
   .remember-period-picker {
-    margin-top: 8px;
+    margin: 6px 0px;
 
     input[type=range] {
       -webkit-appearance: none;
