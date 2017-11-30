@@ -32,7 +32,7 @@
             type="password" 
             id="masterPassword" 
             v-model="masterPassword" 
-            placeholder="master password"
+            placeholder="🔒 master password"
             ref="masterPassword">
         </div>
         
@@ -440,8 +440,9 @@ export default {
   }
 
   #select-keyfile {
-    margin: 0px $wall-padding;
-    margin-bottom: 5px;
+    padding: $wall-padding;
+    background-color: $light-background-color;
+    border-bottom: 1px solid $light-gray;
 
     i {
       font-size: 14px;
@@ -457,27 +458,37 @@ export default {
     float: left;
   }
 
-  input[type=password], select, button {
+  input[type=password] {
     width: 100%;
-    margin: 5px 0px;
     box-sizing: border-box;
-
     font-size: 18px;
-    padding: 5px 15px;
+    border-width: 0px 0px;
+    padding: 5px $wall-padding;
     border-top: 1px solid $light-gray;
-    border-bottom: 1px solid $light-gray;
-    border-width: 1px 0px;
 
     &:focus {
       outline: none;
     }
   }
 
+  button {
+    font-size: 18px;
+    border-width: 1px 0px;
+    width: 100%;
+    border-top: 1px solid $light-gray;
+    border-bottom: 1px solid $light-gray;
+    margin: 5px 0px;
+    box-sizing: border-box;
+  }
 
-  input[type=range] {
-    -webkit-appearance: none;
-    margin: 5px;
-    margin-left: 0px;
+  .remember-period-picker {
+    margin-top: 8px;
+
+    input[type=range] {
+      -webkit-appearance: none;
+      margin: 6px;
+      margin-left: 0px;
+    }
   }
   input[type=range]:focus {
     outline: none;

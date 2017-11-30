@@ -5,10 +5,8 @@ module.exports = function OptionsLink() {
   var exports = {
     go: go
   }
-
   function go() {
     chrome.runtime.openOptionsPage();
   }
-
   return exports;
 }
