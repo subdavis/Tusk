@@ -1,13 +1,18 @@
 {
   "name": "ckpx",
   "description": "A modern keepass extension",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "author": "Brandon Davis <brandon@subdavis.com>",
   "license": "MIT",
   "private": true,
   "scripts": {
+    "clean": "rm -rf dist && rm ckpx.zip",
     "dev": "cross-env NODE_ENV=development webpack-dev-server --open --hot",
-    "build": "cross-env NODE_ENV=production webpack --progress --hide-modules"
+    "build": "cross-env NODE_ENV=production webpack --progress --hide-modules",
+    "watch": "gulp watch",
+    
+    "package": "zip -r ckpx manifest.json  *.html dist",
+    "prepackage": "npm run clean && npm run build"
   },
   "dependencies": {
     "axios": "^0.17.1",
