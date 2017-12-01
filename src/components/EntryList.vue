@@ -102,7 +102,7 @@ export default {
 
 .entries {
   border-bottom: 2px solid $light-gray;
-  height: 400px;
+  height: 350px;
   overflow-y: auto;
 }
 

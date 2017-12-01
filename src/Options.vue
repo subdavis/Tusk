@@ -18,7 +18,9 @@
         v-if="show.manageKeyfiles.visible"
         :settings="services.settings"
         :key-file-parser="services.keyFileParser"></manage-keyfiles>
-      <advanced-settings id="/advanced" v-if="show.advanced.visible" class="content-body"></advanced-settings>
+      <advanced-settings id="/advanced" 
+        v-if="show.advanced.visible"
+        :settings="services.settings"></advanced-settings>
     </div>
   </div>
 </template>

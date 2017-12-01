@@ -16,6 +16,7 @@
     "font-awesome": "^4.7.0",
     "jquery": "^3.2.1",
     "json-formatter": "^0.1.0",
+    "json-formatter-js": "^2.2.0",
     "kdbxweb": "^1.0.2",
     "materialize-css": "^0.100.2",
     "pako": "^1.0.6",

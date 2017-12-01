@@ -88,7 +88,7 @@ export default {
 @import "../styles/settings.scss";
 
 .all-attributes {
-  max-height: 450px;
+  max-height: 400px;
   overflow-y: auto;
 }
 .attribute-box {
