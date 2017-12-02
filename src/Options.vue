@@ -6,21 +6,23 @@
       :initial-tab="initialTab"></options-navbar>
     <!-- Router View -->
     <div id="overflowbox">
-      <options-startup id="/" v-if="show.startup.visible" class="content-body"
-        :settings="services.settings"></options-startup>
-      <manage-databases id="/manage/databases" 
-        v-if="show.manageDatabases.visible"
-        :dropbox-file-manager="services.dropboxFileManager"
-        :google-drive-manager="services.googleDrivePasswordFileManager"
-        :onedrive-manager="services.oneDriveFileManager"
-        :sample-manager="services.sampleDatabaseFileManager"></manage-databases>
-      <manage-keyfiles id="/manage/keyfiles" 
-        v-if="show.manageKeyfiles.visible"
-        :settings="services.settings"
-        :key-file-parser="services.keyFileParser"></manage-keyfiles>
-      <advanced-settings id="/advanced" 
-        v-if="show.advanced.visible"
-        :settings="services.settings"></advanced-settings>
+      <div id="contentbox">
+        <options-startup id="/" v-if="show.startup.visible" class="content-body"
+          :settings="services.settings"></options-startup>
+        <manage-databases id="/manage/databases" 
+          v-if="show.manageDatabases.visible"
+          :dropbox-file-manager="services.dropboxFileManager"
+          :google-drive-manager="services.googleDrivePasswordFileManager"
+          :onedrive-manager="services.oneDriveFileManager"
+          :sample-manager="services.sampleDatabaseFileManager"></manage-databases>
+        <manage-keyfiles id="/manage/keyfiles" 
+          v-if="show.manageKeyfiles.visible"
+          :settings="services.settings"
+          :key-file-parser="services.keyFileParser"></manage-keyfiles>
+        <advanced-settings id="/advanced" 
+          v-if="show.advanced.visible"
+          :settings="services.settings"></advanced-settings>
+      </div>
     </div>
   </div>
 </template>
@@ -128,13 +130,17 @@ export default {
 <style lang="scss">
 @import './styles/options.scss';
 
-#main {
+body {
   background-color: $background-color;
 }
 
 #overflowbox {
-  width: 800px;
-  height: 490px;
   overflow-y: auto;
+  margin-top: 60px;
+}
+#contentbox {
+  margin: 0px auto;
+  width: $options-width;
+  /* height: 490px; */
 }
 </style>

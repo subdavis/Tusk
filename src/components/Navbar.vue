@@ -33,9 +33,19 @@ export default {
 <style lang="scss">
 @import "../styles/settings.scss";
 
-#navbar {
-  li.active {
-    border-bottom: 3px solid $background-color;
+nav {
+  position: fixed;
+  top: 0px;
+  z-index: 100;
+
+  .nav-content {
+    width: $options-width;
+    margin: 0px auto;
+
+    li.active {
+      border-bottom: 3px solid $background-color;
+    }
   }
 }
+
 </style>

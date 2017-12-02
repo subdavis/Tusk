@@ -32,7 +32,8 @@
 	"options_page": "options.html",
 	"options_ui": {
 		"page": "options.html",
-		"chrome_style": false
+		"chrome_style": false,
+		"open_in_tab": true
 	},
 	"commands": {
 		"_execute_page_action": {

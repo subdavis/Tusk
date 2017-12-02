@@ -478,6 +478,7 @@ export default {
     border-top: 1px solid $light-gray;
     border-bottom: 1px solid $light-gray;
     margin: 0px;
+    padding: 4px;
     box-sizing: border-box;
   }
 

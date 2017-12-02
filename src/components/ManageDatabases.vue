@@ -52,11 +52,4 @@ export default {
 
 <style lang="scss">
 @import "../styles/settings.scss";
-
-.switch label input[type=checkbox]:checked + .lever {
-	background-color: $green;
-	&:after {
-		background-color: $light-green;
-	}	
-}
 </style>
