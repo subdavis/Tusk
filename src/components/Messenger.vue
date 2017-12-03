@@ -5,6 +5,8 @@
       <span>{{ messages.warn }}</span></div>
     <div class="box-bar small error" v-show="messages.error">
       <span>{{ messages.error }}</span></div>
+    <div class="box-bar small success" v-show="messages.success">
+      <span>{{ messages.success }}</span></div>
   </div>
 </template>
 

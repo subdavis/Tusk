@@ -76,13 +76,17 @@
 
     <!-- Footer -->
     <div class="box-bar medium between footer" v-show="!busy">
-      <span class="selectable" @click="OptionsLink.go">
+      <span class="selectable" 
+        @click="links.openOptions">
         <i class="fa fa-cog" aria-hidden="true"></i> Settings</span>
-      <span class="selectable" v-if="isUnlocked()" @click="forgetPassword()">
+      <span class="selectable" v-if="isUnlocked()" 
+        @click="forgetPassword()">
         <i class="fa fa-lock" aria-hidden="true" ></i> Lock Database</span>
-      <span class="selectable" v-else @click="closeWindow">
+      <span class="selectable" v-else 
+        @click="closeWindow">
         <i class="fa fa-times-circle" aria-hidden="true"></i> Close Window</span>
-      <span class="selectable">
+      <span class="selectable" 
+        @click="links.openWebstore">
         <i class="fa fa-info-circle" aria-hidden="true"></i> v{{ appVersion }}</span>
     </div>
 
@@ -102,7 +106,7 @@ export default {
     secureCache: Object,
     settings: Object,
     keepassService: Object,
-    OptionsLink: Object
+    links: Object
   },
   components: {
     InfoCluster,
@@ -119,7 +123,8 @@ export default {
       },
       generalMessages: {
         warn: "",
-        error: ""
+        error: "",
+        success: ""
       },
       busy: false,
       masterPassword: "",
@@ -349,13 +354,7 @@ export default {
     }
   },
   mounted () {
-
-    this.$nextTick(function() {
-      let mp = this.$refs.masterPassword;
-      if (mp !== undefined)
-        mp.focus()
-    })
-
+    
     if (!this.isUnlocked()) {
       this.settings.getKeyFiles().then(keyFiles => {
         this.keyFiles = keyFiles
@@ -383,21 +382,37 @@ export default {
           }
         }
       })
-      // modify unlockedState internal state
-      this.unlockedState.getTabDetails()
+
+      let focus = () => {
+        this.$nextTick(nil => {
+          let mp = this.$refs.masterPassword;
+          if (mp !== undefined)
+            mp.focus()              
+        })
+      }
 
       this.busy = true
       this.secureCache.get('entries').then(entries => {
-        if (entries && entries.length > 0)
+        if (entries && entries.length > 0){
           this.showResults(entries)
-        this.busy = false
+        }
       }).catch(err => {
         //this is fine - it just means the cache expired.  Clear the cache to be sure.
-        this.busy = false
         this.secureCache.clear('entries')
+      }).then(nil => {
+        // state settled
+        this.busy = false
+        focus()
       })
     }
 
+    // modify unlockedState internal state
+    this.unlockedState.getTabDetails().then(nil => {
+      if (this.unlockedState.sitePermission)
+        this.generalMessages.success = "You have previously granted CKPX permission to fill passwords on this site."
+      else
+        this.generalMessages.warn = "This may be a new site to CKPX. Before filling in a password, double check that this is the  correct site."
+    })
     //set knowlege from the URL
     this.databaseFileName = decodeURIComponent(this.$router.getRoute().title)
   }

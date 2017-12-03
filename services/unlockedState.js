@@ -66,15 +66,15 @@ function UnlockedState($router, keepassReference, protectedMemory, settings) {
 					chromePromise.permissions.contains({
 						origins: [my.origin]
 					})
-						.then(function() {
-							my.sitePermission = true;
-						})
-						.catch(function(err) {
-							my.sitePermission = false;
-						})
-						.then(function() {
-							resolve();
-						})
+					.then(function() {
+						my.sitePermission = true;
+					})
+					.catch(function(err) {
+						my.sitePermission = false;
+					})
+					.then(function() {
+						resolve();
+					})
 				} else {
 					reject(new Error("Unable to determine tab details"));
 				}
