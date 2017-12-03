@@ -4,6 +4,7 @@
 	  	<div class="title">
 	  		<span><svg class="icon" viewBox="0 0 1 1"><use v-bind="{'xlink:href':'#'+providerManager.icon}"/></svg> {{ providerManager.chooseTitle }}</span>
 	  		<span v-for="db in databases" class="chip">{{ db.title }}</span>
+	  		<span class="error" v-if="messages.error">{{messages.error}}</span>
 	  	</div>
 	  	<div>
 	  		<div class="switch">
@@ -28,7 +29,10 @@ export default {
 		return {
 			busy: false,
 			databases: [],
-			loggedIn: false
+			loggedIn: false,
+			messages: {
+				error: ""
+			}
 		}
 	},
 	components: {
@@ -54,6 +58,8 @@ export default {
 					this.busy = false
 				})
 			}).catch(err => {
+				console.error("Error while connecting to database backend for ", this.providerManager.title)
+				this.messages.error = err.toString()
 				console.error(err)
 				this.busy = false
 			})
@@ -86,6 +92,10 @@ export default {
 .database-manager {
 	background-color: $light-background-color;
 
+	.error {
+		font-size: 12px;
+	}
+
 	svg {
     width: 18px;
     vertical-align: middle;
@@ -100,7 +110,7 @@ export default {
 		font-color: $dark-background-color;
 	}
 	.switch {
-		min-width: 120px;
+		min-width: 122px;
 	}
 	.between {
 		line-height: 36px;

@@ -114,6 +114,9 @@ function DropboxFileManager(settings) {
 			if (response.status == 401) {
 				//unauthorized, means the token is bad.  retry with new token.
 				return interactiveLogin().then(listDatabases);
+			} else if (!response.status) {
+				// network error
+				throw new Error("Network Connection Error")
 			}
 		});
 	}

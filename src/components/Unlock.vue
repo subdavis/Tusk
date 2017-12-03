@@ -296,6 +296,7 @@ export default {
       this.$forceUpdate()
       //save longer term (in encrypted storage)
       this.secureCache.save('entries', entries);
+      this.busy = false
     },
     clickUnlock (event) {
       event.preventDefault()
@@ -348,7 +349,7 @@ export default {
     }
   },
   mounted () {
-    
+
     this.$nextTick(function() {
       let mp = this.$refs.masterPassword;
       if (mp !== undefined)
@@ -384,11 +385,15 @@ export default {
       })
       // modify unlockedState internal state
       this.unlockedState.getTabDetails()
+
+      this.busy = true
       this.secureCache.get('entries').then(entries => {
         if (entries && entries.length > 0)
-          showResults(entries)
+          this.showResults(entries)
+        this.busy = false
       }).catch(err => {
         //this is fine - it just means the cache expired.  Clear the cache to be sure.
+        this.busy = false
         this.secureCache.clear('entries')
       })
     }

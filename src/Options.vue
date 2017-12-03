@@ -21,7 +21,8 @@
           :key-file-parser="services.keyFileParser"></manage-keyfiles>
         <advanced-settings id="/advanced" 
           v-if="show.advanced.visible"
-          :settings="services.settings"></advanced-settings>
+          :settings="services.settings"
+          :secure-cache-disk="services.secureCacheDisk"></advanced-settings>
       </div>
     </div>
   </div>
@@ -87,7 +88,8 @@ export default {
         googleDrivePasswordFileManager,
         oneDriveFileManager,
         sampleDatabaseFileManager,
-        keyFileParser
+        keyFileParser,
+        secureCacheDisk
       },
       show: {
         startup: { visible: false },

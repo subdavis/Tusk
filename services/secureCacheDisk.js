@@ -57,7 +57,6 @@ module.exports = function SecureCacheDisk(protectedMemory, secureCacheMemory, se
 	        reject(new Error('Disk cache is not enabled'));
 	        return;
 	      }
-
 	      if (chrome.extension.inIncognitoContext) {
 	        reject(new Error('Secure cache cannot work in incognito mode'));
 	      	return;
@@ -119,6 +118,7 @@ module.exports = function SecureCacheDisk(protectedMemory, secureCacheMemory, se
         });
       }).catch(function(err) {
         //fallback to in-memory
+        //  console.error(err)
         secureCacheMemory.save(key, data).then(function() {
           resolve();
         }).catch(function(err) {
@@ -139,11 +139,11 @@ module.exports = function SecureCacheDisk(protectedMemory, secureCacheMemory, se
             var decoder = new TextDecoder();
             var serialized = decoder.decode(new Uint8Array(decryptedBytes));
             var data = protectedMemory.hydrate(serialized);
-
             resolve(data);
           });
         }).catch(function(err) {
           //fallback to in-memory
+          // console.error(err)
           secureCacheMemory.get(key).then(function(data) {
             resolve(data);
           }).catch(function(err) {

@@ -94,9 +94,11 @@ function OneDriveFileManager (settings) {
   }
 
   function listDatabases () {
-    return getToken()
-      .then(searchFiles)
-      .then(filterFiles);
+    return getToken().then(token => {
+      return searchFiles(token).then(filterFiles)
+    }).catch(err => {
+      console.error(err)
+    })
   }
 
   function searchFiles (token) {
@@ -117,6 +119,7 @@ function OneDriveFileManager (settings) {
           .then(getToken)
           .then(searchFiles)
       } else {
+        throw new Error("Network Error")
         console.error(error);
       }
     })

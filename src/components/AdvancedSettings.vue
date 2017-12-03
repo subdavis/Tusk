@@ -6,7 +6,8 @@
 		</div>
 		<div class="switch box-bar roomy lighter">
 	    <label>
-	      <input type="checkbox" v-model="diskCachingEnabled" @click="toggleOnDiskCaching">
+	      <input type="checkbox" v-model="flags.diskCache" 
+	      	@click="toggleOnDiskCaching">
 	      <span class="lever"></span>
 	      Enable On-disk Caching
 	    </label>
@@ -18,7 +19,9 @@
 		</div>
 		<div class="switch box-bar roomy lighter">
 	    <label>
-	      <input type="checkbox" v-model="encourageEnabled" @click="toggleEncourage">
+	      <input type="checkbox" 
+	      	v-model="flags.useCredentialApi" 
+	      	@click="toggleUseCredentialsApi">
 	      <span class="lever"></span>
 	      Encourage Chrome to save your credentials when filling them
 	    </label>
@@ -40,12 +43,16 @@ import JSONFormatter from 'json-formatter-js'
 
 export default {
 	props: {
-		settings: Object
+		settings: Object,
+		secureCacheDisk: Object
 	},
 	data () {
 		return {
-			diskCachingEnabled: false,
-			encourageEnabled: false,
+			busy: false,
+			flags: {
+				diskCache: false,
+				useCredentialApi: false,
+			},
 			blobs: [
 				{k: 'databaseUsages', f: this.settings.getDatabaseUsages},
 				{k: 'defaultRememberOptions', f: this.settings.getDefaultRememberOptions},
@@ -56,11 +63,15 @@ export default {
 		}
 	},
 	methods: {
-		toggleEncourage () {
-
+		toggleUseCredentialsApi (event) {
+			this.flags.useCredentialApi = !this.flags.useCredentialApi
 		},
-		toggleOnDiskCaching () {
-			
+		toggleOnDiskCaching (event) {
+			this.flags.diskCache = !this.flags.diskCache
+			this.settings.setDiskCacheFlag(this.flags.diskCache)
+	    if (!this.flags.diskCache) {
+	      this.secureCacheDisk.clear('entries');
+	    }
 		}
 	},
 	mounted () {
@@ -74,30 +85,17 @@ export default {
 				}				
 			})
 		})
+
+		this.busy = true
+		this.settings.getDiskCacheFlag()
+		.then(flag => { this.flags.diskCache = flag })
+		.then(this.settings.getUseCredentialApiFlag)
+		.then(flag => {
+			this.flags.useCredentialApi = flag
+			this.busy = false
+		})
 	}
 }
-/*
- settings.getDiskCacheFlag().then(function(flag) {
-    $scope.flags.useDiskCache = flag;
-    $scope.$apply();
-  });
-
-  settings.getUseCredentialApiFlag().then( flag => {
-  	$scope.flags.useCredentialApi = flag;
-  	$scope.$apply();
-  })
-
-  $scope.updateDiskCacheFlag = function() {
-    settings.setDiskCacheFlag($scope.flags.useDiskCache);
-    if (!$scope.useDiskCache) {
-      secureCacheDisk.clear('entries');
-    }
-  }
-
-  $scope.updateUseCredentialApiFlag = function() {
-  	settings.setUseCredentialApiFlag($scope.flags.useCredentialApi)
-  }
-*/
 </script>
 
 <style lang="scss">
