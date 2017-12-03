@@ -2,8 +2,11 @@
 	<nav class="nav-extended">
     <div class="nav-content">
       <ul class="tabs tabs-transparent">
-        <li v-for="route in routes" class="tab" v-bind:class="{ active: (activeTab == route.route) }">
-        	<a href="#" @click="setRoute(route.route)">{{ route.name }}</a>
+        <!-- set class like /advanced-active-listener so the router can set -->
+        <li v-for="route in routes" 
+          class="tab" 
+          :class="{ active: (route.var.visible) }">
+        	<a @click="$router.route(route.route)">{{ route.name }}</a>
         </li>
       </ul>
     </div>
@@ -15,18 +18,7 @@ export default {
 	props: {
 		routes: Array,
     initialTab: String
-	},
-  data () {
-    return {
-      activeTab: this.initialTab
-    }
-  },
-  methods: {
-    setRoute (path) {
-      this.activeTab = path
-      this.$router.route(path)
-    }
-  }
+	}
 }
 </script>
 

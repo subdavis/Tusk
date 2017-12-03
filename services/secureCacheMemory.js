@@ -69,7 +69,7 @@ module.exports = function SecureCacheMemory(protectedMemory) {
       notifier(savedState); //notify others
     });
     port.onDisconnect.addListener(function(p) {
-      // asdf
+      // Nothing to do here yet...
     })
   });
 

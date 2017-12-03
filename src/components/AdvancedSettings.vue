@@ -33,7 +33,7 @@
 		</div>
 		<div class="box-bar between lighter roomy" v-for="blob in blobs">
 	  	<div class="json" :id="blob.k"></div>
-	  	<a class="waves-effect waves-light btn">Remove</a>
+	  	<a v-if="blob.delete !== undefined" class="waves-effect waves-light btn" @click="blob.delete.f(blob.delete.arg); init()">{{ blob.delete.op }}</a>
 	  </div>
 	</div>
 </template>
@@ -54,17 +54,44 @@ export default {
 				useCredentialApi: false,
 			},
 			blobs: [
-				{k: 'databaseUsages', f: this.settings.getDatabaseUsages},
-				{k: 'defaultRememberOptions', f: this.settings.getDefaultRememberOptions},
-				{k: 'keyFiles', f: this.settings.getKeyFiles},
-				{k: 'license', f: this.settings.getLicense},
-				{k: 'forgetTimes', f: this.settings.getAllForgetTimes}
+				{
+					k: 'databaseUsages', // key
+					f: this.settings.getDatabaseUsages, // getter
+					delete: {
+						f: this.settings.destroyLocalStorage,
+						arg: 'databaseUsages',
+						op: 'Delete'
+					}
+				},
+				{
+					k: 'defaultRememberOptions', 
+					f: this.settings.getDefaultRememberOptions,
+					delete: {
+						f: this.settings.destroyLocalStorage,
+						arg: 'rememberPeriod',
+						op: 'Reset'
+					}
+				},
+				{
+					k: 'keyFiles', 
+					f: this.settings.getKeyFiles,
+					delete: {
+						f: this.settings.deleteAllKeyFiles,
+						arg: undefined,
+						op: 'Delete'
+					}
+				},
+				{
+					k: 'forgetTimes', 
+					f: this.settings.getAllForgetTimes
+				}
 			]
 		}
 	},
 	methods: {
 		toggleUseCredentialsApi (event) {
 			this.flags.useCredentialApi = !this.flags.useCredentialApi
+			this.settings.setUseCredentialApiFlag(this.flags.useCredentialApi)
 		},
 		toggleOnDiskCaching (event) {
 			this.flags.diskCache = !this.flags.diskCache
@@ -72,28 +99,33 @@ export default {
 	    if (!this.flags.diskCache) {
 	      this.secureCacheDisk.clear('entries');
 	    }
+		},
+		init () {
+			this.blobs.forEach(blob => {
+				blob.f().then(result => {
+					if (result && Object.keys(result).length){
+						let formatter = new JSONFormatter(result)
+						let place = document.getElementById(blob.k)
+						while (place.firstChild) place.removeChild(place.firstChild);
+						place.appendChild(formatter.render())
+					} else {
+						document.getElementById(blob.k).parentNode.remove()
+					}				
+				})
+			})
+
+			this.busy = true
+			this.settings.getDiskCacheFlag()
+			.then(flag => { this.flags.diskCache = flag })
+			.then(this.settings.getUseCredentialApiFlag)
+			.then(flag => {
+				this.flags.useCredentialApi = flag
+				this.busy = false
+			})
 		}
 	},
 	mounted () {
-		this.blobs.forEach(blob => {
-			blob.f().then(result => {
-				if (result && Object.keys(result).length){
-					let formatter = new JSONFormatter(result)
-					document.getElementById(blob.k).appendChild(formatter.render())
-				} else {
-					document.getElementById(blob.k).parentNode.remove()
-				}				
-			})
-		})
-
-		this.busy = true
-		this.settings.getDiskCacheFlag()
-		.then(flag => { this.flags.diskCache = flag })
-		.then(this.settings.getUseCredentialApiFlag)
-		.then(flag => {
-			this.flags.useCredentialApi = flag
-			this.busy = false
-		})
+		this.init()
 	}
 }
 </script>

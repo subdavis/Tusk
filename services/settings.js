@@ -73,6 +73,16 @@ function Settings() {
 		});
 	}
 
+	exports.deleteAllKeyFiles = function () {
+		return chromePromise.storage.local.remove('keyFiles')
+	}
+
+	exports.destroyLocalStorage = function (key) {
+		if (key.length) {
+			return chromePromise.storage.local.remove(key)
+		}
+	}
+
 	exports.addKeyFile = function(name, key) {
 		return exports.getKeyFiles().then(function(keyFiles) {
 			var matches = keyFiles.filter(function(keyFile) {
@@ -261,7 +271,8 @@ function Settings() {
 				forgetTimes = items[storageKey];
 			}
 			keysArray.forEach(function(key) {
-				if (forgetTimes[key]) delete forgetTimes[key];
+				if (forgetTimes[key]) 
+					delete forgetTimes[key];
 			})
 
 			return chromePromise.storage.local.set({
