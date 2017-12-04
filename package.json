@@ -6,11 +6,10 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "clean": "rm -rf dist && rm ckpx.zip",
+    "clean": "rm -rf dist && rm -f ckpx.zip",
     "dev": "cross-env NODE_ENV=development webpack-dev-server --open --hot",
     "build": "cross-env NODE_ENV=production webpack --progress --hide-modules",
     "watch": "gulp watch",
-    
     "package": "zip -r ckpx manifest.json  *.html dist",
     "prepackage": "npm run clean && npm run build"
   },
@@ -20,7 +19,6 @@
     "case": "^1.5.4",
     "font-awesome": "^4.7.0",
     "jquery": "^3.2.1",
-    "json-formatter": "^0.1.0",
     "json-formatter-js": "^2.2.0",
     "kdbxweb": "^1.0.2",
     "materialize-css": "^0.100.2",

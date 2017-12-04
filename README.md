@@ -1,6 +1,6 @@
 # ckpx
 
-> A modern, clean keepass browser extension built with Vue.js and kdbxweb
+> A modern, clean keepass browser extension built with Vue.js and kdbxweb.  Rebooted from https://github.com/perfectapi/CKP.
 
 ## Build Setup
 
@@ -12,7 +12,7 @@ npm install
 npm run dev
 
 # static reload with file watch
-gulp watch
+npm run watch
 
 # build for production with minification
 npm run build

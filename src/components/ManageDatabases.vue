@@ -19,16 +19,19 @@
 
 <script>
 import OauthProvider from '@/components/OauthProvider'
+import SharedLinkProvider from '@/components/SharedLinkProvider'
 import VirtualRouter from '$lib/virtual-router.js'
 export default {
 	props: {
 		dropboxFileManager: Object,
 		googleDriveManager: Object,
 		onedriveManager: Object,
-		sampleManager: Object
+		sampleManager: Object,
+		sharedLinkManager: Object
 	},
 	components: {
-		OauthProvider
+		OauthProvider,
+		SharedLinkProvider
 	},
 	data () {
 		return {

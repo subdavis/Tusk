@@ -3,7 +3,7 @@
   	<h3>Getting Started with CKPX</h3>
 		
 		<p>CKPX helps you keep track of all your accounts by storing your passwords in an encrypted file called a Keepass Database.  You choose where this file is stored - most people keep them in a cloud storage provider like Dropbox or Google Drive for easy access and syncing between laptops, desktops, and phones.  To use CKPX, you should first enable one of the storage providers below.</p>
-		
+
 		<a @click="$router.route('/manage/databases')" class="waves-effect waves-light btn">1. Cloud Storage Setup</a>
 
 		<p>Optionally, you may also import any required keyfiles.  A keyfile can be used together with a password to provide even better security, or even used instead of one.</p>

@@ -14,7 +14,8 @@
           :dropbox-file-manager="services.dropboxFileManager"
           :google-drive-manager="services.googleDrivePasswordFileManager"
           :onedrive-manager="services.oneDriveFileManager"
-          :sample-manager="services.sampleDatabaseFileManager"></manage-databases>
+          :sample-manager="services.sampleDatabaseFileManager"
+          :shared-url-manager="services.sharedUrlFileManager"></manage-databases>
         <manage-keyfiles id="/manage/keyfiles" 
           v-if="show.manageKeyfiles.visible"
           :settings="services.settings"
@@ -88,6 +89,7 @@ export default {
         googleDrivePasswordFileManager,
         oneDriveFileManager,
         sampleDatabaseFileManager,
+        sharedUrlFileManager,
         keyFileParser,
         secureCacheDisk
       },

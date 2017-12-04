@@ -24,10 +24,4 @@ export default {
 
 <style lang="scss">
 @import "../styles/settings.scss";
-/*.messenger .fa {
-  float: left;
-  margin: 2px;
-  margin-right: 4px;
-  margin-left: -3px;
-}*/
 </style>
