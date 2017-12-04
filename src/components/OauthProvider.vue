@@ -1,3 +1,14 @@
+<!-- 
+	OauthProvider:
+	Database Provider for database managers that implement the oauth interface:
+		/* The providerManager implements the following methods that return promises:
+		 * isLoggedIn()
+		 * login()
+		 * logout()
+		 * listDatabases()
+		 */
+	If new providers are added, prefer that they are oauth providers.
+-->
 <template>
   <div class="box-bar roomy database-manager">
   	<div class="between">
@@ -15,15 +26,12 @@
 			    </label>
 			  </div>
 			</div>
-			<!-- <spinner v-else size="medium"></spinner> -->
 		</div>
 		<div class="description">{{ providerManager.chooseDescription }}</div>
   </div>
 </template>
 
 <script>
-import Spinner from 'vue-simple-spinner'
-
 export default {
 	data () {
 		return {
@@ -35,16 +43,7 @@ export default {
 			}
 		}
 	},
-	components: {
-		Spinner
-	},
 	props: {
-		/* The providerManager implements the following that return promises...
-		 * isLoggedIn()
-		 * login()
-		 * logout()
-		 * listDatabases()
-		 */
 		providerManager: Object 
 	},
 	methods: {

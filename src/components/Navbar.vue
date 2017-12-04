@@ -1,3 +1,8 @@
+<!-- 
+  Navbar:
+  requires a lib/VirtualRouter, and the routes object used to initialize the virtualrouter.
+  Active tab changes automatically based on visible route.
+-->
 <template>
 	<nav class="nav-extended">
     <div class="nav-content">

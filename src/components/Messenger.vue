@@ -1,5 +1,9 @@
+<!-- 
+  Messenger:
+
+  Displays given messages for warning, error, and success
+ -->
 <template>
-  <!-- General Messages - Show these all the time -->
   <div class="messenger">
     <div class="box-bar small warn" v-show="messages.warn">
       <i class="fa fa-exclamation-triangle fa-fw fa-2x dashicon warn" aria-hidden="true"></i>
