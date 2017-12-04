@@ -30,7 +30,6 @@ Icon
 
 # chrome web-store assets
 store/
-dist/
 
 # Thumbnails
 ._*
@@ -41,6 +40,7 @@ dist/
 
 #packaged app
 build/
+dist/
 *.zip
 
 #nodejs
