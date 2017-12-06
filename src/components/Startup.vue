@@ -32,7 +32,7 @@ export default {
 
           if (availableFiles.length) {
             //choose one of the files
-            this.$router.route('/choose-file')
+            this.$router.route('/choose')
           } else {
             //no files available - allow the user to link to the options page
             $scope.ready = true;

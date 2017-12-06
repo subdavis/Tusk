@@ -1,29 +1,3 @@
-/**
-
-The MIT License (MIT)
-
-Copyright (c) 2015 Steven Campbell.
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-
- */
-
 "use strict";
 
 import axios from 'axios/dist/axios.min.js'
@@ -75,21 +49,23 @@ function OneDriveFileManager (settings) {
       resolve = resolvep;
       reject = rejectp;
     })
-    var url = 'https://login.live.com/oauth20_authorize.srf' +
-            '?client_id=f4c55645-3f43-4f8e-a7d2-ec167b416f1d' +
-            '&scope=' + encodeURIComponent('onedrive.readonly') +
-            '&response_type=token' +
-            '&redirect_uri=' + encodeURIComponent(chrome.identity.getRedirectURL('onedrive'));
-
-    chromePromise.identity.launchWebAuthFlow({url: url, interactive: true}).then(function (redirectUrl) {
-      var authInfo = parseAuthInfoFromUrl(redirectUrl);
-      if (authInfo === null) {
-        reject('Failed to extract authentication information from redirect url');
-      } else {
-        settings.saveAccessToken(accessTokenType, authInfo.access_token);
-        resolve();
-      }
-    });
+    chromePromise.runtime.getManifest().then(manifest => {
+      var url = 'https://login.live.com/oauth20_authorize.srf' +
+              '?client_id=' + manifest.static_data.onedrive.client_id +
+              '&scope=' + encodeURIComponent('onedrive.readonly') +
+              '&response_type=token' +
+              '&redirect_uri=' + encodeURIComponent(chrome.identity.getRedirectURL('onedrive'));
+      console.log(url)
+      chromePromise.identity.launchWebAuthFlow({url: url, interactive: true}).then(function (redirectUrl) {
+        var authInfo = parseAuthInfoFromUrl(redirectUrl);
+        if (authInfo === null) {
+          reject('Failed to extract authentication information from redirect url');
+        } else {
+          settings.saveAccessToken(accessTokenType, authInfo.access_token);
+          resolve();
+        }
+      });
+    })
     return returnPromise;
   }
 

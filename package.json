@@ -6,12 +6,14 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "clean": "rm -rf dist && rm -f ckpx.zip",
+    "clean": "rm -rf dist-ff dist-chrome && rm -f *.zip",
     "dev": "cross-env NODE_ENV=development webpack-dev-server --open --hot",
-    "build": "cross-env NODE_ENV=production webpack --progress --hide-modules",
-    "watch": "gulp watch",
-    "package": "zip -r ckpx manifest.json  *.html dist",
-    "prepackage": "npm run clean && npm run build"
+    "build-firefox": "cross-env NODE_ENV=production webpack --config webpack.firefox.config.js --progress --hide-modules",
+    "build-chrome": "cross-env NODE_ENV=production webpack --config webpack.chrome.config.js --progress --hide-modules",
+    "watch-chrome": "gulp watch-chrome",
+    "watch-firefox": "gulp watch-firefox",
+    "package": "zip -r firefox.ckpx dist-firefox && zip -r chrome.ckpx dist-chrome",
+    "prepackage": "npm run clean && npm run build-firefox && npm run build-chrome"
   },
   "dependencies": {
     "axios": "^0.17.1",
@@ -45,11 +47,14 @@
     "node-sass": "^4.5.3",
     "sass-loader": "^6.0.6",
     "style-loader": "^0.19.0",
+    "uglifyjs-webpack-plugin": "^1.1.2",
     "url-loader": "^0.6.2",
     "vue-loader": "^13.0.5",
     "vue-template-compiler": "^2.4.4",
+    "wasm-loader": "^1.1.0",
     "webpack": "^3.6.0",
     "webpack-dev-server": "^2.9.1",
+    "webpack-merge": "^4.1.1",
     "webpack-stream": "^4.0.0"
   }
 }

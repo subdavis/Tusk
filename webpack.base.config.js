@@ -1,5 +1,7 @@
 var path = require('path')
+var merge = require('webpack-merge');
 var ExtractTextPlugin = require("extract-text-webpack-plugin")
+var UglifyJSPlugin = require('uglifyjs-webpack-plugin')
 var webpack = require('webpack')
 
 module.exports = {
@@ -7,11 +9,13 @@ module.exports = {
     'popup': './src/popup.js',
     'options': './src/options.js',
     'background': './background/background.js',
-    'inject': './background/inject.js'
+    'inject': './background/inject.js',
+    'popup_page': './html/popup.html',
+    'options_page': './html/options.html',
+    'argon2.wasm': './lib/argon2.wasm'
   },
   output: {
-    path: path.resolve(__dirname, './dist'),
-    publicPath: '/dist/',
+    publicPath: '/',
     filename: '[name].build.js'
   },
   module: {
@@ -60,6 +64,27 @@ module.exports = {
         exclude: /node_modules/
       },
       {
+        test: /\.wasm$/,
+        loader: 'file-loader',
+        options: {
+          name: '[name].[ext]'
+        }
+      },
+      {
+        test: /\.html$/,
+        loader: 'file-loader',
+        options: {
+          name: '[name].[ext]'.replace('_page', '')
+        }
+      },
+      {
+        test: /manifest\.json$/,
+        loader: 'file-loader',
+        options: {
+          name: 'manifest.json'
+        }
+      },
+      {
         test: /\.(png|jpg|gif|svg)$/,
         loader: 'file-loader',
         options: {
@@ -67,15 +92,15 @@ module.exports = {
         }
       },
       {
-          test: /\.css$/,
-          use: ExtractTextPlugin.extract({
-              fallback: "style-loader",
-              use: "css-loader"
-          })
+        test: /\.css$/,
+        use: ExtractTextPlugin.extract({
+            fallback: "style-loader",
+            use: "css-loader"
+        })
       },
       {
-          test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
-          loader: 'url-loader?limit=10000',
+        test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
+        loader: 'url-loader?limit=10000',
       }
     ]
   },
@@ -103,11 +128,12 @@ module.exports = {
         return getPath('css/[name].css').replace('css', 'css');
       }
     }),
-  ]
+  ],
+  devtool: '#source-map'
 }
 
-if (process.env.NODE_ENV === 'dev') {
-  module.exports.devtool = '#source-map'
+if (process.env.NODE_ENV === 'production') {
+  module.exports.devtool = undefined
   // http://vue-loader.vuejs.org/en/workflow/production.html
   module.exports.plugins = (module.exports.plugins || []).concat([
     new webpack.DefinePlugin({
@@ -115,14 +141,15 @@ if (process.env.NODE_ENV === 'dev') {
         NODE_ENV: '"production"'
       }
     }),
-    new webpack.optimize.UglifyJsPlugin({
-      sourceMap: true,
-      compress: {
-        warnings: false
-      }
+    new UglifyJSPlugin({
+      sourceMap: true
     }),
     new webpack.LoaderOptionsPlugin({
       minimize: true
     })
   ])
+  // module.exports.entry = merge({
+  //   'popup_page': './html/popup.html',
+  //   'options_page': './html/options.html',
+  // }, module.exports.entry)
 }
