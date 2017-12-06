@@ -48,7 +48,7 @@
               <span class="selectable" v-for="(kf, kf_index) in keyFiles" :keyfile-index="kf_index" @click="chooseKeyFile(kf_index)">
                 <i class="fa fa-file" aria-hidden="true"></i>
                 {{ kf.name }}</span>
-              <span class="selectable"><i class="fa fa-wrench" aria-hidden="true"></i> Manage Keyfiles</span>
+              <span @click="links.openOptions" class="selectable"><i class="fa fa-wrench" aria-hidden="true"></i> Manage Keyfiles</span>
             </div>
           </transition>
         </div>

@@ -9,13 +9,11 @@ module.exports = {
     'popup': './src/popup.js',
     'options': './src/options.js',
     'background': './background/background.js',
-    'inject': './background/inject.js',
-    'popup_page': './html/popup.html',
-    'options_page': './html/options.html',
-    'argon2.wasm': './lib/argon2.wasm'
+    'inject': './background/inject.js'
   },
   output: {
-    publicPath: '/',
+    publicPath: '/dist/',
+    path: path.resolve(__dirname, './dist'),
     filename: '[name].build.js'
   },
   module: {
