@@ -14,6 +14,7 @@
 		<oauth-provider :provider-manager="googleDriveManager"></oauth-provider>
 		<oauth-provider :provider-manager="onedriveManager"></oauth-provider>
 		<oauth-provider :provider-manager="sampleManager"></oauth-provider>
+		<shared-link-provider :provider-manager="sharedUrlManager"></shared-link-provider>
   </div>
 </template>
 
@@ -27,7 +28,7 @@ export default {
 		googleDriveManager: Object,
 		onedriveManager: Object,
 		sampleManager: Object,
-		sharedLinkManager: Object
+		sharedUrlManager: Object
 	},
 	components: {
 		OauthProvider,

@@ -18,8 +18,25 @@ function SharedUrlFileManager() {
     chooseTitle: 'Shared Link',
     chooseDescription: 'Rather than granting full access to your cloud storage provider, get a shared link and paste it in.',
     setUrls: setUrls,
-    getUrls: getUrls
+    getUrls: getUrls,
+    login: enable,
+    logout: disable,
+    isLoggedIn: isEnabled
   };
+
+  function enable() {
+    return chromePromise.storage.local.set({'sharedUrlsEnabled':true})
+  }
+
+  function disable () {
+    return chromePromise.storage.local.set({'sharedUrlsEnabled':false})
+  }
+
+  function isEnabled () {
+    return chromePromise.storage.local.get('sharedUrlsEnabled').then(result => {
+      return result.sharedUrlsEnabled || false
+    })
+  }
 
   function listDatabases() {
   	return getUrls().then(urls => {

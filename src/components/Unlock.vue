@@ -37,17 +37,21 @@
         </div>
         
         <div class="stack-item">
-          <div id="select-keyfile" class="selectable" @click="keyFilePicker = !keyFilePicker">
-          <i class="fa fa-key" aria-hidden="true"></i>
-          {{ selectedKeyFileName }}</div>
+          <div id="select-keyfile" class="selectable" @click="selectedKeyFile = undefined; keyFilePicker = !keyFilePicker">
+            <i class="fa fa-key" aria-hidden="true"></i>
+            {{selectedKeyFileName}}
+          </div>
         </div>
         
         <div class="stack-item keyfile-picker" v-if="keyFilePicker">
           <transition name="keyfile-picker">
             <div>
-              <span class="selectable" v-for="(kf, kf_index) in keyFiles" :keyfile-index="kf_index" @click="chooseKeyFile(kf_index)">
-                <i class="fa fa-file" aria-hidden="true"></i>
-                {{ kf.name }}</span>
+              <span class="selectable" v-for="(kf, kf_index) in keyFiles" :keyfile-index="kf_index">
+                <span @click="chooseKeyFile(kf_index)">
+                  <i class="fa fa-file" aria-hidden="true"></i>
+                  {{ kf.name }}
+                </span>
+              </span>
               <span @click="links.openOptions" class="selectable"><i class="fa fa-wrench" aria-hidden="true"></i> Manage Keyfiles</span>
             </div>
           </transition>
@@ -193,10 +197,11 @@ export default {
       window.close()
     },
     chooseKeyFile (index) {
-      if (index >= 0)
-        this.selectedKeyFile = this.keyFiles[index]
+      if (index !== undefined)
+        if (index >= 0)
+          this.selectedKeyFile = this.keyFiles[index]
       else
-        console.log("GOTO options")
+        this.selectedKeyFile = undefined
       this.keyFilePicker = false
     },
     chooseAnotherFile () {
@@ -454,7 +459,7 @@ export default {
       padding: 2px 0px;
 
       &:hover {
-        padding-left: 5px;
+        padding-left: 3px;
       }
     }
   }
