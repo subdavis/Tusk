@@ -14,6 +14,7 @@ function SampleDatabaseFileManager() {
     getChosenDatabaseFile: getChosenDatabaseFile,
     supportedFeatures: ['ingognito', 'listDatabases'],
     title: 'Sample',
+    permissions: [],
     icon: 'icon-flask',
     chooseTitle: 'Sample Database',
     chooseDescription: 'Sample database that you can use to try out the functionality.  The master password is 123.',

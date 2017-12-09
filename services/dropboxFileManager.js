@@ -14,13 +14,13 @@ function DropboxFileManager(settings) {
 	}
 	var exports = {
 		key: 'dropbox',
-		routePath: '/dropbox',
 		listDatabases: listDatabasesSafe,
 		getDatabaseChoiceData: getDatabaseChoiceData,
 		getChosenDatabaseFile: getChosenDatabaseFile,
 		supportedFeatures: ['ingognito', 'listDatabases'],
 		title: 'Dropbox',
 		icon: 'icon-dropbox',
+		permissions: ['https://*.dropbox.com/'],
 		chooseTitle: 'Dropbox',
 		chooseDescription: 'Access password files stored on Dropbox.  Files will be retrieved from Dropbox each time they are used.',
 		interactiveLogin: interactiveLogin,
@@ -84,6 +84,7 @@ function DropboxFileManager(settings) {
 	}
 
 	function listDatabases() {
+		console.log("List Databsaes")
 		return getDatabases('.kdbx').catch(response => {
 			if (response.status == 401) {
 				//unauthorized, means the token is bad.  retry with new token.

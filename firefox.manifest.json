@@ -47,6 +47,9 @@
 		},
 		"onedrive" : {
 			"client_id" : "08b651fe-3b64-4a5e-aeb7-66d7220ec707"
+		},
+		"gdrive": {
+			"client_id": "965112583821-sr9nsmv4n9h5te982i5v4jehtqkv8fbu.apps.googleusercontent.com"
 		}
 	},
 	"permissions": [
@@ -55,11 +58,9 @@
 		"clipboardWrite",
 		"identity",
 		"alarms",
-		"notifications"
-	],
-	"optional_permissions": [
-		"https://*/",
-		"http://*/",
-		"file:///*/"
+		"notifications",
+		"https://*/*",
+		"http://*/*",
+		"file:///*/*"
 	]
 }

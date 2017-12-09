@@ -62,7 +62,7 @@ const keyFileParser = new KeyFileParser()
 // File Managers
 const localChromePasswordFileManager = new LocalChromePasswordFileManager()
 const dropboxFileManager = new DropboxFileManager(settings)
-const googleDrivePasswordFileManager = new GoogleDrivePasswordFileManager()
+const googleDrivePasswordFileManager = new GoogleDrivePasswordFileManager(settings)
 const sharedUrlFileManager = new SharedUrlFileManager()
 const oneDriveFileManager = new OneDriveFileManager(settings)
 const sampleDatabaseFileManager = new SampleDatabaseFileManager()

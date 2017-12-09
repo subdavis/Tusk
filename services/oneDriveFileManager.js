@@ -15,6 +15,7 @@ function OneDriveFileManager (settings) {
     getDatabaseChoiceData: getDatabaseChoiceData,
     getChosenDatabaseFile: getChosenDatabaseFile,
     supportedFeatures: ['listDatabases'],
+    permissions: ['https://login.live.com/'],
     title: 'OneDrive',
     icon: 'icon-onedrive',
     chooseTitle: 'OneDrive',
@@ -64,6 +65,8 @@ function OneDriveFileManager (settings) {
           settings.saveAccessToken(accessTokenType, authInfo.access_token);
           resolve();
         }
+      }).catch(err => {
+        reject(err)
       });
     })
     return returnPromise;
@@ -79,7 +82,7 @@ function OneDriveFileManager (settings) {
 
   function searchFiles (token) {
     // there is no proper way of searching for file-extensions right now (?), so we search for files containing kdb and filter ourselves afterwards
-    var query = encodeURIComponent('kdb');
+    var query = encodeURIComponent('kdbx');
     var filter = encodeURIComponent('file ne null');
     var url = 'https://api.onedrive.com/v1.0/drive/root/view.search?q=' + query + '&filter=' + filter;
     return axios({ 

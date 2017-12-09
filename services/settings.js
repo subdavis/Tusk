@@ -330,6 +330,12 @@ function Settings() {
 		})
 	}
 
+	exports.getSharedUrlList = function() {
+		return chromePromise.storage.local.get('sharedUrlList').then(links => {
+			return links || false;
+		})
+	}
+
 	return exports;
 }
 

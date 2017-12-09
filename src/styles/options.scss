@@ -38,3 +38,31 @@ h3 {
 		background-color: $light-green;
 	}	
 }
+
+.database-manager {
+	background-color: $light-background-color;
+
+	.error {
+		font-size: 12px;
+	}
+
+	svg {
+    width: 18px;
+    vertical-align: middle;
+  }
+  .chip {
+		height: 24px;
+		line-height: 24px;
+		font-size: 11px;
+	}
+	.description {
+		font-size: 12px;
+		font-color: $dark-background-color;
+	}
+	.switch {
+		min-width: 122px;
+	}
+	.between {
+		line-height: 36px;
+	}
+}

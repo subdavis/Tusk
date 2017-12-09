@@ -50,20 +50,24 @@ export default {
 		populate () {
 			// TODO: deal with the race condition here....
 			this.busy = true
+			this.messages.error = ""
 			this.providerManager.listDatabases().then(databases => {
 				this.databases = databases
 				this.providerManager.isLoggedIn().then(loggedIn => {
+					console.log("RAN!", this.providerManager.key)
 					this.loggedIn = loggedIn
 					this.busy = false
 				})
 			}).catch(err => {
 				console.error("Error while connecting to database backend for ", this.providerManager.title)
 				this.messages.error = err.toString()
+				this.databases = []
 				console.error(err)
 				this.busy = false
 			})
 		},
 		toggleLogin (event) {
+			//v-bind:id="'toggleButton'+providerManager.key"
 			if (!this.busy){
 				if (this.loggedIn){
 					this.providerManager.logout().then(nil => {
@@ -88,31 +92,4 @@ export default {
 
 <style lang="scss">
 @import "../styles/settings.scss";
-.database-manager {
-	background-color: $light-background-color;
-
-	.error {
-		font-size: 12px;
-	}
-
-	svg {
-    width: 18px;
-    vertical-align: middle;
-  }
-  .chip {
-		height: 24px;
-		line-height: 24px;
-		font-size: 11px;
-	}
-	.description {
-		font-size: 12px;
-		font-color: $dark-background-color;
-	}
-	.switch {
-		min-width: 122px;
-	}
-	.between {
-		line-height: 36px;
-	}
-}
 </style>

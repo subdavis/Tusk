@@ -63,6 +63,9 @@
 		},
 		"onedrive" : {
 			"client_id" : "f4c55645-3f43-4f8e-a7d2-ec167b416f1d"
+		},
+		"gdrive": {
+			"client_id": "965112583821-sr9nsmv4n9h5te982i5v4jehtqkv8fbu.apps.googleusercontent.com"
 		}
 	}
 }

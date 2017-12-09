@@ -84,7 +84,16 @@ export default {
 				{
 					k: 'forgetTimes', 
 					f: this.settings.getAllForgetTimes
-				}
+				},
+				{
+					k: 'sharedUrlList', // key
+					f: this.settings.getSharedUrlList, // getter
+					delete: {
+						f: this.settings.destroyLocalStorage,
+						arg: 'sharedUrlList',
+						op: 'Delete'
+					}
+				},
 			]
 		}
 	},
