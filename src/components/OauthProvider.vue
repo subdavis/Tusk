@@ -59,7 +59,7 @@ export default {
 					this.busy = false
 				})
 			}).catch(err => {
-				console.error("Error while connecting to database backend for ", this.providerManager.title)
+				console.error("Error while connecting to database backend for", this.providerManager.title)
 				this.messages.error = err.toString()
 				this.databases = []
 				console.error(err)
@@ -67,7 +67,7 @@ export default {
 			})
 		},
 		toggleLogin (event) {
-			//v-bind:id="'toggleButton'+providerManager.key"
+			//v-bind:id="'toggleButton'+providerManager.key"j
 			if (!this.busy){
 				if (this.loggedIn){
 					this.providerManager.logout().then(nil => {

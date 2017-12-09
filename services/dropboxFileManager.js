@@ -12,6 +12,7 @@ function DropboxFileManager(settings) {
 	var state = {
 		loggedIn: false
 	}
+
 	var exports = {
 		key: 'dropbox',
 		listDatabases: listDatabasesSafe,
@@ -23,7 +24,7 @@ function DropboxFileManager(settings) {
 		permissions: ['https://*.dropbox.com/'],
 		chooseTitle: 'Dropbox',
 		chooseDescription: 'Access password files stored on Dropbox.  Files will be retrieved from Dropbox each time they are used.',
-		interactiveLogin: interactiveLogin,
+		interactiveLogin: auth,
 		ensureOriginPermissions: ensureOriginPermissions,
 		state: state,
 		login: login,
@@ -43,7 +44,7 @@ function DropboxFileManager(settings) {
 	}
 
 	function login() {
-		return listDatabases();
+		return auth(true);
 	}
 
 	function isLoggedIn () {
@@ -74,6 +75,7 @@ function DropboxFileManager(settings) {
 					'Authorization': 'Bearer ' + accessToken
 				}
 			}).then(response => {
+				// SUCCESS!
 				return response.data.matches.map(function(fileInfo) {
 					return {
 						title: fileInfo.metadata.path_display
@@ -85,11 +87,13 @@ function DropboxFileManager(settings) {
 
 	function listDatabases() {
 		console.log("List Databsaes")
-		return getDatabases('.kdbx').catch(response => {
-			if (response.status == 401) {
+		return getDatabases('.kdbx').catch(error => {
+			// FAIL
+			let status = error.response.status;
+			if (status == 401) {
 				//unauthorized, means the token is bad.  retry with new token.
-				return interactiveLogin().then(listDatabases);
-			} else if (!response.status) {
+				return auth(false).then(listDatabases);
+			} else if (!status) {
 				// network error
 				throw new Error("Network Connection Error")
 			}
@@ -131,7 +135,7 @@ function DropboxFileManager(settings) {
 			}).catch(function(response) {
 				if (response.status == 401) {
 					//unauthorized, means the token is bad.  retry with new token.
-					return interactiveLogin().then(function() {
+					return auth(false).then(function() {
 						return getChosenDatabaseFile(dbInfo);
 					});
 				}
@@ -159,13 +163,14 @@ function DropboxFileManager(settings) {
 				return stored_token;
 			}
 
-			return interactiveLogin().then(function(new_token) {
+			return auth(false).then(function(new_token) {
 				return new_token;
 			});
 		})
 	}
 
-	function interactiveLogin() {
+	function auth(interactive) {
+		interactive = !!interactive;
 		return ensureOriginPermissions().then(ensured => {
 			return new Promise(function(resolve, reject) {
 				chromePromise.runtime.getManifest().then(manifest => {
@@ -175,7 +180,7 @@ function DropboxFileManager(settings) {
 						+ '&redirect_uri=' + encodeURIComponent(chrome.identity.getRedirectURL('dropbox'))
 						+ '&force_reapprove=false';
 					console.log("BeforeLaunch", authUrl);
-					chromePromise.identity.launchWebAuthFlow({'url': authUrl, 'interactive': true}).then(function(redirect_url) {
+					chromePromise.identity.launchWebAuthFlow({'url': authUrl, 'interactive': interactive}).then(function(redirect_url) {
 						console.log("After", redirect_url);
 						var tokenMatches = /access_token=([^&]+)/.exec(redirect_url);
 						var stateMatches = /state=([^&]+)/.exec(redirect_url);

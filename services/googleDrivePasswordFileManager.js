@@ -17,7 +17,7 @@ function GoogleDrivePasswordFileManager(settings) {
     listDatabases: listDatabasesSafe,
     getDatabaseChoiceData: getDatabaseChoiceData,
     getChosenDatabaseFile: getChosenDatabaseFile,
-    interactiveLogin: interactiveLogin,
+    interactiveLogin: auth,
     supportedFeatures: ['listDatabases'],
     permissions: [
       "https://www.googleapis.com/*",
@@ -64,7 +64,7 @@ function GoogleDrivePasswordFileManager(settings) {
   }
 
   function login() {
-    return listDatabases();
+    return auth(true);
   }
 
   function logout() {
@@ -103,7 +103,7 @@ function GoogleDrivePasswordFileManager(settings) {
         state.loggedIn = true;
         return stored_token;
       }
-      return interactiveLogin().then(new_token => {
+      return auth(false).then(new_token => {
         return new_token;
       })
     })
@@ -195,7 +195,8 @@ function GoogleDrivePasswordFileManager(settings) {
     }
   }
 
-  function interactiveLogin() {
+  function auth(interactive) {
+    interactive = !!interactive;
     console.info("Beginning new interactive Login session")
     return ensureGoogleUrlPermissions().then(ensured => {
       return new Promise(function(resolve, reject) {
@@ -207,7 +208,7 @@ function GoogleDrivePasswordFileManager(settings) {
             + '&state=' + encodeURIComponent(randomState)
             + '&redirect_uri=' + encodeURIComponent(chrome.identity.getRedirectURL('gdrive'));
           console.log(authUrl)
-          chromePromise.identity.launchWebAuthFlow({'url': authUrl, 'interactive': true}).then(function(redirect_url) {
+          chromePromise.identity.launchWebAuthFlow({'url': authUrl, 'interactive': interactive}).then(function(redirect_url) {
             console.log("After", redirect_url);
             var tokenMatches = /access_token=([^&]+)/.exec(redirect_url);
             var stateMatches = /state=([^&]+)/.exec(redirect_url);
