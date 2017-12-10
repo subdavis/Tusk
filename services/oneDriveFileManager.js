@@ -2,86 +2,29 @@
 
 import axios from 'axios/dist/axios.min.js'
 import { ChromePromiseApi } from '$lib/chrome-api-promise.js'
+import { OauthManager } from '$services/oauthManager.js' 
 
 const chromePromise = ChromePromiseApi()
 
 function OneDriveFileManager (settings) {
   var accessTokenType = 'onedrive';
-
-  var exports = {
-    key: 'onedrive',
-    routePath: '/onedrive',
-    listDatabases: listDatabases,
-    getDatabaseChoiceData: getDatabaseChoiceData,
-    getChosenDatabaseFile: getChosenDatabaseFile,
+  var state = {
+    loggedIn: false
+  }
+  var oauth = {
+    key: accessTokenType,
+    accessTokenType: accessTokenType,
+    authUrl: 'https://login.live.com/oauth20_authorize.srf?response_type=token'
+      + '&scope=' + encodeURIComponent('onedrive.readonly'),
     supportedFeatures: ['listDatabases'],
-    permissions: ['https://login.live.com/'],
+    origins: ['https://login.live.com/'],
     title: 'OneDrive',
     icon: 'icon-onedrive',
     chooseTitle: 'OneDrive',
     chooseDescription: 'Access password files stored on OneDrive.  Files will be retrieved from OneDrive each time they are used.',
-    login: authorize,
-    logout: revokeAuth,
-    isLoggedIn: isAuthorized
   };
 
-  function ensureOriginPermissions() {
-    var dropboxOrigins = ['https://login.live.com/'];
-    return chromePromise.permissions.contains({origins: dropboxOrigins}).then(function() {
-      return true;
-    }).catch(function() {
-      return chromePromise.permissions.request({origins: dropboxOrigins}).then(function() {
-        return true;
-      }).catch(function(err) {
-        return false;
-      })
-    });
-  }
-
-  function isAuthorized () {
-    return settings.getAccessToken(accessTokenType).then(function (token) {
-      return token != null;
-    });
-  }
-
-  function authorize () {
-    var resolve, reject;
-    let returnPromise = new Promise((resolvep, rejectp) => {
-      resolve = resolvep;
-      reject = rejectp;
-    })
-    chromePromise.runtime.getManifest().then(manifest => {
-      var url = 'https://login.live.com/oauth20_authorize.srf' +
-              '?client_id=' + manifest.static_data.onedrive.client_id +
-              '&scope=' + encodeURIComponent('onedrive.readonly') +
-              '&response_type=token' +
-              '&redirect_uri=' + encodeURIComponent(chrome.identity.getRedirectURL('onedrive'));
-      console.log(url)
-      chromePromise.identity.launchWebAuthFlow({url: url, interactive: true}).then(function (redirectUrl) {
-        var authInfo = parseAuthInfoFromUrl(redirectUrl);
-        if (authInfo === null) {
-          reject('Failed to extract authentication information from redirect url');
-        } else {
-          settings.saveAccessToken(accessTokenType, authInfo.access_token);
-          resolve();
-        }
-      }).catch(err => {
-        reject(err)
-      });
-    })
-    return returnPromise;
-  }
-
-  function listDatabases () {
-    return getToken().then(token => {
-      return searchFiles(token).then(filterFiles)
-    }).catch(err => {
-      console.error(err)
-    })
-  }
-
-  function searchFiles (token) {
-    // there is no proper way of searching for file-extensions right now (?), so we search for files containing kdb and filter ourselves afterwards
+  oauth.searchRequestFunction = function (token) {
     var query = encodeURIComponent('kdbx');
     var filter = encodeURIComponent('file ne null');
     var url = 'https://api.onedrive.com/v1.0/drive/root/view.search?q=' + query + '&filter=' + filter;
@@ -91,20 +34,35 @@ function OneDriveFileManager (settings) {
       headers: { 
         Authorization: 'Bearer ' + token 
       }
-    }).catch(function (error) {
-      // token expired
-      if (error.response.status && error.response.status == 401) {
-        return authorize()
-          .then(getToken)
-          .then(searchFiles)
-      } else {
-        throw new Error("Network Error")
-        console.error(error);
-      }
     })
   }
 
-  function filterFiles (response) {
+  oauth.searchRequestHandler = function (response) {
+
+    function transformFile (file) {
+      var path = "";
+      if (file.parentReference) {
+        // path will be e.g. "/drive/root:/Documents"
+        path = file.parentReference.path;
+
+        // extract the part after the colon, so "/Documents"
+        var split = /:(.+)$/.exec(path);
+        if (split) {
+          path = split[1];
+        }
+
+        if (!/\/$/.exec(path)) {
+          // append trailing slash, if there was none
+          path += "/";
+        }
+      }
+
+      return {
+        url: file['@content.downloadUrl'],
+        title: path + file.name
+      }
+    }
+
     if (!response) {
       return Promise.reject('Unable to get a response from OneDrive');
     }
@@ -112,7 +70,7 @@ function OneDriveFileManager (settings) {
       return Promise.reject('Unexpected response from OneDrive API');
     }
 
-    // only return files that have a .kdb or .kdbx extension
+    // only return files that have a .kdbx extension
     var files = response.data.value.filter(function (file) {
       return file.name && /\.kdbx?$/.exec(file.name);
     });
@@ -120,44 +78,8 @@ function OneDriveFileManager (settings) {
     return files.map(transformFile);
   }
 
-  function parseAuthInfoFromUrl (url) {
-    var hash = /#(.+)$/.exec(url);
-    if (!hash) {
-      return null;
-    }
-
-    hash = hash[1];
-    return JSON.parse('{"' + hash.replace(/&/g, '","').replace(/=/g, '":"') + '"}', function(key, value) {
-      return key === "" ? value : decodeURIComponent(value);
-    });
-  }
-
-  function transformFile (file) {
-    var path = "";
-    if (file.parentReference) {
-      // path will be e.g. "/drive/root:/Documents"
-      path = file.parentReference.path;
-
-      // extract the part after the colon, so "/Documents"
-      var split = /:(.+)$/.exec(path);
-      if (split) {
-        path = split[1];
-      }
-
-      if (!/\/$/.exec(path)) {
-        // append trailing slash, if there was none
-        path += "/";
-      }
-    }
-
-    return {
-      url: file['@content.downloadUrl'],
-      title: path + file.name
-    }
-  }
-
   //get the minimum information needed to identify this file for future retrieval
-  function getDatabaseChoiceData(dbInfo) {
+  oauth.getDatabaseChoiceData = function (dbInfo) {
     return {
       url: dbInfo.url,
       title: dbInfo.title
@@ -165,26 +87,7 @@ function OneDriveFileManager (settings) {
   }
 
   //given minimal file information, retrieve the actual file
-  function getChosenDatabaseFile(dbInfo) {
-    return getToken()
-      .then(function (token) {
-        return loadFile(dbInfo, token);
-      })
-      .then(function (response) {
-        return response.data;
-      })
-      .catch(function (response) {
-        // token expired
-        if (response.status && response.status == 401) {
-          return authorize().then(function () {
-            return getChosenDatabaseFile(dbInfo);
-          });
-        }
-      });
-  }
-
-  function loadFile (dbInfo, token) {
-    var id = encodeURIComponent(dbInfo.id);
+  oauth.fileRequestFunction = function (dbInfo, token) {
     return axios({
       method: 'GET',
       url: dbInfo.url,
@@ -192,34 +95,40 @@ function OneDriveFileManager (settings) {
       headers: {
         Authorization: 'Bearer ' + token
       }
-    });
-  }
-
-  function revokeAuth () {
-    return ensureOriginPermissions().then(nil => {
-      return axios.get('https://login.live.com/oauth20_logout.srf?client_id=f4c55645-3f43-4f8e-a7d2-ec167b416f1d')
-      .then(response => {
-        if (response.status == 200){
-          settings.saveAccessToken(accessTokenType, null);
-          console.info("You have logged out of OneDrive")
-          return;
-        } else {
-          console.error("Could not log out of Onedrive, ", response)
-        }
-      })
     })
   }
 
-  function getToken () {
-    return settings.getAccessToken(accessTokenType).then(function (token) {
-      if (!token) {
-        return Promise.reject('No access token available. Did you authorize yet?');
-      }
-      return token;
-    });
+  oauth.revokeAuth = function () {
+    return chromePromise.runtime.getManifest().then(manifest => {
+      let url = 'https://login.live.com/oauth20_logout.srf?client_id='
+        + manifest.static_data.onedrive.client_id
+      return axios.get(url)
+    })
   }
 
-  return exports;
+  oauth.handleAuthRedirectURI = function (redirect_url, randomState, resolve, reject)  {
+
+    function parseAuthInfoFromUrl (url) {
+      var hash = /#(.+)$/.exec(url);
+      if (!hash) {
+        return null;
+      }
+      hash = hash[1];
+      return JSON.parse('{"' + hash.replace(/&/g, '","').replace(/=/g, '":"') + '"}', function(key, value) {
+        return key === "" ? value : decodeURIComponent(value);
+      });
+    }
+
+    var authInfo = parseAuthInfoFromUrl(redirect_url);
+    if (authInfo === null) {
+      reject('Failed to extract authentication information from redirect url');
+    } else {
+      settings.saveAccessToken(accessTokenType, authInfo.access_token);
+      resolve();
+    }
+  }
+
+  return OauthManager(settings, oauth)
 }
 
 export { OneDriveFileManager }

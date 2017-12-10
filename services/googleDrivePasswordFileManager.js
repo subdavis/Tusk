@@ -1,5 +1,6 @@
+const Base64 = require('base64-arraybuffer')
+
 import axios from 'axios/dist/axios.min.js'
-let Base64 = require('base64-arraybuffer')
 import { ChromePromiseApi } from '$lib/chrome-api-promise.js'
 import { urlencode } from '$lib/utils.js'
 import { OauthManager } from '$services/oauthManager.js' 
@@ -17,10 +18,9 @@ function GoogleDrivePasswordFileManager (settings) {
     key: accessTokenType,
     accessTokenType: accessTokenType,
     supportedFeatures: ['listDatabases'],
-    authUrl: 'https://accounts.google.com/o/oauth2/v2/auth?' 
-      + 'scope=' + encodeURIComponent('https://www.googleapis.com/auth/drive.readonly')
-      + '&response_type=token',
-    permissions: [
+    authUrl: 'https://accounts.google.com/o/oauth2/v2/auth?response_type=token' 
+      + '&scope=' + encodeURIComponent('https://www.googleapis.com/auth/drive.readonly'),
+    origins: [
       "https://www.googleapis.com/*",
       "https://accounts.google.com/*",
       "https://*.googleusercontent.com/*",

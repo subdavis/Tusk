@@ -1,31 +1,32 @@
 "use strict";
-
-import axios from 'axios/dist/axios.min.js'
-let Base64 = require('base64-arraybuffer')
+const Base64 = require('base64-arraybuffer')
 import { ChromePromiseApi } from '$lib/chrome-api-promise.js'
 const chromePromise = ChromePromiseApi()
 
 function OauthManager(settings, oauth) {
-	/*oauth contains the following properties:
-		{
-			accessTokenType      // provider name
-			origins              // permissions needed
-			title
-			icon
-			chooseTitle
-			chooseDescription
-			authURL               // state, redirect_uri, client_id will be added.
+	/*
+		Takes:
+			settings - an instance of services/settings.js
+			oauth    - {
+				// PROPERTIES
+				accessTokenType      // provider name
+				origins              // permissions needed
+				title
+				icon
+				chooseTitle
+				chooseDescription
+				authUrl               // state, redirect_uri, client_id will be added.
 
-			searchRequestFunction // function(token) > axios_response
-			searchRequestHandler  // function(axios_response)  > dbInfo
-
-			fileRequestFunction   // function(dbinfo, token) > axios_response with response.data = arraybuffer
-
-			getDatabaseChoiceData // function(dbInfo) > dbInfo
-
-			revokeAuth            // function takes no params > null
-			handleAuthRedirectURI // function (uri, resolve, reject) > token
-		}
+				// FUNCTIONS
+				searchRequestFunction // function(token) > axios response promise
+				searchRequestHandler  // function(axios_response)  > dbInfo
+				fileRequestFunction   // function(dbinfo, token) > axios response with response.data = arraybuffer
+				getDatabaseChoiceData // function(dbInfo) > dbInfo
+				revokeAuth            // function takes no params > promise resolved with null
+				handleAuthRedirectURI // function (uri, randomState, resolve, reject) > promise resolved with token
+			}
+		Returns:
+			the exports object it creates.
 	*/
 	var accessTokenType = oauth.accessTokenType
 
