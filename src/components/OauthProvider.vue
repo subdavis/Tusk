@@ -54,7 +54,6 @@ export default {
 			this.providerManager.listDatabases().then(databases => {
 				this.databases = databases
 				this.providerManager.isLoggedIn().then(loggedIn => {
-					console.log("RAN!", this.providerManager.key)
 					this.loggedIn = loggedIn
 					this.busy = false
 				})
