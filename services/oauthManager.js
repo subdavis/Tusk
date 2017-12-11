@@ -6,8 +6,8 @@ const chromePromise = ChromePromiseApi()
 function OauthManager(settings, oauth) {
 	/*
 		Takes:
-			settings - an instance of services/settings.js
-			oauth    - {
+			- settings - an instance of services/settings.js
+			- oauth    - {
 				// PROPERTIES
 				accessTokenType      // provider name
 				origins              // permissions needed
@@ -26,7 +26,7 @@ function OauthManager(settings, oauth) {
 				handleAuthRedirectURI // function (uri, randomState, resolve, reject) > promise resolved with token
 			}
 		Returns:
-			the exports object it creates.
+			- the exports object it creates.
 	*/
 	var accessTokenType = oauth.accessTokenType
 
@@ -45,13 +45,31 @@ function OauthManager(settings, oauth) {
 		permissions: oauth.permissions,
 		chooseTitle: oauth.chooseTitle,
 		chooseDescription: oauth.chooseDescription,
-		interactiveLogin: auth,
+		interactiveLogin: login,
 		ensureOriginPermissions: ensureOriginPermissions,
 		state: state,
 		login: login,
 		isLoggedIn: isLoggedIn,
 		logout: logout
 	};
+
+	function getToken() {
+		return ensureOriginPermissions().then(ensured => {
+			if (ensured) {
+				return settings.getAccessToken(accessTokenType).then(function(stored_token) {
+					if (stored_token) {
+						state.loggedIn = true;
+						return stored_token;
+					}
+					return auth(false) // try passive auth if there's no token...
+				})
+			}
+		})
+	}
+
+	function removeToken () {
+    return settings.saveAccessToken(accessTokenType, null);
+  }
 
 	//lists databases if a token is already stored
 	function listDatabasesSafe() {
@@ -64,8 +82,44 @@ function OauthManager(settings, oauth) {
 		});
 	}
 
+	function getDatabases() {
+		return getToken()
+			.then(oauth.searchRequestFunction)
+			.then(oauth.searchRequestHandler)
+	}
+
+	function listDatabases(attempt) {
+		return getDatabases().catch(error => {
+			
+			let status = error.response.status
+			attempt = attempt || 0
+			
+			if (attempt > 0)
+				throw new Error(error)
+			
+			if (status >= 400 && status <= 599) {
+				console.error("listDatabases failed with status code", status)
+				//unauthorized or forbidden, means the token is bad.  retry with new token.
+				let timeoutPromise = new Promise((resolve, reject)=> {
+					let waiter = setTimeout(() => {
+						clearTimeout(waiter)
+						console.info("First attempt to listDatabases failed, waiting....")
+						resolve(false) // false for no auth intaractivity
+					}, 400)          // Wait 400 MS before trying again
+				})
+				return timeoutPromise
+					.then(auth)      // try passive auth if something failed.
+					.then(token => {
+						return listDatabases(1)
+					});
+			} else if (!status) {
+				throw new Error("Network Connection Error")
+			}
+		});
+	}
+
 	function login() {
-		return auth(true);
+		return auth(true)
 	}
 
 	function isLoggedIn () {
@@ -77,52 +131,26 @@ function OauthManager(settings, oauth) {
 	function logout() {
 		return oauth.revokeAuth().then(function() {
 			return settings.saveAccessToken(accessTokenType, null).then(function() {
-				state.loggedIn = false;
-			});
+				state.loggedIn = false
+			})
 		})
 	}
 
-	function getDatabases() {
-		return getToken()
-			.then(oauth.searchRequestFunction)
-			.then(oauth.searchRequestHandler)
-	}
-
-	function listDatabases(attempt) {
-		return getDatabases().catch(error => {
-			
-			let status = error.response.status;
-			attempt = attempt || 0
-			
-			if (attempt > 0)
-				throw new Error(error)
-			
-			if (status == 401 || status == 403) {
-				//unauthorized or forbidden, means the token is bad.  retry with new token.
-				return auth(false).then(token => {
-					return listDatabases(1)
-				});
-			} else if (!status) {
-				// network error
-				throw new Error("Network Connection Error")
-			}
-		});
-	}
-
 	//given minimal file information, retrieve the actual file
-	function getChosenDatabaseFile(dbInfo) {
+	function getChosenDatabaseFile(dbInfo, attempt) {
 		return getToken().then(function(accessToken) {
 			return oauth.fileRequestFunction(dbInfo, accessToken).then(function(response) {
-				return response.data;
-			}).catch(function(response) {
-				if (response.status == 401) {
+				return response.data
+			}).catch(function(error) {
+				console.error("Get chosen file failure:", error) 
+				if (error.response.status == 401) {
 					//unauthorized, means the token is bad.  retry with new token.
 					return auth(false).then(function() {
 						return getChosenDatabaseFile(dbInfo);
-					});
+					})
 				}
-			});
-		});
+			})
+		})
 	}
 
 	function ensureOriginPermissions() {
@@ -137,24 +165,6 @@ function OauthManager(settings, oauth) {
 		});
 	}
 
-	function getToken() {
-		return ensureOriginPermissions().then(ensured => {
-			if (ensured) {
-				return settings.getAccessToken(accessTokenType).then(function(stored_token) {
-					if (stored_token) {
-						state.loggedIn = true;
-						return stored_token;
-					}
-					return auth(false)
-				})
-			}
-		})
-	}
-
-	function removeToken () {
-    return settings.saveAccessToken(accessTokenType, null);
-  }
-
 	function auth(interactive) {
 		interactive = !!interactive;
 		console.info("Authenticating for ", oauth.accessTokenType, interactive)
@@ -166,10 +176,10 @@ function OauthManager(settings, oauth) {
 					  + '&client_id=' + manifest.static_data[oauth.accessTokenType].client_id
 						+ '&state=' + encodeURIComponent(randomState)
 						+ '&redirect_uri=' + encodeURIComponent(chrome.identity.getRedirectURL(oauth.accessTokenType));
-					chromePromise.identity.launchWebAuthFlow({'url': authUrl, 'interactive': interactive}).then(function(redirect_url) {
+					chromePromise.identity.launchWebAuthFlow({'url': authUrl, 'interactive': interactive}).then(redirect_url => {
 						oauth.handleAuthRedirectURI(redirect_url, randomState, resolve, reject)
 					}).catch(function(err) {
-						console.error("Error from webauthflow", err);
+						console.error("Error from webauthflow for", oauth.accessTokenType , err);
 						reject(err);
 					});
 				});

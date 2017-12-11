@@ -15,7 +15,8 @@
           :google-drive-manager="services.googleDrivePasswordFileManager"
           :onedrive-manager="services.oneDriveFileManager"
           :sample-manager="services.sampleDatabaseFileManager"
-          :shared-url-manager="services.sharedUrlFileManager"></manage-databases>
+          :shared-url-manager="services.sharedUrlFileManager"
+          :settings="services.settings"></manage-databases>
         <manage-keyfiles id="/manage/keyfiles" 
           v-if="show.manageKeyfiles.visible"
           :settings="services.settings"

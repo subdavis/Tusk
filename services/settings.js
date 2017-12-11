@@ -137,6 +137,15 @@ function Settings() {
 		});
 	}
 
+	exports.disableDatabaseProvider = function(provider) {
+		return chromePromise.storage.local.get(['selectedDatabase']).then(items => {
+			if (items.selectedDatabase)
+				if (items.selectedDatabase.providerKey == provider.key)
+					return chromePromise.storage.local.remove('selectedDatabase')
+			return Promise.resolve(false)
+		})
+	}
+
 	exports.saveDefaultRememberOptions = function(rememberPeriod) {
 		if (rememberPeriod !== 0) {
 			return chromePromise.storage.local.set({

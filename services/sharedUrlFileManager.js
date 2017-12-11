@@ -39,11 +39,16 @@ function SharedUrlFileManager() {
   }
 
   function listDatabases() {
-  	return getUrls().then(urls => {
-  		if (urls)
-  			return urls;
-  		return [];
-  	});
+    return isEnabled().then(enabled => {
+      if (enabled)
+        return getUrls().then(urls => {
+          if (urls)
+            return urls
+          return []
+        })
+      else
+        return Promise.resolve([])
+    })
   }
 
   //get the minimum information needed to identify this file for future retrieval

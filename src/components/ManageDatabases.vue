@@ -10,11 +10,21 @@
 			
 			<p id="/new/user" v-show="show.newUser.visible">If you've never used keepass before, you will need to create a new keepass database before enabling the providers below.  You can do this by downloading a desktop keepass application like <a href="https://keepassxc.org/">KeePassXC</a> or generate one quickly in your browser with <a href="https://app.keeweb.info/">KeeWeb</a>.  Store the keepass databse file in a cloud provider like <a href="https://dropbox.com">Dropbox</a> or <a href="http://drive.google.com">Google Drive</a> and come back here when you're done.</p>
 		</div>
-		<oauth-provider :provider-manager="dropboxFileManager"></oauth-provider>
-		<oauth-provider :provider-manager="googleDriveManager"></oauth-provider>
-		<oauth-provider :provider-manager="onedriveManager"></oauth-provider>
-		<oauth-provider :provider-manager="sampleManager"></oauth-provider>
-		<shared-link-provider :provider-manager="sharedUrlManager"></shared-link-provider>
+		<oauth-provider 
+			:provider-manager="dropboxFileManager"
+			:settings="settings"></oauth-provider>
+		<oauth-provider 
+			:provider-manager="googleDriveManager"
+			:settings="settings"></oauth-provider>
+		<oauth-provider 
+			:provider-manager="onedriveManager"
+			:settings="settings"></oauth-provider>
+		<oauth-provider 
+			:provider-manager="sampleManager"
+			:settings="settings"></oauth-provider>
+		<shared-link-provider 
+			:provider-manager="sharedUrlManager"
+			:settings="settings"></shared-link-provider>
   </div>
 </template>
 
@@ -28,7 +38,8 @@ export default {
 		googleDriveManager: Object,
 		onedriveManager: Object,
 		sampleManager: Object,
-		sharedUrlManager: Object
+		sharedUrlManager: Object,
+		settings: Object,
 	},
 	components: {
 		OauthProvider,

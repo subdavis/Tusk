@@ -72,7 +72,7 @@
         </div>
         
         <div class="stack-item">
-          <button id="unlock-button" class="selectable" v-on:click="clickUnlock">Unlock Database</button>
+          <button class="action-button selectable" v-on:click="clickUnlock">Unlock Database</button>
         </div>
       </form>
 
@@ -361,6 +361,7 @@ export default {
   mounted () {
     
     if (!this.isUnlocked()) {
+      this.busy = true
       this.settings.getKeyFiles().then(keyFiles => {
         this.keyFiles = keyFiles
         return this.settings.getDefaultRememberOptions()
@@ -429,14 +430,6 @@ export default {
 
 #masterPasswordGroup {
 
-  #unlock-button {
-    background-color: $blue;
-
-    &:hover {
-      opacity: .7;
-    }
-  }
-
   .keyfile-picker {
     background-color: $light-background-color;
     box-sizing: border-box;
@@ -496,17 +489,6 @@ export default {
     }
   }
 
-  button {
-    font-size: 18px;
-    border-width: 1px 0px;
-    width: 100%;
-    border-top: 1px solid $light-gray;
-    border-bottom: 1px solid $light-gray;
-    margin: 0px;
-    padding: 4px;
-    box-sizing: border-box;
-  }
-
   .remember-period-picker {
     margin: 6px 0px;
 
@@ -541,19 +523,6 @@ export default {
 }
 .spinner {
   padding: $wall-padding;
-}
-
-.unlockLogo {
-  font-weight: 700;
-  font-size: 20px;
-  text-align: center;
-  padding: 20px 0px;
-
-  img {
-    width: 48px;
-    height: 48px;
-    vertical-align: middle;
-  }
 }
 
 .footer span {

@@ -50,14 +50,17 @@ export default {
 		}
 	},
 	props: {
-		providerManager: Object 
+		providerManager: Object,
+		settings: Object
 	},
 	methods: {
 		toggleLogin () {
-			if (this.loggedIn)
+			if (this.loggedIn){
+				this.settings.disableDatabaseProvider(this.providerManager)
 				this.providerManager.logout()
-			else
+			} else {
 				this.providerManager.login()
+			}
 		},
 		removeLink (index) {
 			if (index !== undefined)

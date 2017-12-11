@@ -70,15 +70,19 @@ function GoogleDrivePasswordFileManager (settings) {
         }
       }
       return axios(requestmeta).then(response => {
+        console.log(response)
         var requestfile = {
           method: 'GET',
-          url: response.details.downloadUrl,
-          requestType: 'arraybuffer',
+          url: response.data.downloadUrl,
+          responseType: 'arraybuffer',
           headers: {
             'Authorization': 'Bearer ' + token
           }
         };
-        return axios(requestfile)
+        return axios(requestfile).then(response => {
+          console.log(response)
+          return response
+        })
           .catch(err => {
             attempt = attempt || 0;
             if (attempt == 0) {
@@ -94,7 +98,7 @@ function GoogleDrivePasswordFileManager (settings) {
   }
 
   oauth.revokeAuth = function () {
-    settings.getAccessToken(accessTokenType).then(function(accessToken) {
+    return settings.getAccessToken(accessTokenType).then(function(accessToken) {
       if (accessToken) {
         var url = 'https://accounts.google.com/o/oauth2/revoke?token=' + accessToken
         return axios({

@@ -64,6 +64,15 @@ export default {
 					}
 				},
 				{
+					k: 'selectedDatabase',
+					f: this.settings.getCurrentDatabaseChoice,
+					delete: {
+						f: this.settings.saveCurrentDatabase,
+						arg: this.settings.destroyLocalStorage,
+						op: 'Delete'
+					}
+				},
+				{
 					k: 'defaultRememberOptions', 
 					f: this.settings.getDefaultRememberOptions,
 					delete: {

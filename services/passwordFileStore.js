@@ -30,10 +30,8 @@ module.exports = function PasswordFileStoreRegistry() {
       var matches = fileManagers.filter(function(fileManager) {
         return fileManager.key == choice.providerKey;
       });
-
       if (matches.length !== 1) throw new Error('Unable to find file manager for key ' + choice.providerKey);
-
-      return matches[0].getChosenDatabaseFile(choice.passwordFile);
+      return matches[0].getChosenDatabaseFile(choice.passwordFile)
     });
   }
 

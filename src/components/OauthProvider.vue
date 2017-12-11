@@ -44,7 +44,8 @@ export default {
 		}
 	},
 	props: {
-		providerManager: Object 
+		providerManager: Object,
+		settings: Object
 	},
 	methods: {
 		populate () {
@@ -70,6 +71,8 @@ export default {
 			if (!this.busy){
 				if (this.loggedIn){
 					this.providerManager.logout().then(nil => {
+						// if logout works, attempt to unset the currentDatabaseChoice.
+						this.settings.disableDatabaseProvider(this.providerManager)
 						this.populate()
 					})
 				} else {
