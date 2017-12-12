@@ -1,5 +1,4 @@
 var path = require('path')
-var merge = require('webpack-merge');
 var ExtractTextPlugin = require("extract-text-webpack-plugin")
 var UglifyJSPlugin = require('uglifyjs-webpack-plugin')
 var webpack = require('webpack')

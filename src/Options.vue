@@ -1,5 +1,5 @@
 <template>
-  <div id="main">
+  <div id="popup-view">
     <svg-defs></svg-defs>
     <options-navbar
       :routes="routes"

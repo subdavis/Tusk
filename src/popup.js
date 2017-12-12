@@ -16,6 +16,5 @@ import VirtualRouter from '$lib/virtual-router.js'
 Vue.prototype.$router = new VirtualRouter()
 
 new Vue({
-  el: '#app',
   render: h => h(Popup)
-})
+}).$mount('#app')

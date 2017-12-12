@@ -2,6 +2,8 @@
 
 > A modern, clean keepass browser extension built with Vue.js and kdbxweb.  Rebooted from https://github.com/perfectapi/CKP.
 
+Homepage: https://subdavis.com/CKPX
+
 ## Build Setup
 
 ```bash
@@ -16,6 +18,17 @@ npm run watch
 
 # build for production with minification
 npm run build
+
+# run the packer script targeted for 'chrome' or 'firefox'
+TARGET_BROWSER=firefox ./packer.sh
 ```
 
 For detailed explanation on how things work, consult the [docs for vue-loader](http://vuejs.github.io/vue-loader).
+
+## Browser Permissions
+
+> CKPX requires cross-origin permissions in order to inject credentials and query the storage backends on the user's behalf.
+
+In chrome, these permissions requests are __always__ promted to the user upon first use.
+
+Because of Firefox's implementation of `browser.permissions`, it was necessary to request all permissions at install time to avoid code rot.  A deeper explanation of the firefox permissions can be found [on stackoverflow](https://stackoverflow.com/questioans/47723297/firefox-extension-api-permissions-request-may-only-be-called-from-a-user-input)
