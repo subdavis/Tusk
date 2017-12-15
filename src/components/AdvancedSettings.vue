@@ -14,7 +14,7 @@
 	  </div>
 
 		<div class="box-bar roomy">
-			<h4>Encourage Chrome to emember your passwords</h4>
+			<h4>Encourage Browser to remember your passwords</h4>
 			<p><a href="https://w3c.github.io/webappsec-credential-management/">Chrome Credential API</a> allows JavaScript to interact in a limited way with the Chrome password manager.  If enabled in the browser, Tusk can use this to encourage Chrome to remember the passwords you use so that they become available in your browser without needing to use Tusk.<br /><br />Chrome also syncs passwords between devices, so they should also become available on your mobile device or other computers.</p>
 		</div>
 		<div class="switch box-bar roomy lighter">
