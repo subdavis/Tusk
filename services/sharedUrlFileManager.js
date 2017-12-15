@@ -1,32 +1,11 @@
-/**
-
-The MIT License (MIT)
-
-Copyright (c) 2015 Steven Campbell.
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-
- */
-
 "use strict";
 
-function SharedUrlFileManager($http, $timeout) {
+import axios from 'axios/dist/axios.min.js'
+import { ChromePromiseApi } from '$lib/chrome-api-promise.js'
+
+const chromePromise = ChromePromiseApi()
+
+function SharedUrlFileManager() {
   var exports = {
     key: 'shared-url',
     routePath: '/shared-url',
@@ -39,15 +18,37 @@ function SharedUrlFileManager($http, $timeout) {
     chooseTitle: 'Shared Link',
     chooseDescription: 'Rather than granting full access to your cloud storage provider, get a shared link and paste it in.',
     setUrls: setUrls,
-    getUrls: getUrls
+    getUrls: getUrls,
+    login: enable,
+    logout: disable,
+    isLoggedIn: isEnabled
   };
 
+  function enable() {
+    return chromePromise.storage.local.set({'sharedUrlsEnabled':true})
+  }
+
+  function disable () {
+    return chromePromise.storage.local.set({'sharedUrlsEnabled':false})
+  }
+
+  function isEnabled () {
+    return chromePromise.storage.local.get('sharedUrlsEnabled').then(result => {
+      return result.sharedUrlsEnabled || false
+    })
+  }
+
   function listDatabases() {
-  	return getUrls().then(urls => {
-  		if (urls)
-  			return urls;
-  		return [];
-  	});
+    return isEnabled().then(enabled => {
+      if (enabled)
+        return getUrls().then(urls => {
+          if (urls)
+            return urls
+          return []
+        })
+      else
+        return Promise.resolve([])
+    })
   }
 
   //get the minimum information needed to identify this file for future retrieval
@@ -57,7 +58,7 @@ function SharedUrlFileManager($http, $timeout) {
 
   //given minimal file information, retrieve the actual file
   function getChosenDatabaseFile(dbInfo, attempt) {
-		return $http({
+		return axios({
       method: 'GET',
       url: dbInfo.direct_link,
       responseType: 'arraybuffer',
@@ -69,12 +70,12 @@ function SharedUrlFileManager($http, $timeout) {
 
   function setUrls(urls){
   	if(urls)
-  	  return chrome.p.storage.local.set({'sharedUrlList': urls});
+  	  return chromePromise.storage.local.set({'sharedUrlList': urls});
   	else
-  	  return chrome.p.storage.local.remove('sharedUrlList');
+  	  return chromePromise.storage.local.remove('sharedUrlList');
   }
   function getUrls(){
-  	return chrome.p.storage.local.get('sharedUrlList').then(results => {
+  	return chromePromise.storage.local.get('sharedUrlList').then(results => {
   		if (results.hasOwnProperty('sharedUrlList'))
   			return results.sharedUrlList;
   		return false;
@@ -83,3 +84,5 @@ function SharedUrlFileManager($http, $timeout) {
 
   return exports;
 }
+
+export { SharedUrlFileManager }

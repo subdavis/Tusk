@@ -1,0 +1,109 @@
+@import "../../node_modules/materialize-css/sass/components/_color.scss";
+@import "../../node_modules/materialize-css/sass/components/_variables.scss";
+@import "../../node_modules/materialize-css/sass/components/_normalize.scss";
+@import "../../node_modules/materialize-css/sass/components/_typography.scss";
+
+@import "./settings.scss";
+
+.selectable {
+  transition: all .3s ease;
+  &:hover {
+    cursor: pointer;
+  }
+
+  &.flair:hover {
+    padding-left: 20px;
+  }
+}
+
+.between {
+  width: 100%;
+  justify-content: space-between;
+  display: flex;
+}
+
+.stack-item {
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.error {
+  background-color: $light-red;
+}
+
+.warn {
+  background-color: $warn-yellow;
+}
+
+.success {
+  background-color: $green;
+}
+
+button.action-button {
+  background-color: $blue;
+  font-size: 18px;
+  border-width: 1px 0px;
+  width: 100%;
+  border-top: 1px solid $light-gray;
+  border-bottom: 1px solid $light-gray;
+  margin: 0px;
+  padding: 4px;
+  box-sizing: border-box;
+  
+  &:hover {
+    opacity: .7;
+  }
+}
+
+.box-bar {
+  
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px $wall-padding;
+  border-bottom: 2px solid $light-gray;
+  font-size: 18px;
+  
+  &.button {
+    background-color: $background-color;
+  }
+
+  &.roomy {
+    padding: $wall-padding $options-wall-padding;
+
+    &.small {
+      padding: 6px $options-wall-padding;
+      font-size: 14px;
+    }
+  }
+
+  &.small {
+    padding: 6px $wall-padding;
+    font-size: 12px;
+  }
+
+  &.medium {
+    padding: 8px $wall-padding;
+    font-size: 14px;
+  }
+
+  &.lighter {
+    background-color: $light-background-color;
+  }
+
+  &.plain {
+    border-bottom: 0px;
+  }
+}
+
+.unlockLogo {
+  font-weight: 700;
+  font-size: 20px;
+  text-align: center;
+  padding: 20px 0px;
+
+  img {
+    width: 48px;
+    height: 48px;
+    vertical-align: middle;
+  }
+}

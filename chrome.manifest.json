@@ -1,0 +1,71 @@
+{
+	"name": "KeePass Tusk - A better password manager",
+	"short_name": "KeePass Tusk",
+	"version": "2017.11.12",
+	"manifest_version": 2,
+	"minimum_chrome_version": "48",
+	"description": "Readonly KeePass password database integration for Chrome™",
+	"icons": {
+		"16": "assets/icons/logo_16.png",
+		"48": "assets/icons/logo_48.png"
+	},
+	"key":"MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAhoF/A6nYIxSHW2AekTQRJga9QodwEJBTeAA5r0tW9djrTHY3Ei0FdnUE1FrH2Hx03tsj4RjXMWDHtsqMg4REJdFNzndsRKWvliGomXtxE8XByawJf/NGx0/imAtVBrHc846D/Bn4q1dRaRauqkPMKgpcHoPeg+uLTBIfAn5qPgLlvLLqNSKRg6zGYkm0iBYFiyLd1cqWjsDrVhant90W5rE7qmGQPXZudkc2ejtijuMJL4CF9BeQXOVv/9a0XzAwNbArSr+zHnNOicZPyeEnT7mujFDvLRzXvi7OPW+8mdEsm3AeagKZ6bGUuqyzwxs8XlysWqJsXBoX6tjZCGGVpQIDAQAB",
+	"oauth2": {
+		"client_id": "965112583821-v7rulpbf3dfjkg06rfhqd54qk37lp6l1.apps.googleusercontent.com",
+		"scopes": [
+			"https://www.googleapis.com/auth/drive.readonly",
+			"https://www.googleapis.com/auth/chromewebstore.readonly"
+		]
+	},
+	"background": {
+		"scripts": [
+			"dist/background.build.js"
+		],
+		"persistent": false
+	},
+	"incognito": "split",
+	"browser_action": {
+		"default_icon": "assets/icons/logo_38.png",
+		"default_popup": "popup.html",
+    "default_title": "KeePass Tusk"
+	},
+	"options_ui": {
+		"page": "options.html",
+		"chrome_style": false,
+		"open_in_tab": true
+	},
+	"commands": {
+		"_execute_page_action": {
+			"suggested_key": {
+				"windows": "Ctrl+Shift+Space",
+				"mac": "Command+Shift+Space",
+				"chromeos": "Ctrl+Shift+Space",
+				"linux": "Ctrl+Shift+Space"
+			}
+		}
+	},
+	"permissions": [
+		"activeTab",
+		"storage",
+		"clipboardWrite",
+		"identity",
+		"alarms",
+		"notifications"
+	],
+	"optional_permissions": [
+		"https://*/",
+		"http://*/",
+		"file:///*/"
+	],
+	"static_data": {
+		"dropbox" : {
+			"client_id": "lau0eigo4cfthqz"
+		},
+		"onedrive" : {
+			"client_id" : "f4c55645-3f43-4f8e-a7d2-ec167b416f1d"
+		},
+		"gdrive": {
+			"client_id": "876467817034-rlas0hnb5jc9dt1qmp11l6g4724ktoqn.apps.googleusercontent.com"
+		}
+	}
+}

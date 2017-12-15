@@ -1,136 +1,58 @@
-/**
+const Base64 = require('base64-arraybuffer')
 
-The MIT License (MIT)
+import axios from 'axios/dist/axios.min.js'
+import { ChromePromiseApi } from '$lib/chrome-api-promise.js'
+import { urlencode } from '$lib/utils.js'
+import { OauthManager } from '$services/oauthManager.js' 
 
-Copyright (c) 2015 Steven Campbell.
+const chromePromise = ChromePromiseApi()
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+function GoogleDrivePasswordFileManager (settings) {
+  var accessTokenType = 'gdrive';
 
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
+  var state = {
+    loggedIn: false
+  }
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-
- */
-
-function GoogleDrivePasswordFileManager($http, $timeout) {
-	"use strict";
-  
-  var exports = {
-    key: 'gdrive',
-    routePath: '/choose-file',
-    listDatabases: listDatabases,
-    getDatabaseChoiceData: getDatabaseChoiceData,
-    getChosenDatabaseFile: getChosenDatabaseFile,
+  var oauth = {
+    key: accessTokenType,
+    accessTokenType: accessTokenType,
     supportedFeatures: ['listDatabases'],
+    authUrl: 'https://accounts.google.com/o/oauth2/v2/auth?response_type=token' 
+      + '&scope=' + encodeURIComponent('https://www.googleapis.com/auth/drive.readonly'),
+    origins: [
+      "https://www.googleapis.com/*",
+      "https://accounts.google.com/*",
+      "https://*.googleusercontent.com/*",
+    ],
     title: 'Google Drive',
     icon: 'icon-google',
     chooseTitle: 'Google Drive',
     chooseDescription: 'Access password files stored on your Google Drive.  The file(s) will be fetched from Google Drive each time they are used.',
-    interactiveRequestAuth: interactiveRequestAuth,
-    revokeAuth: revokeAuth,
-    isAuthorized: isAuthorized,
-    ensureGoogleUrlPermissions: ensureGoogleUrlPermissions
   };
 
-  var accessToken;  //cached access token
-  function interactiveRequestAuth() {
-    return auth(true);
-  }
-
-  //revoke the oauth2 token on the oauth2 server
-  function revokeAuth() {
-    if (accessToken) {
-      var url = 'https://accounts.google.com/o/oauth2/revoke?token=' + accessToken
-      return $http.get(url, {responseType: 'jsonp'}).then(function(response) {
-        return removeCachedAuthToken();
-      });
-  	} else {
-  	  return Promise.resolve();
-  	}
-  }
-
-  //remove chrome's cached copy of the oauth2 token
-  function removeCachedAuthToken() {
-    return new Promise(function(resolve) {
-      if (accessToken) {
-        var tempAccessToken = accessToken;
-        accessToken = null;
-        // Remove token from the token cache.
-        chrome.identity.removeCachedAuthToken({
-          token : tempAccessToken
-        }, function() {
-          resolve();
-        });
-      } else {
-        resolve();
+  oauth.searchRequestFunction = function (token) {
+    var request = {
+      method: 'GET',
+      url: "https://www.googleapis.com/drive/v2/files?q=" + urlencode("fileExtension = 'kdbx' and trashed=false"),
+      headers: {
+        'Authorization': 'Bearer ' + token
       }
-    });
+    }
+    return axios(request)
   }
 
-  function isAuthorized() {
-    return accessToken ? true : false;
-  }
-
-  function ensureGoogleUrlPermissions() {
-    var origins = [
-      "https://www.googleapis.com/",
-      "https://accounts.google.com/",
-      "https://*.googleusercontent.com/"
-    ];
-
-    return new Promise(function(resolve, reject) {
-      chrome.permissions.contains({origins: origins}, function(alreadyGranted) {
-        if (alreadyGranted) {
-          resolve();
-        } else {
-          chrome.permissions.request({origins: origins}, function(granted) {
-            // The callback argument will be true if the user granted the permissions.
-            if (granted) {
-              resolve();
-            } else {
-            	var err = chrome.runtime.lastError;
-            	console.log(err);
-              reject(new Error('User denied access to google docs urls'));
-            }
-          });
-        }
-      });
-    });
-  }
-
-  function listDatabases() {
-    return getPasswordFiles().catch(function(err) {
-      return [];
-    });
-  }
-
-  function getPasswordFiles() {
-    var url = "https://www.googleapis.com/drive/v2/files?q=" +
-      "(fileExtension='kdbx' or fileExtension='kdb') and trashed=false";
-    return sendAuthorizedGoogleDriveGet(url).then(function(data) {
-      return data.items.map(function(entry) {
-        return {
-          title : entry.title,
-          url : entry.selfLink
-        };
-      });
-    });
+  oauth.searchRequestHandler = function (response) {
+    return response.data.items.map(function(entry) {
+      return {
+        title : entry.title,
+        url : entry.selfLink
+      }
+    })
   }
 
   //get the minimum information needed to identify this file for future retrieval
-  function getDatabaseChoiceData(dbInfo) {
+  oauth.getDatabaseChoiceData = function (dbInfo) {
     return {
       title: dbInfo.title,
       url: dbInfo.url
@@ -138,86 +60,85 @@ function GoogleDrivePasswordFileManager($http, $timeout) {
   }
 
   //given minimal file information, retrieve the actual file
-  function getChosenDatabaseFile(databaseChoiceData, attempt) {
-    return sendAuthorizedGoogleDriveGet(databaseChoiceData.url).then(function(details) {
-      //the first url just gets us the file details, which we use to download the file
-      return sendAuthorizedGoogleDriveGet(details.downloadUrl, 'arraybuffer');
-    }).then(function(data) {
-      return data;
-    }).catch(function(err) {
-    	attempt = attempt || 0;
-    	if (attempt == 0) {
-    		//sometimes the url returned returns 403 OK, because somehow it is invalid.  In this scenario, try again to get a working url
-    		return getChosenDatabaseFile(databaseChoiceData, 1);
-    	} else {
-    		throw err
-    	}
-    });
-  }
-
-  //sends an authorized request to google drive, including retry
-  //(retry is necessary because local cached token may get out of sync, then we need a new one)
-  function sendAuthorizedGoogleDriveGet(url, optionalResponseType, attempt) {
-    attempt = attempt || 0;
-    var rateLimits = [1, 2, 4, 8, 16];
-    return auth().then(function() {
-      var request = {
-        method: 'GET',
-        url: url,
+  oauth.fileRequestFunction = function (dbInfo, token) {
+    function getFileFromDatabase(attempt) {
+      var requestmeta = {
+        method: "GET",
+        url: dbInfo.url,
         headers: {
-          'Authorization': 'Bearer ' + accessToken
+          'Authorization': 'Bearer ' + token
         }
-      };
-      if (optionalResponseType)
-        request.responseType = optionalResponseType;
-
-      return $http(request);
-    }).then(function(response) {
-      return response.data;
-    }).catch(function(response) {
-      if (response.status == 401 && attempt < 2) {
-        return removeCachedAuthToken().then(function() {
-          return sendAuthorizedGoogleDriveGet(url, optionalResponseType, attempt + 1);
-        });
-      } else if (response.status == 403 && attempt < rateLimits.length) {
-        //rate limited, retry
-      	var message = (optionalResponseType == 'arraybuffer') ? new Uint8Array(response.data) : response.data;
-        console.log('403, retrying', url, response.statusText, message);
-        return $timeout(function() {
-        	return sendAuthorizedGoogleDriveGet(url, optionalResponseType, attempt + 1);
-        }, rateLimits[attempt] + Math.floor(Math.random() * 1000));
-      } else {
-        console.log('failed to fetch', url, accessToken, response);
-        throw new Error("Request to retrieve files from drive failed - " + (response.statusText || response.message))
       }
-    });
+      return axios(requestmeta).then(response => {
+        console.log(response)
+        var requestfile = {
+          method: 'GET',
+          url: response.data.downloadUrl,
+          responseType: 'arraybuffer',
+          headers: {
+            'Authorization': 'Bearer ' + token
+          }
+        };
+        return axios(requestfile).then(response => {
+          console.log(response)
+          return response
+        })
+          .catch(err => {
+            attempt = attempt || 0;
+            if (attempt == 0) {
+              //sometimes the url returned returns 403 OK, because somehow it is invalid.  In this scenario, try again to get a working url
+              return getFileFromDatabase(1)
+            } else {
+              return Promise.reject(err)
+            }
+          });
+      })
+    }
+    return getFileFromDatabase(0)
   }
 
-  //get authorization token
-  function auth(interactive) {
-    interactive = !!interactive;
-    return new Promise(function(resolve, reject) {
-      accessToken = null;
-  		chrome.identity.getAuthToken({
-  			interactive : interactive
-  		}, function(token) {
-  			accessToken = token;
-  			if (token)
-  			  resolve();
-  			else
-  			  var err = chrome.runtime.lastError;
-  			  if (!err) {
-  			    err = new Error("Failed to authenticate.");
-  			  }
-  			  if (err.message == "OAuth2 not granted or revoked.") {
-  			    //too confusing
-  			    reject(new Error("CKPX needs access to Google Drive to access this password file.  You must Authorize google drive access to continue."))
-  			  } else {
-    			  reject(err);
-  			  }
-  		});
-    });
+  oauth.revokeAuth = function () {
+    return settings.getAccessToken(accessTokenType).then(function(accessToken) {
+      if (accessToken) {
+        var url = 'https://accounts.google.com/o/oauth2/revoke?token=' + accessToken
+        return axios({
+          url: url, 
+          responseType: 'jsonp'
+        }).catch(err => {
+          // Assume the request failed because the token was already bad...
+          console.error(err)
+          return Promise.resolve();
+        })
+      } else {
+        return Promise.resolve();
+      }
+    })
   }
 
-  return exports;
+  oauth.handleAuthRedirectURI = function (redirect_url, randomState, resolve, reject)  {
+    var tokenMatches = /access_token=([^&]+)/.exec(redirect_url);
+    var stateMatches = /state=([^&]+)/.exec(redirect_url);
+
+    if (tokenMatches && stateMatches) {
+      var access_token = tokenMatches[1];
+      var checkState = decodeURIComponent(stateMatches[1]);
+      if (checkState === randomState) {
+        settings.saveAccessToken(accessTokenType, access_token).then(function() {
+          resolve(access_token);
+        });
+      } else {
+        //some sort of error or parsing failure
+        reject(redirect_url);
+        console.error("Auth error with state", redirect_url);
+      }
+    } else {
+      //some sort of error
+      reject(redirect_url)
+      console.error("Auth Error", redirect_url);
+    }
+  }
+
+  return OauthManager(settings, oauth)
 }
+
+export { GoogleDrivePasswordFileManager }

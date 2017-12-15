@@ -1,29 +1,3 @@
-/**
-
-The MIT License (MIT)
-
-Copyright (c) 2015 Steven Campbell.
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-
-*/
-
 "use strict";
 
 /**
@@ -37,7 +11,7 @@ THE SOFTWARE.
  * Max storage time is 40 minutes, which is the expected TTL of the secret.  You
  * can see details of the expiry time in chrome://identity-internals/
  */
-function SecureCacheDisk(protectedMemory, secureCacheMemory, settings) {
+module.exports = function SecureCacheDisk(protectedMemory, secureCacheMemory, settings) {
   var exports = {
     save: set,
     get: get,
@@ -57,7 +31,6 @@ function SecureCacheDisk(protectedMemory, secureCacheMemory, settings) {
 	        reject(new Error('Disk cache is not enabled'));
 	        return;
 	      }
-
 	      if (chrome.extension.inIncognitoContext) {
 	        reject(new Error('Secure cache cannot work in incognito mode'));
 	      	return;
@@ -119,6 +92,7 @@ function SecureCacheDisk(protectedMemory, secureCacheMemory, settings) {
         });
       }).catch(function(err) {
         //fallback to in-memory
+        //  console.error(err)
         secureCacheMemory.save(key, data).then(function() {
           resolve();
         }).catch(function(err) {
@@ -139,11 +113,11 @@ function SecureCacheDisk(protectedMemory, secureCacheMemory, settings) {
             var decoder = new TextDecoder();
             var serialized = decoder.decode(new Uint8Array(decryptedBytes));
             var data = protectedMemory.hydrate(serialized);
-
             resolve(data);
           });
         }).catch(function(err) {
           //fallback to in-memory
+          // console.error(err)
           secureCacheMemory.get(key).then(function(data) {
             resolve(data);
           }).catch(function(err) {

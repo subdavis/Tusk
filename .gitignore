@@ -40,6 +40,7 @@ store/
 
 #packaged app
 build/
+dist/
 *.zip
 
 #nodejs

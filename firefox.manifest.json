@@ -1,0 +1,66 @@
+{
+	"name": "KeePass Tusk - A better password manager",
+	"short_name": "KeePass Tusk",
+	"version": "2017.11.12",
+	"manifest_version": 2,
+	"minimum_chrome_version": "48",
+	"description": "Readonly KeePass password database integration for Chrome™",
+	"icons": {
+		"16": "assets/icons/logo_16.png",
+		"48": "assets/icons/logo_48.png"
+	},
+	"background": {
+		"scripts": [
+			"dist/background.build.js"
+		],
+		"persistent": false
+	},
+	"browser_action": {
+		"default_icon": "assets/icons/logo_38.png",
+		"default_popup": "popup.html",
+    "default_title": "KeePass Tusk"
+	},
+	"options_ui": {
+		"page": "options.html",
+		"chrome_style": false,
+		"open_in_tab": true
+	},
+	"applications": {
+	  "gecko": {
+	    "id": "brandon@subdavis.com",
+	    "strict_min_version": "57.0"
+	  }
+	},
+	"commands": {
+		"_execute_page_action": {
+			"suggested_key": {
+				"windows": "Ctrl+Shift+Space",
+				"mac": "Command+Shift+Space",
+				"chromeos": "Ctrl+Shift+Space",
+				"linux": "Ctrl+Shift+Space"
+			}
+		}
+	},
+	"static_data": {
+		"dropbox" : {
+			"client_id": "lau0eigo4cfthqz"
+		},
+		"onedrive" : {
+			"client_id" : "08b651fe-3b64-4a5e-aeb7-66d7220ec707"
+		},
+		"gdrive": {
+			"client_id": "876467817034-rlas0hnb5jc9dt1qmp11l6g4724ktoqn.apps.googleusercontent.com"
+		}
+	},
+	"permissions": [
+		"activeTab",
+		"storage",
+		"clipboardWrite",
+		"identity",
+		"alarms",
+		"notifications",
+		"https://*/*",
+		"http://*/*",
+		"file:///*/*"
+	]
+}

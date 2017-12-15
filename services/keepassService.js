@@ -1,35 +1,15 @@
-/**
-
-The MIT License (MIT)
-
-Copyright (c) 2015 Steven Campbell.
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-
- */
-
 "use strict";
-
 /**
  * Service for opening keepass files
  */
-function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry, keepassReference) {
+let Case = require('case'),
+    Base64 = require('base64-arraybuffer'),
+    pako = require('pako'),
+    kdbxweb = require('kdbxweb')
+
+import { argon2 } from '$lib/argon2.js'
+
+function KeepassService(keepassHeader, settings, passwordFileStoreRegistry, keepassReference) {
   var my = {};
 
   var littleEndian = (function() {
@@ -44,7 +24,7 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry, keepa
      * (password isn't empty OR keyfile isn't empty)
      * ELSE
      * (assume password is the empty string)
-     */
+     */ 
     if (masterPassword === undefined && keyFileInfo === undefined){
       // Neither keyfile nor password provided.  Assume empty string password.
       masterPassword = "";
@@ -55,6 +35,7 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry, keepa
     }
     var fileKey = keyFileInfo ? Base64.decode(keyFileInfo.encodedKey) : null;
     return passwordFileStoreRegistry.getChosenDatabaseFile(settings).then(function(buf) {
+      console.log(buf)
       var h = keepassHeader.readHeader(buf);
   		return getKey(h.kdbx, masterPassword, fileKey);
   	});
@@ -217,3 +198,5 @@ function Keepass(keepassHeader, pako, settings, passwordFileStoreRegistry, keepa
 
   return my;
 }
+
+export { KeepassService }

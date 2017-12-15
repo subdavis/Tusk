@@ -1,35 +1,13 @@
-/**
-
-The MIT License (MIT)
-
-Copyright (c) 2015 Steven Campbell.
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-
-*/
-
 "use strict";
+
+import { ChromePromiseApi } from '$lib/chrome-api-promise.js'
+
+const chromePromise = ChromePromiseApi()
 
 /**
  * Shared state and methods for an unlocked password file.
  */
-function UnlockedState($interval, $location, keepassReference, protectedMemory, settings) {
+function UnlockedState($router, keepassReference, protectedMemory, settings) {
 	var my = {
 		tabId: "", //tab id of current tab
 		url: "", //url of current tab
@@ -37,9 +15,11 @@ function UnlockedState($interval, $location, keepassReference, protectedMemory, 
 		origin: "", //url of current tab without path or querystring
 		sitePermission: false, //true if the extension already has rights to autofill the password
 		entries: null, //filtered password database entries
+		cache: {}, // a secure cache that refreshes when values are SET.
 		clipboardStatus: "" //status message about clipboard, used when copying password to the clipboard
 	};
 	var copyEntry;
+	var cacheTimeoutId;
 
 	//determine current url:
 	my.getTabDetails = function() {
@@ -57,18 +37,18 @@ function UnlockedState($interval, $location, keepassReference, protectedMemory, 
 					var parsedUrl = parseUrl(tabs[0].url);
 					my.origin = parsedUrl.protocol + '//' + parsedUrl.hostname + '/';
 
-					chrome.p.permissions.contains({
+					chromePromise.permissions.contains({
 						origins: [my.origin]
 					})
-						.then(function() {
-							my.sitePermission = true;
-						})
-						.catch(function(err) {
-							my.sitePermission = false;
-						})
-						.then(function() {
-							resolve();
-						})
+					.then(function() {
+						my.sitePermission = true;
+					})
+					.catch(function(err) {
+						my.sitePermission = false;
+					})
+					.then(function() {
+						resolve();
+					})
 				} else {
 					reject(new Error("Unable to determine tab details"));
 				}
@@ -76,11 +56,36 @@ function UnlockedState($interval, $location, keepassReference, protectedMemory, 
 		});
 	};
 
+	my.clearCache = function() {
+		// Destroys an object in memory.
+		function destroy(obj) {
+		    for(var prop in obj){
+		        var property = obj[prop];
+		        if(property != null && typeof(property) == 'object') {
+		            destroy(property);
+		        }
+		        else {
+		            obj[prop] = null;
+		        }
+		    }
+		}
+		destroy(my.cache)
+		my.cache = {}
+	}
+
+	my.cacheSet = function (key, val) {
+		// Refresh cache
+		clearTimeout(cacheTimeoutId)
+		cacheTimeoutId = setTimeout(my.clearCache, 60000);
+
+		my.cache[key] = val;
+	}
+
 	my.clearBackgroundState = function() {
 		my.entries = null;
 		my.clipboardStatus = "";
 	}
-	$interval(my.clearBackgroundState, 60000, 1);  //clear backgroundstate after 10 minutes live - we should never be alive that long
+	setTimeout(my.clearBackgroundState, 60000);  //clear backgroundstate after 1 minutes live - we should never be alive that long
 
 	my.autofill = function(entry) {
 		settings.getUseCredentialApiFlag().then(useCredentialApi => {
@@ -99,7 +104,7 @@ function UnlockedState($interval, $location, keepassReference, protectedMemory, 
 				}
 			});
 
-			window.close(); //close the popup
+			// window.close(); //close the popup
 		})
 	}
 
@@ -114,7 +119,7 @@ function UnlockedState($interval, $location, keepassReference, protectedMemory, 
 	}
 
 	my.gotoDetails = function(entry) {
-		$location.path('/entry-details/' + entry.id);
+		$router.route('/entry-details/' + entry.id);
 	}
 
 	my.getDecryptedAttribute = function(entry, attributeName) {
@@ -169,3 +174,5 @@ function UnlockedState($interval, $location, keepassReference, protectedMemory, 
 
 	return my;
 }
+
+export { UnlockedState }

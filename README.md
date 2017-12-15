@@ -1,49 +1,40 @@
-# CKPX
+# Tusk
 
-Chrome extension for interacting with KeePass password file.
+![Tusk](https://github.com/subdavis/Tusk/blob/develop/assets/icons/logo_256.png)
 
-Due to the inactivity of [CKP](https://github.com/perfectapi/CKP), CKPX now exists as an independent fork.  The name CKPX was chosen as homage to KeePassX, an independent derivative of KeePass.
+> A modern, clean keepass browser extension built with Vue.js and kdbxweb.  Rebooted from https://github.com/perfectapi/CKP.
 
-## Running or Updating the code locally
+Homepage: https://subdavis.com/Tusk
 
-To configure a development environment...
+## Build Setup
 
-1) Aquire the necessary tools:
-    * [Node.Js](http://nodejs.org/) - prerequisite for other dev tools
-    * [Grunt.js](gruntjs.com) - for less/css processing, packaging, and copying libs to the lib folder
-    * [Bower](http://bower.io/) - for dependencies (libraries)
+```bash
+# install dependencies
+npm install
 
-2) Clone the codebase
-	
-    ```
-    git clone https://github.com/subdavis/CKPX.git
-    cd CKPX
-    ```
+# serve with hot reload at localhost:8080
+npm run dev
 
-3) Install the dependencies. 
+# static reload with file watch
+npm run watch
 
-    ```
-    npm install
-    bower install 
-    ```
+# build for production with minification
+npm run build
 
-4) Copy the dependencies to their lib location.  
+# run the packer script targeted for 'chrome' or 'firefox'
+TARGET_BROWSER=firefox ./packer.sh
+```
 
-    ```
-    grunt updatelib
-    ```
+For detailed explanation on how things work, consult the [docs for vue-loader](http://vuejs.github.io/vue-loader).
 
-5) If you are editing ```.less``` files then run ```grunt watch``` to compile them when they change.
+## Browser Permissions
 
-## Installing in chrome ##
+> Tusk requires cross-origin permissions in order to inject credentials and query the storage backends on the user's behalf.
 
-Install the latest stable version from [Chorme Web Store](https://chrome.google.com/webstore/detail/fmhmiaejopepamlcjkncpgpdjichnecm).
+In chrome, these permissions requests are __always__ promted to the user upon first use.
 
-To install the code manually in Chrome, open **More Tools\Extensions**, check the **Developer mode** checkbox.  Click **Load unpacked extension** and browse to the folder where you cloned the code.  
+Because of Firefox's implementation of `browser.permissions`, it was necessary to request all permissions at install time to avoid code rot.  A deeper explanation of the firefox permissions can be found [on stackoverflow](https://stackoverflow.com/questioans/47723297/firefox-extension-api-permissions-request-may-only-be-called-from-a-user-input)
 
-You may find the [Chrome Apps & Extensions Developer Tool](https://chrome.google.com/webstore/detail/chrome-apps-extensions-de/ohmmkhmmmpcnpikjeljgnaoabkaalbgc) to be helpful when debugging the background page.
+## Looking for CKPX?
 
-
-## Running tests ##
-
-Open ```./tests/services.html``` in your browser
+You found it!  CKPX has been rebranded as Tusk to mark it's Firefox release, since the C stood for 'Chrome'.

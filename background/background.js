@@ -31,7 +31,10 @@ THE SOFTWARE.
   (they will be lost)
 */
 
-(function(protectedMemory, settings) {
+import ProtectedMemory from '$services/protectedMemory.js'
+import { Settings } from '$services/settings.js'
+
+function Background(protectedMemory, settings) {
 	if (chrome.extension.inIncognitoContext) {
 		doReplaceRules();
 	} else {
@@ -51,7 +54,7 @@ THE SOFTWARE.
 				],
 				actions: [
 					new chrome.declarativeContent.ShowPageAction()
-					//new chrome.declarativeContent.RequestContentScript({js: ['keepass.js']})
+					//new chrome.declarativeContent.RequestContentScript({js: ['inject.js']})
 				]
 			};
 			var textField = {
@@ -116,7 +119,7 @@ THE SOFTWARE.
 			chrome.notifications.create({
 				'type': 'basic',
 				'iconUrl': 'assets/icons/logo_48.png',
-				'title': 'CKPX',
+				'title': 'Tusk',
 				'message': message.text
 			}, function(notificationId) {
 				chrome.alarms.create('clearNotification-'+notificationId, {
@@ -152,16 +155,15 @@ THE SOFTWARE.
 						o: message.o,
 						uca: message.uca
 					});
-
 					return;
 				}
-
 				chrome.tabs.executeScript(message.tabId, {
-					file: "keepass.js",
+					file: "/dist/inject.build.js",
 					allFrames: true,
 					runAt: "document_start"
 				}, function(result) {
 					//script injected
+					console.log("injected")
 					chrome.tabs.sendMessage(message.tabId, {
 						m: "fillPassword",
 						u: message.u,
@@ -222,7 +224,7 @@ THE SOFTWARE.
 							chrome.notifications.create({
 								'type': 'basic',
 								'iconUrl': 'assets/icons/logo_48.png',
-								'title': 'CKPX',
+								'title': 'Tusk',
 								'message': 'Clipboard cleared'
 							}, function(notificationId) {
 								setTimeout(function() {
@@ -235,7 +237,7 @@ THE SOFTWARE.
 								chrome.notifications.create({
 									'type': 'basic',
 									'iconUrl': 'assets/icons/logo_48.png',
-									'title': 'CKPX',
+									'title': 'Tusk',
 									'message': 'Remembered password expired'
 								}, function(notificationId) {
 									chrome.alarms.create('clearNotification-'+notificationId, {
@@ -277,4 +279,6 @@ THE SOFTWARE.
 			});
 	}
 
-})(new ProtectedMemory(), new Settings());
+}
+
+Background(new ProtectedMemory(), new Settings())
