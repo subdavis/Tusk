@@ -3,7 +3,7 @@ import { ChromePromiseApi } from '$lib/chrome-api-promise.js'
 
 const chromePromise = ChromePromiseApi()
 /**
- * Settings for CKPX  */
+ * Settings for Tusk  */
 function Settings() {
 	"use strict";
 

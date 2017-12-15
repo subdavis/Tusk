@@ -2,7 +2,7 @@
 	<div>
 		<div class="box-bar roomy">
 			<h4>Enable on-disk password caching</h4>
-			<p>Unless you use the "remember password" option, CKPX can only keep your password file open in-memory for a very brief time, typically about 10 seconds after you close the popup.  This can be frustrating if you have a long password and you need to access several websites.  With this option enabled, an unlocked database is encrypted and stored locally so that you don't have to re-type your password for each website.  The cache expires automatically after about 40 minutes.</p>
+			<p>Unless you use the "remember password" option, Tusk can only keep your password file open in-memory for a very brief time, typically about 10 seconds after you close the popup.  This can be frustrating if you have a long password and you need to access several websites.  With this option enabled, an unlocked database is encrypted and stored locally so that you don't have to re-type your password for each website.  The cache expires automatically after about 40 minutes.</p>
 		</div>
 		<div class="switch box-bar roomy lighter">
 	    <label>
@@ -15,7 +15,7 @@
 
 		<div class="box-bar roomy">
 			<h4>Encourage Chrome to emember your passwords</h4>
-			<p><a href="https://w3c.github.io/webappsec-credential-management/">Chrome Credential API</a> allows JavaScript to interact in a limited way with the Chrome password manager.  If enabled in the browser, CKPX can use this to encourage Chrome to remember the passwords you use so that they become available in your browser without needing to use CKPX.<br /><br />Chrome also syncs passwords between devices, so they should also become available on your mobile device or other computers.</p>
+			<p><a href="https://w3c.github.io/webappsec-credential-management/">Chrome Credential API</a> allows JavaScript to interact in a limited way with the Chrome password manager.  If enabled in the browser, Tusk can use this to encourage Chrome to remember the passwords you use so that they become available in your browser without needing to use Tusk.<br /><br />Chrome also syncs passwords between devices, so they should also become available on your mobile device or other computers.</p>
 		</div>
 		<div class="switch box-bar roomy lighter">
 	    <label>
@@ -29,7 +29,7 @@
 		
 		<div class="box-bar roomy">
 			<h4>Stored Data</h4>
-			<p>The following objects represent the current data cached in chrome storage.  This data is only available to CKPX, and is never sent over any network connection.</p>
+			<p>The following objects represent the current data cached in chrome storage.  This data is only available to Tusk, and is never sent over any network connection.</p>
 		</div>
 		<div class="box-bar between lighter roomy" v-for="blob in blobs">
 	  	<div class="json" :id="blob.k"></div>

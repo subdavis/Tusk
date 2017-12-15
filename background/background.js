@@ -119,7 +119,7 @@ function Background(protectedMemory, settings) {
 			chrome.notifications.create({
 				'type': 'basic',
 				'iconUrl': 'assets/icons/logo_48.png',
-				'title': 'CKPX',
+				'title': 'Tusk',
 				'message': message.text
 			}, function(notificationId) {
 				chrome.alarms.create('clearNotification-'+notificationId, {
@@ -224,7 +224,7 @@ function Background(protectedMemory, settings) {
 							chrome.notifications.create({
 								'type': 'basic',
 								'iconUrl': 'assets/icons/logo_48.png',
-								'title': 'CKPX',
+								'title': 'Tusk',
 								'message': 'Clipboard cleared'
 							}, function(notificationId) {
 								setTimeout(function() {
@@ -237,7 +237,7 @@ function Background(protectedMemory, settings) {
 								chrome.notifications.create({
 									'type': 'basic',
 									'iconUrl': 'assets/icons/logo_48.png',
-									'title': 'CKPX',
+									'title': 'Tusk',
 									'message': 'Remembered password expired'
 								}, function(notificationId) {
 									chrome.alarms.create('clearNotification-'+notificationId, {

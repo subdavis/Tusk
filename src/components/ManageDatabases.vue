@@ -1,7 +1,7 @@
 <template>
   <div>
   	<div class="box-bar about roomy">
-			<p>CKPX <b>requires</b> that you enable at least one of these cloud storage providers to sync your keepass database with.  Once the files appear below, they will be available to unlock within the popup window.</p>
+			<p>Tusk <b>requires</b> that you enable at least one of these cloud storage providers to sync your keepass database with.  Once the files appear below, they will be available to unlock within the popup window.</p>
 			
 			<a class="waves-effect waves-light btn" @click="tabRouter.route('/help/me/choose')">Help me choose</a>
 			<a class="waves-effect waves-light btn" @click="tabRouter.route('/new/user')">I haven't made a keepass database yet.</a>

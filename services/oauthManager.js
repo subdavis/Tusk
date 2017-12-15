@@ -175,7 +175,8 @@ function OauthManager(settings, oauth) {
 					var authUrl = oauth.authUrl
 					  + '&client_id=' + manifest.static_data[oauth.accessTokenType].client_id
 						+ '&state=' + encodeURIComponent(randomState)
-						+ '&redirect_uri=' + encodeURIComponent(chrome.identity.getRedirectURL(oauth.accessTokenType));
+						+ '&redirect_uri=' + encodeURIComponent(chrome.identity.getRedirectURL());
+					console.log(authUrl)
 					chromePromise.identity.launchWebAuthFlow({'url': authUrl, 'interactive': interactive}).then(redirect_url => {
 						oauth.handleAuthRedirectURI(redirect_url, randomState, resolve, reject)
 					}).catch(function(err) {

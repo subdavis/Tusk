@@ -8,9 +8,9 @@
     <div class="box-bar plain">
       <div class="unlockLogo stack-item">
         <img src="../assets/logo.png">
-        <span>CKPX</span>
+        <span>Tusk</span>
       </div>
-      <p>CKPX is an extension that uses your existing KeePass database files to autofill passwords on websites.  In order to continue, you must add your KeePass database file(s).</p>
+      <p>Tusk is an extension that uses your existing KeePass database files to autofill passwords on websites.  In order to continue, you must add your KeePass database file(s).</p>
     </div>
     <div class="stack-item selectable">
       <button class="action-button selectable" v-on:click="links.openOptions">Add a KeePass database file</button>

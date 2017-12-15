@@ -1,6 +1,6 @@
 {
-	"name": "CKPX - Chrome KeePass, Extended",
-	"short_name": "CKPX Extension",
+	"name": "KeePass Tusk - A better password manager",
+	"short_name": "KeePass Tusk",
 	"version": "2017.11.12",
 	"manifest_version": 2,
 	"minimum_chrome_version": "48",
@@ -27,7 +27,7 @@
 	"browser_action": {
 		"default_icon": "assets/icons/logo_38.png",
 		"default_popup": "popup.html",
-    "default_title": "CKP"
+    "default_title": "KeePass Tusk"
 	},
 	"options_ui": {
 		"page": "options.html",
@@ -65,7 +65,7 @@
 			"client_id" : "f4c55645-3f43-4f8e-a7d2-ec167b416f1d"
 		},
 		"gdrive": {
-			"client_id": "965112583821-sr9nsmv4n9h5te982i5v4jehtqkv8fbu.apps.googleusercontent.com"
+			"client_id": "876467817034-rlas0hnb5jc9dt1qmp11l6g4724ktoqn.apps.googleusercontent.com"
 		}
 	}
 }

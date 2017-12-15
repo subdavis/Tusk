@@ -22,7 +22,7 @@
       
       <div class="unlockLogo stack-item">
         <img src="../assets/logo.png">
-        <span>CKPX</span>
+        <span>Elephant for KeePass</span>
       </div>
       
       <form v-on:submit="clickUnlock">
@@ -415,9 +415,9 @@ export default {
     // modify unlockedState internal state
     this.unlockedState.getTabDetails().then(nil => {
       if (this.unlockedState.sitePermission)
-        this.generalMessages.success = "You have previously granted CKPX permission to fill passwords on this site."
+        this.generalMessages.success = "You have previously granted Tusk permission to fill passwords on this site."
       else
-        this.generalMessages.warn = "This may be a new site to CKPX. Before filling in a password, double check that this is the  correct site."
+        this.generalMessages.warn = "This may be a new site to Tusk. Before filling in a password, double check that this is the  correct site."
     })
     //set knowlege from the URL
     this.databaseFileName = decodeURIComponent(this.$router.getRoute().title)
