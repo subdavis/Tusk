@@ -4,19 +4,20 @@
     <div v-if="busy" class="spinner">
       <spinner size="medium" :message="'Starting up...'"></spinner>
     </div>
-
-    <div class="box-bar plain">
-      <div class="unlockLogo stack-item">
-        <img src="../assets/logo.png">
-        <span>Tusk</span>
+    <div v-else>
+      <div class="box-bar plain">
+        <div class="unlockLogo stack-item">
+          <img src="../assets/logo.png">
+          <span>KeePass Tusk</span>
+        </div>
+        <p>Tusk is an extension that uses your existing KeePass database files to autofill passwords on websites.  In order to continue, you must add your KeePass database file(s).</p>
       </div>
-      <p>Tusk is an extension that uses your existing KeePass database files to autofill passwords on websites.  In order to continue, you must add your KeePass database file(s).</p>
-    </div>
-    <div class="stack-item selectable">
-      <button class="action-button selectable" v-on:click="links.openOptions">Add a KeePass database file</button>
-    </div>
-    <div class="box-bar plain">
-      <p>You can return here when you've enabled one of the database file providers.</p>
+      <div class="stack-item selectable">
+        <button class="action-button selectable" v-on:click="links.openOptions">Add a KeePass database file</button>
+      </div>
+      <div class="box-bar plain">
+        <p>You can return here when you've enabled one of the database file providers.</p>
+      </div>
     </div>
   </div>
 </template>
