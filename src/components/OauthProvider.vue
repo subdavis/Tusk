@@ -15,7 +15,7 @@
   		:busy="busy"
   		:databases="databases"
   		:loggedIn="loggedIn"
-  		:messages="messages"
+  		:error="messages.error"
   		:provider-manager="providerManager"
   		:toggle-login="toggleLogin"
   		:removeable="false"
@@ -72,10 +72,15 @@ export default {
 						// if logout works, attempt to unset the currentDatabaseChoice.
 						this.settings.disableDatabaseProvider(this.providerManager)
 						this.populate()
+					}).catch(err => {
+						this.messages.error = err.toString()
 					})
 				} else {
 					this.providerManager.login().then(nil => {
 						this.populate()
+					}).catch(err => {
+						this.loggedIn = false
+						this.messages.error = err.toString()
 					})
 				}
 			} else {

@@ -3,9 +3,9 @@
 		<div class="between">
 	  	<div class="title">
 	  		<span><svg class="icon" viewBox="0 0 1 1"><use v-bind="{'xlink:href':'#'+providerManager.icon}"></use></svg> {{ providerManager.chooseTitle }}</span>
-	  		<span v-for="db in databases" class="chip">{{ db.title }}</span>
-	  		<span class="error" v-if="messages.error">
-	  			{{ link.title }}
+	  		<span class="error" v-show="error.length">{{error}}</span>
+	  		<span v-for="db in databases" class="chip">
+	  			{{ db.title }}
 	  			<i v-if="removeable" class="fa fa-times-circle selectable" aria-hidden="true" @click="removeLink(index)"></i>
 	  		</span>
 	  	</div>
@@ -30,7 +30,7 @@ export default {
 		providerManager: Object,
 		busy: Boolean,
 		databases: Array,
-		messages: Object,
+		error: String,
 		loggedIn: Boolean,
 		toggleLogin: Function,
 		removeable: Boolean,

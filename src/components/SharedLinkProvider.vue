@@ -8,7 +8,7 @@
   		:busy="busy"
   		:databases="links"
   		:loggedIn="loggedIn"
-  		:messages="messages"
+  		:error="messages.error"
   		:provider-manager="providerManager"
   		:toggle-login="toggleLogin"
   		:removeable="true"
