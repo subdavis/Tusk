@@ -22,7 +22,7 @@
       
       <div class="unlockLogo stack-item">
         <img src="../assets/logo.png">
-        <span>Elephant for KeePass</span>
+        <span>KeePass Tusk</span>
       </div>
       
       <form v-on:submit="clickUnlock">
