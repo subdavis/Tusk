@@ -11,27 +11,21 @@
 -->
 <template>
   <div class="box-bar roomy database-manager">
-  	<div class="between">
-	  	<div class="title">
-	  		<span><svg class="icon" viewBox="0 0 1 1"><use v-bind="{'xlink:href':'#'+providerManager.icon}"/></svg> {{ providerManager.chooseTitle }}</span>
-	  		<span v-for="db in databases" class="chip">{{ db.title }}</span>
-	  		<span class="error" v-if="messages.error">{{messages.error}}</span>
-	  	</div>
-	  	<div>
-	  		<div class="switch">
-			    <label>
-			      {{ busy ? 'busy' : (loggedIn ? 'Enabled' : 'Disabled') }}
-			      <input :disabled="busy" type="checkbox" v-model="loggedIn" @click="toggleLogin">
-			      <span class="lever"></span>
-			    </label>
-			  </div>
-			</div>
-		</div>
-		<div class="description">{{ providerManager.chooseDescription }}</div>
+  	<generic-provider-ui
+  		:busy="busy"
+  		:databases="databases"
+  		:loggedIn="loggedIn"
+  		:messages="messages"
+  		:provider-manager="providerManager"
+  		:toggle-login="toggleLogin"
+  		:removeable="false"
+  		:remove-function="undefined"></generic-provider-ui>
   </div>
 </template>
 
 <script>
+import GenericProviderUi from '@/components/GenericProviderUi'
+
 export default {
 	data () {
 		return {
@@ -42,6 +36,9 @@ export default {
 				error: ""
 			}
 		}
+	},
+	components: {
+		GenericProviderUi
 	},
 	props: {
 		providerManager: Object,
@@ -56,6 +53,7 @@ export default {
 				this.databases = databases
 				this.providerManager.isLoggedIn().then(loggedIn => {
 					this.loggedIn = loggedIn
+					console.log(this.providerManager.title, loggedIn)
 					this.busy = false
 				})
 			}).catch(err => {

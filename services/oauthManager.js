@@ -123,8 +123,8 @@ function OauthManager(settings, oauth) {
 	}
 
 	function isLoggedIn () {
-		return settings.getAccessToken(accessTokenType).then(stored_token => {
-			return !!stored_token
+		return new Promise((resolve, reject) => {
+			resolve(state.loggedIn)
 		})
 	}
 
