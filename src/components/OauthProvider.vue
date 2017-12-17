@@ -53,7 +53,6 @@ export default {
 				this.databases = databases
 				this.providerManager.isLoggedIn().then(loggedIn => {
 					this.loggedIn = loggedIn
-					console.log(this.providerManager.title, loggedIn)
 					this.busy = false
 				})
 			}).catch(err => {

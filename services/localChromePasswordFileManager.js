@@ -1,5 +1,5 @@
 "use strict";
-
+const Base64 = require('base64-arraybuffer')
 import { ChromePromiseApi } from '$lib/chrome-api-promise.js'
 
 const chromePromise = ChromePromiseApi()
@@ -7,7 +7,6 @@ const chromePromise = ChromePromiseApi()
 function LocalChromePasswordFileManager() {
   var exports = {
     key: 'local',
-    routePath: '/drag-drop-file',
     listDatabases: listDatabases,
     getDatabaseChoiceData: getDatabaseChoiceData,
     getChosenDatabaseFile: getChosenDatabaseFile,
@@ -17,11 +16,28 @@ function LocalChromePasswordFileManager() {
     title: 'Chrome Storage',
     icon: 'icon-upload',
     chooseTitle: 'File System',
-    chooseDescription: 'Upload files from your local or remote file-system.  A one-time copy of the file(s) will be saved in Chrome local storage.  If you update the database on your local system then you will have to re-upload it in order to see the changes.'
+    chooseDescription: 'Upload files from your local or remote file-system.  A one-time copy of the file(s) will be saved in Chrome local storage.  If you update the database on your local system then you will have to re-upload it in order to see the changes.',
+    login: enable,
+    logout: disable,
+    isLoggedIn: isEnabled
   };
 
   var backwardCompatibleVersion = 1; //missing version or version less than this is ignored due missing info or bugs in old storage
   var currentVersion = 1; //current version
+
+  function enable() {
+    return chromePromise.storage.local.set({'localPasswordFilesEnabled':true})
+  }
+
+  function disable () {
+    return chromePromise.storage.local.set({'localPasswordFilesEnabled':false})
+  }
+
+  function isEnabled () {
+    return chromePromise.storage.local.get('localPasswordFilesEnabled').then(result => {
+      return result.localPasswordFilesEnabled || false
+    })
+  }
 
   var savingLocks = [];  //prevent reading while an async save is ongoing
   function listDatabases() {

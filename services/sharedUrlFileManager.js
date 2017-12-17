@@ -8,7 +8,6 @@ const chromePromise = ChromePromiseApi()
 function SharedUrlFileManager() {
   var exports = {
     key: 'shared-url',
-    routePath: '/shared-url',
     listDatabases: listDatabases,
     getDatabaseChoiceData: getDatabaseChoiceData,
     getChosenDatabaseFile: getChosenDatabaseFile,

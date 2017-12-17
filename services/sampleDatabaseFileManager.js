@@ -8,7 +8,6 @@ const chromePromise = ChromePromiseApi()
 function SampleDatabaseFileManager() {
   var exports = {
     key: 'sample',
-    routePath: '/sample-database',
     listDatabases: listDatabases,
     getDatabaseChoiceData: getDatabaseChoiceData,
     getChosenDatabaseFile: getChosenDatabaseFile,

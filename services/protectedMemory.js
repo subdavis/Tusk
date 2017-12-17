@@ -8,7 +8,7 @@
 
 let Base64 = require('base64-arraybuffer')
 
-module.exports = function ProtectedMemory() {
+function ProtectedMemory() {
   var my = {
     getData: getData,
     setData: setData,
@@ -137,3 +137,5 @@ module.exports = function ProtectedMemory() {
 
   return my;
 }
+
+export { ProtectedMemory }
