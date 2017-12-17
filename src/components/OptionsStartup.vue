@@ -1,6 +1,10 @@
 <template>
   <div>
-  	<h3>Getting Started with Tusk</h3>
+  	
+  	<div class="unlockLogo stack-item optionsheader">
+      <img src="../assets/logo.png">
+      <span>Getting Started with Tusk</span>
+    </div>
 		
 		<p>Tusk helps you keep track of all your accounts by storing your passwords in an encrypted file called a Keepass Database.  You choose where this file is stored - most people keep them in a cloud storage provider like Dropbox or Google Drive for easy access and syncing between laptops, desktops, and phones.  To use Tusk, you should first enable one of the storage providers below.</p>
 
@@ -24,4 +28,9 @@ export default {
 
 <style lang="scss">
 @import "../styles/settings.scss";
+
+.optionsheader {
+	text-align: left;
+	font-size: 28px;
+}
 </style>

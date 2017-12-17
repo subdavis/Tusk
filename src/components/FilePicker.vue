@@ -1,11 +1,14 @@
 <template>
   <div>
-    <go-back :message="'go back'"></go-back>
-  	<div 
-      v-for="(db, index) in databases" 
-      class="box-bar small selectable flair chooseFile" 
-      @click="selectDatabase(index)">
-      <span><svg class="icon" viewBox="0 0 1 1"><use v-bind="{'xlink:href':'#'+db.provider.icon}"/></svg> {{ db.title }}</span> 
+  	<div v-for="(db, index) in databases" class="box-bar small selectable flair chooseFile" @click="selectDatabase(index)">
+      <span>
+        <svg class="icon" viewBox="0 0 1 1">
+          <use v-bind="{'xlink:href':'#'+db.provider.icon}"/>
+        </svg> {{ db.title }}
+      </span> 
+    </div>
+    <div class="box-bar small selectable flair chooseFile" @click="links.openOptions">
+      <span>Manage Database Files</span>
     </div>
   </div>
 </template>
@@ -16,7 +19,8 @@ import GoBack from '@/components/GoBack'
 export default {
 	props: {
     passwordFileStoreRegistry: Object,
-    settings: Object
+    settings: Object,
+    links: Object
 	},
   components: {
     GoBack

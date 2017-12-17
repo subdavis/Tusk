@@ -4,26 +4,15 @@
 -->
 <template>
   <div class="box-bar roomy database-manager">
-  	<div class="between">
-	  	<div class="title">
-	  		<span><svg class="icon" viewBox="0 0 1 1"><use v-bind="{'xlink:href':'#'+providerManager.icon}"/></svg> {{ providerManager.chooseTitle }}</span>
-	  		<span v-if="loggedIn" v-for="(link, index) in links" class="chip">
-	  			{{ link.title }}
-	  			<i class="fa fa-times-circle selectable" aria-hidden="true" @click="removeLink(index)"></i>
-	  		</span>
-	  		<span class="error" v-if="messages.error">{{messages.error}}</span>
-	  	</div>
-	  	<div>
-	  		<div class="switch">
-			    <label>
-			      {{ busy ? 'busy' : (loggedIn ? 'Enabled' : 'Disabled') }}
-			      <input :disabled="busy" type="checkbox" v-model="loggedIn" @click="toggleLogin">
-			      <span class="lever"></span>
-			    </label>
-			  </div>
-			</div>
-		</div>
-		<div class="description">{{ providerManager.chooseDescription }}</div>
+  	<generic-provider-ui
+  		:busy="busy"
+  		:databases="links"
+  		:loggedIn="loggedIn"
+  		:error="messages.error"
+  		:provider-manager="providerManager"
+  		:toggle-login="toggleLogin"
+  		:removeable="true"
+  		:remove-function="removeLink"></generic-provider-ui>
 		<div class="url-form shared-link-box" v-if="loggedIn">
 		  <input id="shared-link" type="text" v-model="currentUrl" placeholder="Shared Link URL"> 
 		  <input id="shared-link-name" type="text" v-model="currentUrlTitle" placeholder="Database Name">
@@ -34,6 +23,7 @@
 
 <script>
 import { ChromePromiseApi } from '$lib/chrome-api-promise.js'
+import GenericProviderUi from '@/components/GenericProviderUi'
 const chromePromise = ChromePromiseApi()
 
 export default {
@@ -49,6 +39,9 @@ export default {
 			}
 		}
 	},
+	components: {
+		GenericProviderUi
+	},
 	props: {
 		providerManager: Object,
 		settings: Object
@@ -57,9 +50,9 @@ export default {
 		toggleLogin () {
 			if (this.loggedIn){
 				this.settings.disableDatabaseProvider(this.providerManager)
-				this.providerManager.logout()
+				this.providerManager.logout().then(() => {this.loggedIn = false})
 			} else {
-				this.providerManager.login()
+				this.providerManager.login().then(() => {this.loggedIn = true})
 			}
 		},
 		removeLink (index) {

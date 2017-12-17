@@ -123,8 +123,8 @@ function OauthManager(settings, oauth) {
 	}
 
 	function isLoggedIn () {
-		return settings.getAccessToken(accessTokenType).then(stored_token => {
-			return !!stored_token
+		return new Promise((resolve, reject) => {
+			resolve(state.loggedIn)
 		})
 	}
 
@@ -175,7 +175,7 @@ function OauthManager(settings, oauth) {
 					var authUrl = oauth.authUrl
 					  + '&client_id=' + manifest.static_data[oauth.accessTokenType].client_id
 						+ '&state=' + encodeURIComponent(randomState)
-						+ '&redirect_uri=' + encodeURIComponent(chrome.identity.getRedirectURL());
+						+ '&redirect_uri=' + encodeURIComponent(chrome.identity.getRedirectURL(oauth.accessTokenType));
 					console.log(authUrl)
 					chromePromise.identity.launchWebAuthFlow({'url': authUrl, 'interactive': interactive}).then(redirect_url => {
 						oauth.handleAuthRedirectURI(redirect_url, randomState, resolve, reject)
