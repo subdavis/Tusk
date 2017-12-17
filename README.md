@@ -1,10 +1,8 @@
 # Tusk
 
-![Tusk](https://github.com/subdavis/Tusk/blob/develop/assets/icons/logo_256.png)
+> A modern, clean keepass browser extension built with Vue.js and kdbxweb.  Rebooted from perfectapi/CKP
 
-> A modern, clean keepass browser extension built with Vue.js and kdbxweb.  Rebooted from https://github.com/perfectapi/CKP.
-
-Homepage: https://subdavis.com/Tusk
+![Tusk](https://github.com/subdavis/Tusk/blob/develop/assets/icons/logo_256.png "Tusk Logo")
 
 ## Build Setup
 
