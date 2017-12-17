@@ -13,6 +13,7 @@
           v-if="show.manageDatabases.visible"
           :dropbox-file-manager="services.dropboxFileManager"
           :google-drive-manager="services.googleDrivePasswordFileManager"
+          :local-file-manager="services.localChromePasswordFileManager"
           :onedrive-manager="services.oneDriveFileManager"
           :sample-manager="services.sampleDatabaseFileManager"
           :shared-url-manager="services.sharedUrlFileManager"
@@ -32,12 +33,12 @@
 
 <script>
 // Singletons
-import ChromePromiseApi from '$lib/chrome-api-promise.js'
+import { ChromePromiseApi } from '$lib/chrome-api-promise.js'
 import { Settings } from '$services/settings.js'
-import ProtectedMemory from '$services/protectedMemory.js'
-import SecureCacheMemory from '$services/secureCacheMemory.js'
-import SecureCacheDisk from '$services/secureCacheDisk.js'
-import PasswordFileStore from '$services/passwordFileStore.js'
+import { ProtectedMemory } from '$services/protectedMemory.js'
+import { SecureCacheMemory } from '$services/secureCacheMemory.js'
+import { SecureCacheDisk } from '$services/secureCacheDisk.js'
+import { PasswordFileStoreRegistry } from '$services/passwordFileStore.js'
 import { KeyFileParser } from '$services/keyFileParser.js'
 // File Managers
 import { LocalChromePasswordFileManager } from '$services/localChromePasswordFileManager.js'
@@ -68,7 +69,7 @@ const sharedUrlFileManager = new SharedUrlFileManager()
 const oneDriveFileManager = new OneDriveFileManager(settings)
 const sampleDatabaseFileManager = new SampleDatabaseFileManager()
 
-const passwordFileStoreRegistry = new PasswordFileStore(localChromePasswordFileManager, dropboxFileManager, googleDrivePasswordFileManager, sharedUrlFileManager, sampleDatabaseFileManager, oneDriveFileManager)
+const passwordFileStoreRegistry = new PasswordFileStoreRegistry(localChromePasswordFileManager, dropboxFileManager, googleDrivePasswordFileManager, sharedUrlFileManager, sampleDatabaseFileManager, oneDriveFileManager)
 
 export default {
   name: 'app',
@@ -88,6 +89,7 @@ export default {
         settings,
         dropboxFileManager,
         googleDrivePasswordFileManager,
+        localChromePasswordFileManager,
         oneDriveFileManager,
         sampleDatabaseFileManager,
         sharedUrlFileManager,

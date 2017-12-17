@@ -4,7 +4,7 @@
  * Provides a container for various storage mechanisms (aka FileManagers)that can be injected,
  * so that the rest of the code can be independent of specifics.
 **/
-module.exports = function PasswordFileStoreRegistry() {
+function PasswordFileStoreRegistry() {
   var exports = {
     listFileManagers: listFileManagers,
     getChosenDatabaseFile: getChosenDatabaseFile
@@ -37,3 +37,5 @@ module.exports = function PasswordFileStoreRegistry() {
 
   return exports;
 }
+
+export { PasswordFileStoreRegistry }

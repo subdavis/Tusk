@@ -26,14 +26,14 @@
 <script>
 // Singletons
 import { Settings } from '$services/settings.js'
-import ProtectedMemory from '$services/protectedMemory.js'
+import { ProtectedMemory } from '$services/protectedMemory.js'
 import { KeepassHeader } from '$services/keepassHeader.js'
 import { KeepassReference } from '$services/keepassReference.js'
 import { KeepassService } from '$services/keepassService.js'
 import { UnlockedState } from '$services/unlockedState.js'
-import SecureCacheMemory from '$services/secureCacheMemory.js'
-import SecureCacheDisk from '$services/secureCacheDisk.js'
-import PasswordFileStore from '$services/passwordFileStore.js'
+import { SecureCacheMemory } from '$services/secureCacheMemory.js'
+import { SecureCacheDisk } from '$services/secureCacheDisk.js'
+import { PasswordFileStoreRegistry } from '$services/passwordFileStore.js'
 import { Links } from '$services/links.js'
 // File Managers
 import { LocalChromePasswordFileManager } from '$services/localChromePasswordFileManager.js'
@@ -65,7 +65,7 @@ const sharedUrlFileManager = new SharedUrlFileManager()
 const oneDriveFileManager = new OneDriveFileManager(settings)
 const sampleDatabaseFileManager = new SampleDatabaseFileManager()
 
-const passwordFileStoreRegistry = new PasswordFileStore(localChromePasswordFileManager, dropboxFileManager, googleDrivePasswordFileManager, sharedUrlFileManager, sampleDatabaseFileManager, oneDriveFileManager)
+const passwordFileStoreRegistry = new PasswordFileStoreRegistry(localChromePasswordFileManager, dropboxFileManager, googleDrivePasswordFileManager, sharedUrlFileManager, sampleDatabaseFileManager, oneDriveFileManager)
 const keepassService = new KeepassService(keepassHeader, settings, passwordFileStoreRegistry, keepassReference)
 
 export default {

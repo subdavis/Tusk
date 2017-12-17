@@ -3,7 +3,7 @@
 /**
  * Storage in background page memory.
  */
-module.exports = function SecureCacheMemory(protectedMemory) {
+function SecureCacheMemory(protectedMemory) {
   var exports = {}
 
   var awaiting = [];
@@ -84,3 +84,5 @@ module.exports = function SecureCacheMemory(protectedMemory) {
 
   return exports;
 }
+
+export { SecureCacheMemory }

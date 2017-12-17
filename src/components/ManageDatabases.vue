@@ -25,17 +25,23 @@
 		<shared-link-provider 
 			:provider-manager="sharedUrlManager"
 			:settings="settings"></shared-link-provider>
+		<local-password-file-provider
+			:provider-manager="localFileManager"
+			:settings="settings"></local-password-file-provider>
   </div>
 </template>
 
 <script>
 import OauthProvider from '@/components/OauthProvider'
 import SharedLinkProvider from '@/components/SharedLinkProvider'
+import LocalPasswordFileProvider from '@/components/LocalPasswordFileProvider'
 import VirtualRouter from '$lib/virtual-router.js'
+
 export default {
 	props: {
 		dropboxFileManager: Object,
 		googleDriveManager: Object,
+		localFileManager: Object,
 		onedriveManager: Object,
 		sampleManager: Object,
 		sharedUrlManager: Object,
@@ -43,7 +49,8 @@ export default {
 	},
 	components: {
 		OauthProvider,
-		SharedLinkProvider
+		SharedLinkProvider,
+		LocalPasswordFileProvider
 	},
 	data () {
 		return {
@@ -59,7 +66,7 @@ export default {
 		 this.tabRouter.registerRoutes([
       { route: '/help/me/choose', var: this.show.help },
       { route: '/new/user', var: this.show.newUser },
-      { route: '/', var: this.show.none } // Use this to hide others
+      { route: '/', var: this.show.none } // Use this to hide others, since no id=none element exists.
     ])
 	}
 }
