@@ -1,8 +1,13 @@
-# This is a 
+## This issue is a 
 
 - [ ] bug
 - [ ] feature
 - [ ] question
+
+<!-- 
+- [x] is a checked box 
+- [ ] is an empty box
+-->
 
 ### Please describe the current behavior, and explain why it's bad.
 
