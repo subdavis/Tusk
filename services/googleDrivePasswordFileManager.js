@@ -80,7 +80,6 @@ function GoogleDrivePasswordFileManager (settings) {
           }
         };
         return axios(requestfile).then(response => {
-          console.log(response)
           return response
         })
           .catch(err => {

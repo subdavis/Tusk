@@ -53,7 +53,9 @@ function SharedUrlFileManager() {
 
   //get the minimum information needed to identify this file for future retrieval
   function getDatabaseChoiceData(dbInfo) {
-    return dbInfo;
+    return {
+      direct_link: dbInfo.direct_link
+    }
   }
 
   //given minimal file information, retrieve the actual file

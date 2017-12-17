@@ -35,53 +35,8 @@ import ProtectedMemory from '$services/protectedMemory.js'
 import { Settings } from '$services/settings.js'
 
 function Background(protectedMemory, settings) {
-	if (chrome.extension.inIncognitoContext) {
-		doReplaceRules();
-	} else {
-		chrome.runtime.onInstalled.addListener(doReplaceRules);
-		chrome.runtime.onInstalled.addListener(settings.upgrade);
-		chrome.runtime.onStartup.addListener(forgetStuff)
-	}
-
-	function doReplaceRules() {
-		chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
-			var passwordField = {
-				id: "pwdField",
-				conditions: [
-					new chrome.declarativeContent.PageStateMatcher({
-						css: ["input[type='password']"]
-					})
-				],
-				actions: [
-					new chrome.declarativeContent.ShowPageAction()
-					//new chrome.declarativeContent.RequestContentScript({js: ['inject.js']})
-				]
-			};
-			var textField = {
-				id: "textField",
-				conditions: [
-					new chrome.declarativeContent.PageStateMatcher({
-						css: ["input[type='text'], input[type='email'], input:not([type])"]
-					})
-				],
-				actions: [
-					new chrome.declarativeContent.ShowPageAction()
-				]
-			};
-			var iframeLogin = {
-				id: "iframeLogin",
-				conditions: [
-					new chrome.declarativeContent.PageStateMatcher({
-						css: ["iframe[src^='https']"]
-					})
-				],
-				actions: [
-					new chrome.declarativeContent.ShowPageAction()
-				]
-			};
-			chrome.declarativeContent.onPageChanged.addRules([passwordField, textField, iframeLogin]);
-		});
-	}
+	chrome.runtime.onInstalled.addListener(settings.upgrade);
+	chrome.runtime.onStartup.addListener(forgetStuff);
 
 	//keep saved state for the popup for as long as we are alive (not long):
 	chrome.runtime.onConnect.addListener(function(port) {

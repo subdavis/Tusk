@@ -62,5 +62,9 @@
 		"https://*/*",
 		"http://*/*",
 		"file:///*/*"
+	],
+	"optional_permissions": [
+		"https://*/*",
+		"http://*/*"
 	]
 }

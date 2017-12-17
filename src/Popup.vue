@@ -8,7 +8,8 @@
       :password-file-store-registry="services.passwordFileStoreRegistry"></startup>
     <file-picker id="/choose" v-if="show.filePicker.visible" 
       :password-file-store-registry="services.passwordFileStoreRegistry"
-      :settings="services.settings"></file-picker>
+      :settings="services.settings"
+      :links="services.links"></file-picker>
     <unlock id="/unlock/:provider/:title" v-if="show.unlock.visible"
       :unlocked-state="services.unlockedState" 
       :secure-cache="services.secureCache" 

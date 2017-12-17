@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- Busy Spinner -->
-    <div v-if="busy" class="spinner">
+    <div v-if="busy" class="box-bar plain spinner">
       <spinner size="medium" :message="'Starting up...'"></spinner>
     </div>
     <div v-else>
