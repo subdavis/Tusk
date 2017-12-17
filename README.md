@@ -37,4 +37,4 @@ Because of Firefox's implementation of `browser.permissions`, it was necessary t
 
 ## Looking for CKPX?
 
-You found it!  CKPX has been rebranded as Tusk to mark it's Firefox release, since the C stood for 'Chrome'.
+You found it!  CKPX has been rebranded as Tusk to mark its Firefox release.  The C in CKPX stood for 'Chrome'.
