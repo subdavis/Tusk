@@ -2,10 +2,11 @@
 
 require('font-awesome/css/font-awesome.css')
 
-// Require icons for the manifest
+// Require static assets we need.
 require('../assets/icons/logo_38.png')
 require('../assets/icons/logo_16.png')
 require('../assets/icons/logo_48.png')
+require('../assets/Sample123.kdbx')
 
 // Vue Components
 import Vue from 'vue'
@@ -16,5 +17,5 @@ import VirtualRouter from '$lib/virtual-router.js'
 Vue.prototype.$router = new VirtualRouter()
 
 new Vue({
-  render: h => h(Popup)
+	render: h => h(Popup)
 }).$mount('#app')

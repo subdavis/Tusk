@@ -1,6 +1,8 @@
 "use strict";
 
-import { ChromePromiseApi } from '$lib/chrome-api-promise.js'
+import {
+	ChromePromiseApi
+} from '$lib/chrome-api-promise.js'
 
 const chromePromise = ChromePromiseApi()
 
@@ -38,17 +40,17 @@ function UnlockedState($router, keepassReference, protectedMemory, settings) {
 					my.origin = parsedUrl.protocol + '//' + parsedUrl.hostname + '/';
 
 					chromePromise.permissions.contains({
-						origins: [my.origin]
-					})
-					.then(function() {
-						my.sitePermission = true;
-					})
-					.catch(function(err) {
-						my.sitePermission = false;
-					})
-					.then(function() {
-						resolve();
-					})
+							origins: [my.origin]
+						})
+						.then(function() {
+							my.sitePermission = true;
+						})
+						.catch(function(err) {
+							my.sitePermission = false;
+						})
+						.then(function() {
+							resolve();
+						})
 				} else {
 					reject(new Error("Unable to determine tab details"));
 				}
@@ -59,25 +61,25 @@ function UnlockedState($router, keepassReference, protectedMemory, settings) {
 	my.clearCache = function() {
 		// Destroys an object in memory.
 		function destroy(obj) {
-		    for(var prop in obj){
-		        var property = obj[prop];
-		        if(property != null && typeof(property) == 'object') {
-		            destroy(property);
-		        }
-		        else {
-		            obj[prop] = null;
-		        }
-		    }
+			for (var prop in obj) {
+				var property = obj[prop];
+				if (property != null && typeof(property) == 'object') {
+					destroy(property);
+				} else {
+					obj[prop] = null;
+				}
+			}
 		}
 		destroy(my.cache)
 		my.cache = {}
 	}
 
-	my.cacheSet = function (key, val) {
+	my.cacheSet = function(key, val) {
 		// Refresh cache
 		clearTimeout(cacheTimeoutId)
-		cacheTimeoutId = setTimeout(my.clearCache, 60000);
-
+		cacheTimeoutId = setTimeout(function(my_closure) {
+			my_closure.clearCache()
+		}(my), 60000);
 		my.cache[key] = val;
 	}
 
@@ -85,7 +87,7 @@ function UnlockedState($router, keepassReference, protectedMemory, settings) {
 		my.entries = null;
 		my.clipboardStatus = "";
 	}
-	setTimeout(my.clearBackgroundState, 60000);  //clear backgroundstate after 1 minutes live - we should never be alive that long
+	setTimeout(my.clearBackgroundState, 60000); //clear backgroundstate after 1 minutes live - we should never be alive that long
 
 	my.autofill = function(entry) {
 		settings.getUseCredentialApiFlag().then(useCredentialApi => {
@@ -175,4 +177,6 @@ function UnlockedState($router, keepassReference, protectedMemory, settings) {
 	return my;
 }
 
-export { UnlockedState }
+export {
+	UnlockedState
+}

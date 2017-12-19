@@ -1,5 +1,7 @@
 let Base64 = require('base64-arraybuffer')
-import { ChromePromiseApi } from '$lib/chrome-api-promise.js'
+import {
+	ChromePromiseApi
+} from '$lib/chrome-api-promise.js'
 
 const chromePromise = ChromePromiseApi()
 /**
@@ -37,7 +39,7 @@ function Settings() {
 	exports.deleteKeyFile = function(name) {
 		return exports.getKeyFiles().then(function(keyFiles) {
 			keyFiles.forEach(function(keyFile, index) {
-				if (keyFile.name == name) {
+				if (keyFile.name === name) {
 					keyFiles.splice(index, 1);
 				}
 			})
@@ -48,11 +50,11 @@ function Settings() {
 		});
 	}
 
-	exports.deleteAllKeyFiles = function () {
+	exports.deleteAllKeyFiles = function() {
 		return chromePromise.storage.local.remove('keyFiles')
 	}
 
-	exports.destroyLocalStorage = function (key) {
+	exports.destroyLocalStorage = function(key) {
 		if (key.length) {
 			return chromePromise.storage.local.remove(key)
 		}
@@ -61,7 +63,7 @@ function Settings() {
 	exports.addKeyFile = function(name, key) {
 		return exports.getKeyFiles().then(function(keyFiles) {
 			var matches = keyFiles.filter(function(keyFile) {
-				return keyFile.name == name;
+				return keyFile.name === name;
 			})
 
 			var encodedKey = Base64.encode(key);
@@ -108,13 +110,13 @@ function Settings() {
 	}
 
 	exports.saveCurrentDatabaseChoice = function(passwordFile, provider) {
-		let shallowCopy = function (obj) { 
+		let shallowCopy = function(obj) {
 			let clone = {}
-		  clone.prototype = obj.prototype
-		  Object.keys(obj).forEach(property => {
-		  	clone[property] = obj[property];
-		  })
-		  return clone
+			clone.prototype = obj.prototype
+			Object.keys(obj).forEach(property => {
+				clone[property] = obj[property];
+			})
+			return clone
 		}
 		let passwordFileClone = shallowCopy(passwordFile)
 		passwordFileClone.data = undefined; //don't save the data with the choice
@@ -140,7 +142,7 @@ function Settings() {
 	exports.disableDatabaseProvider = function(provider) {
 		return chromePromise.storage.local.get(['selectedDatabase']).then(items => {
 			if (items.selectedDatabase)
-				if (items.selectedDatabase.providerKey == provider.key)
+				if (items.selectedDatabase.providerKey === provider.key)
 					return chromePromise.storage.local.remove('selectedDatabase')
 			return Promise.resolve(false)
 		})
@@ -158,7 +160,7 @@ function Settings() {
 	}
 
 	exports.getDefaultRememberOptions = function() {
-		return chromePromise.storage.local.get('rememberPeriod').then( items => {
+		return chromePromise.storage.local.get('rememberPeriod').then(items => {
 			if (items.rememberPeriod) {
 				return {
 					rememberPassword: true,
@@ -255,7 +257,7 @@ function Settings() {
 				forgetTimes = items[storageKey];
 			}
 			keysArray.forEach(function(key) {
-				if (forgetTimes[key]) 
+				if (forgetTimes[key])
 					delete forgetTimes[key];
 			})
 
@@ -306,7 +308,7 @@ function Settings() {
 	}
 
 	exports.getUseCredentialApiFlag = function() {
-		return chromePromise.storage.local.get('useCredentialApi').then( items => {
+		return chromePromise.storage.local.get('useCredentialApi').then(items => {
 			return !!items.useCredentialApi;
 		})
 	}
@@ -348,4 +350,6 @@ function Settings() {
 	return exports;
 }
 
-export { Settings }
+export {
+	Settings
+}

@@ -18,9 +18,10 @@ function KeepassReference() {
 		my.majorVersion = majorVersion; //update the major version if it changed.
 		var re = /(\{[^\{\}]+\})/g;
 		var expressions = re.exec(fieldValue || '');
-		if (!expressions) return fieldValue;  //no references
-		
-		var result = '', lastIndex = 0;
+		if (!expressions) return fieldValue; //no references
+
+		var result = '',
+			lastIndex = 0;
 		while (expressions) {
 			if (expressions.index >= lastIndex) {
 				result += fieldValue.substring(lastIndex, expressions.index);
@@ -33,13 +34,13 @@ function KeepassReference() {
 		if (lastIndex < fieldValue.length) {
 			result += fieldValue.substring(lastIndex, fieldValue.length);
 		}
-		
+
 		return result;
 	}
 
-	my.keewebGetDecryptedFieldValue = function(entry, fieldName){
-		if (entry.protectedData === undefined || !entry.protectedData[fieldName]){
-  			return entry[fieldName] || "";  //not an encrypted field
+	my.keewebGetDecryptedFieldValue = function(entry, fieldName) {
+		if (entry.protectedData === undefined || !entry.protectedData[fieldName]) {
+			return entry[fieldName] || ""; //not an encrypted field
 		}
 		let keewebProtectedValue = new kdbxweb.ProtectedValue(
 			entry['protectedData'][fieldName].value,
@@ -59,11 +60,16 @@ function KeepassReference() {
 		if (localParts) {
 			// local field
 			switch (localParts[1].toUpperCase()) {
-				case 'TITLE': return currentEntry.title; 
-				case 'USERNAME': return currentEntry.userName;
-				case 'URL': return currentEntry.url;
-				case 'NOTES': return currentEntry.notes;
-				case 'PASSWORD': return currentEntry.password;
+				case 'TITLE':
+					return currentEntry.title;
+				case 'USERNAME':
+					return currentEntry.userName;
+				case 'URL':
+					return currentEntry.url;
+				case 'NOTES':
+					return currentEntry.notes;
+				case 'PASSWORD':
+					return currentEntry.password;
 			}
 		}
 
@@ -104,13 +110,20 @@ function KeepassReference() {
 
 	function getPropertyNameFromCode(code) {
 		switch (code) {
-			case 'T': return 'title';
-			case 'U': return 'userName';
-			case 'P': return 'password';
-			case 'A': return 'url';
-			case 'N': return 'notes';
-			case 'I': return 'id';
-			case 'O': return '*';
+			case 'T':
+				return 'title';
+			case 'U':
+				return 'userName';
+			case 'P':
+				return 'password';
+			case 'A':
+				return 'url';
+			case 'N':
+				return 'notes';
+			case 'I':
+				return 'id';
+			case 'O':
+				return '*';
 		}
 
 		return '';
@@ -119,4 +132,6 @@ function KeepassReference() {
 	return my;
 }
 
-export { KeepassReference }
+export {
+	KeepassReference
+}

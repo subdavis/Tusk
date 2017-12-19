@@ -1,6 +1,8 @@
 "use strict";
 const Base64 = require('base64-arraybuffer')
-import { ChromePromiseApi } from '$lib/chrome-api-promise.js'
+import {
+	ChromePromiseApi
+} from '$lib/chrome-api-promise.js'
 const chromePromise = ChromePromiseApi()
 
 function OauthManager(settings, oauth) {
@@ -67,9 +69,9 @@ function OauthManager(settings, oauth) {
 		})
 	}
 
-	function removeToken () {
-    return settings.saveAccessToken(accessTokenType, null);
-  }
+	function removeToken() {
+		return settings.saveAccessToken(accessTokenType, null);
+	}
 
 	//lists databases if a token is already stored
 	function listDatabasesSafe() {
@@ -90,25 +92,25 @@ function OauthManager(settings, oauth) {
 
 	function listDatabases(attempt) {
 		return getDatabases().catch(error => {
-			
+
 			let status = error.response.status
 			attempt = attempt || 0
-			
+
 			if (attempt > 0)
 				throw new Error(error)
-			
+
 			if (status >= 400 && status <= 599) {
 				console.error("listDatabases failed with status code", status)
 				//unauthorized or forbidden, means the token is bad.  retry with new token.
-				let timeoutPromise = new Promise((resolve, reject)=> {
+				let timeoutPromise = new Promise((resolve, reject) => {
 					let waiter = setTimeout(() => {
 						clearTimeout(waiter)
 						console.info("First attempt to listDatabases failed, waiting....")
 						resolve(false) // false for no auth intaractivity
-					}, 400)          // Wait 400 MS before trying again
+					}, 400) // Wait 400 MS before trying again
 				})
 				return timeoutPromise
-					.then(auth)      // try passive auth if something failed.
+					.then(auth) // try passive auth if something failed.
 					.then(token => {
 						return listDatabases(1)
 					});
@@ -122,7 +124,7 @@ function OauthManager(settings, oauth) {
 		return auth(true)
 	}
 
-	function isLoggedIn () {
+	function isLoggedIn() {
 		return new Promise((resolve, reject) => {
 			resolve(state.loggedIn)
 		})
@@ -142,7 +144,7 @@ function OauthManager(settings, oauth) {
 			return oauth.fileRequestFunction(dbInfo, accessToken).then(function(response) {
 				return response.data
 			}).catch(function(error) {
-				console.error("Get chosen file failure:", error) 
+				console.error("Get chosen file failure:", error)
 				if (error.response.status == 401) {
 					//unauthorized, means the token is bad.  retry with new token.
 					return auth(false).then(function() {
@@ -154,10 +156,14 @@ function OauthManager(settings, oauth) {
 	}
 
 	function ensureOriginPermissions() {
-		return chromePromise.permissions.contains({origins: oauth.origins}).then(function() {
+		return chromePromise.permissions.contains({
+			origins: oauth.origins
+		}).then(function() {
 			return true;
 		}).catch(function() {
-			return chromePromise.permissions.request({origins: oauth.origins}).then(function() {
+			return chromePromise.permissions.request({
+				origins: oauth.origins
+			}).then(function() {
 				return true;
 			}).catch(function(err) {
 				return false;
@@ -171,21 +177,24 @@ function OauthManager(settings, oauth) {
 		return ensureOriginPermissions().then(ensured => {
 			return new Promise(function(resolve, reject) {
 				chromePromise.runtime.getManifest().then(manifest => {
-					var randomState = Base64.encode(window.crypto.getRandomValues(new Uint8Array(16)));  //random state, protects against CSRF
-					var authUrl = oauth.authUrl
-					  + '&client_id=' + manifest.static_data[oauth.accessTokenType].client_id
-						+ '&state=' + encodeURIComponent(randomState)
-						+ '&redirect_uri=' + encodeURIComponent(chrome.identity.getRedirectURL(oauth.accessTokenType));
+					var randomState = Base64.encode(window.crypto.getRandomValues(new Uint8Array(16))); //random state, protects against CSRF
+					var authUrl = oauth.authUrl +
+						'&client_id=' + manifest.static_data[oauth.accessTokenType].client_id +
+						'&state=' + encodeURIComponent(randomState) +
+						'&redirect_uri=' + encodeURIComponent(chrome.identity.getRedirectURL(oauth.accessTokenType));
 					console.log(authUrl)
-					chromePromise.identity.launchWebAuthFlow({'url': authUrl, 'interactive': interactive}).then(redirect_url => {
+					chromePromise.identity.launchWebAuthFlow({
+						'url': authUrl,
+						'interactive': interactive
+					}).then(redirect_url => {
 						oauth.handleAuthRedirectURI(redirect_url, randomState, resolve, reject)
 					}).catch(function(err) {
-						console.error("Error from webauthflow for", oauth.accessTokenType , err);
+						console.error("Error from webauthflow for", oauth.accessTokenType, err);
 						reject(err);
 					});
 				});
 			}).then(token => {
-				if (token){
+				if (token) {
 					console.info("Successfully logged into", oauth.accessTokenType)
 					state.loggedIn = true
 				}
@@ -197,4 +206,6 @@ function OauthManager(settings, oauth) {
 	return exports;
 }
 
-export { OauthManager }
+export {
+	OauthManager
+}
