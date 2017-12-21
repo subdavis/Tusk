@@ -1,8 +1,12 @@
 "use strict";
 const Base64 = require('base64-arraybuffer')
 import axios from 'axios/dist/axios.min.js'
-import { ChromePromiseApi } from '$lib/chrome-api-promise.js'
-import { OauthManager } from '$services/oauthManager.js' 
+import {
+	ChromePromiseApi
+} from '$lib/chrome-api-promise.js'
+import {
+	OauthManager
+} from '$services/oauthManager.js'
 
 const chromePromise = ChromePromiseApi()
 
@@ -24,7 +28,7 @@ function DropboxFileManager(settings) {
 		chooseDescription: 'Access password files stored on Dropbox.  Files will be retrieved from Dropbox each time they are used.',
 	};
 
-	oauth.searchRequestFunction = function (token) {
+	oauth.searchRequestFunction = function(token) {
 		return axios({
 			method: 'post',
 			url: 'https://api.dropbox.com/2/files/search',
@@ -41,7 +45,7 @@ function DropboxFileManager(settings) {
 		})
 	}
 
-	oauth.searchRequestHandler = function (response) {
+	oauth.searchRequestHandler = function(response) {
 		return response.data.matches.map(function(fileInfo) {
 			return {
 				title: fileInfo.metadata.path_display
@@ -50,21 +54,21 @@ function DropboxFileManager(settings) {
 	}
 
 	//get the minimum information needed to identify this file for future retrieval
-	oauth.getDatabaseChoiceData = function (dbInfo) {
+	oauth.getDatabaseChoiceData = function(dbInfo) {
 		return {
 			title: dbInfo.title
 		}
 	}
 
 	//given minimal file information, retrieve the actual file
-	oauth.fileRequestFunction = function (dbInfo, token) {
+	oauth.fileRequestFunction = function(dbInfo, token) {
 		function http_header_safe_json(v) {
 			var charsToEncode = /[\u007f-\uffff]/g;
-	 		return JSON.stringify(v).replace(charsToEncode,
+			return JSON.stringify(v).replace(charsToEncode,
 				function(c) {
 					return '\\u' + ('000' + c.charCodeAt(0).toString(16)).slice(-4);
 				}
-		 	);
+			);
 		}
 		var arg = {
 			"path": dbInfo.title
@@ -80,11 +84,11 @@ function DropboxFileManager(settings) {
 		})
 	}
 
-	oauth.revokeAuth = function () {
+	oauth.revokeAuth = function() {
 		return Promise.resolve()
 	}
 
-	oauth.handleAuthRedirectURI = function (redirect_url, randomState, resolve, reject)  {
+	oauth.handleAuthRedirectURI = function(redirect_url, randomState, resolve, reject) {
 
 		var tokenMatches = /access_token=([^&]+)/.exec(redirect_url);
 		var stateMatches = /state=([^&]+)/.exec(redirect_url);
@@ -92,7 +96,7 @@ function DropboxFileManager(settings) {
 
 		if (tokenMatches && stateMatches && uidMatches) {
 			var access_token = tokenMatches[1];
-			var checkState = decodeURIComponent(decodeURIComponent(stateMatches[1]));  //I have no idea why it is double-encoded
+			var checkState = decodeURIComponent(decodeURIComponent(stateMatches[1])); //I have no idea why it is double-encoded
 			var uid = uidMatches[1];
 			if (checkState === randomState) {
 				state.loggedIn = true;
@@ -114,4 +118,6 @@ function DropboxFileManager(settings) {
 	return OauthManager(settings, oauth)
 }
 
-export { DropboxFileManager }
+export {
+	DropboxFileManager
+}
