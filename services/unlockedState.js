@@ -77,9 +77,9 @@ function UnlockedState($router, keepassReference, protectedMemory, settings) {
 	my.cacheSet = function(key, val) {
 		// Refresh cache
 		clearTimeout(cacheTimeoutId)
-		cacheTimeoutId = setTimeout(function(my_closure) {
-			my_closure.clearCache()
-		}(my), 60000);
+		cacheTimeoutId = setTimeout(function() {
+			my.clearCache()
+		}, 60000);
 		my.cache[key] = val;
 	}
 

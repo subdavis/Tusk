@@ -1,14 +1,31 @@
 let Base64 = require('base64-arraybuffer')
-import {
-	ChromePromiseApi
-} from '$lib/chrome-api-promise.js'
+import { ChromePromiseApi } from '$lib/chrome-api-promise.js'
 
 const chromePromise = ChromePromiseApi()
+
 /**
  * Settings for Tusk  */
 function Settings() {
 	"use strict";
 
+	// Set up indexdb...
+	var databaseReady = new Promise((resolve, reject) => {
+		var indexdbRequest = window.indexedDB.open('TuskExtensionDatabase')
+
+		indexdbRequest.onerror = (event) => {
+			reject(event.target.errorCode);
+		}
+
+		indexdbRequest.onupgradeneeded = (event) => {
+			var db = event.target.result;
+			var objectstore = db.createObjectStore('usage', { keypath: 'dbfile' })
+		}
+
+		indexdbRequest.onsuccess = (event) => {
+			resolve(event.target.result);
+		}
+	})
+	
 	var exports = {}
 
 	//upgrade old settings.  Called on install.
@@ -94,6 +111,41 @@ function Settings() {
 		return chromePromise.storage.local.get('useDiskCache').then(function(items) {
 			return items.useDiskCache;
 		});
+	}
+
+	exports.getDatabaseUsagesIdx = function () {
+		let txPromise = new Promise((resolve, reject) => {
+			databaseReady.then(db => {
+			  let tx = db.transaction(['usage'])
+				let objectStore = tx.objectStore('usage')
+				let req = objectStore.add(usages)
+				req.onerror = event => {
+					reject(event.target.errorCode)
+				}
+				req.onsuccess = event => {
+					resolve(event.target.result)
+				}
+			})
+		})
+		return txPromise
+	}
+
+	exports.saveDatabaseUsagesIdx = function (usages) {
+		let txPromise = new Promise((resolve, reject) => {
+			databaseReady.then(db => {
+				let tx = db.transaction(['usage'], 'readwrite')
+
+				tx.oncomplete = (event) => {
+					resolve(event.target.result)
+				}
+				tx.onerror = (event) => {
+					reject(event.target.errorCode)
+				}
+				let objectStore = tx.objectStore('usage')
+				let req = objectStore.add(usages)
+			})
+		})
+		return txPromise
 	}
 
 	exports.saveDatabaseUsages = function(usages) {

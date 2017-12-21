@@ -4,7 +4,15 @@
 -->
 <template>
 	<div class="box-bar roomy database-manager">
-		<generic-provider-ui :busy="busy" :databases="databases" :loggedIn="loggedIn" :error="messages.error" :provider-manager="providerManager" :toggle-login="toggleLogin" :removeable="true" :remove-function="removePasswordFile"></generic-provider-ui>
+		<generic-provider-ui 
+			:busy="busy" 
+			:databases="databases" 
+			:loggedIn="loggedIn" 
+			:error="messages.error" 
+			:provider-manager="providerManager" 
+			:toggle-login="toggleLogin" 
+			:removeable="true" 
+			:remove-function="removePasswordFile"></generic-provider-ui>
 		<div class="url-form shared-link-box" v-if="loggedIn">
 			<input type="file" style="display:none" id="file-selector" name='file' @change="handleAdd" multiple />
 			<a class="waves-effect waves-light btn" @click="selectFile">Add URL Source</a>
