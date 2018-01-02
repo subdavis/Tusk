@@ -1,14 +1,15 @@
 let Base64 = require('base64-arraybuffer')
-import {
-	ChromePromiseApi
-} from '$lib/chrome-api-promise.js'
+import { ChromePromiseApi } from '$lib/chrome-api-promise.js'
 
 const chromePromise = ChromePromiseApi()
+
 /**
  * Settings for Tusk  */
-function Settings() {
+function Settings(secureCache) {
 	"use strict";
 
+	// Set up indexdb...
+	
 	var exports = {}
 
 	//upgrade old settings.  Called on install.
@@ -207,6 +208,16 @@ function Settings() {
 		});
 	};
 
+	exports.cacheMasterPassword = function(pw, args) {
+		return exports.getCurrentDatabaseChoice().then(info => {
+			let key = info.passwordFile.title + "__" + info.providerKey + ".password"
+			return secureCache.save(key, pw).then(nil => {
+				let forgetTime = args['forgetTime']
+				return exports.setForgetTime(key, forgetTime)
+			})
+		})
+	}
+
 	/*
 	 * Sets a time to forget something
 	 */
@@ -217,7 +228,9 @@ function Settings() {
 			if (items[storageKey]) {
 				forgetTimes = items[storageKey];
 			}
-			forgetTimes[key] = time;
+			// only set if not exists...  This prevents us from resetting the clock every unlock...
+			if (!(key in forgetTimes))
+				forgetTimes[key] = time;
 
 			return chromePromise.storage.local.set({
 				'forgetTimes': forgetTimes
@@ -292,7 +305,11 @@ function Settings() {
 				var key = info.passwordFile.title + "__" + info.providerKey;
 				var usage = usages[key] || {};
 
-				return usage;
+				return secureCache.get(key + ".password").then(value => {
+					console.log(value, "getSECURECACHE")
+					usage['passwordKey'] = value;
+					return usage
+				})
 			});
 		})
 	}

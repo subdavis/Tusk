@@ -4,6 +4,11 @@
 
 ![Tusk](https://github.com/subdavis/Tusk/blob/develop/assets/icons/logo_256.png "Tusk Logo")
 
+## Installation
+
+**Firefox:** https://addons.mozilla.org/en-GB/firefox/addon/keepass-tusk/
+**Chrome:** https://chrome.google.com/webstore/detail/fmhmiaejopepamlcjkncpgpdjichnecm
+
 ## Build Setup
 
 ```bash

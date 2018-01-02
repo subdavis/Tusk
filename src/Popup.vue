@@ -50,10 +50,10 @@
 	import EntryDetails from '@/components/EntryDetails'
 	import SvgDefs from '@/components/SvgDefs'
 
-	const settings = new Settings()
 	const links = new Links()
 	const protectedMemory = new ProtectedMemory()
 	const secureCacheMemory = new SecureCacheMemory(protectedMemory)
+	const settings = new Settings(secureCacheMemory)
 	const secureCacheDisk = new SecureCacheDisk(protectedMemory, secureCacheMemory, settings)
 	const keepassHeader = new KeepassHeader(settings)
 	const keepassReference = new KeepassReference()

@@ -4,7 +4,15 @@
 -->
 <template>
 	<div class="box-bar roomy database-manager">
-		<generic-provider-ui :busy="busy" :databases="links" :loggedIn="loggedIn" :error="messages.error" :provider-manager="providerManager" :toggle-login="toggleLogin" :removeable="true" :remove-function="removeLink"></generic-provider-ui>
+		<generic-provider-ui 
+			:busy="busy" 
+			:databases="links" 
+			:loggedIn="loggedIn" 
+			:error="messages.error" 
+			:provider-manager="providerManager" 
+			:toggle-login="toggleLogin" 
+			:removeable="true" 
+			:remove-function="removeLink"></generic-provider-ui>
 		<div class="url-form shared-link-box" v-if="loggedIn">
 			<input id="shared-link" type="text" v-model="currentUrl" placeholder="Shared Link URL">
 			<input id="shared-link-name" type="text" v-model="currentUrlTitle" placeholder="Database Name">

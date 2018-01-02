@@ -81,3 +81,4 @@ bower_components/
 .sublime-grunt.cache
 
 *.travis.yml
+manifest.json

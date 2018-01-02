@@ -37,7 +37,6 @@ function KeepassService(keepassHeader, settings, passwordFileStoreRegistry, keep
 		}
 		var fileKey = keyFileInfo ? Base64.decode(keyFileInfo.encodedKey) : null;
 		return passwordFileStoreRegistry.getChosenDatabaseFile(settings).then(function(buf) {
-			console.log(buf)
 			var h = keepassHeader.readHeader(buf);
 			return getKey(h.kdbx, masterPassword, fileKey);
 		});

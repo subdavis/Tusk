@@ -4,7 +4,8 @@
 function Links() {
 	var my = {
 		openOptions: openOptions,
-		openWebstore: openWebstore
+		openWebstore: openWebstore,
+		openHomepage: openHomepage
 	}
 
 	function openOptions() {
@@ -16,6 +17,13 @@ function Links() {
 			url: "https://chrome.google.com/webstore/detail/ckpx-chrome-keepass-exten/fmhmiaejopepamlcjkncpgpdjichnecm"
 		})
 	}
+
+	function openHomepage() {
+		chrome.tabs.create({
+			url: "https://subdavis.com/Tusk"
+		})
+	}
+
 	return my;
 }
 export {

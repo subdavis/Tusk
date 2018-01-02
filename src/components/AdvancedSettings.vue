@@ -34,7 +34,7 @@
 			<h4>Stored Data</h4>
 			<p>The following objects represent the current data cached in chrome storage. This data is only available to Tusk, and is never sent over any network connection.</p>
 		</div>
-		<div class="box-bar between lighter roomy" v-for="blob in blobs">
+		<div class="box-bar between lighter roomy" v-for="blob in jsonState">
 			<div class="json" :id="blob.k"></div>
 			<a v-if="blob.delete !== undefined" class="waves-effect waves-light btn" @click="blob.delete.f(blob.delete.arg); init()">{{ blob.delete.op }}</a>
 		</div>
@@ -56,13 +56,13 @@
 					diskCache: false,
 					useCredentialApi: false,
 				},
-				blobs: [{
-						k: 'databaseUsages', // key
-						f: this.settings.getDatabaseUsages, // getter
+				jsonState: [{
+						k: 'databaseUsages',                    // key
+						f: this.settings.getDatabaseUsages,     // getter
 						delete: {
-							f: this.settings.destroyLocalStorage,
-							arg: 'databaseUsages',
-							op: 'Delete'
+							f: this.settings.destroyLocalStorage, // remover
+							arg: 'databaseUsages',                // remover args
+							op: 'Delete'                          // remover button name
 						}
 					},
 					{
@@ -121,7 +121,7 @@
 				}
 			},
 			init() {
-				this.blobs.forEach(blob => {
+				this.jsonState.forEach(blob => {
 					blob.f().then(result => {
 						if (result && Object.keys(result).length) {
 							let formatter = new JSONFormatter(result)

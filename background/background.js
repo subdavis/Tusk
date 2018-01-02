@@ -19,7 +19,7 @@ function Background(protectedMemory, settings) {
 			if (!msg) return;
 			switch (msg.action) {
 				case 'clear':
-					protectedMemory.clearData();
+					protectedMemory.clearData(msg.key);
 					break;
 				case 'save':
 					protectedMemory.setData(msg.key, msg.value);

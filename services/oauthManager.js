@@ -145,6 +145,8 @@ function OauthManager(settings, oauth) {
 				return response.data
 			}).catch(function(error) {
 				console.error("Get chosen file failure:", error)
+				if (error.response === undefined)
+					return Promise.reject({message:"No network connection"})
 				if (error.response.status == 401) {
 					//unauthorized, means the token is bad.  retry with new token.
 					return auth(false).then(function() {
