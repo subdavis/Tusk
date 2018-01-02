@@ -5,7 +5,7 @@ const chromePromise = ChromePromiseApi()
 
 /**
  * Settings for Tusk  */
-function Settings() {
+function Settings(secureCache) {
 	"use strict";
 
 	// Set up indexdb...
@@ -258,6 +258,16 @@ function Settings() {
 				return null;
 		});
 	};
+
+	exports.cacheMasterPassword = function(pw, args) {
+		return exports.getCurrentDatabaseChoice().then(info => {
+			let key = info.passwordFile.title + "__" + info.providerKey
+			return secureCache.save(key, pw).then(nil => {
+				let forgetTime = args['forgetTime']
+				return exports.setForgetTime(key, forgetTime)
+			})
+		})
+	}
 
 	/*
 	 * Sets a time to forget something

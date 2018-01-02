@@ -38,24 +38,22 @@
 				<div class="stack-item keyfile-picker" v-if="keyFilePicker">
 					<transition name="keyfile-picker">
 						<div>
-							<span class="selectable" v-for="(kf, kf_index) in keyFiles" :keyfile-index="kf_index">
-                <span @click="chooseKeyFile(kf_index)">
-                  <i class="fa fa-file" aria-hidden="true"></i>
-                  {{ kf.name }}
-                </span>
+							<span class="selectable" v-for="(kf, kf_index) in keyFiles" :keyfile-index="kf_index" @click="chooseKeyFile(kf_index)">
+                <i class="fa fa-file fa-fw" aria-hidden="true"></i>
+                {{ kf.name }}
 							</span>
-							<span @click="links.openOptions" class="selectable"><i class="fa fa-wrench" aria-hidden="true"></i> Manage Keyfiles</span>
+							<span @click="links.openOptions" class="selectable"><i class="fa fa-wrench fa-fw" aria-hidden="true"></i> Manage Keyfiles</span>
 						</div>
 					</transition>
 				</div>
 
-				<div class="box-bar small plain remember-period-picker">
+				<!-- <div class="box-bar small plain remember-period-picker">
 					<span>
             <label for="rememberPeriodLength">
               <span>{{rememberPeriodText}} (slide to choose)</span></label>
 					<input id="rememberPeriodLength" type="range" min="0" :max="slider_options.length - 1" step="1" v-model="slider_int" v-on:input="setRememberPeriod(undefined)" />
 					</span>
-				</div>
+				</div> -->
 
 				<div class="stack-item">
 					<button class="action-button selectable" v-on:click="clickUnlock">Unlock Database</button>
@@ -72,7 +70,7 @@
         <i class="fa fa-lock" aria-hidden="true" ></i> Lock Database</span>
 			<span class="selectable" v-else @click="closeWindow">
         <i class="fa fa-times-circle" aria-hidden="true"></i> Close Window</span>
-			<span class="selectable" @click="links.openWebstore">
+			<span class="selectable" @click="links.openHomepage">
         <i class="fa fa-info-circle" aria-hidden="true"></i> v{{ appVersion }}</span>
 		</div>
 
@@ -215,12 +213,10 @@
 				return this.unlockedState.cache.allEntries !== undefined
 			},
 			forgetPassword() {
-				this.settings.saveCurrentDatabaseUsage({
-					requiresKeyfile: this.selectedKeyFile ? true : false,
-					keyFileName: this.selectedKeyFile ? this.selectedKeyFile.name : undefined,
-					rememberPeriod: this.rememberPeriod
-				}).then(nil => {
+				this.settings.getCurrentDatabaseChoice().then(info => {
+					var passwordCacheKey = info.passwordFile.title + "__" + info.providerKey;
 					this.secureCache.clear('entries')
+					this.secureCache.clear(passwordCacheKey)
 					this.unlockedState.clearBackgroundState()
 					this.unlockedState.clearCache() // new
 				})
@@ -338,17 +334,17 @@
 							keyFileName: keyFileName,
 							rememberPeriod: this.rememberPeriod
 						}
-						if (this.rememberPeriod !== 0)
-							dbUsage.passwordKey = passwordKey
+						if (this.rememberPeriod !== 0) {
+							let check_time = 60000 * this.rememberPeriod // milliseconds / min
+							// Save the password in memory independently.
+							this.settings.cacheMasterPassword(passwordKey, { 
+								forgetTime: Date.now() + check_time 
+							})
+						} else {
+							// this.settings.clearForgetTimes(['forgetPassword'])
+						}
 						this.settings.saveCurrentDatabaseUsage(dbUsage)
 						this.settings.saveDefaultRememberOptions(this.rememberPeriod)
-						if (this.rememberPeriod > 0) {
-							let check_time = 60000 * this.rememberPeriod // milliseconds / min
-							this.settings.setForgetTime('forgetPassword', (Date.now() + check_time))
-						} else {
-							// don't clear passwords
-							this.settings.clearForgetTimes(['forgetPassword'])
-						}
 						this.showResults(entries)
 						this.busy = false
 						this.masterPassword = ""
@@ -418,9 +414,9 @@
 			// modify unlockedState internal state
 			this.unlockedState.getTabDetails().then(nil => {
 				if (this.unlockedState.sitePermission)
-					this.generalMessages.success = "You have previously granted Tusk permission to fill passwords on this site."
+					this.generalMessages.success = "You have previously granted Tusk permission to fill passwords on " + this.unlockedState.origin
 				else
-					this.generalMessages.warn = "This may be a new site to Tusk. Before filling in a password, double check that this is the  correct site."
+					this.generalMessages.warn = "This may be a new site to Tusk. Before filling in a password, double check that this is the correct site."
 			})
 			//set knowlege from the URL
 			this.databaseFileName = decodeURIComponent(this.$router.getRoute().title)
