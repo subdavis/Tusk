@@ -63,10 +63,11 @@ function SecureCacheMemory(protectedMemory) {
 		return p; //will resolve when we get something
 	}
 
-	exports.clear = function() {
+	exports.clear = function(key) {
 		return ready.then(function(port) {
 			port.postMessage({
-				action: 'clear'
+				action: 'clear',
+				key: key
 			});
 		})
 	}

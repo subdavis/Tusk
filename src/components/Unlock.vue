@@ -47,13 +47,13 @@
 					</transition>
 				</div>
 
-				<!-- <div class="box-bar small plain remember-period-picker">
+				<div class="box-bar small plain remember-period-picker">
 					<span>
             <label for="rememberPeriodLength">
               <span>{{rememberPeriodText}} (slide to choose)</span></label>
 					<input id="rememberPeriodLength" type="range" min="0" :max="slider_options.length - 1" step="1" v-model="slider_int" v-on:input="setRememberPeriod(undefined)" />
 					</span>
-				</div> -->
+				</div>
 
 				<div class="stack-item">
 					<button class="action-button selectable" v-on:click="clickUnlock">Unlock Database</button>
@@ -214,7 +214,7 @@
 			},
 			forgetPassword() {
 				this.settings.getCurrentDatabaseChoice().then(info => {
-					var passwordCacheKey = info.passwordFile.title + "__" + info.providerKey;
+					var passwordCacheKey = info.passwordFile.title + "__" + info.providerKey + ".password";
 					this.secureCache.clear('entries')
 					this.secureCache.clear(passwordCacheKey)
 					this.unlockedState.clearBackgroundState()
@@ -303,7 +303,7 @@
 				this.unlockedState.cacheSet('priorityEntries', priorityEntries)
 				this.$forceUpdate()
 				//save longer term (in encrypted storage)
-				this.secureCache.save('entries', entries);
+				// this.secureCache.save('entries', entries);
 				this.busy = false
 			},
 			clickUnlock(event) {
@@ -354,6 +354,11 @@
 						this.generalMessages['error'] = errmsg
 						this.busy = false
 					})
+				}).catch(err => {
+					let errmsg = err.message || "Incorrect password or keyfile"
+					console.error(errmsg)
+					this.generalMessages['error'] = errmsg
+					this.busy = false
 				})
 			}
 		},

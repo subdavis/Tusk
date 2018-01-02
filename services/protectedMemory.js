@@ -65,10 +65,18 @@ function ProtectedMemory() {
 		});
 	}
 
-	function clearData() {
-		dataMap = {};
-		keyPromise = initNewKey();
-		return keyPromise
+	function clearData(key) {
+		if (key !== undefined)
+			delete dataMap[key]
+		else
+			dataMap = {};
+
+		if (Object.keys(dataMap).length === 0) {
+			keyPromise = initNewKey();
+			return keyPromise
+		} else {
+			return Promise.resolve(keyPromise)
+		}
 	}
 
 	function serialize(data) {

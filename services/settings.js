@@ -9,22 +9,6 @@ function Settings(secureCache) {
 	"use strict";
 
 	// Set up indexdb...
-	var databaseReady = new Promise((resolve, reject) => {
-		var indexdbRequest = window.indexedDB.open('TuskExtensionDatabase')
-
-		indexdbRequest.onerror = (event) => {
-			reject(event.target.errorCode);
-		}
-
-		indexdbRequest.onupgradeneeded = (event) => {
-			var db = event.target.result;
-			var objectstore = db.createObjectStore('usage', { keypath: 'dbfile' })
-		}
-
-		indexdbRequest.onsuccess = (event) => {
-			resolve(event.target.result);
-		}
-	})
 	
 	var exports = {}
 
@@ -111,41 +95,6 @@ function Settings(secureCache) {
 		return chromePromise.storage.local.get('useDiskCache').then(function(items) {
 			return items.useDiskCache;
 		});
-	}
-
-	exports.getDatabaseUsagesIdx = function () {
-		let txPromise = new Promise((resolve, reject) => {
-			databaseReady.then(db => {
-			  let tx = db.transaction(['usage'])
-				let objectStore = tx.objectStore('usage')
-				let req = objectStore.add(usages)
-				req.onerror = event => {
-					reject(event.target.errorCode)
-				}
-				req.onsuccess = event => {
-					resolve(event.target.result)
-				}
-			})
-		})
-		return txPromise
-	}
-
-	exports.saveDatabaseUsagesIdx = function (usages) {
-		let txPromise = new Promise((resolve, reject) => {
-			databaseReady.then(db => {
-				let tx = db.transaction(['usage'], 'readwrite')
-
-				tx.oncomplete = (event) => {
-					resolve(event.target.result)
-				}
-				tx.onerror = (event) => {
-					reject(event.target.errorCode)
-				}
-				let objectStore = tx.objectStore('usage')
-				let req = objectStore.add(usages)
-			})
-		})
-		return txPromise
 	}
 
 	exports.saveDatabaseUsages = function(usages) {
@@ -261,7 +210,7 @@ function Settings(secureCache) {
 
 	exports.cacheMasterPassword = function(pw, args) {
 		return exports.getCurrentDatabaseChoice().then(info => {
-			let key = info.passwordFile.title + "__" + info.providerKey
+			let key = info.passwordFile.title + "__" + info.providerKey + ".password"
 			return secureCache.save(key, pw).then(nil => {
 				let forgetTime = args['forgetTime']
 				return exports.setForgetTime(key, forgetTime)
@@ -279,7 +228,9 @@ function Settings(secureCache) {
 			if (items[storageKey]) {
 				forgetTimes = items[storageKey];
 			}
-			forgetTimes[key] = time;
+			// only set if not exists...  This prevents us from resetting the clock every unlock...
+			if (!(key in forgetTimes))
+				forgetTimes[key] = time;
 
 			return chromePromise.storage.local.set({
 				'forgetTimes': forgetTimes
@@ -354,7 +305,11 @@ function Settings(secureCache) {
 				var key = info.passwordFile.title + "__" + info.providerKey;
 				var usage = usages[key] || {};
 
-				return usage;
+				return secureCache.get(key + ".password").then(value => {
+					console.log(value, "getSECURECACHE")
+					usage['passwordKey'] = value;
+					return usage
+				})
 			});
 		})
 	}

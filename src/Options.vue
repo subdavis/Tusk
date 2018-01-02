@@ -51,9 +51,9 @@
 	import AdvancedSettings from '@/components/AdvancedSettings'
 	import SvgDefs from '@/components/SvgDefs'
 
-	const settings = new Settings()
 	const protectedMemory = new ProtectedMemory()
 	const secureCacheMemory = new SecureCacheMemory(protectedMemory)
+	const settings = new Settings(secureCacheMemory)
 	const secureCacheDisk = new SecureCacheDisk(protectedMemory, secureCacheMemory, settings)
 	const keyFileParser = new KeyFileParser()
 
