@@ -16,8 +16,7 @@ function UnlockedState($router, keepassReference, protectedMemory, settings) {
 		title: "", //window title of current tab
 		origin: "", //url of current tab without path or querystring
 		sitePermission: false, //true if the extension already has rights to autofill the password
-		entries: null, //filtered password database entries
-		cache: {}, // a secure cache that refreshes when values are SET.
+		cache: {}, // a secure cache that refreshes when values are set or fetched
 		clipboardStatus: "" //status message about clipboard, used when copying password to the clipboard
 	};
 	var copyEntry;
@@ -79,15 +78,25 @@ function UnlockedState($router, keepassReference, protectedMemory, settings) {
 		clearTimeout(cacheTimeoutId)
 		cacheTimeoutId = setTimeout(function() {
 			my.clearCache()
-		}, 60000);
+			window.close()
+		}, 120000);
 		my.cache[key] = val;
 	}
 
-	my.clearBackgroundState = function() {
-		my.entries = null;
+	my.cacheGet = function(key) {
+		// Refresh cache
+		clearTimeout(cacheTimeoutId)
+		cacheTimeoutId = setTimeout(function() {
+			my.clearCache()
+			window.close()
+		}, 120000);
+		return my.cache[key];
+	}
+
+	my.clearClipboardState = function() {
 		my.clipboardStatus = "";
 	}
-	setTimeout(my.clearBackgroundState, 60000); //clear backgroundstate after 1 minutes live - we should never be alive that long
+	setTimeout(my.clearClipboardState, 60000); //clear backgroundstate after 1 minutes live - we should never be alive that long
 
 	my.autofill = function(entry) {
 		settings.getUseCredentialApiFlag().then(useCredentialApi => {
@@ -125,7 +134,7 @@ function UnlockedState($router, keepassReference, protectedMemory, settings) {
 	}
 
 	my.getDecryptedAttribute = function(entry, attributeName) {
-		return keepassReference.getFieldValue(entry, attributeName, my.entries);
+		return keepassReference.getFieldValue(entry, attributeName, my.cache.allEntries);
 	}
 
 	//listens for the copy event and does the copy
@@ -140,13 +149,6 @@ function UnlockedState($router, keepassReference, protectedMemory, settings) {
 		e.preventDefault();
 
 		settings.setForgetTime('clearClipboard', Date.now() + 1 * 60000)
-		chrome.alarms.clear("forgetStuff", function() {
-			//reset alarm timer so that it fires about 1 minute from now
-			chrome.alarms.create("forgetStuff", {
-				delayInMinutes: 1,
-				periodInMinutes: 10
-			});
-		})
 
 		chrome.runtime.sendMessage({
 			m: "showMessage",

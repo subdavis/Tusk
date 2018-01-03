@@ -83,6 +83,15 @@ function SecureCacheMemory(protectedMemory) {
 		})
 	}
 
+	exports.forgetStuff = function() {
+		// Causes forgetStuff to run in the event page.
+		return ready.then(port => {
+			port.postMessage({
+				action: 'forgetStuff'
+			})
+		})
+	}
+
 	return exports;
 }
 

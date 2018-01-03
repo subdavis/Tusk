@@ -45,9 +45,9 @@
 		data() {
 			return {
 				searchTerm: "",
-				filteredEntries: this.unlockedState.cache.allEntries,
-				priorityEntries: this.unlockedState.cache.priorityEntries,
-				allEntries: this.unlockedState.cache.allEntries,
+				filteredEntries: this.unlockedState.cacheGet('allEntries'),
+				priorityEntries: this.unlockedState.cacheGet('priorityEntries'),
+				allEntries: this.unlockedState.cacheGet('allEntries'),
 				allMessages: this.messages
 			}
 		},
@@ -84,7 +84,7 @@
 			let st = this.unlockedState.cache.searchFilter
 			if (st !== undefined)
 				this.searchTerm = st
-			let um = this.unlockedState.cache.unlockedMessages
+			let um = this.unlockedState.cacheGet('unlockedMessages')
 			if (um !== undefined)
 				this.allMessages = um
 		}

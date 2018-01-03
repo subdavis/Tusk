@@ -124,8 +124,8 @@
 						text: "Do not remember"
 					},
 					{
-						time: 30,
-						text: "Remember for 30 min."
+						time: 1,
+						text: "Remember for 1 min."
 					},
 					{
 						time: 120,
@@ -215,11 +215,14 @@
 			forgetPassword() {
 				this.settings.getCurrentDatabaseChoice().then(info => {
 					var passwordCacheKey = info.passwordFile.title + "__" + info.providerKey + ".password";
-					this.secureCache.clear('entries')
 					this.secureCache.clear(passwordCacheKey)
-					this.unlockedState.clearBackgroundState()
-					this.unlockedState.clearCache() // new
+				}).catch(err => {
+					// Error, wipe everything.
+					this.secureCache.clear()
 				})
+				this.secureCache.clear('entries')
+				this.unlockedState.clearClipboardState()
+				this.unlockedState.clearCache() // new
 			},
 			showResults(entries) {
 

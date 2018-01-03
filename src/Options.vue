@@ -20,7 +20,8 @@
 					:key-file-parser="services.keyFileParser"></manage-keyfiles>
 				<advanced-settings id="/advanced" v-if="show.advanced.visible" 
 					:settings="services.settings" 
-					:secure-cache-disk="services.secureCacheDisk"></advanced-settings>
+					:secure-cache-disk="services.secureCacheDisk"
+					:secure-cache-memory="services.secureCacheMemory"></advanced-settings>
 			</div>
 		</div>
 	</div>
@@ -97,7 +98,8 @@
 					sampleDatabaseFileManager,
 					sharedUrlFileManager,
 					keyFileParser,
-					secureCacheDisk
+					secureCacheDisk,
+					secureCacheMemory
 				},
 				show: {
 					startup: {

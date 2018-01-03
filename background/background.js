@@ -3,6 +3,9 @@
 /*
   This page runs as an Event page, not a Background page, so don't use global variables
   (they will be lost)
+
+  Be careful using settings.  
+  Settings can call secureCacheMemory, which in turn can open new ports to this script.
 */
 
 import { ProtectedMemory } from '$services/protectedMemory.js'
@@ -28,6 +31,9 @@ function Background(protectedMemory, settings) {
 					protectedMemory.getData(msg.key).then(function(value) {
 						port.postMessage(value);
 					});
+					break;
+				case 'forgetStuff':
+					forgetStuff();
 					break;
 				default:
 					throw new Error('unrecognized action ' + obj.action)
@@ -125,7 +131,7 @@ function Background(protectedMemory, settings) {
 
 	chrome.alarms.create("forgetStuff", {
 		delayInMinutes: 1,
-		periodInMinutes: 10
+		periodInMinutes: 2 // Check every 2 min
 	});
 
 	chrome.alarms.onAlarm.addListener(function(alarm) {
@@ -141,6 +147,8 @@ function Background(protectedMemory, settings) {
 	});
 
 	function forgetStuff() {
+		console.log("ForgetStuff", new Date())
+		protectedMemory.clearData('entries'); // ALWAYS clear entries.
 		settings.getAllForgetTimes().then(function(allTimes) {
 			var now = Date.now();
 			var forgottenKeys = [];
@@ -161,21 +169,23 @@ function Background(protectedMemory, settings) {
 								}, 2000);
 							})
 							break;
-						case 'forgetPassword':
-							forgetPassword().then(function() {
-								chrome.notifications.create({
-									'type': 'basic',
-									'iconUrl': 'assets/icons/logo_48.png',
-									'title': 'Tusk',
-									'message': 'Remembered password expired'
-								}, function(notificationId) {
-									chrome.alarms.create('clearNotification-'+notificationId, {
-										delayInMinutes: 1
-									});
+						default:
+							if (key.indexOf('password') >= 0) {
+								forgetPassword().then(function() {
+									chrome.notifications.create({
+										'type': 'basic',
+										'iconUrl': 'assets/icons/logo_48.png',
+										'title': 'Tusk',
+										'message': 'Remembered password expired'
+									}, function(notificationId) {
+										chrome.alarms.create('clearNotification-'+notificationId, {
+											delayInMinutes: 1
+										});
+									})
 								})
-							})
-							
-							break;
+							} else {
+								console.error("I don't know what to do with key", key)
+							}
 					}
 				}
 			}
@@ -198,14 +208,12 @@ function Background(protectedMemory, settings) {
 
 	function forgetPassword() {
 		return settings
-			.getCurrentDatabaseUsage()
-			.then(usage => {
-				return settings.saveCurrentDatabaseUsage({
-					requiresKeyfile: usage.requiresKeyfile,
-		 			keyFileName: usage.keyFileName,
-		 			rememberPeriod: usage.rememberPeriod
-				});
-			});
+			.getCurrentDatabaseChoice()
+			.then(info => { 
+				let key = info.passwordFile.title + "__" + info.providerKey + ".password"; 
+				return key
+			})
+			.then(protectedMemory.clearData)
 	}
 
 }
