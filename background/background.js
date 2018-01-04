@@ -148,7 +148,7 @@ function Background(protectedMemory, settings) {
 
 	function forgetStuff() {
 		console.log("ForgetStuff", new Date())
-		protectedMemory.clearData('entries'); // ALWAYS clear entries.
+		protectedMemory.clearData('secureCache.entries'); // ALWAYS clear entries.
 		settings.getAllForgetTimes().then(function(allTimes) {
 			var now = Date.now();
 			var forgottenKeys = [];
