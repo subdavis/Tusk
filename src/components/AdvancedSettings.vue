@@ -38,6 +38,12 @@
 			<div class="json" :id="blob.k"></div>
 			<a v-if="blob.delete !== undefined" class="waves-effect waves-light btn" @click="blob.delete.f(blob.delete.arg); init()">{{ blob.delete.op }}</a>
 		</div>
+
+		<div class="box-bar roomy">
+			<h4>Trigger Events</h4>
+			<p>Here you can manually trigger events.  Some of them happen naturally in response to other events or on timers.</p>
+			<a class="waves-effect waves-light btn" @click="triggerForgetStuffAlarm">forgetStuff Alarm</a>
+		</div>
 	</div>
 </template>
 
@@ -47,7 +53,8 @@
 	export default {
 		props: {
 			settings: Object,
-			secureCacheDisk: Object
+			secureCacheDisk: Object,
+			secureCacheMemory: Object
 		},
 		data() {
 			return {
@@ -119,6 +126,9 @@
 				if (!this.flags.diskCache) {
 					this.secureCacheDisk.clear('entries');
 				}
+			},
+			triggerForgetStuffAlarm(event) {
+				this.secureCacheMemory.forgetStuff()
 			},
 			init() {
 				this.jsonState.forEach(blob => {

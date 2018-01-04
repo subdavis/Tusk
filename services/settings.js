@@ -306,7 +306,6 @@ function Settings(secureCache) {
 				var usage = usages[key] || {};
 
 				return secureCache.get(key + ".password").then(value => {
-					console.log(value, "getSECURECACHE")
 					usage['passwordKey'] = value;
 					return usage
 				})

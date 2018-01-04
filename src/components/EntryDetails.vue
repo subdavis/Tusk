@@ -58,10 +58,11 @@
 		},
 		mounted() {
 			let entryId = this.$router.getRoute().entryId
-			this.entry = this.unlockedState.cache.allEntries.filter(entry => {
+			this.entry = this.unlockedState.cacheGet('allEntries').filter(entry => {
 				return entry.id == entryId
 			})[0]
 			this.attributes = this.entry.keys.map(key => {
+				// Should NOT be succeptible to XSS
 				let value = key !== 'notes' ?
 					(this.entry[key] || "").replace(/\n/g, "<br>") :
 					this.entry[key]

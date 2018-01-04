@@ -215,11 +215,14 @@
 			forgetPassword() {
 				this.settings.getCurrentDatabaseChoice().then(info => {
 					var passwordCacheKey = info.passwordFile.title + "__" + info.providerKey + ".password";
-					this.secureCache.clear('entries')
 					this.secureCache.clear(passwordCacheKey)
-					this.unlockedState.clearBackgroundState()
-					this.unlockedState.clearCache() // new
+				}).catch(err => {
+					// Error, wipe everything.
+					this.secureCache.clear()
 				})
+				this.secureCache.clear('entries')
+				this.unlockedState.clearClipboardState()
+				this.unlockedState.clearCache() // new
 			},
 			showResults(entries) {
 
@@ -303,7 +306,7 @@
 				this.unlockedState.cacheSet('priorityEntries', priorityEntries)
 				this.$forceUpdate()
 				//save longer term (in encrypted storage)
-				// this.secureCache.save('entries', entries);
+				this.secureCache.save('entries', entries);
 				this.busy = false
 			},
 			clickUnlock(event) {
@@ -365,33 +368,36 @@
 		mounted() {
 
 			if (!this.isUnlocked()) {
-				this.busy = true
-				this.settings.getKeyFiles().then(keyFiles => {
-					this.keyFiles = keyFiles
-					return this.settings.getDefaultRememberOptions()
-				}).then(rememberOptions => {
-					this.setRememberPeriod(rememberOptions.rememberPeriod)
-					return this.settings.getCurrentDatabaseUsage()
-				}).then(usage => {
-					// tweak UI based on what we know about the db file
-					this.hidePassword = (usage.requiresPassword === false)
-					this.hideKeyFile = (usage.requiresKeyfile === false)
-					this.rememberedPassword = (usage.passwordKey !== undefined)
-					this.setRememberPeriod(usage.rememberPeriod)
 
-					if (usage.passwordKey !== undefined && usage.requiresKeyfile === false) {
-						this.unlock(usage.passwordKey) // Autologin if no keyfile
-					} else if (usage.keyFileName !== undefined) {
-						let matches = this.keyFiles.filter(kf => {
-							return kf.name === usage.keyFileName
-						})
-						if (matches.length > 0) {
-							this.selectedKeyFile = matches[0]
-							if (this.hidePassword === true || usage.passwordKey !== undefined)
-								this.unlock(usage.passwordKey)
+				let try_autounlock = () => {
+					this.busy = true
+					this.settings.getKeyFiles().then(keyFiles => {
+						this.keyFiles = keyFiles
+						return this.settings.getDefaultRememberOptions()
+					}).then(rememberOptions => {
+						this.setRememberPeriod(rememberOptions.rememberPeriod)
+						return this.settings.getCurrentDatabaseUsage()
+					}).then(usage => {
+						// tweak UI based on what we know about the db file
+						this.hidePassword = (usage.requiresPassword === false)
+						this.hideKeyFile = (usage.requiresKeyfile === false)
+						this.rememberedPassword = (usage.passwordKey !== undefined)
+						this.setRememberPeriod(usage.rememberPeriod)
+
+						if (usage.passwordKey !== undefined && usage.requiresKeyfile === false) {
+							this.unlock(usage.passwordKey) // Autologin if no keyfile
+						} else if (usage.keyFileName !== undefined) {
+							let matches = this.keyFiles.filter(kf => {
+								return kf.name === usage.keyFileName
+							})
+							if (matches.length > 0) {
+								this.selectedKeyFile = matches[0]
+								if (this.hidePassword === true || usage.passwordKey !== undefined)
+									this.unlock(usage.passwordKey)
+							}
 						}
-					}
-				})
+					})
+				}
 
 				let focus = () => {
 					this.$nextTick(nil => {
@@ -403,12 +409,15 @@
 
 				this.busy = true
 				this.secureCache.get('entries').then(entries => {
-					if (entries && entries.length > 0) {
+					if (entries !== undefined && entries.length > 0) {
 						this.showResults(entries)
+					} else {
+						try_autounlock()
 					}
 				}).catch(err => {
 					//this is fine - it just means the cache expired.  Clear the cache to be sure.
 					this.secureCache.clear('entries')
+					try_autounlock()
 				}).then(nil => {
 					// state settled
 					this.busy = false
