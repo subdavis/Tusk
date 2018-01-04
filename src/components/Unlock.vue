@@ -370,7 +370,6 @@
 			if (!this.isUnlocked()) {
 
 				let try_autounlock = () => {
-					console.info("Trying autounlock...")
 					this.busy = true
 					this.settings.getKeyFiles().then(keyFiles => {
 						this.keyFiles = keyFiles
@@ -411,7 +410,6 @@
 				this.busy = true
 				this.secureCache.get('entries').then(entries => {
 					if (entries !== undefined && entries.length > 0) {
-						console.info("Showing cached entries..")
 						this.showResults(entries)
 					} else {
 						try_autounlock()
