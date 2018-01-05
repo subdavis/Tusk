@@ -170,11 +170,20 @@
     </table>
     <p>Request features in the github issue tracker.</p>
 
-    <h1 id="example">Example</h1>
+    <h1 id="security">Security</h1>
+    <p>Tusk provides security bug fixes and improved practices compared to CKP.  Some of the major fixes include:</p>
+    <ul>
+    	<li>Tusk is not vulnerable to <a href="https://subdavis.com/blog/jekyll/update/2017/01/02/ckp-security-flaw.html">this bug</a> where your master key can be recovered from disk.</li>
+    	<li>Tusk properly handles password memory and password forget times.</li>
+    	<li>Tusk properly handles evicting your unlocked database entries from cached memory</li>
+    	<li>Tusk uses <a href="https://github.com/keeweb/kdbxweb">KdbxWeb</a> for crypto operations.</li>
+    </ul>
+
+    <h1 id="demo">Demo</h1>
     <img src="https://media.giphy.com/media/xT0xeNpNEBZzlYGMWA/giphy.gif" width="60%"/>
     <p>Unlock screen, where the suggested password will appear, as well as any messages about the current page.</p>
 
-    <h1 id="contribute">Contribute</h1>
+    <h1 id="contribution">Contribution</h1>
     <p>Tusk is open source.  We use GitHub for source control, and contributions are welcome.</p>
     <ul>
       <li>
