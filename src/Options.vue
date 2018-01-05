@@ -20,7 +20,6 @@
 					:key-file-parser="services.keyFileParser"></manage-keyfiles>
 				<advanced-settings id="/advanced" v-if="show.advanced.visible" 
 					:settings="services.settings" 
-					:secure-cache-disk="services.secureCacheDisk"
 					:secure-cache-memory="services.secureCacheMemory"></advanced-settings>
 			</div>
 		</div>
@@ -34,7 +33,6 @@
 	import {Settings} from '$services/settings.js'
 	import {ProtectedMemory} from '$services/protectedMemory.js'
 	import {SecureCacheMemory} from '$services/secureCacheMemory.js'
-	import {SecureCacheDisk} from '$services/secureCacheDisk.js'
 	import {PasswordFileStoreRegistry} from '$services/passwordFileStore.js'
 	import {KeyFileParser} from '$services/keyFileParser.js'
 	// File Managers
@@ -55,7 +53,6 @@
 	const protectedMemory = new ProtectedMemory()
 	const secureCacheMemory = new SecureCacheMemory(protectedMemory)
 	const settings = new Settings(secureCacheMemory)
-	const secureCacheDisk = new SecureCacheDisk(protectedMemory, secureCacheMemory, settings)
 	const keyFileParser = new KeyFileParser()
 
 	// File Managers
@@ -98,7 +95,6 @@
 					sampleDatabaseFileManager,
 					sharedUrlFileManager,
 					keyFileParser,
-					secureCacheDisk,
 					secureCacheMemory
 				},
 				show: {

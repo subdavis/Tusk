@@ -33,7 +33,6 @@
 	import { KeepassService } from '$services/keepassService.js'
 	import { UnlockedState } from '$services/unlockedState.js'
 	import { SecureCacheMemory } from '$services/secureCacheMemory.js'
-	import { SecureCacheDisk } from '$services/secureCacheDisk.js'
 	import { PasswordFileStoreRegistry } from '$services/passwordFileStore.js'
 	import { Links } from '$services/links.js'
 	// File Managers
@@ -54,7 +53,6 @@
 	const protectedMemory = new ProtectedMemory()
 	const secureCacheMemory = new SecureCacheMemory(protectedMemory)
 	const settings = new Settings(secureCacheMemory)
-	const secureCacheDisk = new SecureCacheDisk(protectedMemory, secureCacheMemory, settings)
 	const keepassHeader = new KeepassHeader(settings)
 	const keepassReference = new KeepassReference()
 
@@ -84,7 +82,7 @@
 				services: {
 					/* The services exposed to UI components */
 					settings,
-					secureCache: secureCacheDisk,
+					secureCache: secureCacheMemory,
 					passwordFileStoreRegistry,
 					keepassService,
 					links,
