@@ -404,7 +404,7 @@
 				}
 
 				this.busy = true
-				this.secureCache.get('entries').then(entries => {
+				this.secureCache.get('secureCache.entries').then(entries => {
 					if (entries !== undefined && entries.length > 0) {
 						this.showResults(entries)
 					} else {
@@ -412,7 +412,7 @@
 					}
 				}).catch(err => {
 					//this is fine - it just means the cache expired.  Clear the cache to be sure.
-					this.secureCache.clear('entries')
+					this.secureCache.clear('secureCache.entries')
 					try_autounlock()
 				}).then(nil => {
 					// state settled

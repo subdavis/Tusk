@@ -1,8 +1,7 @@
 "use strict";
 
 /*
-  This page runs as an Event page, not a Background page, so don't use global variables
-  (they will be lost)
+  This page runs as an Background page, not an event
 
   Be careful using settings.  
   Settings can call secureCacheMemory, which in turn can open new ports to this script.

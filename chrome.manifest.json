@@ -13,8 +13,7 @@
 	"background": {
 		"scripts": [
 			"dist/background.build.js"
-		],
-		"persistent": false
+		]
 	},
 	"incognito": "split",
 	"browser_action": {
