@@ -2,11 +2,12 @@
 
 require('font-awesome/css/font-awesome.css')
 
-// Require static assets we need.
-require('../assets/icons/logo_38.png')
-require('../assets/icons/logo_16.png')
-require('../assets/icons/logo_48.png')
-require('../assets/Sample123.kdbx')
+// Require static assets we need...
+require('$assets/icons/logo_38.png')
+require('$assets/icons/logo_16.png')
+require('$assets/icons/logo_48.png')
+require('$assets/Sample123.kdbx')
+require('$lib/argon2.wasm')
 
 // Vue Components
 import Vue from 'vue'

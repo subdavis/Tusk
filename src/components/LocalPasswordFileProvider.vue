@@ -118,7 +118,6 @@
 		},
 		mounted() {
 			this.providerManager.isLoggedIn().then(loggedIn => {
-				console.log("WOOOOO", loggedIn)
 				this.loggedIn = loggedIn
 			})
 			this.providerManager.listDatabases().then(databases => {

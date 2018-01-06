@@ -142,10 +142,6 @@
 					{
 						time: 1440,
 						text: "Remember for 24 hours."
-					},
-					{
-						time: -1,
-						text: "Remember forever."
 					}
 				],
 				slider_int: 0
