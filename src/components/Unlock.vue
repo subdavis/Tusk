@@ -206,7 +206,7 @@
 			},
 			chooseAnotherFile() {
 				this.unlockedState.clearBackgroundState()
-				this.secureCache.clear('entries')
+				this.secureCache.clear('secureCache.entries')
 				this.$router.route('/choose')
 			},
 			isUnlocked: function() {
@@ -220,7 +220,7 @@
 					// Error, wipe everything.
 					this.secureCache.clear()
 				})
-				this.secureCache.clear('entries')
+				this.secureCache.clear('secureCache.entries')
 				this.unlockedState.clearClipboardState()
 				this.unlockedState.clearCache() // new
 			},
@@ -306,7 +306,7 @@
 				this.unlockedState.cacheSet('priorityEntries', priorityEntries)
 				this.$forceUpdate()
 				//save longer term (in encrypted storage)
-				this.secureCache.save('entries', entries);
+				this.secureCache.save('secureCache.entries', entries);
 				this.busy = false
 			},
 			clickUnlock(event) {

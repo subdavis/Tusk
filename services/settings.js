@@ -7,28 +7,13 @@ const chromePromise = ChromePromiseApi()
  * Settings for Tusk  */
 function Settings(secureCache) {
 	"use strict";
-
-	// Set up indexdb...
 	
 	var exports = {}
 
 	//upgrade old settings.  Called on install.
 	exports.upgrade = function() {
-		//Upgrade is not backward compatible.  Wipe usage.
-		exports.getDatabaseUsages().then(function(usages) {
-			for (let usageKey in usages) {
-				let usage = usages[usageKey]
-				usages[usageKey] = {
-					// do data translations...
-					passwordKey: usage.passwordKey,
-					requiresKeyfile: usage.requiresKeyFile,
-					requiresPassword: usage.requiresPassword,
-					version: usage.version,
-					keyFileName: usage.keyFileName
-				};
-			}
-			// exports.saveDatabaseUsages(usages);
-		});
+		// Patch https://subdavis.com/blog/jekyll/update/2017/01/02/ckp-security-flaw.html
+		chrome.storage.local.clear()
 	}
 
 	exports.getKeyFiles = function() {
@@ -84,19 +69,7 @@ function Settings(secureCache) {
 			});
 		});
 	}
-
-	exports.setDiskCacheFlag = function(val) {
-		return chromePromise.storage.local.set({
-			'useDiskCache': val
-		});
-	}
-
-	exports.getDiskCacheFlag = function() {
-		return chromePromise.storage.local.get('useDiskCache').then(function(items) {
-			return items.useDiskCache;
-		});
-	}
-
+	
 	exports.saveDatabaseUsages = function(usages) {
 		return chromePromise.storage.local.set({
 			'databaseUsages': usages
@@ -312,23 +285,6 @@ function Settings(secureCache) {
 			});
 		})
 	}
-
-	exports.setUseCredentialApiFlag = function(flagValue) {
-		if (flagValue) {
-			return chromePromise.storage.local.set({
-				'useCredentialApi': true
-			})
-		}
-
-		return chromePromise.storage.local.remove('useCredentialApi');
-	}
-
-	exports.getUseCredentialApiFlag = function() {
-		return chromePromise.storage.local.get('useCredentialApi').then(items => {
-			return !!items.useCredentialApi;
-		})
-	}
-
 
 	exports.setPasswordListIconOption = function(option) {
 		return chromePromise.storage.local.set({
