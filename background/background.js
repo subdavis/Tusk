@@ -87,8 +87,7 @@ function Background(protectedMemory, settings) {
 						m: "fillPassword",
 						u: message.u,
 						p: message.p,
-						o: message.o,
-						uca: message.uca
+						o: message.o
 					});
 					return;
 				}
@@ -103,8 +102,7 @@ function Background(protectedMemory, settings) {
 						m: "fillPassword",
 						u: message.u,
 						p: message.p,
-						o: message.o,
-						uca: message.uca
+						o: message.o
 					});
 				});
 			})

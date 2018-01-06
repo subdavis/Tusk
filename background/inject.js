@@ -36,17 +36,6 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 
 		//passed the origin check - go ahead and fill the password
 		filler.fillPassword(message.u, message.p);
-
-		if (message.uca && navigator.credentials) {
-			// try to tell Chrome to remember the password
-			let credential = new PasswordCredential({
-				'id': message.u,
-				'password': message.p
-			})
-			navigator.credentials.store(credential).then( results => {
-				console.log(results);
-			});
-		}
 	}
 
 	function parseUrl(url) {

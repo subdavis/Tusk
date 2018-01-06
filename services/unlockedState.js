@@ -99,24 +99,21 @@ function UnlockedState($router, keepassReference, protectedMemory, settings) {
 	setTimeout(my.clearClipboardState, 60000); //clear backgroundstate after 1 minutes live - we should never be alive that long
 
 	my.autofill = function(entry) {
-		settings.getUseCredentialApiFlag().then(useCredentialApi => {
-			chrome.runtime.sendMessage({
-				m: "requestPermission",
-				perms: {
-					origins: [my.origin]
-				},
-				then: {
-					m: "autofill",
-					tabId: my.tabId,
-					u: entry.userName,
-					p: getPassword(entry),
-					o: my.origin,
-					uca: useCredentialApi
-				}
-			});
+		chrome.runtime.sendMessage({
+			m: "requestPermission",
+			perms: {
+				origins: [my.origin]
+			},
+			then: {
+				m: "autofill",
+				tabId: my.tabId,
+				u: entry.userName,
+				p: getPassword(entry),
+				o: my.origin
+			}
+		});
 
-			// window.close(); //close the popup
-		})
+		window.close(); //close the popup
 	}
 
 	//get clear-text password from entry
