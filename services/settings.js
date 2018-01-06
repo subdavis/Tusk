@@ -13,9 +13,13 @@ function Settings(secureCache) {
 	//upgrade old settings.  Called on install.
 	exports.upgrade = function() {
 		// Patch https://subdavis.com/blog/jekyll/update/2017/01/02/ckp-security-flaw.html
-		// chrome.storage.local.clear()
-
-		// That's been done now.  Nothing to see here....
+		exports.getDatabaseUsages().then(usages => {
+			let keys = Object.keys(usages)
+			keys.forEach(k => {
+				if (usages[k]['passwordKey'] !== undefined)
+					chrome.storage.local.clear()
+			})
+		})
 	}
 
 	exports.getKeyFiles = function() {
