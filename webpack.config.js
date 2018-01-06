@@ -96,6 +96,7 @@ module.exports = {
             '$lib': path.resolve(__dirname, 'lib/'),
             '$services': path.resolve(__dirname, 'services/'),
             '$bwr': path.resolve(__dirname, 'bower_components/'),
+            '$assets': path.resolve(__dirname, 'assets/'),
             '@': path.resolve(__dirname, 'src/'),
         },
         extensions: ['*', '.js', '.vue', '.json']
