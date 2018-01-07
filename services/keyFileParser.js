@@ -3,6 +3,8 @@
 /**
  * Parses a KeePass key file
  */
+const Base64 = require('base64-arraybuffer')
+
 function KeyFileParser() {
 	var exports = {
 
