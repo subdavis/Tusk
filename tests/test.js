@@ -1,16 +1,8 @@
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>Mocha Tests - Services</title>
-  <link rel="stylesheet" href="../bower_components/mocha/mocha.css" />
-</head>
-<body>
-  <div id="mocha"></div>
-  <!--<script src="../bower_components/requirejs/require.js"></script>-->
-  <script src="../bower_components/mocha/mocha.js"></script>
+/*
+  <script src="../node_modules/mocha/mocha.js"></script>
   <script>mocha.setup('bdd')</script>
-  <script src="../bower_components/should/should.js"></script>
-  <script src="../bower_components/sinonjs/sinon.js"></script>
+  <script src="../node_modules/should/should.js"></script>
+  <script src="../node_modules/sinon/pkg/sinon.js"></script>
   <script src="../lib/base64.js"></script>
   <script src="../lib/angular.min.js"></script>
   <script src="../lib/case.min.js"></script>
@@ -27,11 +19,7 @@
   <script src="test.protectedMemory.js"></script>
   <script src="test.oneDriveFileManager.js"></script>
   <script src="test.keepassReference.js"></script>
-  <script src="test.settings.js"></script>
-  <script>
-    mocha.checkLeaks();
-    //mocha.globals(['jQuery']);
-    mocha.run();
-  </script>
-</body>
-</html>
+*/
+require('./test.keepassReference.js')
+require('./test.protectedMemory.js')
+require('./test.secureCache.js')

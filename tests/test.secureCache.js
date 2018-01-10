@@ -1,3 +1,7 @@
+const should = require('should')
+
+import { ProtectedMemory } from '$services/protectedMemory.js'
+
 var memory = {};
 var disk = {};
 var chrome = {
@@ -71,7 +75,7 @@ describe('SecureCache on disk', function() {
   });
 
   it('should be ready eventually', function() {
-    var cache = new SecureCacheDisk(protectedMemory, null, settings);
+    var cache = new SecureCacheMemory(protectedMemory);
     var ready = cache.ready();
 
     return ready.then(function(val) {
@@ -142,7 +146,6 @@ describe('SecureCache fallback to in-memory', function() {
 
   it ('should be ready eventually', function() {
     var memoryCache = new SecureCacheMemory(protectedMemory);
-    var cache = new SecureCacheDisk(protectedMemory, memoryCache, settings);
     var ready = cache.ready();
 
     return ready.then(function(val) {
@@ -152,8 +155,7 @@ describe('SecureCache fallback to in-memory', function() {
 
   it('should save something', function() {
     var memoryCache = new SecureCacheMemory(protectedMemory);
-    var cache = new SecureCacheDisk(protectedMemory, memoryCache, settings);
-    return cache.save('key1', 'some data').then(function() {
+    return memoryCache.save('key1', 'some data').then(function() {
       var m = memory['secureCache.key1'];
       m.should.not.equal('some data');
       m.should.not.equal(undefined);
@@ -162,8 +164,7 @@ describe('SecureCache fallback to in-memory', function() {
 
   it('should return unencrypted data', function() {
     var memoryCache = new SecureCacheMemory(protectedMemory);
-    var cache = new SecureCacheDisk(protectedMemory, memoryCache, settings);
-    return cache.save('key1', 'some data').then(function() {
+    return memoryCache.save('key1', 'some data').then(function() {
       return cache.get('key1');
     }).then(function(data) {
       data.should.equal('some data');

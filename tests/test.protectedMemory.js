@@ -1,4 +1,7 @@
-//require(['Base64','protectedMemory','mocha'])
+const should = require('should')
+
+import { ProtectedMemory } from '$services/protectedMemory.js'
+
 describe('Protected Memory', function() {
 
 	describe('setData()', function() {

@@ -1,3 +1,7 @@
+const should = require('should')
+
+import { KeepassReference } from '$services/keepassReference.js'
+
 describe('Keepass References', function () {
 
 	// http://keepass.info/help/base/fieldrefs.html

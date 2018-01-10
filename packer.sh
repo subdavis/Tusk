@@ -11,4 +11,4 @@ cp $TARGET_BROWSER.tusk.zip ./demo-$TARGET_BROWSER
 cd ./demo-$TARGET_BROWSER
 unzip *
 cd ..
-echo 'Files packed to $TARGET_BROWSER.tusk.zip.  Verify the build in ./demo-$TARGET_BROWSER'
+echo "Files packed to $TARGET_BROWSER.tusk.zip.  Verify the build in ./demo-$TARGET_BROWSER"
