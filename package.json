@@ -8,11 +8,11 @@
   "scripts": {
     "prebuild": "npm run clean",
     "build": "cross-env NODE_ENV=production webpack --progress --hide-modules",
-    "build-tests": "cross-env NODE_ENV=test webpack --config webpack.test.config.js 'mocha-loader!./tests/test.js' --output-filename tests/bundle.build.js",
+    "build-tests": "cross-env NODE_ENV=test webpack --config webpack.test.config.js --progress",
     "bundle": "./packer.sh chrome && ./packer.sh firefox",
     "clean": "rm -rf dist/ *.zip manifest.json demo*",
     "watch": "gulp watch",
-    "watchtests": "gulp watchtests"
+    "watch-tests": "gulp watchtests"
   },
   "dependencies": {
     "axios": "^0.17.1",
