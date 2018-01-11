@@ -12,24 +12,37 @@
 
 ## Build Setup
 
+Tusk requires:
+* `node`
+* `npm`
+* `gulp`
+* `yarn`
+
 ```bash
 # install dependencies
-npm install
-
-# serve with hot reload at localhost:8080
-npm run dev
+yarn install
 
 # static reload with file watch
-npm run watch
+yarn watch
 
 # build for production with minification
-npm run build
+yarn build
 
-# run the packer script targeted for 'chrome' or 'firefox'
-TARGET_BROWSER=firefox ./packer.sh
+# run the packer script targeted for 'chrome' or 'firefox' after build
+yarn bundle
+
+# build the tests
+yarn build-tests
+
+# static reload with file watch for tests
+yarn watch-tests
 ```
 
 For detailed explanation on how things work, consult the [docs for vue-loader](http://vuejs.github.io/vue-loader).
+
+## Running tests
+
+To run tests, first build them with `yarn build-tests` or `yarn watch-tests` then open `tests/test.html` in a browser.s
 
 ## Browser Permissions
 

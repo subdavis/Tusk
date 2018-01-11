@@ -1,41 +1,24 @@
+import { Settings } from '$services/settings'
+
+var disk = {};
+
+window.chrome.storage.local = {
+	'set': function(data, callback) {
+		disk = data;
+		callback();
+	},
+	'get': function(key, callback) {
+		callback(disk);
+	}
+}
 describe('Settings', function () {
 	"use strict";
-	
-	chrome.p = {
-		storage: {
-			local: {
-				'set': function(storageObject) {
-					return new Promise(function(resolve, reject) {
-						for(let key in storageObject) {
-							storage[key] = storageObject[key];
-						}
-						resolve(true);
-					})
-				},
-				'get': function(key) {
-					return new Promise(function(resolve, reject) {
-						var result = {};
-						if (Array.isArray(key)) {
-							key.forEach(function(singleKey) {
-								result[singleKey] = storage[singleKey];
-							})
-						} else {
-							result[key] = storage[key];
-						}
 
-						resolve(result);
-					})
-				}
-			}
-		}
-	}
-
-	let storage = {};
 	let settings = new Settings();
 
-	afterEach(function() {
-		storage = {};
-	});
+	beforeEach(function() {
+    disk = {};
+  })
 
 	describe('forget times', function() {
 		it('should set a simple time', function() {
@@ -57,15 +40,15 @@ describe('Settings', function () {
 			})
 		})
 
-		it('should support update of remembered time', function() {
+		it('should not update remembered time if it exists', function() {
 			let time1 = new Date();
-			let time2 = new Date() + 1;
+			let time2 = new Date() + 100000;
 			return settings.setForgetTime('test', time1).then(function() {
 				return settings.setForgetTime('test', time2)
 			}).then(function() {
 				return settings.getForgetTime('test')
 			}).then(function(returnedTime) {
-				returnedTime.should.equal(time2);
+				returnedTime.should.equal(time1);
 			});
 		})
 
