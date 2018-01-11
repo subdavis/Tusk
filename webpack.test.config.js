@@ -1,8 +1,20 @@
 var path = require('path')
 
 module.exports = {
+	entry: {
+		'bundle': './tests/test.js'
+	},
+	output: {
+      publicPath: '/tests/',
+      path: path.resolve(__dirname, './tests'),
+      filename: '[name].build.js'
+  },
 	module: {
     rules: [{
+	      test: /test\.js$/,
+	      use: 'mocha-loader',
+	      exclude: /node_modules/,
+    }, {
         test: /\.scss$/,
         use: [
             'vue-style-loader',

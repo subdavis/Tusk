@@ -42,6 +42,7 @@ store/
 build/
 dist/
 *.zip
+*.build.js
 
 #nodejs
 # Logs
