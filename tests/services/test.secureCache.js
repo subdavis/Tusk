@@ -5,30 +5,21 @@ import { SecureCacheMemory } from '$services/secureCacheMemory.js'
 
 var memory = {};
 var disk = {};
-window.chrome = {
-  identity: {
-  },
-  runtime: {
-  },
-  extension: {
-  },
-  tabs: {
-    query: function(query, callback) {
-      callback([{id: 1}]);
-    }
-  },
-  storage: {
-    local: {
-      set: function(items, callback) {
-        disk = items;
-        callback();
-      },
-      get: function(key, callback) {
-        callback(disk);
-      }
-    }
+window.chrome.tabs =  {
+  query: function(query, callback) {
+    callback([{id: 1}]);
   }
-};
+}
+window.chrome.storage.local = {
+  set: function(items, callback) {
+    disk = items;
+    callback();
+  },
+  get: function(key, callback) {
+    callback(disk);
+  }
+}
+
 var settings = {
   getDiskCacheFlag: function() {
     return Promise.resolve(true);
