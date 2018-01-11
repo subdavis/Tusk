@@ -40,6 +40,10 @@ yarn watch-tests
 
 For detailed explanation on how things work, consult the [docs for vue-loader](http://vuejs.github.io/vue-loader).
 
+## Running tests
+
+To run tests, first build them with `yarn build-tests` or `yarn watch-tests` then open `tests/test.html` in a browser.s
+
 ## Browser Permissions
 
 > Tusk requires cross-origin permissions in order to inject credentials and query the storage backends on the user's behalf.
