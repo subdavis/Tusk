@@ -54,6 +54,10 @@ module.exports = {
         loader: 'babel-loader',
         exclude: /node_modules/
     }, {
+        test: /\.(png|jpg|gif|svg|kdbx)$/,
+        exclude: '/.*/',
+        loader: 'ignore-loader'
+    }, {
         test: /\.html$/,
         loader: 'file-loader',
         options: {

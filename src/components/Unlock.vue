@@ -423,8 +423,9 @@
 
 			// modify unlockedState internal state
 			this.unlockedState.getTabDetails().then(nil => {
-				if (this.unlockedState.sitePermission)
+				if (this.unlockedState.sitePermission){
 					this.generalMessages.success = "You have previously granted Tusk permission to fill passwords on " + this.unlockedState.origin
+				}
 				else
 					this.generalMessages.warn = "This may be a new site to Tusk. Before filling in a password, double check that this is the correct site."
 			})

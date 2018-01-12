@@ -43,6 +43,7 @@
     "extract-text-webpack-plugin": "^3.0.2",
     "file-loader": "^1.1.5",
     "gulp": "^3.9.1",
+    "ignore-loader": "^0.1.2",
     "mocha": "^4.1.0",
     "mocha-loader": "^1.1.2",
     "node-sass": "^4.5.3",

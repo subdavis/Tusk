@@ -10,14 +10,16 @@ window.chrome.tabs =  {
     callback([{id: 1}]);
   }
 }
-window.chrome.storage.local = {
-  set: function(items, callback) {
-    disk = items;
-    callback();
-  },
-  get: function(key, callback) {
-    callback(disk);
-  }
+window.chrome.storage = {
+	local: {
+	  set: function(items, callback) {
+	    disk = items;
+	    callback();
+	  },
+	  get: function(key, callback) {
+	    callback(disk);
+	  }
+	}
 }
 
 var settings = {
@@ -56,39 +58,44 @@ function mockBackgroundPage() {
 
 var protectedMemory = new ProtectedMemory();
 
-describe('SecureCacheMemory', function() {
-  beforeEach(function() {
-    memory = {}; disk = {};
+describe('SecureCache', function() {
 
-    //mock the way the background page responds
-    mockBackgroundPage();
-  })
+	describe('SecureCacheMemory', function(){
+		
+		beforeEach(function() {
+	    memory = {}; disk = {};
 
-  it ('should be ready eventually', function() {
-    var memoryCache = new SecureCacheMemory(protectedMemory);
-    var ready = memoryCache.ready();
+	    //mock the way the background page responds
+	    mockBackgroundPage();
+	  })
 
-    return ready.then(function(val) {
-      val.should.be.true;
-    })
-  });
+	  it ('should be ready eventually', function() {
+	    var memoryCache = new SecureCacheMemory(protectedMemory);
+	    var ready = memoryCache.ready();
 
-  it('should save something', function() {
-    var memoryCache = new SecureCacheMemory(protectedMemory);
-    return memoryCache.save('key1', 'some data').then(function() {
-      var m = memory['key1'];
-      m.should.not.equal('some data');
-      m.should.not.equal(undefined);
-    });
-  })
+	    return ready.then(function(val) {
+	      val.should.be.true;
+	    })
+	  });
 
-  it('should return unencrypted data', function() {
-    var memoryCache = new SecureCacheMemory(protectedMemory);
-    return memoryCache.save('key1', 'some data').then(function() {
-      return memoryCache.get('key1');
-    }).then(function(data) {
-      data.should.equal('some data');
-    });
-  })
+	  it('should save something', function() {
+	    var memoryCache = new SecureCacheMemory(protectedMemory);
+	    return memoryCache.save('key1', 'some data').then(function() {
+	      var m = memory['key1'];
+	      m.should.not.equal('some data');
+	      m.should.not.equal(undefined);
+	    });
+	  })
+
+	  it('should return unencrypted data', function() {
+	    var memoryCache = new SecureCacheMemory(protectedMemory);
+	    return memoryCache.save('key1', 'some data').then(function() {
+	      return memoryCache.get('key1');
+	    }).then(function(data) {
+	      data.should.equal('some data');
+	    });
+	  })
+
+	})
 
 });

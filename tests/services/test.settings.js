@@ -1,5 +1,5 @@
 import { Settings } from '$services/settings'
-
+const should = require('should')
 var disk = {};
 
 window.chrome.storage.local = {
@@ -9,6 +9,10 @@ window.chrome.storage.local = {
 	},
 	'get': function(key, callback) {
 		callback(disk);
+	},
+	'remove': function(key, callback) {
+		delete disk[key];
+		callback()
 	}
 }
 describe('Settings', function () {
@@ -21,6 +25,7 @@ describe('Settings', function () {
   })
 
 	describe('forget times', function() {
+		
 		it('should set a simple time', function() {
 			return settings.setForgetTime(new Date());
 		});
@@ -95,6 +100,29 @@ describe('Settings', function () {
 		it('should not error on deleting invalid key', function() {
 			return settings.clearForgetTimes(['invalidKey'])
 		})
+	})
+
+	describe("Remember Options", function() {
+		
+		it('should support setting default remember options', function() {
+			let rememberPeriod = 1234;
+			return settings.saveDefaultRememberOptions(rememberPeriod).then(function() {
+				return settings.getDefaultRememberOptions().then(options => {
+					options.rememberPeriod.should.equal(rememberPeriod).which.is.a.Number();
+					options.rememberPassword.should.be.true();
+				})
+			})
+		})
+
+		it('should support resetting the remember options', function() {
+			let rememberPeriod = 0;
+			return settings.saveDefaultRememberOptions(rememberPeriod).then(function(){
+				return settings.getDefaultRememberOptions().then(options => {
+					options.rememberPassword.should.be.false();
+				})
+			})
+		})
+	
 	})
 	
 });
