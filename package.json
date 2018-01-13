@@ -27,6 +27,7 @@
     "pako": "^1.0.6",
     "vue": "^2.4.4",
     "vue-simple-spinner": "^1.2.8",
+    "webdav": "^1.1.1",
     "xmldom": "^0.1.27"
   },
   "browserslist": [
