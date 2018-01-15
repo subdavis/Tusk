@@ -149,6 +149,7 @@ function OauthManager(settings, oauth) {
 					return Promise.reject({message:"No network connection"})
 				if (error.response.status == 401) {
 					//unauthorized, means the token is bad.  retry with new token.
+					console.error("Stale token sent for " + oauth.accessTokenType + ": trying passive Oauth Refresh.")
 					return auth(false).then(function() {
 						return getChosenDatabaseFile(dbInfo);
 					})
@@ -184,7 +185,7 @@ function OauthManager(settings, oauth) {
 						'&client_id=' + manifest.static_data[oauth.accessTokenType].client_id +
 						'&state=' + encodeURIComponent(randomState) +
 						'&redirect_uri=' + encodeURIComponent(chrome.identity.getRedirectURL(oauth.accessTokenType));
-					console.log(authUrl)
+					console.info("Sending request for AUTH to", oauth.authUrl)
 					chromePromise.identity.launchWebAuthFlow({
 						'url': authUrl,
 						'interactive': interactive

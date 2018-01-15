@@ -21,6 +21,9 @@
 				<advanced-settings id="/advanced" v-if="show.advanced.visible" 
 					:settings="services.settings" 
 					:secure-cache-memory="services.secureCacheMemory"></advanced-settings>
+				<reauthorize id="/reauthorize" v-if="show.reauthorize.visible"
+					:settings="services.settings"
+					:providers="[services.dropboxFileManager,services.googleDrivePasswordFileManager,services.oneDriveFileManager]"></reauthorize>
 			</div>
 		</div>
 	</div>
@@ -49,6 +52,7 @@
 	import ManageKeyfiles from '@/components/ManageKeyfiles'
 	import AdvancedSettings from '@/components/AdvancedSettings'
 	import SvgDefs from '@/components/SvgDefs'
+	import Reauthorize from '@/components/Reauthorize'
 
 	const protectedMemory = new ProtectedMemory()
 	const secureCacheMemory = new SecureCacheMemory(protectedMemory)
@@ -80,7 +84,8 @@
 			ManageDatabases,
 			ManageKeyfiles,
 			AdvancedSettings,
-			SvgDefs
+			SvgDefs,
+			Reauthorize
 		},
 		data() {
 			return {
@@ -109,6 +114,9 @@
 					},
 					advanced: {
 						visble: false
+					},
+					reauthorize: {
+						visible: false
 					}
 				}
 			}
@@ -134,10 +142,19 @@
 					route: '/advanced',
 					name: "Advanced",
 					var: this.show.advanced
+				},
+				{
+					route: '/reauthorize/:provider',
+					name: "Reauthorize",
+					var: this.show.reauthorize
 				}
 			])
 			this.routes = this.$router.routes // HACK since Vue doesn't notice changes in 
-			this.$router.route(this.initialTab)
+			let hashroute = this.$router.processHash(window.location.hash);
+			if (hashroute)
+				this.$router.route(hashroute)
+			else
+				this.$router.route(this.initialTab)
 		}
 	}
 </script>

@@ -42,7 +42,7 @@
                 <i class="fa fa-file fa-fw" aria-hidden="true"></i>
                 {{ kf.name }}
 							</span>
-							<span @click="links.openOptions" class="selectable"><i class="fa fa-wrench fa-fw" aria-hidden="true"></i> Manage Keyfiles</span>
+							<span @click="links.openOptionsKeyfiles" class="selectable"><i class="fa fa-wrench fa-fw" aria-hidden="true"></i> Manage Keyfiles</span>
 						</div>
 					</transition>
 				</div>
@@ -354,6 +354,7 @@
 						this.busy = false
 					})
 				}).catch(err => {
+					this.settings.handleProviderError(err)
 					let errmsg = err.message || "Incorrect password or keyfile"
 					console.error(errmsg)
 					this.generalMessages['error'] = errmsg
