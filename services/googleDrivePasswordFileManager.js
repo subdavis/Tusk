@@ -76,7 +76,6 @@ function GoogleDrivePasswordFileManager(settings) {
 				}
 			}
 			return axios(requestmeta).then(response => {
-				console.log(response)
 				var requestfile = {
 					method: 'GET',
 					url: response.data.downloadUrl,
@@ -121,6 +120,7 @@ function GoogleDrivePasswordFileManager(settings) {
 	}
 
 	oauth.handleAuthRedirectURI = function(redirect_url, randomState, resolve, reject) {
+		console.log(redirect_url)
 		var tokenMatches = /access_token=([^&]+)/.exec(redirect_url);
 		var stateMatches = /state=([^&]+)/.exec(redirect_url);
 

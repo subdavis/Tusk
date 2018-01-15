@@ -1,7 +1,8 @@
-let Base64 = require('base64-arraybuffer')
+const Base64 = require('base64-arraybuffer')
 import { ChromePromiseApi } from '$lib/chrome-api-promise.js'
-
+import { Links } from '$services/links.js'
 const chromePromise = ChromePromiseApi()
+const links = new Links()
 
 /**
  * Settings for Tusk  */
@@ -19,6 +20,17 @@ function Settings(secureCache) {
 				if (usages[k]['passwordKey'] !== undefined)
 					chrome.storage.local.clear()
 			})
+		})
+	}
+
+	exports.handleProviderError = function(err, provider) {
+		exports.getCurrentDatabaseChoice().then(info => {
+			let providerKey = provider === undefined ? info.providerKey : provider.key;
+			let errmsg = err.message || ""
+			if (errmsg.indexOf('interact') >= 0) {
+				/* There was an error with reauthorizing google drive... */
+				links.openOptionsReauth(providerKey)
+			}
 		})
 	}
 

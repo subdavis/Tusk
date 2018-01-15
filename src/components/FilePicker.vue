@@ -7,8 +7,8 @@
         </svg> {{ db.title }}
       </span>
 		</div>
-		<div class="box-bar small selectable flair chooseFile" @click="links.openOptions">
-			<span>Manage Database Files</span>
+		<div class="box-bar small selectable flair chooseFile" @click="links.openOptionsDatabases">
+			<span><b>Manage Database Files</b></span>
 		</div>
 	</div>
 </template>
@@ -52,6 +52,10 @@
 						})
 						this.databases = this.databases.concat(databases)
 					}
+				}).catch(err => {
+					this.settings.handleProviderError(err, provider);
+					console.error("Error when trying to listDatabases")
+					console.error(err)
 				})
 			})
 		}
