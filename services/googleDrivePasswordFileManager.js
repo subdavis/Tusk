@@ -120,7 +120,6 @@ function GoogleDrivePasswordFileManager(settings) {
 	}
 
 	oauth.handleAuthRedirectURI = function(redirect_url, randomState, resolve, reject) {
-		console.log(redirect_url)
 		var tokenMatches = /access_token=([^&]+)/.exec(redirect_url);
 		var stateMatches = /state=([^&]+)/.exec(redirect_url);
 
@@ -141,6 +140,40 @@ function GoogleDrivePasswordFileManager(settings) {
 			reject(redirect_url)
 			console.error("Auth Error", redirect_url);
 		}
+	}
+
+	function chrome_auth (interactive){
+		// chrome_auth is an alternative auth function run when the 
+		// browser is Chrome.  It uses chrome.identity.getAuthToken rather than
+		// a standard Oauth flow.
+		interactive = !!interactive;
+		return new Promise(function(resolve, reject) {
+			chrome.identity.getAuthToken({
+				interactive : interactive
+			}, function(token) {
+				if (token)
+				  settings.saveAccessToken(accessTokenType, token).then(function() {
+						resolve(token);
+					});
+				else {
+					let err = chrome.runtime.lastError;
+					if (!err) {
+						err = new Error("Failed to authenticate.");
+					}
+					if (err.message == "OAuth2 not granted or revoked.") {
+						//too confusing
+						reject(new Error("You must Authorize google drive access to continue."))
+					} else {
+						reject(err);
+					}
+				}
+			});
+		});
+	}
+
+	// If this browser has the getAuthToken function.  Hack for #64
+	if (chrome.identity.getAuthToken !== undefined){
+		oauth['auth'] = chrome_auth;
 	}
 
 	return OauthManager(settings, oauth)

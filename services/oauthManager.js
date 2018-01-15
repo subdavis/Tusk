@@ -177,29 +177,38 @@ function OauthManager(settings, oauth) {
 	function auth(interactive) {
 		interactive = !!interactive;
 		console.info("Authenticating for ", oauth.accessTokenType, interactive)
-		return ensureOriginPermissions().then(ensured => {
+
+		let authfunction = is_interactive => {
 			return new Promise(function(resolve, reject) {
 				chromePromise.runtime.getManifest().then(manifest => {
-					var randomState = Base64.encode(window.crypto.getRandomValues(new Uint8Array(16))); //random state, protects against CSRF
+					//random state, protects against CSRF
+					var randomState = Base64.encode(window.crypto.getRandomValues(new Uint8Array(16))); 
 					var authUrl = oauth.authUrl +
 						'&client_id=' + manifest.static_data[oauth.accessTokenType].client_id +
 						'&state=' + encodeURIComponent(randomState) +
 						'&redirect_uri=' + encodeURIComponent(chrome.identity.getRedirectURL(oauth.accessTokenType));
-					console.info("Sending request for AUTH to", oauth.authUrl)
+					console.info("Sending request for AUTH to", oauth.authUrl);
 					chromePromise.identity.launchWebAuthFlow({
 						'url': authUrl,
-						'interactive': interactive
+						'interactive': is_interactive
 					}).then(redirect_url => {
-						oauth.handleAuthRedirectURI(redirect_url, randomState, resolve, reject)
+						oauth.handleAuthRedirectURI(redirect_url, randomState, resolve, reject);
 					}).catch(function(err) {
 						console.error("Error from webauthflow for", oauth.accessTokenType, err);
 						reject(err);
 					});
 				});
-			}).then(token => {
+			})
+		}
+
+		// If the oauth provider has chosen to implement its own auth function.
+		authfunction = oauth.auth !== undefined ? oauth.auth : authfunction;
+
+		return ensureOriginPermissions().then(ensured => {
+			return authfunction(interactive).then(token => {
 				if (token) {
-					console.info("Successfully logged into", oauth.accessTokenType)
-					state.loggedIn = true
+					console.info("Successfully logged into", oauth.accessTokenType);
+					state.loggedIn = true;
 				}
 				return token;
 			});

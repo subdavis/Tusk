@@ -146,7 +146,8 @@
 				{
 					route: '/reauthorize/:provider',
 					name: "Reauthorize",
-					var: this.show.reauthorize
+					var: this.show.reauthorize,
+					hidden_from_navbar: true
 				}
 			])
 			this.routes = this.$router.routes // HACK since Vue doesn't notice changes in 
