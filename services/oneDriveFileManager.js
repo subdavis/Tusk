@@ -112,8 +112,6 @@ function OneDriveFileManager(settings) {
 
 	oauth.handleAuthRedirectURI = function(redirect_url, randomState, resolve, reject) {
 
-		console.log(redirect_url)
-
 		function parseAuthInfoFromUrl(url) {
 			var hash = /#(.+)$/.exec(url);
 			if (!hash) {
