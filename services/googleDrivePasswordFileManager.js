@@ -147,15 +147,15 @@ function GoogleDrivePasswordFileManager(settings) {
 		// browser is Chrome.  It uses chrome.identity.getAuthToken rather than
 		// a standard Oauth flow.
 		interactive = !!interactive;
-    return new Promise(function(resolve, reject) {
-  		chrome.identity.getAuthToken({
-  			interactive : interactive
-  		}, function(token) {
-  			if (token)
-  			  settings.saveAccessToken(accessTokenType, token).then(function() {
+		return new Promise(function(resolve, reject) {
+			chrome.identity.getAuthToken({
+				interactive : interactive
+			}, function(token) {
+				if (token)
+				  settings.saveAccessToken(accessTokenType, token).then(function() {
 						resolve(token);
 					});
-  			else {
+				else {
 					let err = chrome.runtime.lastError;
 					if (!err) {
 						err = new Error("Failed to authenticate.");
@@ -166,9 +166,9 @@ function GoogleDrivePasswordFileManager(settings) {
 					} else {
 						reject(err);
 					}
-  			}
-  		});
-    });
+				}
+			});
+		});
 	}
 
 	// If this browser has the getAuthToken function.  Hack for #64
