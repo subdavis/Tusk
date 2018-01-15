@@ -8,7 +8,7 @@
 		<div class="nav-content">
 			<ul class="tabs tabs-transparent">
 				<!-- set class like /advanced-active-listener so the router can set -->
-				<li v-for="route in routes" class="tab" :class="{ active: (route.var.visible) }">
+				<li v-for="route in routes" v-if="!route.hidden_from_navbar" class="tab" :class="{ active: (route.var.visible) }">
 					<a @click="$router.route(route.route)">{{ route.name }}</a>
 				</li>
 			</ul>
