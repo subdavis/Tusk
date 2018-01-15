@@ -53,7 +53,8 @@
 						this.databases = this.databases.concat(databases)
 					}
 				}).catch(err => {
-					settings.handleProviderError(err, provider);
+					this.settings.handleProviderError(err, provider);
+					console.error("Error when trying to listDatabases")
 					console.error(err)
 				})
 			})
