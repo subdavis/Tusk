@@ -142,6 +142,10 @@
 					{
 						time: 1440,
 						text: "Remember for 24 hours."
+					},
+					{
+						time: -1,
+						text: "Until Chrome exits."
 					}
 				],
 				slider_int: 0

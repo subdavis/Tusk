@@ -150,7 +150,8 @@ function Background(protectedMemory, settings) {
 			var now = Date.now();
 			var forgottenKeys = [];
 			for (var key in allTimes) {
-				if (allTimes[key] < now) {
+				// If the time has passed but is still positive...
+				if (allTimes[key] < now && allTimes[key] > 0) {
 					forgottenKeys.push(key);
 					switch (key) {
 						case 'clearClipboard':

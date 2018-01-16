@@ -64,6 +64,7 @@
 							this.settings.disableDatabaseProvider(this.providerManager)
 							this.populate()
 						}).catch(err => {
+							this.settings.disableDatabaseProvider(this.providerManager)
 							this.messages.error = err.toString()
 						})
 					} else {
