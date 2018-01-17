@@ -199,9 +199,16 @@ function Settings(secureCache) {
 		});
 	};
 
-	exports.cacheMasterPassword = function(pw, args) {
+	exports.getCurrentMasterPasswordCacheKey = function() {
 		return exports.getCurrentDatabaseChoice().then(info => {
-			let key = info.passwordFile.title + "__" + info.providerKey + ".password"
+			if (info !== null)
+				return info.passwordFile.title + "__" + info.providerKey + ".password"
+			return null;
+		});
+	}
+
+	exports.cacheMasterPassword = function(pw, args) {
+		return exports.getCurrentMasterPasswordCacheKey().then(key => {
 			return secureCache.save(key, pw).then(nil => {
 				let forgetTime = args['forgetTime']
 				return exports.setForgetTime(key, forgetTime)

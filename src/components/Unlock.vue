@@ -213,12 +213,9 @@
 				return this.unlockedState.cache.allEntries !== undefined
 			},
 			forgetPassword() {
-				this.settings.getCurrentDatabaseChoice().then(info => {
-					var passwordCacheKey = info.passwordFile.title + "__" + info.providerKey + ".password";
-					this.secureCache.clear(passwordCacheKey)
-				}).catch(err => {
-					// Error, wipe everything.
-					this.secureCache.clear()
+				this.settings.getCurrentMasterPasswordCacheKey().then(key => {
+					if (key !== null)
+						this.secureCache.clear(key)
 				})
 				this.secureCache.clear('secureCache.entries')
 				this.unlockedState.clearClipboardState()
@@ -341,10 +338,11 @@
 							let check_time = 60000 * this.rememberPeriod // milliseconds / min
 							// Save the password in memory independently.
 							this.settings.cacheMasterPassword(passwordKey, { 
-								forgetTime: Date.now() + check_time 
+								forgetTime: check_time > 0 ? Date.now() + check_time : check_time
 							})
 						} else {
-							// this.settings.clearForgetTimes(['forgetPassword'])
+							this.settings.getCurrentMasterPasswordCacheKey()
+								.then(this.secureCache.clear)
 						}
 						this.settings.saveCurrentDatabaseUsage(dbUsage)
 						this.settings.saveDefaultRememberOptions(this.rememberPeriod)

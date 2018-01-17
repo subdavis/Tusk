@@ -77,7 +77,7 @@ module.exports = {
             test: /\.(png|jpg|gif|svg|kdbx)$/,
             loader: 'file-loader',
             options: {
-                name: '[name].[ext]?[hash]'
+                name: '[name].[ext]'
             }
         }, {
             test: /\.css$/,
