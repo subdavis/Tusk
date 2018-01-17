@@ -33,12 +33,13 @@
 		"open_in_tab": true
 	},
 	"commands": {
-		"_execute_page_action": {
+		"_execute_browser_action": {
 			"suggested_key": {
 				"windows": "Ctrl+Shift+Space",
 				"mac": "Command+Shift+Space",
 				"chromeos": "Ctrl+Shift+Space",
-				"linux": "Ctrl+Shift+Space"
+				"linux": "Ctrl+Shift+Space",
+				"default": "Ctrl+Shift+Space"
 			}
 		}
 	},
