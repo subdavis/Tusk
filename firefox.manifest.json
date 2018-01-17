@@ -1,7 +1,7 @@
 {
 	"name": "KeePass Tusk - A better password manager",
 	"short_name": "KeePass Tusk",
-	"version": "2018.1.15",
+	"version": "2018.1.16",
 	"manifest_version": 2,
 	"minimum_chrome_version": "48",
 	"description": "Readonly KeePass password database integration for Chrome™",
@@ -31,12 +31,13 @@
 	  }
 	},
 	"commands": {
-		"_execute_page_action": {
+		"_execute_browser_action": {
 			"suggested_key": {
 				"windows": "Ctrl+Shift+Space",
 				"mac": "Command+Shift+Space",
 				"chromeos": "Ctrl+Shift+Space",
-				"linux": "Ctrl+Shift+Space"
+				"linux": "Ctrl+Shift+Space",
+				"default": "Ctrl+Shift+Space"
 			}
 		}
 	},
