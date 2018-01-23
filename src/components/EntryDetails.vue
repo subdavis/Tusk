@@ -24,6 +24,7 @@
 </template>
 
 <script>
+	const otp = require('keeweb/app/scripts/util/otp.js')
 	import GoBack from '@/components/GoBack'
 
 	export default {
@@ -57,6 +58,7 @@
 			}
 		},
 		mounted() {
+			console.log(otp)
 			let entryId = this.$router.getRoute().entryId
 			this.entry = this.unlockedState.cacheGet('allEntries').filter(entry => {
 				return entry.id == entryId
@@ -72,13 +74,24 @@
 				}
 			})
 			for (var protectedKey in this.entry.protectedData) {
-				this.attributes.push({
-					'key': protectedKey,
-					'value': this.hiddenValue,
-					'isHidden': true,
-					'protected': true,
-					'protectedAttr': this.entry.protectedData[protectedKey]
-				})
+				if (protectedKey === "otp") {
+					let url = this.unlockedState.getDecryptedAttribute(this.entry, protectedKey)
+					let code = otp.parseUrl(url)
+					code.next((code, timeleft)=>{
+						this.attributes.push({
+							'key': 'OTP',
+							'value': code
+						})
+					})
+				} else {
+					this.attributes.push({
+						'key': protectedKey,
+						'value': this.hiddenValue,
+						'isHidden': true,
+						'protected': true,
+						'protectedAttr': this.entry.protectedData[protectedKey]
+					})
+				}
 			}
 		}
 	}
