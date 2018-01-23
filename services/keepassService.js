@@ -95,7 +95,6 @@ function KeepassService(keepassHeader, settings, passwordFileStoreRegistry, keep
 	 * Takes a kdbxweb group object and transforms it into a list of entries.
 	 **/
 	function parseKdbxDb(groups) {
-		console.log(groups);
 		var results = [];
 		for (var i = 0; i < groups.length; i++) {
 			var group = groups[i]
