@@ -2,8 +2,17 @@
 	<div>
 		<go-back :message="'back to entry list'"></go-back>
 		<div class="all-attributes">
-			<div class="attribute-box" v-for="attr in attributes">
 
+			<div v-if="otp" class="attribute-box">
+				<span class="attribute-title">One Time Password</span>
+				<br>
+				<span class="attribute-value">{{otp_value}}</span>
+				<div class="progress">
+			      <div class="determinate" v-bind:style="{ width: otp_width }"></div>
+			  </div>
+			</div>
+			
+			<div class="attribute-box" v-for="attr in attributes">
 				<span class="attribute-title">{{ attr.key }}</span>
 				<br>
 				<pre v-if="attr.key == 'notes'" class="attribute-value">{{ attr.value }}</pre>
@@ -15,15 +24,16 @@
             <i v-else-if="attr.protected && !attr.isHidden"
               class="fa fa-eye" aria-hidden="true"></i>
             {{ attr.value }}
-            </span>
+          </span>
 				</div>
-
 			</div>
+		
 		</div>
 	</div>
 </template>
 
 <script>
+	const OTP = require('keeweb/app/scripts/util/otp.js')
 	import GoBack from '@/components/GoBack'
 
 	export default {
@@ -37,7 +47,13 @@
 		data() {
 			return {
 				attributes: [],
-				hiddenValue: '••••••••••'
+				hiddenValue: '••••••••••',
+				// OTP
+				otp: false,
+				otp_timeleft: 0,
+				otp_loop: undefined,
+				otp_value: "",
+				otp_width: 0
 			}
 		},
 		methods: {
@@ -54,7 +70,23 @@
 					this.exposeAttribute(attr)
 				else
 					this.hideAttribute(attr)
+			},
+			setupOTP(url) {
+				let otpobj = OTP.parseUrl(url)
+				this.otp = true
+				let do_otp = () => {
+					otpobj.next((code, timeleft)=>{
+						this.otp_value = code;
+						this.otp_timeleft = (timeleft / 1000) | 0;
+						this.otp_width = Math.floor(timeleft / 300) + "%"
+					})
+				}
+				this.otp_loop = setInterval(do_otp, 1000)
+				do_otp()
 			}
+		},
+		beforeDestroy(){
+			clearInterval(this.otp_loop)
 		},
 		mounted() {
 			let entryId = this.$router.getRoute().entryId
@@ -72,13 +104,18 @@
 				}
 			})
 			for (var protectedKey in this.entry.protectedData) {
-				this.attributes.push({
-					'key': protectedKey,
-					'value': this.hiddenValue,
-					'isHidden': true,
-					'protected': true,
-					'protectedAttr': this.entry.protectedData[protectedKey]
-				})
+				if (protectedKey === "otp") {
+					let url = this.unlockedState.getDecryptedAttribute(this.entry, protectedKey)
+					this.setupOTP(url)
+				} else {
+					this.attributes.push({
+						'key': protectedKey,
+						'value': this.hiddenValue,
+						'isHidden': true,
+						'protected': true,
+						'protectedAttr': this.entry.protectedData[protectedKey]
+					})
+				}
 			}
 		}
 	}
