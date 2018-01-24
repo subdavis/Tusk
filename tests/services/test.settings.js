@@ -104,21 +104,20 @@ describe('Settings', function () {
 
 	describe("Remember Options", function() {
 		
-		it('should support setting default remember options', function() {
+		it('should support setting default remember period', function() {
 			let rememberPeriod = 1234;
-			return settings.saveDefaultRememberOptions(rememberPeriod).then(function() {
-				return settings.getDefaultRememberOptions().then(options => {
-					options.rememberPeriod.should.equal(rememberPeriod).which.is.a.Number();
-					options.rememberPassword.should.be.true();
+			return settings.getSetDefaultRememberPeriod(rememberPeriod).then(function() {
+				return settings.getSetDefaultRememberPeriod().then(period => {
+					period.should.equal(rememberPeriod).which.is.a.Number();
 				})
 			})
 		})
 
-		it('should support resetting the remember options', function() {
-			let rememberPeriod = 0;
-			return settings.saveDefaultRememberOptions(rememberPeriod).then(function(){
-				return settings.getDefaultRememberOptions().then(options => {
-					options.rememberPassword.should.be.false();
+		it('should support setting the expire interval', function() {
+			let expireInterval = 8;
+			return settings.getSetExpireInterval(expireInterval).then(function(){
+				return settings.getSetExpireInterval().then(interval => {
+					interval.should.equal(expireInterval).which.is.a.Number();
 				})
 			})
 		})

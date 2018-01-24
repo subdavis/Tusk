@@ -81,7 +81,7 @@
 						this.otp_width = Math.floor(timeleft / 300) + "%"
 					})
 				}
-				this.otp_loop = setInterval(do_otp, 1000)
+				this.otp_loop = setInterval(do_otp, 2000)
 				do_otp()
 			}
 		},

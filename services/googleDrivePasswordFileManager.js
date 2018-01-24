@@ -102,7 +102,7 @@ function GoogleDrivePasswordFileManager(settings) {
 	}
 
 	oauth.revokeAuth = function() {
-		return settings.getAccessToken(accessTokenType).then(function(accessToken) {
+		return settings.getSetAccessToken(accessTokenType).then(function(accessToken) {
 			if (accessToken) {
 				var url = 'https://accounts.google.com/o/oauth2/revoke?token=' + accessToken
 				return axios({
@@ -127,7 +127,7 @@ function GoogleDrivePasswordFileManager(settings) {
 			var access_token = tokenMatches[1];
 			var checkState = decodeURIComponent(stateMatches[1]);
 			if (checkState === randomState) {
-				settings.saveAccessToken(accessTokenType, access_token).then(function() {
+				settings.getSetAccessToken(accessTokenType, access_token).then(function() {
 					resolve(access_token);
 				});
 			} else {
@@ -152,7 +152,7 @@ function GoogleDrivePasswordFileManager(settings) {
 				interactive : interactive
 			}, function(token) {
 				if (token)
-				  settings.saveAccessToken(accessTokenType, token).then(function() {
+				  settings.getSetAccessToken(accessTokenType, token).then(function() {
 						resolve(token);
 					});
 				else {
