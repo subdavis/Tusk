@@ -248,7 +248,7 @@ function Settings(secureCache) {
 	let keyGetSetter = function(key, val, defaultval, value_type) {
 		let update_obj = {}
 		update_obj[key] = val
-		if (val !== undefined && typeof(val) === value_type)
+		if (val !== undefined && (typeof(val) === value_type || val === null) )
 			return chromePromise.storage.local.set(update_obj).then(nil => {
 				return val
 			})
