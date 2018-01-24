@@ -345,10 +345,7 @@
 								.then(this.secureCache.clear)
 						}
 						this.settings.saveCurrentDatabaseUsage(dbUsage)
-						console.log(this.rememberPeriod)
-						this.settings.getSetDefaultRememberPeriod(this.rememberPeriod).then(result => {
-							console.log(result)
-						})
+						this.settings.getSetDefaultRememberPeriod(this.rememberPeriod)
 						this.showResults(entries)
 						this.busy = false
 						this.masterPassword = ""
