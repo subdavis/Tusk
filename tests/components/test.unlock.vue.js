@@ -92,11 +92,8 @@ describe('Unlock.vue', function(done) {
   			getKeyFiles: function() {
   				return Promise.resolve([])
   			},
-  			getDefaultRememberOptions: function() {
-  				return Promise.resolve({
-  					rememberPeriod: 1440,
-  					rememberPassword: true
-  				})
+  			getDefaultRememberPeriod: function() {
+  				return Promise.resolve(1440)
   			},
   			getCurrentDatabaseUsage: function() {
   				return Promise.resolve({

@@ -127,7 +127,7 @@ function OneDriveFileManager(settings) {
 		if (authInfo === null) {
 			reject('Failed to extract authentication information from redirect url');
 		} else {
-			settings.saveAccessToken(accessTokenType, authInfo.access_token);
+			settings.getSetAccessToken(accessTokenType, authInfo.access_token);
 			resolve();
 		}
 	}

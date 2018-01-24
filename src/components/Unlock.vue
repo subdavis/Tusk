@@ -345,7 +345,10 @@
 								.then(this.secureCache.clear)
 						}
 						this.settings.saveCurrentDatabaseUsage(dbUsage)
-						this.settings.saveDefaultRememberOptions(this.rememberPeriod)
+						console.log(this.rememberPeriod)
+						this.settings.getSetDefaultRememberPeriod(this.rememberPeriod).then(result => {
+							console.log(result)
+						})
 						this.showResults(entries)
 						this.busy = false
 						this.masterPassword = ""
@@ -372,9 +375,9 @@
 					this.busy = true
 					this.settings.getKeyFiles().then(keyFiles => {
 						this.keyFiles = keyFiles
-						return this.settings.getDefaultRememberOptions()
-					}).then(rememberOptions => {
-						this.setRememberPeriod(rememberOptions.rememberPeriod)
+						return this.settings.getSetDefaultRememberPeriod()
+					}).then(rememberPeriod => {
+						this.setRememberPeriod(rememberPeriod)
 						return this.settings.getCurrentDatabaseUsage()
 					}).then(usage => {
 						// tweak UI based on what we know about the db file
