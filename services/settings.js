@@ -261,7 +261,7 @@ function Settings(secureCache) {
 			})
 	}
 
-	exports.getSetExpireInterval = function(interval) {
+	exports.getSetClipboardExpireInterval = function(interval) {
 		return keyGetSetter('expireInterval', interval, 2, 'number')
 	}
 

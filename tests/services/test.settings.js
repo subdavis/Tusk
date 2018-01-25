@@ -113,10 +113,10 @@ describe('Settings', function () {
 			})
 		})
 
-		it('should support setting the expire interval', function() {
+		it('should support setting the clipboard expire interval', function() {
 			let expireInterval = 8;
-			return settings.getSetExpireInterval(expireInterval).then(function(){
-				return settings.getSetExpireInterval().then(interval => {
+			return settings.getSetClipboardExpireInterval(expireInterval).then(function(){
+				return settings.getSetClipboardExpireInterval().then(interval => {
 					interval.should.equal(expireInterval).which.is.a.Number();
 				})
 			})

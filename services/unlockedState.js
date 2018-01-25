@@ -145,7 +145,7 @@ function UnlockedState($router, keepassReference, protectedMemory, settings) {
 		e.clipboardData.setData('text/plain', textToPutOnClipboard);
 		e.preventDefault();
 
-		settings.getSetExpireInterval().then(interval => {
+		settings.getSetClipboardExpireInterval().then(interval => {
 			settings.setForgetTime('clearClipboard', Date.now() + interval * 60000)
 			chrome.runtime.sendMessage({
 				m: "showMessage",

@@ -2,8 +2,8 @@
 	<div>
 		
 		<div class="box-bar roomy">
-			<h4>Expiration Check Interval</h4>
-			<p>Every N minutes, Tusk will wake up and check if anything needs to be cleared.  This includes sensitive information stored in memory like your master key as well as text that was put on the clipboard.</p>
+			<h4>Clipboard Expiration Time</h4>
+			<p>When you copy a value to the clipboard, Tusk will set a timeout to automatically clear it again.  You can choose how long this timeout will last.</p>
 		</div>
 		<div class="box-bar roomy lighter">
 			<select style="display: inline-block;" v-model="expireTime">
@@ -84,7 +84,7 @@
 		},
 		watch: {
 			expireTime(newval, oldval) {
-				this.settings.getSetExpireInterval(parseInt(newval))
+				this.settings.getSetClipboardExpireInterval(parseInt(newval))
 			}
 		},
 		methods: {
@@ -92,7 +92,7 @@
 				this.secureCacheMemory.forgetStuff()
 			},
 			init() {
-				this.settings.getSetExpireInterval().then(val => {
+				this.settings.getSetClipboardExpireInterval().then(val => {
 					this.expireTime = val;
 				})
 				this.jsonState.forEach(blob => {

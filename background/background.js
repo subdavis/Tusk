@@ -125,12 +125,10 @@ function Background(protectedMemory, settings) {
 	//listen for "autofill" message:
 	chrome.runtime.onMessage.addListener(handleMessage);
 
-	settings.getSetExpireInterval().then(interval => {
-		chrome.alarms.create("forgetStuff", {
-			delayInMinutes: 1,
-			periodInMinutes: interval
-		});
-	})
+	chrome.alarms.create("forgetStuff", {
+		delayInMinutes: 1,
+		periodInMinutes: 2
+	});
 
 	chrome.alarms.onAlarm.addListener(function(alarm) {
 		if (alarm.name == 'forgetStuff') {
