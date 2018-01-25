@@ -5,7 +5,7 @@
 		<!-- Router View -->
 		<div id="overflowbox">
 			<div id="contentbox">
-				<options-startup id="/" v-if="show.startup.visible" class="content-body" 
+				<options-startup id="/" v-if="show.startup.visible"
 					:settings="services.settings"></options-startup>
 				<manage-databases id="/manage/databases" v-if="show.manageDatabases.visible" 
 					:dropbox-file-manager="services.dropboxFileManager" 

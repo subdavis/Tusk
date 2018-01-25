@@ -23,7 +23,6 @@
 			<div class="json" :id="blob.k"></div>
 			<a v-if="blob.delete !== undefined" class="waves-effect waves-light btn" @click="blob.delete.f(blob.delete.arg); init()">{{ blob.delete.op }}</a>
 		</div>
-
 	</div>
 </template>
 
