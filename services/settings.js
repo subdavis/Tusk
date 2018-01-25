@@ -14,7 +14,7 @@ function Settings(secureCache) {
 	//upgrade old settings.  Called on install.
 	exports.upgrade = function() {
 		// Patch https://subdavis.com/blog/jekyll/update/2017/01/02/ckp-security-flaw.html
-		exports.getDatabaseUsages().then(usages => {
+		exports.getSetDatabaseUsages().then(usages => {
 			let keys = Object.keys(usages)
 			keys.forEach(k => {
 				if (usages[k]['passwordKey'] !== undefined)
@@ -87,19 +87,6 @@ function Settings(secureCache) {
 			});
 		});
 	}
-	
-	exports.saveDatabaseUsages = function(usages) {
-		return chromePromise.storage.local.set({
-			'databaseUsages': usages
-		});
-	}
-
-	exports.getDatabaseUsages = function() {
-		return chromePromise.storage.local.get(['databaseUsages']).then(function(items) {
-			items.databaseUsages = items.databaseUsages || {};
-			return items.databaseUsages;
-		});
-	}
 
 	exports.saveCurrentDatabaseChoice = function(passwordFile, provider) {
 		let shallowCopy = function(obj) {
@@ -139,65 +126,6 @@ function Settings(secureCache) {
 			return Promise.resolve(false)
 		})
 	}
-
-	exports.saveDefaultRememberOptions = function(rememberPeriod) {
-		if (rememberPeriod !== 0) {
-			return chromePromise.storage.local.set({
-				'rememberPeriod': rememberPeriod
-			})
-		}
-
-		// clear options
-		return chromePromise.storage.local.remove('rememberPeriod')
-	}
-
-	exports.getDefaultRememberOptions = function() {
-		return chromePromise.storage.local.get('rememberPeriod').then(items => {
-			if (items.rememberPeriod) {
-				return {
-					rememberPassword: true,
-					rememberPeriod: items.rememberPeriod
-				}
-			} else {
-				return {
-					rememberPassword: false,
-					rememberPeriod: 0
-				}
-			}
-		})
-	}
-
-	exports.saveLicense = function(license) {
-		return chromePromise.storage.local.set({
-			'license': license
-		});
-	}
-
-	exports.getLicense = function() {
-		return chromePromise.storage.local.get(['license']).then(function(items) {
-			if (items.license)
-				return items.license;
-			else
-				return null;
-		})
-	}
-
-	exports.saveAccessToken = function(type, accessToken) {
-		var entries = {};
-		entries[type + 'AccessToken'] = accessToken;
-
-		return chromePromise.storage.local.set(entries);
-	};
-
-	exports.getAccessToken = function(type) {
-		var key = type + 'AccessToken';
-		return chromePromise.storage.local.get([key]).then(function(items) {
-			if (items[key])
-				return items[key];
-			else
-				return null;
-		});
-	};
 
 	exports.getCurrentMasterPasswordCacheKey = function() {
 		return exports.getCurrentDatabaseChoice().then(info => {
@@ -284,11 +212,11 @@ function Settings(secureCache) {
 	 */
 	exports.saveCurrentDatabaseUsage = function(usage) {
 		return exports.getCurrentDatabaseChoice().then(function(info) {
-			return exports.getDatabaseUsages().then(function(usages) {
+			return exports.getSetDatabaseUsages().then(function(usages) {
 				var key = info.passwordFile.title + "__" + info.providerKey;
 				usages[key] = usage;
 
-				return exports.saveDatabaseUsages(usages);
+				return exports.getSetDatabaseUsages(usages);
 			});
 		});
 	}
@@ -299,7 +227,7 @@ function Settings(secureCache) {
 	 */
 	exports.getCurrentDatabaseUsage = function() {
 		return exports.getCurrentDatabaseChoice().then(function(info) {
-			return exports.getDatabaseUsages().then(function(usages) {
+			return exports.getSetDatabaseUsages().then(function(usages) {
 				var key = info.passwordFile.title + "__" + info.providerKey;
 				var usage = usages[key] || {};
 
@@ -311,37 +239,43 @@ function Settings(secureCache) {
 		})
 	}
 
-	exports.setPasswordListIconOption = function(option) {
-		return chromePromise.storage.local.set({
-			'showPasswordListIcon': option
-		})
-	}
-
-	exports.getPasswordListIconOption = function() {
-		return chromePromise.storage.local.get('showPasswordListIcon').then(function(option) {
-			let result = option.showPasswordListIcon || {};
-			result.entry = result.entry || false;
-			result.group = result.group || false;
-			return result;
-		})
-	}
-
-	exports.setPasswordListGroupOption = function(option) {
-		return chromePromise.storage.local.set({
-			'showPasswordListGroup': option
-		})
-	}
-
-	exports.getPasswordListGroupOption = function() {
-		return chromePromise.storage.local.get('showPasswordListGroup').then(function(option) {
-			return option.showPasswordListGroup || false;
-		})
-	}
-
 	exports.getSharedUrlList = function() {
 		return chromePromise.storage.local.get('sharedUrlList').then(links => {
 			return links || false;
 		})
+	}
+
+	let keyGetSetter = function(key, val, defaultval, value_type) {
+		let update_obj = {}
+		update_obj[key] = val
+		if (val !== undefined && (typeof(val) === value_type || val === null) )
+			return chromePromise.storage.local.set(update_obj).then(nil => {
+				return val
+			})
+		else
+			return chromePromise.storage.local.get(key).then(oldval => {
+				if (oldval[key] !== undefined)
+					if (typeof(oldval[key]) === value_type)
+						return oldval[key]
+				return defaultval
+			})
+	}
+
+	exports.getSetClipboardExpireInterval = function(interval) {
+		return keyGetSetter('expireInterval', interval, 2, 'number')
+	}
+
+	exports.getSetAccessToken = function(type, accessToken) {
+		let key = type + 'AccessToken';
+		return keyGetSetter(key, accessToken, null, 'string')
+	}
+
+	exports.getSetDatabaseUsages = function(usages) {
+		return keyGetSetter('databaseUsages', usages, {}, 'object')
+	}
+
+	exports.getSetDefaultRememberPeriod = function(rememberPeriod) {
+		return keyGetSetter('rememberPeriod', rememberPeriod, 0, 'number')
 	}
 
 	return exports;

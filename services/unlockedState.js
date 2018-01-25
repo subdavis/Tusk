@@ -145,14 +145,15 @@ function UnlockedState($router, keepassReference, protectedMemory, settings) {
 		e.clipboardData.setData('text/plain', textToPutOnClipboard);
 		e.preventDefault();
 
-		settings.setForgetTime('clearClipboard', Date.now() + 1 * 60000)
-
-		chrome.runtime.sendMessage({
-			m: "showMessage",
-			text: 'Password copied to clipboard.  Clipboard will clear in 60 seconds.'
+		settings.getSetClipboardExpireInterval().then(interval => {
+			settings.setForgetTime('clearClipboard', Date.now() + interval * 60000)
+			chrome.runtime.sendMessage({
+				m: "showMessage",
+				text: 'Password copied to clipboard.  Clipboard will clear in '+ interval +' minute(s).'
+			});
+			window.close(); //close the popup
 		});
 
-		window.close(); //close the popup
 	});
 
 	function parseUrl(url) {

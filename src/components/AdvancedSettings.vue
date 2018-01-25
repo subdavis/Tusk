@@ -1,6 +1,20 @@
 <template>
 	<div>
-
+		
+		<div class="box-bar roomy">
+			<h4>Clipboard Expiration Time</h4>
+			<p>When you copy a value to the clipboard, Tusk will set a timeout to automatically clear it again.  You can choose how long this timeout will last.</p>
+		</div>
+		<div class="box-bar roomy lighter">
+			<select style="display: inline-block;" v-model="expireTime">
+				<option value="1">1 minute</option> 
+				<option value="2">2 minutes</option>
+				<option value="3">3 minutes</option>
+				<option value="5">5 minutes</option>
+				<option value="8">8 minutes</option>
+			</select>
+		</div>
+		
 		<div class="box-bar roomy">
 			<h4>Stored Data</h4>
 			<p>The following objects represent the current data cached in chrome storage. This data is only available to Tusk, and is never sent over any network connection.</p>
@@ -9,7 +23,6 @@
 			<div class="json" :id="blob.k"></div>
 			<a v-if="blob.delete !== undefined" class="waves-effect waves-light btn" @click="blob.delete.f(blob.delete.arg); init()">{{ blob.delete.op }}</a>
 		</div>
-
 	</div>
 </template>
 
@@ -24,9 +37,10 @@
 		data() {
 			return {
 				busy: false,
+				expireTime: 2,
 				jsonState: [{
 						k: 'databaseUsages',                    // key
-						f: this.settings.getDatabaseUsages,     // getter
+						f: this.settings.getSetDatabaseUsages,  // getter
 						delete: {
 							f: this.settings.destroyLocalStorage, // remover
 							arg: 'databaseUsages',                // remover args
@@ -40,15 +54,6 @@
 							f: this.settings.saveCurrentDatabase,
 							arg: this.settings.destroyLocalStorage,
 							op: 'Delete'
-						}
-					},
-					{
-						k: 'defaultRememberOptions',
-						f: this.settings.getDefaultRememberOptions,
-						delete: {
-							f: this.settings.destroyLocalStorage,
-							arg: 'rememberPeriod',
-							op: 'Reset'
 						}
 					},
 					{
@@ -76,11 +81,19 @@
 				]
 			}
 		},
+		watch: {
+			expireTime(newval, oldval) {
+				this.settings.getSetClipboardExpireInterval(parseInt(newval))
+			}
+		},
 		methods: {
 			triggerForgetStuffAlarm(event) {
 				this.secureCacheMemory.forgetStuff()
 			},
 			init() {
+				this.settings.getSetClipboardExpireInterval().then(val => {
+					this.expireTime = val;
+				})
 				this.jsonState.forEach(blob => {
 					blob.f().then(result => {
 						if (result && Object.keys(result).length) {

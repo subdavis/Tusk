@@ -100,7 +100,7 @@ function DropboxFileManager(settings) {
 			var uid = uidMatches[1];
 			if (checkState === randomState) {
 				state.loggedIn = true;
-				settings.saveAccessToken(accessTokenType, access_token).then(function() {
+				settings.getSetAccessToken(accessTokenType, access_token).then(function() {
 					resolve(access_token);
 				});
 			} else {
