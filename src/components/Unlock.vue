@@ -78,6 +78,8 @@
 </template>
 
 <script>
+	import { parseUrl, getValidTokens } from '$lib/utils.js'
+
 	import InfoCluster from '@/components/InfoCluster'
 	import EntryList from '@/components/EntryList'
 	import Spinner from 'vue-simple-spinner'
@@ -223,55 +225,10 @@
 			},
 			showResults(entries) {
 
-				let getValidTokens = tokenString => {
-					if (!tokenString)
-						return []
-					else
-						return tokenString.toLowerCase().split(/\.|\s|\//).filter(t => {
-							return (t && t !== "com" && t !== "www" && t.length > 1)
-						})
-				} // end getValidTokens
-
-				let parseUrl = url => {
-					if (url && !url.indexOf('http') == 0)
-						url = 'http://' + url
-					//from https://gist.github.com/jlong/2428561
-					var parser = document.createElement('a')
-					parser.href = url
-					return parser
-				} // end parseUrl
-
-				let rankEntries = (entries, siteUrl, title, siteTokens) => {
-					entries.forEach(function(entry) {
-						//apply a ranking algorithm to find the best matches
-						var entryHostName = parseUrl(entry.url).hostname || ""
-
-						if (entryHostName && entryHostName == siteUrl.hostname)
-							entry.matchRank = 100 //exact url match
-						else
-							entry.matchRank = 0
-
-						entry.matchRank += (entry.title && title && entry.title.toLowerCase() == title.toLowerCase()) ? 1 : 0
-						entry.matchRank += (entry.title && entry.title.toLowerCase() === siteUrl.hostname.toLowerCase()) ? 1 : 0
-						entry.matchRank += (entry.url && siteUrl.hostname.indexOf(entry.url.toLowerCase()) > -1) ? 0.9 : 0
-						entry.matchRank += (entry.title && siteUrl.hostname.indexOf(entry.title.toLowerCase()) > -1) ? 0.9 : 0
-
-						var entryTokens = getValidTokens(entryHostName + "." + entry.title);
-						for (var i = 0; i < entryTokens.length; i++) {
-							var token1 = entryTokens[i]
-							for (var j = 0; j < siteTokens.length; j++) {
-								var token2 = siteTokens[j]
-
-								entry.matchRank += (token1 === token2) ? 0.2 : 0;
-							}
-						}
-					})
-				} // end rankEntries
-
 				let siteUrl = parseUrl(this.unlockedState.url)
 				let title = this.unlockedState.title
 				let siteTokens = getValidTokens(siteUrl.hostname + '.' + this.unlockedState.title)
-				rankEntries(entries, siteUrl, title, siteTokens) // in-place
+				this.keepassService.rankEntries(entries, siteUrl, title, siteTokens) // in-place
 
 				let allEntries = entries
 				let priorityEntries = entries
@@ -365,7 +322,6 @@
 			}
 		},
 		mounted() {
-
 			if (!this.isUnlocked()) {
 
 				let try_autounlock = () => {
