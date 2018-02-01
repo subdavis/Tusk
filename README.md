@@ -10,6 +10,10 @@
 
 **Chrome:** https://chrome.google.com/webstore/detail/fmhmiaejopepamlcjkncpgpdjichnecm
 
+## Tusk Custom Fields
+
+* `TUSK_URLS`: a comma separated list of URLs or hostnames to which the entry should always match.  For example, active directory login credentials that must match several sites.  e.g. `my.login.domain.com,https://github.com,foobar.net`
+
 ## Build Setup
 
 Tusk requires:

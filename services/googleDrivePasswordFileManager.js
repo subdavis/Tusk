@@ -172,9 +172,15 @@ function GoogleDrivePasswordFileManager(settings) {
 	}
 
 	// If this browser has the getAuthToken function.  Hack for #64
-	if (chrome.identity.getAuthToken !== undefined){
-		oauth['auth'] = chrome_auth;
+	try {
+		if (chrome.identity.getAuthToken !== undefined){
+			oauth['auth'] = chrome_auth;
+		}
+	} 
+	catch (e) {
+		console.info("Firefox mobile detected.")
 	}
+
 
 	return OauthManager(settings, oauth)
 }

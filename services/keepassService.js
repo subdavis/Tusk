@@ -7,9 +7,8 @@ let Case = require('case'),
 	pako = require('pako'),
 	kdbxweb = require('kdbxweb')
 
-import {
-	argon2
-} from '$lib/argon2.js'
+import { argon2 } from '$lib/argon2.js'
+import { parseUrl, getValidTokens } from '$lib/utils.js'
 
 function KeepassService(keepassHeader, settings, passwordFileStoreRegistry, keepassReference) {
 	var my = {};
@@ -67,6 +66,45 @@ function KeepassService(keepassHeader, settings, passwordFileStoreRegistry, keep
 			};
 		});
 	}
+
+	my.rankEntries = (entries, siteUrl, title, siteTokens) => {
+		entries.forEach(function(entry) {
+			//apply a ranking algorithm to find the best matches
+			var entryHostnames = [ parseUrl(entry.url).hostname || "" ]
+			
+			if (entry.keys.indexOf('tuskUrls') >= 0){
+				let others = entry.tuskUrls
+					.split(',')
+					.map(val => {
+						return parseUrl(val).hostname
+					})
+				entryHostnames = entryHostnames.concat(others)
+			}
+
+			if (entryHostnames.length && entryHostnames.some((host => host == siteUrl.hostname)))
+				entry.matchRank = 100 //exact url match
+			else
+				entry.matchRank = 0
+
+			entry.matchRank += (entry.title && title && entry.title.toLowerCase() == title.toLowerCase()) ? 1 : 0
+			entry.matchRank += (entry.title && entry.title.toLowerCase() === siteUrl.hostname.toLowerCase()) ? 1 : 0
+			entry.matchRank += (entry.url && siteUrl.hostname.indexOf(entry.url.toLowerCase()) > -1) ? 0.9 : 0
+			entry.matchRank += (entry.title && siteUrl.hostname.indexOf(entry.title.toLowerCase()) > -1) ? 0.9 : 0
+
+			var entryTokens = getValidTokens(entryHostnames.join('.') + "." + entry.title);
+			for (var i = 0; i < entryTokens.length; i++) {
+				var token1 = entryTokens[i]
+				for (var j = 0; j < siteTokens.length; j++) {
+					var token2 = siteTokens[j]
+					if (token1 == token2) {
+						console.log(token2)
+						entry.matchRank += 0.2;
+					}
+					
+				}
+			}
+		})
+	} // end rankEntries
 
 	function getKey(isKdbx, masterPassword, fileKey) {
 		var creds = new kdbxweb.Credentials(kdbxweb.ProtectedValue.fromString(masterPassword), fileKey);
