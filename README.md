@@ -1,49 +1,61 @@
-# CKPX
+# Tusk
 
-Chrome extension for interacting with KeePass password file.
+> A modern, clean keepass browser extension built with Vue.js and kdbxweb.  Rebooted from perfectapi/CKP
 
-Due to the inactivity of [CKP](https://github.com/perfectapi/CKP), CKPX now exists as an independent fork.  The name CKPX was chosen as homage to KeePassX, an independent derivative of KeePass.
+![Tusk](https://github.com/subdavis/Tusk/blob/develop/assets/icons/logo_256.png "Tusk Logo")
 
-## Running or Updating the code locally
+## Installation
 
-To configure a development environment...
+**Firefox:** https://addons.mozilla.org/en-GB/firefox/addon/keepass-tusk/
 
-1) Aquire the necessary tools:
-    * [Node.Js](http://nodejs.org/) - prerequisite for other dev tools
-    * [Grunt.js](gruntjs.com) - for less/css processing, packaging, and copying libs to the lib folder
-    * [Bower](http://bower.io/) - for dependencies (libraries)
+**Chrome:** https://chrome.google.com/webstore/detail/fmhmiaejopepamlcjkncpgpdjichnecm
 
-2) Clone the codebase
-	
-    ```
-    git clone https://github.com/subdavis/CKPX.git
-    cd CKPX
-    ```
+## Tusk Custom Fields
 
-3) Install the dependencies. 
+* `TUSK_URLS`: a comma separated list of URLs or hostnames to which the entry should always match.  For example, active directory login credentials that must match several sites.  e.g. `my.login.domain.com,https://github.com,foobar.net`
 
-    ```
-    npm install
-    bower install 
-    ```
+## Build Setup
 
-4) Copy the dependencies to their lib location.  
+Tusk requires:
+* `node`
+* `npm`
+* `gulp`
+* `yarn`
 
-    ```
-    grunt updatelib
-    ```
+```bash
+# install dependencies
+yarn install
 
-5) If you are editing ```.less``` files then run ```grunt watch``` to compile them when they change.
+# static reload with file watch
+yarn watch
 
-## Installing in chrome ##
+# build for production with minification
+yarn build
 
-Install the latest stable version from [Chorme Web Store](https://chrome.google.com/webstore/detail/fmhmiaejopepamlcjkncpgpdjichnecm).
+# run the packer script targeted for 'chrome' or 'firefox' after build
+yarn bundle
 
-To install the code manually in Chrome, open **More Tools\Extensions**, check the **Developer mode** checkbox.  Click **Load unpacked extension** and browse to the folder where you cloned the code.  
+# build the tests
+yarn build-tests
 
-You may find the [Chrome Apps & Extensions Developer Tool](https://chrome.google.com/webstore/detail/chrome-apps-extensions-de/ohmmkhmmmpcnpikjeljgnaoabkaalbgc) to be helpful when debugging the background page.
+# static reload with file watch for tests
+yarn watch-tests
+```
 
+For detailed explanation on how things work, consult the [docs for vue-loader](http://vuejs.github.io/vue-loader).
 
-## Running tests ##
+## Running tests
 
-Open ```./tests/services.html``` in your browser
+To run tests, first build them with `yarn build-tests` or `yarn watch-tests` then open `tests/test.html` in a browser.s
+
+## Browser Permissions
+
+> Tusk requires cross-origin permissions in order to inject credentials and query the storage backends on the user's behalf.
+
+In chrome, these permissions requests are __always__ promted to the user upon first use.
+
+Because of Firefox's implementation of `browser.permissions`, it was necessary to request all permissions at install time to avoid code rot.  A deeper explanation of the firefox permissions can be found [on stackoverflow](https://stackoverflow.com/questions/47723297/firefox-extension-api-permissions-request-may-only-be-called-from-a-user-input)
+
+## Looking for CKPX?
+
+You found it!  CKPX has been rebranded as Tusk to mark its Firefox release.  The C in CKPX stood for 'Chrome'.

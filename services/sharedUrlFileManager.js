@@ -1,85 +1,101 @@
-/**
-
-The MIT License (MIT)
-
-Copyright (c) 2015 Steven Campbell.
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-
- */
-
 "use strict";
 
-function SharedUrlFileManager($http, $timeout) {
-  var exports = {
-    key: 'shared-url',
-    routePath: '/shared-url',
-    listDatabases: listDatabases,
-    getDatabaseChoiceData: getDatabaseChoiceData,
-    getChosenDatabaseFile: getChosenDatabaseFile,
-    supportedFeatures: ['incognito', 'listDatabases'],
-    title: 'Shared Link',
-    icon: 'icon-link',
-    chooseTitle: 'Shared Link',
-    chooseDescription: 'Rather than granting full access to your cloud storage provider, get a shared link and paste it in.',
-    setUrls: setUrls,
-    getUrls: getUrls
-  };
+import axios from 'axios/dist/axios.min.js'
+import {
+	ChromePromiseApi
+} from '$lib/chrome-api-promise.js'
 
-  function listDatabases() {
-  	return getUrls().then(urls => {
-  		if (urls)
-  			return urls;
-  		return [];
-  	});
-  }
+const chromePromise = ChromePromiseApi()
 
-  //get the minimum information needed to identify this file for future retrieval
-  function getDatabaseChoiceData(dbInfo) {
-    return dbInfo;
-  }
+function SharedUrlFileManager() {
+	var exports = {
+		key: 'shared-url',
+		listDatabases: listDatabases,
+		getDatabaseChoiceData: getDatabaseChoiceData,
+		getChosenDatabaseFile: getChosenDatabaseFile,
+		supportedFeatures: ['incognito', 'listDatabases'],
+		title: 'Shared Link',
+		icon: 'icon-link',
+		chooseTitle: 'Shared Link',
+		chooseDescription: 'Rather than granting full access to your cloud storage provider, get a shared link and paste it in.  Google Drive is unsupported.',
+		setUrls: setUrls,
+		getUrls: getUrls,
+		login: enable,
+		logout: disable,
+		isLoggedIn: isEnabled
+	};
 
-  //given minimal file information, retrieve the actual file
-  function getChosenDatabaseFile(dbInfo, attempt) {
-		return $http({
-      method: 'GET',
-      url: dbInfo.direct_link,
-      responseType: 'arraybuffer',
-      cache: true
-    }).then(function(response) {
-    	return response.data;
-    });
-  }
+	function enable() {
+		return chromePromise.storage.local.set({
+			'sharedUrlsEnabled': true
+		})
+	}
 
-  function setUrls(urls){
-  	if(urls)
-  	  return chrome.p.storage.local.set({'sharedUrlList': urls});
-  	else
-  	  return chrome.p.storage.local.remove('sharedUrlList');
-  }
-  function getUrls(){
-  	return chrome.p.storage.local.get('sharedUrlList').then(results => {
-  		if (results.hasOwnProperty('sharedUrlList'))
-  			return results.sharedUrlList;
-  		return false;
-  	});
-  }
+	function disable() {
+		return chromePromise.storage.local.set({
+			'sharedUrlsEnabled': false
+		})
+	}
 
-  return exports;
+	function isEnabled() {
+		return chromePromise.storage.local.get('sharedUrlsEnabled').then(result => {
+			return result.sharedUrlsEnabled || false
+		})
+	}
+
+	function listDatabases() {
+		return isEnabled().then(enabled => {
+			if (enabled)
+				return getUrls().then(urls => {
+					if (urls)
+						return urls
+					return []
+				})
+			else
+				return Promise.resolve([])
+		})
+	}
+
+	//get the minimum information needed to identify this file for future retrieval
+	function getDatabaseChoiceData(dbInfo) {
+		return {
+			direct_link: dbInfo.direct_link,
+			title: dbInfo.title
+		}
+	}
+
+	//given minimal file information, retrieve the actual file
+	function getChosenDatabaseFile(dbInfo, attempt) {
+		return axios({
+			method: 'GET',
+			url: dbInfo.direct_link,
+			responseType: 'arraybuffer',
+			cache: true
+		}).then(function(response) {
+			return response.data;
+		});
+	}
+
+	function setUrls(urls) {
+		if (urls)
+			return chromePromise.storage.local.set({
+				'sharedUrlList': urls
+			});
+		else
+			return chromePromise.storage.local.remove('sharedUrlList');
+	}
+
+	function getUrls() {
+		return chromePromise.storage.local.get('sharedUrlList').then(results => {
+			if (results.hasOwnProperty('sharedUrlList'))
+				return results.sharedUrlList;
+			return false;
+		});
+	}
+
+	return exports;
+}
+
+export {
+	SharedUrlFileManager
 }
