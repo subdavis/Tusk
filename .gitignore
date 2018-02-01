@@ -40,7 +40,9 @@ store/
 
 #packaged app
 build/
+dist/
 *.zip
+*.build.js
 
 #nodejs
 # Logs
@@ -78,3 +80,7 @@ npm-debug.log
 bower_components/
 *.sublime-workspace
 .sublime-grunt.cache
+
+*.travis.yml
+manifest.json
+demo*

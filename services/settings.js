@@ -1,57 +1,41 @@
-/**
-
-The MIT License (MIT)
-
-Copyright (c) 2015 Steven Campbell.
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-
-*/
+const Base64 = require('base64-arraybuffer')
+import { ChromePromiseApi } from '$lib/chrome-api-promise.js'
+import { Links } from '$services/links.js'
+const chromePromise = ChromePromiseApi()
+const links = new Links()
 
 /**
- * Settings for CKPX  */
-function Settings() {
+ * Settings for Tusk  */
+function Settings(secureCache) {
 	"use strict";
-
+	
 	var exports = {}
 
 	//upgrade old settings.  Called on install.
 	exports.upgrade = function() {
-		//Upgrade is not backward compatible.  Wipe usage.
-		exports.getDatabaseUsages().then(function(usages) {
-			for (let usageKey in usages) {
-				let usage = usages[usageKey]
-				usages[usageKey] = {
-					// do data translations...
-					passwordKey: usage.passwordKey,
-					requiresKeyfile: usage.requiresKeyFile,
-					requiresPassword: usage.requiresPassword,
-					version: usage.version,
-					keyFileName: usage.keyFileName
-				};
+		// Patch https://subdavis.com/blog/jekyll/update/2017/01/02/ckp-security-flaw.html
+		exports.getSetDatabaseUsages().then(usages => {
+			let keys = Object.keys(usages)
+			keys.forEach(k => {
+				if (usages[k]['passwordKey'] !== undefined)
+					chrome.storage.local.clear()
+			})
+		})
+	}
+
+	exports.handleProviderError = function(err, provider) {
+		exports.getCurrentDatabaseChoice().then(info => {
+			let providerKey = provider === undefined ? info.providerKey : provider.key;
+			let errmsg = err.message || ""
+			if (errmsg.indexOf('interact') >= 0) {
+				/* There was an error with reauthorizing google drive... */
+				links.openOptionsReauth(providerKey)
 			}
-			// exports.saveDatabaseUsages(usages);
-		});
+		})
 	}
 
 	exports.getKeyFiles = function() {
-		return chrome.p.storage.local.get(['keyFiles']).then(function(items) {
+		return chromePromise.storage.local.get(['keyFiles']).then(function(items) {
 			return items.keyFiles || [];
 		});
 	}
@@ -59,21 +43,31 @@ function Settings() {
 	exports.deleteKeyFile = function(name) {
 		return exports.getKeyFiles().then(function(keyFiles) {
 			keyFiles.forEach(function(keyFile, index) {
-				if (keyFile.name == name) {
+				if (keyFile.name === name) {
 					keyFiles.splice(index, 1);
 				}
 			})
 
-			return chrome.p.storage.local.set({
+			return chromePromise.storage.local.set({
 				'keyFiles': keyFiles
 			});
 		});
 	}
 
+	exports.deleteAllKeyFiles = function() {
+		return chromePromise.storage.local.remove('keyFiles')
+	}
+
+	exports.destroyLocalStorage = function(key) {
+		if (key.length) {
+			return chromePromise.storage.local.remove(key)
+		}
+	}
+
 	exports.addKeyFile = function(name, key) {
 		return exports.getKeyFiles().then(function(keyFiles) {
 			var matches = keyFiles.filter(function(keyFile) {
-				return keyFile.name == name;
+				return keyFile.name === name;
 			})
 
 			var encodedKey = Base64.encode(key);
@@ -88,51 +82,34 @@ function Settings() {
 				})
 			}
 
-			return chrome.p.storage.local.set({
+			return chromePromise.storage.local.set({
 				'keyFiles': keyFiles
 			});
 		});
 	}
 
-	exports.setDiskCacheFlag = function(val) {
-		return chrome.p.storage.local.set({
-			'useDiskCache': val
-		});
-	}
-
-	exports.getDiskCacheFlag = function() {
-		return chrome.p.storage.local.get('useDiskCache').then(function(items) {
-			return items.useDiskCache;
-		});
-	}
-
-	exports.saveDatabaseUsages = function(usages) {
-		return chrome.p.storage.local.set({
-			'databaseUsages': usages
-		});
-	}
-
-	exports.getDatabaseUsages = function() {
-		return chrome.p.storage.local.get(['databaseUsages']).then(function(items) {
-			items.databaseUsages = items.databaseUsages || {};
-			return items.databaseUsages;
-		});
-	}
-
 	exports.saveCurrentDatabaseChoice = function(passwordFile, provider) {
-		passwordFile = angular.copy(passwordFile);
-		passwordFile.data = undefined; //don't save the data with the choice
+		let shallowCopy = function(obj) {
+			let clone = {}
+			clone.prototype = obj.prototype
+			Object.keys(obj).forEach(property => {
+				clone[property] = obj[property];
+			})
+			return clone
+		}
+		let passwordFileClone = shallowCopy(passwordFile)
+		passwordFileClone.data = undefined; //don't save the data with the choice
 
-		return chrome.p.storage.local.set({
+		return chromePromise.storage.local.set({
 			'selectedDatabase': {
-				'passwordFile': passwordFile,
+				'passwordFile': passwordFileClone,
 				'providerKey': provider.key
 			}
 		});
 	}
 
 	exports.getCurrentDatabaseChoice = function() {
-		return chrome.p.storage.local.get(['selectedDatabase']).then(function(items) {
+		return chromePromise.storage.local.get(['selectedDatabase']).then(function(items) {
 			if (items.selectedDatabase) {
 				return items.selectedDatabase;
 			} else {
@@ -141,78 +118,47 @@ function Settings() {
 		});
 	}
 
-	exports.saveDefaultRememberOptions = function(rememberPassword, rememberPeriod) {
-		if (rememberPassword) {
-			return chrome.p.storage.local.set({
-				'rememberPeriod': rememberPeriod
+	exports.disableDatabaseProvider = function(provider) {
+		return chromePromise.storage.local.get(['selectedDatabase']).then(items => {
+			if (items.selectedDatabase)
+				if (items.selectedDatabase.providerKey === provider.key)
+					return chromePromise.storage.local.remove('selectedDatabase')
+			return Promise.resolve(false)
+		})
+	}
+
+	exports.getCurrentMasterPasswordCacheKey = function() {
+		return exports.getCurrentDatabaseChoice().then(info => {
+			if (info !== null)
+				return info.passwordFile.title + "__" + info.providerKey + ".password"
+			return null;
+		});
+	}
+
+	exports.cacheMasterPassword = function(pw, args) {
+		return exports.getCurrentMasterPasswordCacheKey().then(key => {
+			return secureCache.save(key, pw).then(nil => {
+				let forgetTime = args['forgetTime']
+				return exports.setForgetTime(key, forgetTime)
 			})
-		}
-
-		// clear options
-		return chrome.p.storage.local.remove('rememberPeriod')
-	}
-
-	exports.getDefaultRememberOptions = function() {
-		return chrome.p.storage.local.get('rememberPeriod').then( items => {
-			if (items.rememberPeriod) {
-				return {
-					rememberPassword: true,
-					rememberPeriod: items.rememberPeriod
-				}
-			} else {
-				return {
-					rememberPassword: false,
-					rememberPeriod: 0
-				}
-			}
 		})
 	}
-
-	exports.saveLicense = function(license) {
-		return chrome.p.storage.local.set({
-			'license': license
-		});
-	}
-
-	exports.getLicense = function() {
-		return chrome.p.storage.local.get(['license']).then(function(items) {
-			if (items.license)
-				return items.license;
-			else
-				return null;
-		})
-	}
-
-	exports.saveAccessToken = function(type, accessToken) {
-		var entries = {};
-		entries[type + 'AccessToken'] = accessToken;
-
-		return chrome.p.storage.local.set(entries);
-	};
-
-	exports.getAccessToken = function(type) {
-		var key = type + 'AccessToken';
-		return chrome.p.storage.local.get([key]).then(function(items) {
-			if (items[key])
-				return items[key];
-			else
-				return null;
-		});
-	};
 
 	/*
 	 * Sets a time to forget something
 	 */
 	exports.setForgetTime = function(key, time) {
 		var storageKey = 'forgetTimes';
-		return chrome.p.storage.local.get(storageKey).then(function(items) {
+		return chromePromise.storage.local.get(storageKey).then(function(items) {
 			var forgetTimes = {}
 			if (items[storageKey]) {
 				forgetTimes = items[storageKey];
 			}
-			forgetTimes[key] = time;
+			// only set if not exists...  This prevents us from resetting the clock every unlock...
+			if (!(key in forgetTimes))
+				forgetTimes[key] = time;
 
-			return chrome.p.storage.local.set({
+			return chromePromise.storage.local.set({
 				'forgetTimes': forgetTimes
 			});
 		});
@@ -220,7 +166,7 @@ function Settings() {
 
 	exports.getForgetTime = function(key) {
 		var storageKey = 'forgetTimes';
-		return chrome.p.storage.local.get(storageKey).then(function(items) {
+		return chromePromise.storage.local.get(storageKey).then(function(items) {
 			var forgetTimes = {}
 			if (items[storageKey]) {
 				forgetTimes = items[storageKey];
@@ -232,7 +178,7 @@ function Settings() {
 
 	exports.getAllForgetTimes = function() {
 		var storageKey = 'forgetTimes';
-		return chrome.p.storage.local.get(storageKey).then(function(items) {
+		return chromePromise.storage.local.get(storageKey).then(function(items) {
 			var forgetTimes = {}
 			if (items[storageKey]) {
 				forgetTimes = items[storageKey];
@@ -244,94 +190,97 @@ function Settings() {
 
 	exports.clearForgetTimes = function(keysArray) {
 		var storageKey = 'forgetTimes';
-		return chrome.p.storage.local.get(storageKey).then(function(items) {
+		return chromePromise.storage.local.get(storageKey).then(function(items) {
 			var forgetTimes = {}
 			if (items[storageKey]) {
 				forgetTimes = items[storageKey];
 			}
 			keysArray.forEach(function(key) {
-				if (forgetTimes[key]) delete forgetTimes[key];
+				if (forgetTimes[key])
+					delete forgetTimes[key];
 			})
 
-			return chrome.p.storage.local.set({
+			return chromePromise.storage.local.set({
 				'forgetTimes': forgetTimes
 			});
 		});
 	}
 
-  /**
-   * Saves information about how the database was opened, so we can optimize the
-   * UI next time by hiding the irrelevant options and remembering the keyfile
-   */
-  exports.saveCurrentDatabaseUsage = function(usage) {
-    return exports.getCurrentDatabaseChoice().then(function(info) {
-      return exports.getDatabaseUsages().then(function(usages) {
-        var key = info.passwordFile.title + "__" + info.providerKey;
-        usages[key] = usage;
+	/**
+	 * Saves information about how the database was opened, so we can optimize the
+	 * UI next time by hiding the irrelevant options and remembering the keyfile
+	 */
+	exports.saveCurrentDatabaseUsage = function(usage) {
+		return exports.getCurrentDatabaseChoice().then(function(info) {
+			return exports.getSetDatabaseUsages().then(function(usages) {
+				var key = info.passwordFile.title + "__" + info.providerKey;
+				usages[key] = usage;
 
-        return exports.saveDatabaseUsages(usages);
-      });
-    });
-  }
+				return exports.getSetDatabaseUsages(usages);
+			});
+		});
+	}
 
-  /**
-   * Retrieves information about how the database was opened, so we can optimize the
-   * UI by hiding the irrelevant options and remembering the keyfile
-   */
-  exports.getCurrentDatabaseUsage = function() {
-    return exports.getCurrentDatabaseChoice().then(function(info) {
-      return exports.getDatabaseUsages().then(function(usages) {
-        var key = info.passwordFile.title + "__" + info.providerKey;
-        var usage = usages[key] || {};
+	/**
+	 * Retrieves information about how the database was opened, so we can optimize the
+	 * UI by hiding the irrelevant options and remembering the keyfile
+	 */
+	exports.getCurrentDatabaseUsage = function() {
+		return exports.getCurrentDatabaseChoice().then(function(info) {
+			return exports.getSetDatabaseUsages().then(function(usages) {
+				var key = info.passwordFile.title + "__" + info.providerKey;
+				var usage = usages[key] || {};
 
-        return usage;
-      });
-    })
-  }
+				return secureCache.get(key + ".password").then(value => {
+					usage['passwordKey'] = value;
+					return usage
+				})
+			});
+		})
+	}
 
-  exports.setUseCredentialApiFlag = function(flagValue) {
-  	if (flagValue) {
-	  	return chrome.p.storage.local.set({
-	  		'useCredentialApi': true
-	  	})
-   	}
+	exports.getSharedUrlList = function() {
+		return chromePromise.storage.local.get('sharedUrlList').then(links => {
+			return links || false;
+		})
+	}
 
-   	return chrome.p.storage.local.remove('useCredentialApi');
-  }
+	let keyGetSetter = function(key, val, defaultval, value_type) {
+		let update_obj = {}
+		update_obj[key] = val
+		if (val !== undefined && (typeof(val) === value_type || val === null) )
+			return chromePromise.storage.local.set(update_obj).then(nil => {
+				return val
+			})
+		else
+			return chromePromise.storage.local.get(key).then(oldval => {
+				if (oldval[key] !== undefined)
+					if (typeof(oldval[key]) === value_type)
+						return oldval[key]
+				return defaultval
+			})
+	}
 
-  exports.getUseCredentialApiFlag = function() {
-  	return chrome.p.storage.local.get('useCredentialApi').then( items => {
-  		return !!items.useCredentialApi;
-  	})
-  }
+	exports.getSetClipboardExpireInterval = function(interval) {
+		return keyGetSetter('expireInterval', interval, 2, 'number')
+	}
 
+	exports.getSetAccessToken = function(type, accessToken) {
+		let key = type + 'AccessToken';
+		return keyGetSetter(key, accessToken, null, 'string')
+	}
 
-  exports.setPasswordListIconOption = function(option) {
-    return chrome.p.storage.local.set({
-		'showPasswordListIcon': option
-	})
-  }
+	exports.getSetDatabaseUsages = function(usages) {
+		return keyGetSetter('databaseUsages', usages, {}, 'object')
+	}
 
-  exports.getPasswordListIconOption = function() {
-    return chrome.p.storage.local.get('showPasswordListIcon').then(function(option) {
-		return {
-			entry: option.showPasswordListIcon.entry || false,
-			group: option.showPasswordListIcon.group || false
-		}
-	})
-  }
-
-  exports.setPasswordListGroupOption = function(option) {
-    return chrome.p.storage.local.set({
-		'showPasswordListGroup': option
-	})
-  }
-
-  exports.getPasswordListGroupOption = function() {
-    return chrome.p.storage.local.get('showPasswordListGroup').then(function(option) {
-		return option.showPasswordListGroup || false;
-	})
-  }
+	exports.getSetDefaultRememberPeriod = function(rememberPeriod) {
+		return keyGetSetter('rememberPeriod', rememberPeriod, 0, 'number')
+	}
 
 	return exports;
+}
+
+export {
+	Settings
 }

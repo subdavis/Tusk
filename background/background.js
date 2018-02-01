@@ -1,84 +1,18 @@
-/**
-
-The MIT License (MIT)
-
-Copyright (c) 2015 Steven Campbell.
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-
-*/
-
 "use strict";
 
 /*
-  This page runs as an Event page, not a Background page, so don't use global variables
-  (they will be lost)
+  This page runs as an Background page, not an event
+
+  Be careful using settings.  
+  Settings can call secureCacheMemory, which in turn can open new ports to this script.
 */
 
-(function(protectedMemory, settings) {
-	if (chrome.extension.inIncognitoContext) {
-		doReplaceRules();
-	} else {
-		chrome.runtime.onInstalled.addListener(doReplaceRules);
-		chrome.runtime.onInstalled.addListener(settings.upgrade);
-		chrome.runtime.onStartup.addListener(forgetStuff)
-	}
+import { ProtectedMemory } from '$services/protectedMemory.js'
+import { Settings } from '$services/settings.js'
 
-	function doReplaceRules() {
-		chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
-			var passwordField = {
-				id: "pwdField",
-				conditions: [
-					new chrome.declarativeContent.PageStateMatcher({
-						css: ["input[type='password']"]
-					})
-				],
-				actions: [
-					new chrome.declarativeContent.ShowPageAction()
-					//new chrome.declarativeContent.RequestContentScript({js: ['keepass.js']})
-				]
-			};
-			var textField = {
-				id: "textField",
-				conditions: [
-					new chrome.declarativeContent.PageStateMatcher({
-						css: ["input[type='text'], input[type='email'], input:not([type])"]
-					})
-				],
-				actions: [
-					new chrome.declarativeContent.ShowPageAction()
-				]
-			};
-			var iframeLogin = {
-				id: "iframeLogin",
-				conditions: [
-					new chrome.declarativeContent.PageStateMatcher({
-						css: ["iframe[src^='https']"]
-					})
-				],
-				actions: [
-					new chrome.declarativeContent.ShowPageAction()
-				]
-			};
-			chrome.declarativeContent.onPageChanged.addRules([passwordField, textField, iframeLogin]);
-		});
-	}
+function Background(protectedMemory, settings) {
+	chrome.runtime.onInstalled.addListener(settings.upgrade);
+	chrome.runtime.onStartup.addListener(forgetStuff);
 
 	//keep saved state for the popup for as long as we are alive (not long):
 	chrome.runtime.onConnect.addListener(function(port) {
@@ -87,7 +21,7 @@ THE SOFTWARE.
 			if (!msg) return;
 			switch (msg.action) {
 				case 'clear':
-					protectedMemory.clearData();
+					protectedMemory.clearData(msg.key);
 					break;
 				case 'save':
 					protectedMemory.setData(msg.key, msg.value);
@@ -96,6 +30,9 @@ THE SOFTWARE.
 					protectedMemory.getData(msg.key).then(function(value) {
 						port.postMessage(value);
 					});
+					break;
+				case 'forgetStuff':
+					forgetStuff();
 					break;
 				default:
 					throw new Error('unrecognized action ' + obj.action)
@@ -115,8 +52,8 @@ THE SOFTWARE.
 		if (message.m == "showMessage") {
 			chrome.notifications.create({
 				'type': 'basic',
-				'iconUrl': 'assets/icons/logo_48.png',
-				'title': 'CKPX',
+				'iconUrl': '/dist/logo_48.png',
+				'title': 'Tusk',
 				'message': message.text
 			}, function(notificationId) {
 				chrome.alarms.create('clearNotification-'+notificationId, {
@@ -149,25 +86,22 @@ THE SOFTWARE.
 						m: "fillPassword",
 						u: message.u,
 						p: message.p,
-						o: message.o,
-						uca: message.uca
+						o: message.o
 					});
-
 					return;
 				}
-
 				chrome.tabs.executeScript(message.tabId, {
-					file: "keepass.js",
+					file: "dist/inject.build.js",
 					allFrames: true,
 					runAt: "document_start"
 				}, function(result) {
 					//script injected
+					console.log("injected")
 					chrome.tabs.sendMessage(message.tabId, {
 						m: "fillPassword",
 						u: message.u,
 						p: message.p,
-						o: message.o,
-						uca: message.uca
+						o: message.o
 					});
 				});
 			})
@@ -186,7 +120,6 @@ THE SOFTWARE.
 				} 
 			})	
 		})
-		
 	}
 
 	//listen for "autofill" message:
@@ -194,7 +127,7 @@ THE SOFTWARE.
 
 	chrome.alarms.create("forgetStuff", {
 		delayInMinutes: 1,
-		periodInMinutes: 10
+		periodInMinutes: 2
 	});
 
 	chrome.alarms.onAlarm.addListener(function(alarm) {
@@ -210,19 +143,22 @@ THE SOFTWARE.
 	});
 
 	function forgetStuff() {
+		console.log("ForgetStuff", new Date())
+		protectedMemory.clearData('secureCache.entries'); // ALWAYS clear entries.
 		settings.getAllForgetTimes().then(function(allTimes) {
 			var now = Date.now();
 			var forgottenKeys = [];
 			for (var key in allTimes) {
-				if (allTimes[key] < now) {
+				// If the time has passed but is still positive...
+				if (allTimes[key] < now && allTimes[key] > 0) {
 					forgottenKeys.push(key);
 					switch (key) {
 						case 'clearClipboard':
 							clearClipboard();
 							chrome.notifications.create({
 								'type': 'basic',
-								'iconUrl': 'assets/icons/logo_48.png',
-								'title': 'CKPX',
+								'iconUrl': 'dist/logo_48.png',
+								'title': 'Tusk',
 								'message': 'Clipboard cleared'
 							}, function(notificationId) {
 								setTimeout(function() {
@@ -230,21 +166,23 @@ THE SOFTWARE.
 								}, 2000);
 							})
 							break;
-						case 'forgetPassword':
-							forgetPassword().then(function() {
-								chrome.notifications.create({
-									'type': 'basic',
-									'iconUrl': 'assets/icons/logo_48.png',
-									'title': 'CKPX',
-									'message': 'Remembered password expired'
-								}, function(notificationId) {
-									chrome.alarms.create('clearNotification-'+notificationId, {
-										delayInMinutes: 1
-									});
+						default:
+							if (key.indexOf('password') >= 0) {
+								forgetPassword().then(function() {
+									chrome.notifications.create({
+										'type': 'basic',
+										'iconUrl': 'dist/logo_48.png',
+										'title': 'Tusk',
+										'message': 'Remembered password expired'
+									}, function(notificationId) {
+										chrome.alarms.create('clearNotification-'+notificationId, {
+											delayInMinutes: 1
+										});
+									})
 								})
-							})
-							
-							break;
+							} else {
+								console.error("I don't know what to do with key", key)
+							}
 					}
 				}
 			}
@@ -266,7 +204,15 @@ THE SOFTWARE.
 	}
 
 	function forgetPassword() {
-		return settings.saveCurrentDatabaseUsage({});
+		return settings
+			.getCurrentDatabaseChoice()
+			.then(info => { 
+				let key = info.passwordFile.title + "__" + info.providerKey + ".password"; 
+				return key
+			})
+			.then(protectedMemory.clearData)
 	}
 
-})(new ProtectedMemory(), new Settings());
+}
+
+Background(new ProtectedMemory(), new Settings())

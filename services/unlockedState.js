@@ -1,45 +1,26 @@
-/**
-
-The MIT License (MIT)
-
-Copyright (c) 2015 Steven Campbell.
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-
-*/
-
 "use strict";
+
+import {
+	ChromePromiseApi
+} from '$lib/chrome-api-promise.js'
+
+const chromePromise = ChromePromiseApi()
 
 /**
  * Shared state and methods for an unlocked password file.
  */
-function UnlockedState($interval, $location, keepassReference, protectedMemory, settings) {
+function UnlockedState($router, keepassReference, protectedMemory, settings) {
 	var my = {
 		tabId: "", //tab id of current tab
 		url: "", //url of current tab
 		title: "", //window title of current tab
 		origin: "", //url of current tab without path or querystring
 		sitePermission: false, //true if the extension already has rights to autofill the password
-		entries: null, //filtered password database entries
+		cache: {}, // a secure cache that refreshes when values are set or fetched
 		clipboardStatus: "" //status message about clipboard, used when copying password to the clipboard
 	};
 	var copyEntry;
+	var cacheTimeoutId;
 
 	//determine current url:
 	my.getTabDetails = function() {
@@ -57,9 +38,9 @@ function UnlockedState($interval, $location, keepassReference, protectedMemory, 
 					var parsedUrl = parseUrl(tabs[0].url);
 					my.origin = parsedUrl.protocol + '//' + parsedUrl.hostname + '/';
 
-					chrome.p.permissions.contains({
-						origins: [my.origin]
-					})
+					chromePromise.permissions.contains({
+							origins: [my.origin]
+						})
 						.then(function() {
 							my.sitePermission = true;
 						})
@@ -76,31 +57,63 @@ function UnlockedState($interval, $location, keepassReference, protectedMemory, 
 		});
 	};
 
-	my.clearBackgroundState = function() {
-		my.entries = null;
+	my.clearCache = function() {
+		// Destroys an object in memory.
+		function destroy(obj) {
+			for (var prop in obj) {
+				var property = obj[prop];
+				if (property != null && typeof(property) == 'object') {
+					destroy(property);
+				} else {
+					obj[prop] = null;
+				}
+			}
+		}
+		destroy(my.cache)
+		my.cache = {}
+	}
+
+	my.cacheSet = function(key, val) {
+		// Refresh cache
+		clearTimeout(cacheTimeoutId)
+		cacheTimeoutId = setTimeout(function() {
+			my.clearCache()
+			window.close()
+		}, 120000);
+		my.cache[key] = val;
+	}
+
+	my.cacheGet = function(key) {
+		// Refresh cache
+		clearTimeout(cacheTimeoutId)
+		cacheTimeoutId = setTimeout(function() {
+			my.clearCache()
+			window.close()
+		}, 120000);
+		return my.cache[key];
+	}
+
+	my.clearClipboardState = function() {
 		my.clipboardStatus = "";
 	}
-	$interval(my.clearBackgroundState, 60000, 1);  //clear backgroundstate after 10 minutes live - we should never be alive that long
+	setTimeout(my.clearClipboardState, 60000); //clear backgroundstate after 1 minutes live - we should never be alive that long
 
 	my.autofill = function(entry) {
-		settings.getUseCredentialApiFlag().then(useCredentialApi => {
-			chrome.runtime.sendMessage({
-				m: "requestPermission",
-				perms: {
-					origins: [my.origin]
-				},
-				then: {
-					m: "autofill",
-					tabId: my.tabId,
-					u: entry.userName,
-					p: getPassword(entry),
-					o: my.origin,
-					uca: useCredentialApi
-				}
-			});
+		chrome.runtime.sendMessage({
+			m: "requestPermission",
+			perms: {
+				origins: [my.origin]
+			},
+			then: {
+				m: "autofill",
+				tabId: my.tabId,
+				u: entry.userName,
+				p: getPassword(entry),
+				o: my.origin
+			}
+		});
 
-			window.close(); //close the popup
-		})
+		window.close(); //close the popup
 	}
 
 	//get clear-text password from entry
@@ -114,11 +127,11 @@ function UnlockedState($interval, $location, keepassReference, protectedMemory, 
 	}
 
 	my.gotoDetails = function(entry) {
-		$location.path('/entry-details/' + entry.id);
+		$router.route('/entry-details/' + entry.id);
 	}
 
 	my.getDecryptedAttribute = function(entry, attributeName) {
-		return keepassReference.getFieldValue(entry, attributeName, my.entries);
+		return keepassReference.getFieldValue(entry, attributeName, my.cache.allEntries);
 	}
 
 	//listens for the copy event and does the copy
@@ -132,21 +145,15 @@ function UnlockedState($interval, $location, keepassReference, protectedMemory, 
 		e.clipboardData.setData('text/plain', textToPutOnClipboard);
 		e.preventDefault();
 
-		settings.setForgetTime('clearClipboard', Date.now() + 1 * 60000)
-		chrome.alarms.clear("forgetStuff", function() {
-			//reset alarm timer so that it fires about 1 minute from now
-			chrome.alarms.create("forgetStuff", {
-				delayInMinutes: 1,
-				periodInMinutes: 10
+		settings.getSetClipboardExpireInterval().then(interval => {
+			settings.setForgetTime('clearClipboard', Date.now() + interval * 60000)
+			chrome.runtime.sendMessage({
+				m: "showMessage",
+				text: 'Password copied to clipboard.  Clipboard will clear in '+ interval +' minute(s).'
 			});
-		})
-
-		chrome.runtime.sendMessage({
-			m: "showMessage",
-			text: 'Password copied to clipboard.  Clipboard will clear in 60 seconds.'
+			window.close(); //close the popup
 		});
 
-		window.close(); //close the popup
 	});
 
 	function parseUrl(url) {
@@ -168,4 +175,8 @@ function UnlockedState($interval, $location, keepassReference, protectedMemory, 
 	}
 
 	return my;
+}
+
+export {
+	UnlockedState
 }
