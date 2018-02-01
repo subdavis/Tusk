@@ -97,7 +97,6 @@ function KeepassService(keepassHeader, settings, passwordFileStoreRegistry, keep
 				for (var j = 0; j < siteTokens.length; j++) {
 					var token2 = siteTokens[j]
 					if (token1 == token2) {
-						console.log(token2)
 						entry.matchRank += 0.2;
 					}
 					
