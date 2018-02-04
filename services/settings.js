@@ -278,6 +278,10 @@ function Settings(secureCache) {
 		return keyGetSetter('rememberPeriod', rememberPeriod, 0, 'number')
 	}
 
+	exports.getSetOffloaderToken = function(offloaderToken) {
+		return keyGetSetter('offloaderToken', offloaderToken, null, 'string')
+	}
+
 	return exports;
 }
 
