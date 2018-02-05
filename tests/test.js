@@ -6,3 +6,6 @@ require('./services/test.settings.js')
 
 // components
 require('./components/test.unlock.vue.js')
+
+// library
+require('./lib/test.offloader.js')

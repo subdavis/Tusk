@@ -1,6 +1,9 @@
 const Base64 = require('base64-arraybuffer')
+const lambda = require('$lib/lambda-keystore.js')
+
 import { ChromePromiseApi } from '$lib/chrome-api-promise.js'
 import { Links } from '$services/links.js'
+import { Offloader } from '$lib/offloader.js'
 const chromePromise = ChromePromiseApi()
 const links = new Links()
 
@@ -10,6 +13,7 @@ function Settings(secureCache) {
 	"use strict";
 	
 	var exports = {}
+	var offloader = new Offloader(exports, lambda)
 
 	//upgrade old settings.  Called on install.
 	exports.upgrade = function() {
