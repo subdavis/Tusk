@@ -8,4 +8,5 @@ require('./services/test.settings.js')
 require('./components/test.unlock.vue.js')
 
 // library
+require('./lib/test.utils.js')
 require('./lib/test.offloader.js')
