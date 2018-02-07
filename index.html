@@ -1,6 +1,11 @@
 <html>
 <head>
   <title>KeePass Tusk - a better password manager</title>
+  <meta charset="UTF-8">
+  <meta name="description" content="This extension adds KeePass autofill functionality to Google Chrome without compromising security for convenience.">
+  <meta name="keywords" content="keepass,keepassxc,chrome,extension,firefox,addon,tusk,ckp,ckpx,standalone,without,desktop,independent">
+  <meta name="author" content="Brandon Davis">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" href="img/logo.png">
   <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
   <style>
@@ -116,7 +121,7 @@
   
     <h2 id="title"><img class='logo' src="img/logo.png"> KeePass Tusk - a better password manager</h2>
     <p>This extension adds KeePass autofill functionality to Google Chrome without compromising security for convenience.</p>
-    <p>Tusk is a fork of <a href="https://github.com/perfectapi/ckp">CKP</a>, and seeks to provide improvements to the UI, better security practices, and KDBX version 4 support using the <a href="https://github.com/keeweb/kdbxweb">KdbxWeb</a> library.  Tusk is formerly known as CKPX - we are currently in the middle of a rebrand and re-release.</p>
+    <p>Tusk is a fork of <a href="https://github.com/perfectapi/ckp">CKP</a>, and seeks to provide improvements to the UI, <a href="https://subdavis.com/blog/jekyll/update/2017/01/02/ckp-security-flaw.html">better security practices</a>, and KDBX version 4 support using the <a href="https://github.com/keeweb/kdbxweb">KdbxWeb</a> library.  Tusk is formerly known as CKPX.  More information and a user guide can be found on the <a href="https://github.com/subdavis/Tusk/wiki">Wiki</a></p>
     
     <a class="button install" href="https://chrome.google.com/webstore/detail/fmhmiaejopepamlcjkncpgpdjichnecm"><i class="fa fa-chrome fa-fw" aria-hidden="true"></i> Install CKPX from the Google Web Store</a>
     <a class="button ffinstall" href="https://addons.mozilla.org/en-US/firefox/addon/keepass-tusk/"><i class="fa fa-firefox fa-fw" aria-hidden="true"></i> Install Tusk Add-on for Firefox</a><br>
@@ -146,7 +151,7 @@
         <td><i class="fa fa-check-circle" aria-hidden="true"></i></td>
       </tr>
       <tr>
-        <td class="feature">Use Cloud Shared URLs</td>
+        <td class="feature">Dropbox, OwnCloud shared link support</td>
         <td></td>
         <td><i class="fa fa-check-circle" aria-hidden="true"></i></td>
       </tr>
@@ -176,7 +181,6 @@
         <td><i class="fa fa-check-circle" aria-hidden="true"></i></td>
       </tr> -->
     </table>
-    <p>Request features in the github issue tracker.</p>
 
     <h1 id="security">Security</h1>
     <p>Tusk provides security bug fixes and improved practices compared to CKP.  It is not vulnerable to <a href="https://subdavis.com/blog/jekyll/update/2017/01/02/ckp-security-flaw.html">this bug</a> where your master key can be recovered from disk.  Tusk uses <a href="https://github.com/keeweb/kdbxweb">KdbxWeb</a> for crypto operations.</p>
