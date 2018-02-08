@@ -140,12 +140,41 @@ function Settings(secureCache) {
 	}
 
 	exports.cacheMasterPassword = function(pw, args) {
-		return exports.getCurrentMasterPasswordCacheKey().then(key => {
-			return secureCache.save(key, pw).then(nil => {
-				let forgetTime = args['forgetTime']
-				return exports.setForgetTime(key, forgetTime)
+		let currentMasterPasswordCacheKeyPromise = exports.getCurrentMasterPasswordCacheKey()
+		let localOffloadEnabledPromise = exports.getSetLocalKeyOffload()
+		return Promise.all([currentMasterPasswordCacheKeyPromise, localOffloadEnabledPromise]).then(values => {
+			let currentMasterPasswordCacheKey = values[0];
+			let localOffloadEnabled = values[1];
+
+			console.log(currentMasterPasswordCacheKey, localOffloadEnabled)
+			let valueToCachePromise = null;
+			if (localOffloadEnabled) {
+				valueToCachePromise = offloader.encrypt(currentMasterPasswordCacheKey, pw, args['forgetTime'])
+			} else {
+				valueToCachePromise = Promise.resolve(pw);
+			}
+			return valueToCachePromise.then(valueToCache => {
+				return secureCache.save(key, valueToCache).then(nil => {
+					let forgetTime = args['forgetTime']
+					return exports.setForgetTime(key, forgetTime)
+				})
 			})
 		})
+	}
+
+	exports.getCachedMasterPassword = function(key) {
+		let currentMasterPasswordCacheKeyPromise = exports.getCurrentMasterPasswordCacheKey()
+		let localOffloadEnabledPromise = exports.getSetLocalKeyOffload()
+		return Promise.all([currentMasterPasswordCacheKeyPromise, localOffloadEnabledPromise]).then(values => {
+			let currentMasterPasswordCacheKey = values[0];
+			let localOffloadEnabled = values[1];
+
+			if (localOffloadEnabled) {
+
+			} else {
+
+			}
+		});
 	}
 
 	/*
@@ -284,6 +313,10 @@ function Settings(secureCache) {
 
 	exports.getSetOffloaderToken = function(offloaderToken) {
 		return keyGetSetter('offloaderToken', offloaderToken, null, 'string')
+	}
+	
+	exports.getSetLocalKeyOffload = function(enabled) {
+		return keyGetSetter('offloadEnabled', enabled, false, 'boolean')
 	}
 
 	return exports;
