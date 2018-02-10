@@ -69,6 +69,15 @@
 						}
 					},
 					{
+						k: 'offloaderToken',                    // key
+						f: this.settings.getSetOffloaderToken,  // getter
+						delete: {
+							f: this.settings.destroyLocalStorage, // remover
+							arg: 'offloaderToken',                // remover args
+							op: 'Delete'                          // remover button name
+						}
+					},
+					{
 						k: 'selectedDatabase',
 						f: this.settings.getCurrentDatabaseChoice,
 						delete: {

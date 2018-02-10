@@ -140,13 +140,12 @@ function Settings(secureCache) {
 	}
 
 	exports.cacheMasterPassword = function(pw, args) {
+		/* May involve a network call */
 		let currentMasterPasswordCacheKeyPromise = exports.getCurrentMasterPasswordCacheKey()
 		let localOffloadEnabledPromise = exports.getSetLocalKeyOffload()
 		return Promise.all([currentMasterPasswordCacheKeyPromise, localOffloadEnabledPromise]).then(values => {
 			let currentMasterPasswordCacheKey = values[0];
 			let localOffloadEnabled = values[1];
-
-			console.log(currentMasterPasswordCacheKey, localOffloadEnabled)
 			let valueToCachePromise = null;
 			if (localOffloadEnabled) {
 				valueToCachePromise = offloader.encrypt(currentMasterPasswordCacheKey, pw, args['forgetTime'])
@@ -154,26 +153,31 @@ function Settings(secureCache) {
 				valueToCachePromise = Promise.resolve(pw);
 			}
 			return valueToCachePromise.then(valueToCache => {
-				return secureCache.save(key, valueToCache).then(nil => {
+				return secureCache.save(currentMasterPasswordCacheKey, valueToCache).then(nil => {
 					let forgetTime = args['forgetTime']
-					return exports.setForgetTime(key, forgetTime)
+					return exports.setForgetTime(currentMasterPasswordCacheKey, forgetTime)
 				})
 			})
 		})
 	}
 
-	exports.getCachedMasterPassword = function(key) {
+	exports.getCachedMasterPassword = function() {
+		/* Based on the user configuration, this may involve a network call
+		   if offload enabled, get the key from AWS 
+		   else simply store it in background page memory.
+		 */
 		let currentMasterPasswordCacheKeyPromise = exports.getCurrentMasterPasswordCacheKey()
 		let localOffloadEnabledPromise = exports.getSetLocalKeyOffload()
 		return Promise.all([currentMasterPasswordCacheKeyPromise, localOffloadEnabledPromise]).then(values => {
 			let currentMasterPasswordCacheKey = values[0];
 			let localOffloadEnabled = values[1];
-
+			let valueToReturnPromise = null;
 			if (localOffloadEnabled) {
-
+				valueToReturnPromise = offloader.decrypt(currentMasterPasswordCacheKey)
 			} else {
-
+				valueToReturnPromise = secureCache.get(currentMasterPasswordCacheKey)
 			}
+			return valueToReturnPromise;
 		});
 	}
 
@@ -263,11 +267,7 @@ function Settings(secureCache) {
 			return exports.getSetDatabaseUsages().then(function(usages) {
 				var key = info.passwordFile.title + "__" + info.providerKey;
 				var usage = usages[key] || {};
-
-				return secureCache.get(key + ".password").then(value => {
-					usage['passwordKey'] = value;
-					return usage
-				})
+				return usage;
 			});
 		})
 	}

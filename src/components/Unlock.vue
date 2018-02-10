@@ -177,22 +177,22 @@
 				 * if time_int is given, derive slider_int
 				 * else assume slider_int is alread set.
 				 */
-				let slider_option_index;
+				let slider_option_index
 				if (time_int !== undefined) {
 					this.slider_int = (t => {
 						for (let i = 0; i < this.slider_options.length; i++) {
 							if (this.slider_options[i].time === t)
-								return i;
+								return i
 						}
-						return 0;
-					})(time_int);
-					slider_option_index = this.slider_int;
+						return 0
+					})(time_int)
+					slider_option_index = this.slider_int
 				} else {
-					slider_option_index = parseInt(this.slider_int);
+					slider_option_index = parseInt(this.slider_int)
 				}
 				if (slider_option_index < this.slider_options.length) {
-					this.rememberPeriod = this.slider_options[slider_option_index].time;
-					this.rememberPeriodText = this.slider_options[slider_option_index].text;
+					this.rememberPeriod = this.slider_options[slider_option_index].time
+					this.rememberPeriodText = this.slider_options[slider_option_index].text
 				}
 			},
 			closeWindow(event) {
@@ -236,19 +236,20 @@
 				//save short term (in-memory) filtered results
 				priorityEntries = entries.filter(function(entry) {
 					return (entry.matchRank >= 100)
-				});
+				})
 				if (priorityEntries.length == 0) {
 					priorityEntries = entries.filter(function(entry) {
-						return (entry.matchRank > 0.8 && !entry.URL); //a good match for an entry without a url
-					});
+						//a good match for an entry without a url
+						return (entry.matchRank > 0.8 && !entry.URL) 
+					})
 				}
 				if (priorityEntries.length == 0) {
 					priorityEntries = entries.filter(function(entry) {
-						return (entry.matchRank >= 0.4);
-					});
+						return (entry.matchRank >= 0.4)
+					})
 
 					if (priorityEntries.length) {
-						this.unlockedMessages['warn'] = "No close matches, showing " + priorityEntries.length + " partial matches.";
+						this.unlockedMessages['warn'] = "No close matches, showing " + priorityEntries.length + " partial matches."
 					}
 				}
 				if (priorityEntries.length == 0) {
@@ -260,7 +261,8 @@
 				this.unlockedState.cacheSet('priorityEntries', priorityEntries)
 				this.$forceUpdate()
 				//save longer term (in encrypted storage)
-				this.secureCache.save('secureCache.entries', entries);
+				console.log("Unlock ", entries)
+				this.secureCache.save('secureCache.entries', entries)
 				this.busy = false
 			},
 			clickUnlock(event) {
@@ -270,7 +272,7 @@
 			unlock(passwordKey) {
 				this.busy = true
 				this.generalMessages.error = ""
-				let passwordKeyPromise;
+				let passwordKeyPromise
 				if (passwordKey === undefined)
 					passwordKeyPromise = this.keepassService.getMasterKey(this.masterPassword, this.selectedKeyFile)
 				else
@@ -333,6 +335,19 @@
 						this.setRememberPeriod(rememberPeriod)
 						return this.settings.getCurrentDatabaseUsage()
 					}).then(usage => {
+						// There may be a cached password.
+						// Bundle it into the database usage.
+						if (usage.rememberPeriod !== 0) 
+							return this.settings.getCachedMasterPassword().then(password => {
+								console.log(password)
+								usage['passwordKey'] = password
+								return usage
+							}).catch(err => {
+								this.generalMessages['error'] = err.toString()
+								return usage;
+							})
+						return usage
+					}).then(usage => {
 						// tweak UI based on what we know about the db file
 						this.hidePassword = (usage.requiresPassword === false)
 						this.hideKeyFile = (usage.requiresKeyfile === false)
@@ -356,7 +371,7 @@
 
 				let focus = () => {
 					this.$nextTick(nil => {
-						let mp = this.$refs.masterPassword;
+						let mp = this.$refs.masterPassword
 						if (mp !== undefined)
 							mp.focus()
 					})
