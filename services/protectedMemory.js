@@ -66,17 +66,13 @@ function ProtectedMemory() {
 	}
 
 	function clearData(key) {
-		if (key !== undefined)
-			delete dataMap[key]
-		else
-			dataMap = {};
-
-		if (Object.keys(dataMap).length === 0) {
-			keyPromise = initNewKey();
-			return keyPromise
+		if (key !== undefined){
+			delete dataMap[key]	
 		} else {
-			return Promise.resolve(keyPromise)
+			dataMap = {};
+			keyPromise = initNewKey();
 		}
+		return keyPromise
 	}
 
 	function serialize(data) {
