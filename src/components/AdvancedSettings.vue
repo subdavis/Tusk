@@ -14,25 +14,6 @@
 				<option value="8">8 minutes</option>
 			</select>
 		</div>
-
-		<div class="box-bar roomy">
-			<h4>Local Key Offloading [beta]</h4>
-			<p>If enabled, Tusk can help keep you safe by offloading 
-				the temporary key used to encrypt your master credentials in-memory. 
-				This function is only useful if you frequently use the "Remember for {n} hours" feature.
-				If enabled, Tusk will transmit randomly generated keys to a remote server
-				and cache them for up to 48 hours. <b>NO personal data will EVER be sent</b>.  This is a 
-				beta feature: there may be bugs.  Please report them via <a href="https://subdavis.com/Tusk">the support site.</a></p>
-		</div>
-		<div class="box-bar roomy lighter">
-			<div class="switch">
-				<label>
-					{{ pageState.offloadEnabled ? 'Local Key Offload Enabled' : 'Local Key Offload Disabled' }}
-					<input type="checkbox" :checked="pageState.offloadEnabled" @click="toggleOffload">
-					<span class="lever"></span>
-				</label>
-			</div>
-		</div>
 		
 		<div class="box-bar roomy">
 			<h4>Stored Data</h4>
@@ -51,30 +32,18 @@
 	export default {
 		props: {
 			settings: Object,
-			secureCacheMemory: Object,
+			secureCacheMemory: Object
 		},
 		data() {
 			return {
 				busy: false,
 				expireTime: 2,
-				pageState: {
-					offloadEnabled: false
-				},
 				jsonState: [{
 						k: 'databaseUsages',                    // key
 						f: this.settings.getSetDatabaseUsages,  // getter
 						delete: {
 							f: this.settings.destroyLocalStorage, // remover
 							arg: 'databaseUsages',                // remover args
-							op: 'Delete'                          // remover button name
-						}
-					},
-					{
-						k: 'offloaderToken',                    // key
-						f: this.settings.getSetOffloaderToken,  // getter
-						delete: {
-							f: this.settings.destroyLocalStorage, // remover
-							arg: 'offloaderToken',                // remover args
 							op: 'Delete'                          // remover button name
 						}
 					},
@@ -118,13 +87,6 @@
 			}
 		},
 		methods: {
-			toggleOffload() {
-				if (this.pageState.offloadEnabled) {
-					this.settings.getSetLocalKeyOffload(false)
-				} else {
-					this.settings.getSetLocalKeyOffload(true)
-				}
-			},
 			triggerForgetStuffAlarm(event) {
 				this.secureCacheMemory.forgetStuff()
 			},
@@ -143,9 +105,6 @@
 							document.getElementById(blob.k).parentNode.remove()
 						}
 					})
-				})
-				this.settings.getSetLocalKeyOffload().then(enabled => {
-					this.pageState.offloadEnabled = enabled;
 				})
 			}
 		},
