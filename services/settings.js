@@ -1,26 +1,19 @@
 const Base64 = require('base64-arraybuffer')
-const lambda = require('$lib/lambda-keystore.js')
-
 import { ChromePromiseApi } from '$lib/chrome-api-promise.js'
 import { Links } from '$services/links.js'
-import { Offloader } from '$lib/offloader.js'
+const chromePromise = ChromePromiseApi()
+const links = new Links()
 
-/* 
-	Settings for Tusk  
-*/
+/**
+ * Settings for Tusk  */
 function Settings(secureCache) {
 	"use strict";
 	
-	var exports = {};
-	
-	// TODO: fix dependency graph.  This isn't the cleanest.
-	const offloader = new Offloader(exports, lambda);
-	const chromePromise = ChromePromiseApi()
-	const links = new Links()
+	var exports = {}
 
-	// upgrade old settings.  Called on install.
-	// Patch for https://subdavis.com/blog/jekyll/update/2017/01/02/ckp-security-flaw.html
+	//upgrade old settings.  Called on install.
 	exports.upgrade = function() {
+		// Patch https://subdavis.com/blog/jekyll/update/2017/01/02/ckp-security-flaw.html
 		exports.getSetDatabaseUsages().then(usages => {
 			let keys = Object.keys(usages)
 			keys.forEach(k => {
@@ -142,63 +135,17 @@ function Settings(secureCache) {
 		});
 	}
 
-	/*
-		Cache master password encrypted in background page memory.  
-		Optionally offload the encryption keys to remote if local is physically compromised.
-	*/
 	exports.cacheMasterPassword = function(pw, args) {
-		
-		let currentMasterPasswordCacheKeyPromise = exports.getCurrentMasterPasswordCacheKey()
-		let localOffloadEnabledPromise = exports.getSetLocalKeyOffload()
-		return Promise.all([
-			currentMasterPasswordCacheKeyPromise, 
-			localOffloadEnabledPromise
-		]).then(values => {
-			let currentMasterPasswordCacheKey = values[0];
-			let localOffloadEnabled = values[1];
-			let valueToCachePromise = null;
-			if (localOffloadEnabled) {
-				valueToCachePromise = offloader.encrypt(currentMasterPasswordCacheKey, pw, args['forgetTime'])
-			} else {
-				valueToCachePromise = Promise.resolve(pw);
-			}
-			return valueToCachePromise.then(valueToCache => {
-				return secureCache.save(currentMasterPasswordCacheKey, valueToCache).then(() => {
-					let forgetTime = args['forgetTime']
-					return exports.setForgetTime(currentMasterPasswordCacheKey, forgetTime)
-				})
+		return exports.getCurrentMasterPasswordCacheKey().then(key => {
+			return secureCache.save(key, pw).then(nil => {
+				let forgetTime = args['forgetTime']
+				return exports.setForgetTime(key, forgetTime)
 			})
 		})
 	}
 
-	/* 
-		Fetch master password from background memory.
-		Optionally first fetch the keys that encrypted those credentials from remote.
-	*/
-	exports.getCachedMasterPassword = function() {
-		
-		let currentMasterPasswordCacheKeyPromise = exports.getCurrentMasterPasswordCacheKey()
-		let localOffloadEnabledPromise = exports.getSetLocalKeyOffload()
-		return Promise.all([
-			currentMasterPasswordCacheKeyPromise, 
-			localOffloadEnabledPromise
-		]).then(values => {
-			let currentMasterPasswordCacheKey = values[0];
-			let localOffloadEnabled = values[1];
-			let valueToReturnPromise = secureCache.get(currentMasterPasswordCacheKey).then(value => {
-				if (localOffloadEnabled && value !== undefined) {
-					// if there is something to decrypt
-					return offloader.decrypt(currentMasterPasswordCacheKey, value)
-				} else {
-					return value;
-				}
-			});
-			return valueToReturnPromise;
-		});
-	}
-
 	/*
-		Sets a time to forget something
+	 * Sets a time to forget something
 	 */
 	exports.setForgetTime = function(key, time) {
 		var storageKey = 'forgetTimes';
@@ -283,7 +230,11 @@ function Settings(secureCache) {
 			return exports.getSetDatabaseUsages().then(function(usages) {
 				var key = info.passwordFile.title + "__" + info.providerKey;
 				var usage = usages[key] || {};
-				return usage;
+
+				return secureCache.get(key + ".password").then(value => {
+					usage['passwordKey'] = value;
+					return usage
+				})
 			});
 		})
 	}
@@ -294,13 +245,11 @@ function Settings(secureCache) {
 		})
 	}
 
-	// PRIVATE.  Should be used through the methods below.
-	// named "getSetSomeThing" if key is someThing
 	let keyGetSetter = function(key, val, defaultval, value_type) {
 		let update_obj = {}
 		update_obj[key] = val
 		if (val !== undefined && (typeof(val) === value_type || val === null) )
-			return chromePromise.storage.local.set(update_obj).then(() => {
+			return chromePromise.storage.local.set(update_obj).then(nil => {
 				return val
 			})
 		else
@@ -327,14 +276,6 @@ function Settings(secureCache) {
 
 	exports.getSetDefaultRememberPeriod = function(rememberPeriod) {
 		return keyGetSetter('rememberPeriod', rememberPeriod, 0, 'number')
-	}
-
-	exports.getSetOffloaderToken = function(offloaderToken) {
-		return keyGetSetter('offloaderToken', offloaderToken, null, 'string')
-	}
-	
-	exports.getSetLocalKeyOffload = function(enabled) {
-		return keyGetSetter('offloadEnabled', enabled, false, 'boolean')
 	}
 
 	return exports;

@@ -8,16 +8,16 @@ let Case = require('case'),
 	kdbxweb = require('kdbxweb')
 
 import { argon2 } from '$lib/argon2.js'
-import { 
-	parseUrl, 
-	getValidTokens, 
-	jsonCredentialsToKdbx, 
-	protectedValueToJSON, 
-	kdbxCredentialsToJson 
-} from '$lib/utils.js'
+import { parseUrl, getValidTokens } from '$lib/utils.js'
 
 function KeepassService(keepassHeader, settings, passwordFileStoreRegistry, keepassReference) {
 	var my = {};
+
+	var littleEndian = (function() {
+		var buffer = new ArrayBuffer(2);
+		new DataView(buffer).setInt16(0, 256, true);
+		return new Int16Array(buffer)[0] === 256;
+	})();
 
 	my.getMasterKey = function(masterPassword, keyFileInfo) {
 		/**
@@ -51,6 +51,7 @@ function KeepassService(keepassHeader, settings, passwordFileStoreRegistry, keep
 				kdbxweb.CryptoEngine.argon2 = argon2;
 				var kdbxCreds = jsonCredentialsToKdbx(masterKey);
 				return kdbxweb.Kdbx.load(buf, kdbxCreds).then(db => {
+					var psk = new Uint8Array(db.header.protectedStreamKey, 0, db.header.protectedStreamKey.length);
 					var entries = parseKdbxDb(db.groups);
 					majorVersion = db.header.versionMajor;
 					return processReferences(entries, majorVersion);
@@ -202,6 +203,38 @@ function KeepassService(keepassHeader, settings, passwordFileStoreRegistry, keep
 			result[i * 2] = hexit.length == 2 ? hexit : "0" + hexit;
 		}
 		return result.join("");
+	}
+
+	/*
+	 * The following 3 methods are utilities for the KeeWeb protectedValue class.
+	 * Because it uses uint8 arrays that are not JSON serializable, we must transform them
+	 * in and out of JSON serializable formats for use.
+	 */
+
+	function protectedValueToJSON(pv) {
+		return {
+			salt: Array.from(pv._salt),
+			value: Array.from(pv._value)
+		}
+	}
+
+	function kdbxCredentialsToJson(creds) {
+		var jsonRet = {
+			passwordHash: null,
+			keyFileHash: null
+		};
+		for (var key in jsonRet)
+			if (creds[key])
+				jsonRet[key] = protectedValueToJSON(creds[key]);
+		return jsonRet;
+	}
+
+	function jsonCredentialsToKdbx(jsonCreds) {
+		var creds = new kdbxweb.Credentials(null, null);
+		for (var key in jsonCreds)
+			if (jsonCreds[key])
+				creds[key] = new kdbxweb.ProtectedValue(jsonCreds[key].value, jsonCreds[key].salt);
+		return creds;
 	}
 
 	return my;
