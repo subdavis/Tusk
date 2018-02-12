@@ -14,7 +14,7 @@
 			:removeable="true" 
 			:remove-function="removePasswordFile"></generic-provider-ui>
 		<div class="url-form shared-link-box" v-if="loggedIn">
-			<input type="file" style="display:none" id="file-selector" name='file' @change="handleAdd" multiple />
+			<input type="file" accept='.kdbx' style="display:none" id="file-selector" name='file' @change="handleAdd" multiple />
 			<a class="waves-effect waves-light btn" @click="selectFile">Add URL Source</a>
 		</div>
 	</div>
@@ -94,9 +94,8 @@
 
 						var existingIndex = null;
 						this.databases.forEach(function(existingFile, index) {
-							if (existingFile.title == fi.title) {
+							if (existingFile.title == fi.title) 
 								existingIndex = index;
-							}
 						});
 
 						if (existingIndex == null) {
