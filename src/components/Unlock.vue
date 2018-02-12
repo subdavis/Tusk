@@ -12,7 +12,7 @@
 		<messenger :messages="generalMessages" v-show="!busy"></messenger>
 
 		<!-- Unlock input group -->
-		<div id="masterPasswordGroup" v-if="!busy && !isUnlocked()">
+		<div id="masterPasswordGroup" v-show="!busy && !isUnlocked()">
 
 			<div class="box-bar small selectable" @click="$router.route('/choose')">
 				<span><b>{{ databaseFileName }}</b> ( click to change <i class="fa fa-database" aria-hidden="true"></i> )</span>
@@ -261,9 +261,7 @@
 				this.unlockedState.cacheSet('priorityEntries', priorityEntries)
 				this.$forceUpdate()
 				//save longer term (in encrypted storage)
-				console.log("Unlock ", entries)
 				this.secureCache.save('secureCache.entries', entries)
-				this.busy = false
 			},
 			clickUnlock(event) {
 				event.preventDefault()
@@ -328,7 +326,7 @@
 
 				let try_autounlock = () => {
 					this.busy = true
-					this.settings.getKeyFiles().then(keyFiles => {
+					return this.settings.getKeyFiles().then(keyFiles => {
 						this.keyFiles = keyFiles
 						return this.settings.getSetDefaultRememberPeriod()
 					}).then(rememberPeriod => {
@@ -339,14 +337,14 @@
 						// Bundle it into the database usage.
 						if (usage.rememberPeriod !== 0) 
 							return this.settings.getCachedMasterPassword().then(password => {
-								console.log(password)
 								usage['passwordKey'] = password
 								return usage
 							}).catch(err => {
 								this.generalMessages['error'] = err.toString()
 								return usage;
-							})
-						return usage
+							});
+						else
+							return usage
 					}).then(usage => {
 						// tweak UI based on what we know about the db file
 						this.hidePassword = (usage.requiresPassword === false)
@@ -380,14 +378,14 @@
 				this.busy = true
 				this.secureCache.get('secureCache.entries').then(entries => {
 					if (entries !== undefined && entries.length > 0) {
-						this.showResults(entries)
+						return this.showResults(entries)
 					} else {
-						try_autounlock()
+						return try_autounlock()
 					}
 				}).catch(err => {
 					//this is fine - it just means the cache expired.  Clear the cache to be sure.
-					this.secureCache.clear('secureCache.entries')
-					try_autounlock()
+					console.error("Secure Cache of entries expired")
+					return this.secureCache.clear('secureCache.entries')
 				}).then(nil => {
 					// state settled
 					this.busy = false

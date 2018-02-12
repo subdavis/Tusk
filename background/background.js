@@ -24,7 +24,8 @@ function Background(protectedMemory, settings) {
 					protectedMemory.clearData(msg.key);
 					break;
 				case 'save':
-					protectedMemory.setData(msg.key, msg.value);
+					if (msg.key !== 'secureCache.entries')
+						protectedMemory.setData(msg.key, msg.value);
 					break;
 				case 'get':
 					protectedMemory.getData(msg.key).then(function(value) {
