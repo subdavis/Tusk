@@ -16,12 +16,13 @@
 		</div>
 
 		<div class="box-bar roomy">
-			<h4>Local Key Offloading</h4>
+			<h4>Local Key Offloading [beta]</h4>
 			<p>If enabled, Tusk can help keep you safe by offloading 
 				the temporary key used to encrypt your master credentials in-memory. 
 				This function is only useful if you frequently use the "Remember for {n} hours" feature.
-				If enabled, Tusk will transmit randomly generated keys to AWS
-				and cache them for up to 48 hours. <b>NO personal data will EVER be sent</b> </p>
+				If enabled, Tusk will transmit randomly generated keys to a remote server
+				and cache them for up to 48 hours. <b>NO personal data will EVER be sent</b>.  This is a 
+				beta feature: there may be bugs.  Please report them via <a href="https://subdavis.com/Tusk">the support site.</a></p>
 		</div>
 		<div class="box-bar roomy lighter">
 			<div class="switch">
