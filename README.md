@@ -1,5 +1,4 @@
 # Tusk
-
 > A modern, clean keepass browser extension built with Vue.js and kdbxweb.  Rebooted from perfectapi/CKP
 
 ![Tusk](https://github.com/subdavis/Tusk/blob/develop/assets/icons/logo_256.png "Tusk Logo")
@@ -10,7 +9,14 @@
 
 **Chrome:** https://chrome.google.com/webstore/detail/fmhmiaejopepamlcjkncpgpdjichnecm
 
+#### User Guide + Other Docs
+
+* Wiki https://github.com/subdavis/Tusk/wiki
+* Website https://subdavis.com/Tusk
+
 ## Tusk Custom Fields
+
+The following custom fields in a keepass entry are supported and affect the behavior of Tusk.
 
 * `TUSK_URLS`: a comma separated list of URLs or hostnames to which the entry should always match.  For example, active directory login credentials that must match several sites.  e.g. `my.login.domain.com,https://github.com,foobar.net`
 
