@@ -18,6 +18,7 @@
     "axios": "^0.17.1",
     "base64-arraybuffer": "^0.1.5",
     "case": "^1.5.4",
+    "eslint": "^4.17.0",
     "font-awesome": "^4.7.0",
     "jquery": "^3.2.1",
     "json-formatter-js": "^2.2.0",

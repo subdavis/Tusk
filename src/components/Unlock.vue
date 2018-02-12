@@ -12,7 +12,7 @@
 		<messenger :messages="generalMessages" v-show="!busy"></messenger>
 
 		<!-- Unlock input group -->
-		<div id="masterPasswordGroup" v-if="!busy && !isUnlocked()">
+		<div id="masterPasswordGroup" v-show="!busy && !isUnlocked()">
 
 			<div class="box-bar small selectable" @click="$router.route('/choose')">
 				<span><b>{{ databaseFileName }}</b> ( click to change <i class="fa fa-database" aria-hidden="true"></i> )</span>
@@ -177,22 +177,22 @@
 				 * if time_int is given, derive slider_int
 				 * else assume slider_int is alread set.
 				 */
-				let slider_option_index;
+				let slider_option_index
 				if (time_int !== undefined) {
 					this.slider_int = (t => {
 						for (let i = 0; i < this.slider_options.length; i++) {
 							if (this.slider_options[i].time === t)
-								return i;
+								return i
 						}
-						return 0;
-					})(time_int);
-					slider_option_index = this.slider_int;
+						return 0
+					})(time_int)
+					slider_option_index = this.slider_int
 				} else {
-					slider_option_index = parseInt(this.slider_int);
+					slider_option_index = parseInt(this.slider_int)
 				}
 				if (slider_option_index < this.slider_options.length) {
-					this.rememberPeriod = this.slider_options[slider_option_index].time;
-					this.rememberPeriodText = this.slider_options[slider_option_index].text;
+					this.rememberPeriod = this.slider_options[slider_option_index].time
+					this.rememberPeriodText = this.slider_options[slider_option_index].text
 				}
 			},
 			closeWindow(event) {
@@ -236,19 +236,20 @@
 				//save short term (in-memory) filtered results
 				priorityEntries = entries.filter(function(entry) {
 					return (entry.matchRank >= 100)
-				});
+				})
 				if (priorityEntries.length == 0) {
 					priorityEntries = entries.filter(function(entry) {
-						return (entry.matchRank > 0.8 && !entry.URL); //a good match for an entry without a url
-					});
+						//a good match for an entry without a url
+						return (entry.matchRank > 0.8 && !entry.URL) 
+					})
 				}
 				if (priorityEntries.length == 0) {
 					priorityEntries = entries.filter(function(entry) {
-						return (entry.matchRank >= 0.4);
-					});
+						return (entry.matchRank >= 0.4)
+					})
 
 					if (priorityEntries.length) {
-						this.unlockedMessages['warn'] = "No close matches, showing " + priorityEntries.length + " partial matches.";
+						this.unlockedMessages['warn'] = "No close matches, showing " + priorityEntries.length + " partial matches."
 					}
 				}
 				if (priorityEntries.length == 0) {
@@ -260,8 +261,7 @@
 				this.unlockedState.cacheSet('priorityEntries', priorityEntries)
 				this.$forceUpdate()
 				//save longer term (in encrypted storage)
-				this.secureCache.save('secureCache.entries', entries);
-				this.busy = false
+				this.secureCache.save('secureCache.entries', entries)
 			},
 			clickUnlock(event) {
 				event.preventDefault()
@@ -270,7 +270,7 @@
 			unlock(passwordKey) {
 				this.busy = true
 				this.generalMessages.error = ""
-				let passwordKeyPromise;
+				let passwordKeyPromise
 				if (passwordKey === undefined)
 					passwordKeyPromise = this.keepassService.getMasterKey(this.masterPassword, this.selectedKeyFile)
 				else
@@ -326,12 +326,25 @@
 
 				let try_autounlock = () => {
 					this.busy = true
-					this.settings.getKeyFiles().then(keyFiles => {
+					return this.settings.getKeyFiles().then(keyFiles => {
 						this.keyFiles = keyFiles
 						return this.settings.getSetDefaultRememberPeriod()
 					}).then(rememberPeriod => {
 						this.setRememberPeriod(rememberPeriod)
 						return this.settings.getCurrentDatabaseUsage()
+					}).then(usage => {
+						// There may be a cached password.
+						// Bundle it into the database usage.
+						if (usage.rememberPeriod !== 0) 
+							return this.settings.getCachedMasterPassword().then(password => {
+								usage['passwordKey'] = password
+								return usage
+							}).catch(err => {
+								this.generalMessages['error'] = err.toString()
+								return usage;
+							});
+						else
+							return usage
 					}).then(usage => {
 						// tweak UI based on what we know about the db file
 						this.hidePassword = (usage.requiresPassword === false)
@@ -356,7 +369,7 @@
 
 				let focus = () => {
 					this.$nextTick(nil => {
-						let mp = this.$refs.masterPassword;
+						let mp = this.$refs.masterPassword
 						if (mp !== undefined)
 							mp.focus()
 					})
@@ -365,14 +378,14 @@
 				this.busy = true
 				this.secureCache.get('secureCache.entries').then(entries => {
 					if (entries !== undefined && entries.length > 0) {
-						this.showResults(entries)
+						return this.showResults(entries)
 					} else {
-						try_autounlock()
+						return try_autounlock()
 					}
 				}).catch(err => {
 					//this is fine - it just means the cache expired.  Clear the cache to be sure.
-					this.secureCache.clear('secureCache.entries')
-					try_autounlock()
+					console.error("Secure Cache of entries expired")
+					return this.secureCache.clear('secureCache.entries')
 				}).then(nil => {
 					// state settled
 					this.busy = false
