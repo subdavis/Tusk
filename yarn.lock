@@ -3625,9 +3625,9 @@ just-extend@^1.1.26:
   version "1.1.27"
   resolved "https://registry.yarnpkg.com/just-extend/-/just-extend-1.1.27.tgz#ec6e79410ff914e472652abfa0e603c03d60e905"
 
-kdbxweb@^1.0.2:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/kdbxweb/-/kdbxweb-1.0.2.tgz#e36f9857b9b403765ede78da95c204c25ef8781c"
+kdbxweb@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/kdbxweb/-/kdbxweb-1.1.0.tgz#a96158ea59351aa2b763e41348fc955b7582367d"
   dependencies:
     jssha "github:keeweb/jssha#1ffad73a7e5ab7158596c090a524f29ca2aee13d"
     pako "github:keeweb/pako#653c0b00d8941c89d09ed4546d2179001ec44efc"

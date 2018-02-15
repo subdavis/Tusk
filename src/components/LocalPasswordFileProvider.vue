@@ -15,7 +15,7 @@
 			:remove-function="removePasswordFile"></generic-provider-ui>
 		<div class="url-form shared-link-box" v-if="loggedIn">
 			<input type="file" accept='.kdbx' style="display:none" id="file-selector" name='file' @change="handleAdd" multiple />
-			<a class="waves-effect waves-light btn" @click="selectFile">Add URL Source</a>
+			<a class="waves-effect waves-light btn" @click="selectFile">Select Local File</a>
 		</div>
 	</div>
 </template>
@@ -51,7 +51,7 @@
 					this.providerManager.logout().then(() => {
 						this.loggedIn = false
 					})
-				} else {
+				} else if (confirm("Do you understand that Tusk cannot keep your local database file up to date?  If you change it, you'll have to re-upload the file again.")) {
 					this.providerManager.login().then(() => {
 						this.loggedIn = true
 					})
