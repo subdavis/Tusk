@@ -21,7 +21,7 @@
     "font-awesome": "^4.7.0",
     "jquery": "^3.2.1",
     "json-formatter-js": "^2.2.0",
-    "kdbxweb": "^1.0.2",
+    "kdbxweb": "^1.1.0",
     "keeweb": "https://github.com/keeweb/keeweb",
     "materialize-css": "^0.100.2",
     "pako": "^1.0.6",
