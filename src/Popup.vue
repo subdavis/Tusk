@@ -18,6 +18,7 @@
 			:keepass-service="services.keepassService"></unlock>
 		<entry-details id="/entry-details/:entryId" v-if="show.entryDetails.visible" 
 			:unlocked-state="services.unlockedState" 
+			:links="services.links"
 			:settings="services.settings"></entry-details>
 		<!-- End Router View -->
 	</div>

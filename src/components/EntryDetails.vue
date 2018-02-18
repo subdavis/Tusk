@@ -15,16 +15,23 @@
 			<div class="attribute-box" v-for="attr in attributes">
 				<span class="attribute-title">{{ attr.key }}</span>
 				<br>
-				<pre v-if="attr.key == 'notes'" class="attribute-value">{{ attr.value }}</pre>
+				<!-- notes -->
+				<pre v-if="attr.key === 'notes'" class="attribute-value">{{ attr.value }}</pre>
+				<!-- URL -->
+				<span v-else-if="attr.key === 'url'" class="attribute-value">
+					<a @click="links.open(attr.href)" v-bind:href="attr.href">{{ attr.value }}</a>
+				</span>
+				<!-- other -->
 				<span v-else-if="!attr.protected" class="attribute-value">{{ attr.value }}</span>
+				<!-- protected -->
 				<div v-else>
 					<span v-if="attr.key !== 'notes'" class="attribute-value protected" @click="toggleAttribute(attr)">
-            <i v-if="attr.protected && attr.isHidden" 
-              class="fa fa-eye-slash" aria-hidden="true"></i>
-            <i v-else-if="attr.protected && !attr.isHidden"
-              class="fa fa-eye" aria-hidden="true"></i>
-            {{ attr.value }}
-          </span>
+						<i v-if="attr.protected && attr.isHidden" 
+						class="fa fa-eye-slash" aria-hidden="true"></i>
+						<i v-else-if="attr.protected && !attr.isHidden"
+						class="fa fa-eye" aria-hidden="true"></i>
+						{{ attr.value }}
+					</span>
 				</div>
 			</div>
 		
@@ -34,6 +41,7 @@
 
 <script>
 	const OTP = require('keeweb/app/scripts/util/otp.js')
+	import { parseUrl } from '$lib/utils.js'
 	import GoBack from '@/components/GoBack'
 
 	export default {
@@ -42,7 +50,8 @@
 		},
 		props: {
 			unlockedState: Object,
-			settings: Object
+			settings: Object,
+			links: Object
 		},
 		data() {
 			return {
@@ -95,13 +104,19 @@
 			})[0]
 			this.attributes = this.entry.keys.map(key => {
 				// Should NOT be succeptible to XSS
-				let value = key !== 'notes' ?
-					(this.entry[key] || "").replace(/\n/g, "<br>") :
-					this.entry[key]
-				return {
-					'key': key,
-					'value': value
+				let returnMap = {
+					key: key,
+					value: (this.entry[key] || "").replace(/\n/g, "<br>")
 				}
+				switch (key) {
+					case 'url':
+						returnMap['href'] = parseUrl(this.entry[key]).href
+						break;
+					case 'notes':
+						returnMap['value'] = this.entry[key]
+						break;
+				}
+				return returnMap;
 			})
 			for (var protectedKey in this.entry.protectedData) {
 				if (protectedKey === "otp") {
