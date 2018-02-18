@@ -8,8 +8,16 @@ function Links() {
 		openHomepage: openHomepage,
 		openOptionsReauth: openOptionsReauth,
 		openOptionsKeyfiles: openOptionsKeyfiles,
-		openOptionsDatabases: openOptionsDatabases
-	} 
+		openOptionsDatabases: openOptionsDatabases,
+		open: openGeneric
+	}
+	
+	function openGeneric(url) {
+		// Given some URL, open it in a new tab
+		chrome.tabs.create({
+			url: url
+		})
+	}
 
 	function openOptionsPath(path) {
 		// A hack to figure out what the browser uses to point to us.
