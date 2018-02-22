@@ -70,7 +70,11 @@ function SharedUrlFileManager() {
 			method: 'GET',
 			url: dbInfo.direct_link,
 			responseType: 'arraybuffer',
-			cache: true
+			cache: true,
+			headers: {
+				Cookie: "c1=value;",
+				Accept: "*/*"
+			}
 		}).then(function(response) {
 			return response.data;
 		});
