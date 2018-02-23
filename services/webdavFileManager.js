@@ -1,25 +1,41 @@
-const webdav = require('webdav');
 const Base64 = require('base64-arraybuffer');
+const createClient = require("webdav-client");
+const regeneratorRuntime = require('babel-regenerator-runtime')
+import { guid } from '$lib/utils.js'
 import { ChromePromiseApi } from '$lib/chrome-api-promise.js'
+import { create } from "domain";
 
 const chromePromise = ChromePromiseApi()
+const SEARCH_DEPTH = 5
 
-function WebdavFileManager() {
+function WebdavFileManager(settings) {
 	var exports = {
 		key: 'webdav',
 		listDatabases: listDatabases,
 		getDatabaseChoiceData: getDatabaseChoiceData,
 		getChosenDatabaseFile: getChosenDatabaseFile,
-		deleteDatabase: deleteDatabase,
-		supportedFeatures: ['ingognito', 'listDatabases', 'deleteDatabase'],
+		supportedFeatures: ['ingognito', 'listDatabases'],
 		title: 'WebDAV',
 		icon: 'icon-upload',
-		chooseTitle: 'WebDAV'
-		chooseDescription: 'Choose a database from any WebDAV file server.  Tusk will always keep your database in sync with the server and automatically pull new versions.  WARNING: If you require username/password to use webdav, this will store them unencrypted on disk.',
+		chooseTitle: 'WebDAV',
+		chooseDescription: 'Choose a database from any WebDAV file server.  Tusk will always keep your database in sync with the server and automatically pull new versions.  WARNING: If you require username/password to use webdav, Tusk will store them unencrypted on disk.',
 		login: enable,
 		logout: disable,
-		isLoggedIn: isEnabled
+		isLoggedIn: isEnabled,
+		searchServer: searchServer,
+		addServer: addServer,
+		listServers: listServers
 	};
+
+	/*
+	 
+	Object ServerInfo {
+		url string
+		username string
+		password string
+	}
+
+	*/
 
 	function enable() {
 		return chromePromise.storage.local.set({
@@ -43,71 +59,119 @@ function WebdavFileManager() {
 
 	}
 
+	/**
+	 * Returns promise --> nil when search is complete.
+	 * @param {string} serverId 
+	 */
+	function searchServer(serverId) {
+		// let serverInfo = getServer(serverId)
+		// let client = createWebDAVClient(serverInfo.url, serverInfo.username, serverInfo.password)
+		let client = createClient("http://coreos:9093/remote.php/webdav/", "admin", "admin")
+		createClient.setFetchMethod(window.fetch);
+
+		
+		let bfs = async function() {
+			let queue = [ '/' ]
+			let foundFiles = []
+
+			while (queue.length) {
+				let path = queue.shift()
+
+				// TODO: Implement depth better
+				if (path.split('/').length > SEARCH_DEPTH) 
+					break; // We've exceeded search depth
+				
+				let contents = await client.getDirectoryContents(path)
+				contents.forEach(item => {
+					// console.log(item)
+					if (item.type === 'directory')
+						queue.push(item.filename)
+					else if (item.filename.indexOf('.kdbx') >= 1)
+						foundFiles.push(item.filename)						
+				})
+			}
+
+			return foundFiles
+		}
+
+		return bfs()
+	}
+
 	//get the minimum information needed to identify this file for future retrieval
 	function getDatabaseChoiceData(dbInfo) {
 		return {
-			title: dbInfo.title
+			serverId: dbInfo.serverId,
+			path: dbInfo.path
 		}
 	}
 
 	//given minimal file information, retrieve the actual file
 	function getChosenDatabaseFile(dbInfo) {
-		return listDatabases().then(function(databases) {
-			var bytes = databases.reduce(function(prev, storedFile) {
-				if (storedFile.title == dbInfo.title) {
-					var data = Base64.decode(storedFile.data);
-					return data;
-				} else
-					return prev;
-			}, []);
-
-			if (bytes && bytes.byteLength)
-				return bytes;
-			else
-				throw new Error("Failed to find the requested file");
-		});
+		
 	}
 
-	//save the given database to persistent storage
-	function addServer(db) {
-		db.storageVersion = currentVersion;
-		var p = listDatabases().then(function(existingFiles) {
-			var index = existingFiles.reduce(function(prev, curr, index) {
-				if (curr.title == db.title)
-					return index;
-				else
-					return prev;
-			}, -1);
-
-			if (index == -1) {
-				existingFiles.push(db);
-			} else {
-				existingFiles[index] = db;
+	/**
+	 * Return Promise --> Server GUID
+	 * @param {Object:ServerInfo} serverInfo 
+	 */
+	function addServer(url, username, password) {
+		let client = createClient(url, username, password)
+		createClient.setFetchMethod(window.fetch);
+		return client.getDirectoryContents('/').then(contents => {
+			// success!
+			let serverInfo = {
+				url: url,
+				username: username,
+				password: password
 			}
-
-			return chromePromise.storage.local.set({
-				'passwordFiles': existingFiles
-			});
-		});
-
-		savingLocks.push(p); //ensure that a future read has to wait for the write to complete
-		return p;
+			return settings.getSetWebdavServerList().then(serverList => {
+				if (serverList.length){
+					let matches = serverList.filter((elem, i, a) => {
+						return (elem.url == serverInfo.url 
+						&& elem.username == serverInfo.username 
+						&& elem.password == serverInfo.password)
+					})
+					if (matches.length == 1) {
+						return matches[0].serverId
+					} else {
+						let newId = guid()
+						serverInfo['serverId'] = newId
+						serverList.push(serverInfo)
+						return settings.getSetWebdavServerList(serverList).then(() => {
+							return newId
+						})
+					}
+				}
+				return settings.getSetWebdavServerList([serverInfo])
+			})
+		})
 	}
 
-	//remove the database from storage
-	function removeServer(db) {
-		return listDatabases().then(function(databases) {
-			databases = databases.filter(function(existing) {
-				return (existing.title != db.title);
-			});
+	/**
+	 * alias for settings.getSetWebdavServerList
+	 */
+	function listServers() {
+		return settings.getSetWebdavServerList()
+	}
+	
+	/**
+	 * return Promise --> Object:ServerInfo
+	 * @param {string} serverId 
+	 */
+	function getServer(serverId) {
+		chromePromise.storage.local.get('webdavServerList').then(serverList => {
+			let matches = serverList.filter((e, i, a) => {
+				return e.serverId === serverId
+			})
+		})
+	}
 
-			if (databases.length)
-				return chromePromise.storage.local.set({
-					'passwordFiles': databases
-				});
-			else
-				return chromePromise.storage.local.remove('passwordFiles');
-		});
+	/**
+	 * Returns a promise --> Object:ServerInfo
+	 * @param {string} serverId 
+	 */
+	function removeServer(serverId) {
+		// TODO: implement
 	}
 
 	return exports;
