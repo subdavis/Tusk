@@ -278,6 +278,10 @@ function Settings(secureCache) {
 		return keyGetSetter('rememberPeriod', rememberPeriod, 0, 'number')
 	}
 
+	exports.getSetWebdavServerList = function(serverList) {
+		return keyGetSetter('webdavServers', serverList, [], 'object')
+	}
+
 	return exports;
 }
 
