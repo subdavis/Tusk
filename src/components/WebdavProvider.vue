@@ -122,7 +122,11 @@
 					this.providerManager.logout().then(() => {
 						this.loggedIn = false
 					})
+<<<<<<< HEAD
 				} else if (confirm("WebDAV is a beta feature. If you use it, the username and password to the webdav SERVER will be stored on disk.  \n\nTusk will never store you master database password.  \n\nSelect OK to continue.")) {
+=======
+				} else {
+>>>>>>> 87388cd7802ede66d5e87d614d12ba62b989bd58
 					this.providerManager.login().then(() => {
 						this.loggedIn = true
 						this.onLogin()
