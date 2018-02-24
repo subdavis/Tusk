@@ -43,6 +43,7 @@
 	import { OneDriveFileManager } from '$services/oneDriveFileManager.js'
 	import { SharedUrlFileManager } from '$services/sharedUrlFileManager.js'
 	import { SampleDatabaseFileManager } from '$services/sampleDatabaseFileManager.js'
+	import { WebdavFileManager } from '$services/webdavFileManager.js'
 	// Components
 	import Unlock from '@/components/Unlock'
 	import Startup from '@/components/Startup'
@@ -64,8 +65,16 @@
 	const sharedUrlFileManager = new SharedUrlFileManager()
 	const oneDriveFileManager = new OneDriveFileManager(settings)
 	const sampleDatabaseFileManager = new SampleDatabaseFileManager()
+	const webdavFileManager = new WebdavFileManager(settings)
 
-	const passwordFileStoreRegistry = new PasswordFileStoreRegistry(localChromePasswordFileManager, dropboxFileManager, googleDrivePasswordFileManager, sharedUrlFileManager, sampleDatabaseFileManager, oneDriveFileManager)
+	const passwordFileStoreRegistry = new PasswordFileStoreRegistry(
+		localChromePasswordFileManager, 
+		dropboxFileManager, 
+		googleDrivePasswordFileManager, 
+		sharedUrlFileManager, 
+		sampleDatabaseFileManager, 
+		oneDriveFileManager,
+		webdavFileManager)
 	const keepassService = new KeepassService(keepassHeader, settings, passwordFileStoreRegistry, keepassReference)
 	/* beautify preserve:end */
 

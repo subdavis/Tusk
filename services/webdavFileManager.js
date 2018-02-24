@@ -24,6 +24,7 @@ function WebdavFileManager(settings) {
 		isLoggedIn: isEnabled,
 		searchServer: searchServer,
 		addServer: addServer,
+		removeServer: removeServer,
 		listServers: listServers
 	};
 
@@ -56,20 +57,30 @@ function WebdavFileManager(settings) {
 	}
 
 	function listDatabases() {
-
+		return listServers().then(servers => {
+			let promises = []
+			servers.forEach(s => {
+				promises.push(searchServer(s))
+			})
+			return Promise.all(promises).then(results => {
+				// flatten results
+				return [].concat.apply([], results)
+			})
+		})
 	}
 
 	/**
 	 * Returns promise --> nil when search is complete.
 	 * @param {string} serverId 
 	 */
-	function searchServer(serverId) {
-		// let serverInfo = getServer(serverId)
-		// let client = createWebDAVClient(serverInfo.url, serverInfo.username, serverInfo.password)
-		let client = createClient("http://coreos:9093/remote.php/webdav/", "admin", "admin")
+	async function searchServer(serverInfo) {
+		if (!serverInfo.url || !serverInfo.username || !serverInfo.password){
+			console.error("serverInfo is corrupted"); 
+			return
+		}
+		let client = createClient(serverInfo.url, serverInfo.username, serverInfo.password)
 		createClient.setFetchMethod(window.fetch);
 
-		
 		let bfs = async function() {
 			let queue = [ '/' ]
 			let foundFiles = []
@@ -80,14 +91,16 @@ function WebdavFileManager(settings) {
 				// TODO: Implement depth better
 				if (path.split('/').length > SEARCH_DEPTH) 
 					break; // We've exceeded search depth
-				
 				let contents = await client.getDirectoryContents(path)
 				contents.forEach(item => {
-					// console.log(item)
 					if (item.type === 'directory')
 						queue.push(item.filename)
 					else if (item.filename.indexOf('.kdbx') >= 1)
-						foundFiles.push(item.filename)						
+						foundFiles.push({
+							path: item.filename,
+							title: item.filename,
+							serverId: serverInfo.serverId
+						})						
 				})
 			}
 
@@ -107,7 +120,13 @@ function WebdavFileManager(settings) {
 
 	//given minimal file information, retrieve the actual file
 	function getChosenDatabaseFile(dbInfo) {
-		
+		getServer(dbInfo.serverId).then(serverInfo => {
+			let client = createClient(serverInfo.url, serverInfo.username, serverInfo.password)
+			createClient.setFetchMethod(window.fetch)
+			return client.getFileContents(dbInfo.path).then(bin=> {
+				console.log(bin)
+			})
+		})
 	}
 
 	/**
@@ -116,7 +135,7 @@ function WebdavFileManager(settings) {
 	 */
 	function addServer(url, username, password) {
 		let client = createClient(url, username, password)
-		createClient.setFetchMethod(window.fetch);
+		createClient.setFetchMethod(window.fetch)
 		return client.getDirectoryContents('/').then(contents => {
 			// success!
 			let serverInfo = {
@@ -125,24 +144,22 @@ function WebdavFileManager(settings) {
 				password: password
 			}
 			return settings.getSetWebdavServerList().then(serverList => {
-				if (serverList.length){
-					let matches = serverList.filter((elem, i, a) => {
-						return (elem.url == serverInfo.url 
-						&& elem.username == serverInfo.username 
-						&& elem.password == serverInfo.password)
+				serverList = serverList.length ? serverList : []
+				let matches = serverList.filter((elem, i, a) => {
+					return (elem.url == serverInfo.url 
+					&& elem.username == serverInfo.username 
+					&& elem.password == serverInfo.password)
+				})
+				if (matches.length == 1) {
+					return matches[0].serverId
+				} else {
+					let newId = guid()
+					serverInfo['serverId'] = newId
+					serverList.push(serverInfo)
+					return settings.getSetWebdavServerList(serverList).then(() => {
+						return newId
 					})
-					if (matches.length == 1) {
-						return matches[0].serverId
-					} else {
-						let newId = guid()
-						serverInfo['serverId'] = newId
-						serverList.push(serverInfo)
-						return settings.getSetWebdavServerList(serverList).then(() => {
-							return newId
-						})
-					}
 				}
-				return settings.getSetWebdavServerList([serverInfo])
 			})
 		})
 	}
@@ -159,10 +176,14 @@ function WebdavFileManager(settings) {
 	 * @param {string} serverId 
 	 */
 	function getServer(serverId) {
-		chromePromise.storage.local.get('webdavServerList').then(serverList => {
-			let matches = serverList.filter((e, i, a) => {
+		return listServers().then(serverList => {
+			return serverList.filter((e, i, a) => {
 				return e.serverId === serverId
 			})
+		}).then(matches => {
+			if (matches.length === 1)
+				return matches[0]
+			return null
 		})
 	}
 
@@ -172,6 +193,7 @@ function WebdavFileManager(settings) {
 	 */
 	function removeServer(serverId) {
 		// TODO: implement
+		console.log("REMOVE " + serverId)
 	}
 
 	return exports;

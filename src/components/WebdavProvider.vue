@@ -11,20 +11,25 @@
 			:error="messages.error" 
 			:provider-manager="providerManager" 
 			:toggle-login="toggleLogin" 
-			:removeable="true"></generic-provider-ui>
+			:removeable="false"></generic-provider-ui>
 		<div class="top-padding" v-if="loggedIn">
-			<div>
-				<span>Server List:</span>
-				<span v-for="(server, index) in serverList" class="chip">
-					{{ server.username }}@{{ server.url }}
-				</span>
-			</div>
+			<table>
+				<tr>
+					<th>Server List:</th>
+				</tr>
+				<tr v-for="(server, index) in serverList">
+					<td>{{server.username}}</td>
+					<td>{{server.url}}</td>
+					<td><a @click="scan">re-scan</a></td>
+					<td><a @click="remove(server.serverId)">remove</a></td>
+				</tr>
+			</table>
 			<div class="url-form shared-link-box" v-if="loggedIn">
 				
 				<input id="webdav-server" type="text" v-model="webdav.url" placeholder="http://server:port/remote.php/webdav/">
 				<input id="webdav-username" type="text" v-model="webdav.username" placeholder="Username">
 				<input id="webdav-password" type="text" v-model="webdav.password" placeholder="Password">
-				<a class="waves-effect waves-light btn" @click="addServer">Add URL Source</a>
+				<a class="waves-effect waves-light btn" @click="addServer">Add server</a>
 			</div>
 		</div>
 	</div>
@@ -32,7 +37,9 @@
 
 <script>
 	const Base64 = require('base64-arraybuffer')
+	import {ChromePromiseApi} from '$lib/chrome-api-promise.js'
 	import GenericProviderUi from '@/components/GenericProviderUi'
+	const chromePromise = ChromePromiseApi()
 
 	export default {
 		data() {
@@ -60,13 +67,28 @@
 		},
 		methods: {
 			addServer() {
-				this.providerManager.addServer(this.webdav.url, this.webdav.username, this.webdav.password).then(success => {
-					// do somethings
-					this.updateServerList()
+				chromePromise.permissions.request({
+					origins: [this.webdav.url] //FLAGHERE TODO
+				}).then(() => {
+					this.providerManager.addServer(this.webdav.url, this.webdav.username, this.webdav.password).then(success => {
+						// do somethings
+						this.updateServerList()
+					}).catch(err => {
+						console.error(err)
+						this.messages.error = err.toString()
+					})
 				}).catch(err => {
 					console.error(err)
 					this.messages.error = err.toString()
 				})
+			},
+			scan() {
+				this.providerManager.listDatabases().then(databases => {
+					this.databases = databases
+				})
+			},
+			remove(serverId) {
+				this.providerManager.removeServer(serverId)
 			},
 			updateServerList () {
 				this.providerManager.listServers().then(servers => {
@@ -83,19 +105,21 @@
 				} else {
 					this.providerManager.login().then(() => {
 						this.loggedIn = true
+						this.onLogin()
 					})
 				}
+			},
+			onLogin() {
+				/* Other things to do when a successful login happens... */
+				this.scan()
+				this.updateServerList()
 			}
 		},
 		mounted() {
-			this.updateServerList()
 			this.providerManager.isLoggedIn().then(loggedIn => {
 				this.loggedIn = loggedIn
+				if (loggedIn) this.onLogin();
 			})
-			// this.providerManager.listDatabases().then(databases => {
-			// 	if (databases !== false)
-			// 		this.databases = databases
-			// })
 		}
 	}
 </script>
@@ -108,6 +132,6 @@
 	}
 
 	.top-padding {
-		padding: 20px;
+		padding: 20px 0px;
 	}
 </style>
