@@ -117,13 +117,23 @@
 							throw "Invalid Dropbox Shared Link";
 						return "https://dl.dropboxusercontent.com/s/" + path[1];
 					};
+					let ownNextCloudGenerator = function(url) {
+						let exclude = /\/[A-Za-z0-9]{15}\/download/
+						let matches = url.match(exclude) || []
+						if (matches.length === 1) 
+							return url;
+						else
+							return url + "/download"
+					};
 					let generatorMap = {
 						"drive.google.com": googleGenerator,
-						"www.dropbox.com": dropboxGenerator
+						"www.dropbox.com": dropboxGenerator,
+						"\/[A-Za-z0-9]{15}\/?": ownNextCloudGenerator
 					};
-					for (origin in generatorMap) {
-						if (this.origin.toLowerCase() == origin) {
-							this.direct_link = generatorMap[origin](this.url);
+					for (var regx in generatorMap) {
+						let matches = this.url.match(regx) || []
+						if (matches.length) {
+							this.direct_link = generatorMap[regx](this.url);
 							break;
 						}
 					}
