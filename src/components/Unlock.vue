@@ -271,8 +271,9 @@
 				this.busy = true
 				this.generalMessages.error = ""
 				let passwordKeyPromise;
+				let bufferPromise = this.keepassService.getChosenDatabaseFile()
 				if (passwordKey === undefined)
-					passwordKeyPromise = this.keepassService.getMasterKey(this.masterPassword, this.selectedKeyFile)
+					passwordKeyPromise = this.keepassService.getMasterKey(bufferPromise, this.masterPassword, this.selectedKeyFile)
 				else
 					passwordKeyPromise = Promise.resolve(passwordKey)
 
@@ -280,7 +281,7 @@
 					this.selectedKeyFile.name :
 					undefined
 				passwordKeyPromise.then(passwordKey => {
-					this.keepassService.getDecryptedData(passwordKey).then(decryptedData => {
+					this.keepassService.getDecryptedData(bufferPromise, passwordKey).then(decryptedData => {
 						let entries = decryptedData.entries
 						let version = decryptedData.version
 						let dbUsage = {

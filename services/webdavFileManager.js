@@ -1,3 +1,32 @@
+/*
+WebdavFileManager can interface with multiple servers and search them for 
+files of type *.kdbx.  It performas a full scan when the server is added,
+and persists the directory names where kdbx files are found.  These choice
+directories are then searched for new files at every call of listDatabases()
+	
+Object ServerInfo {
+	url      string
+	username string
+	password string
+	serverId string
+}
+
+Object DBInfo {
+	path     string
+	serverId string
+	title    string
+}
+
+Object DirInfo {
+	path     string
+	serverId string
+}
+
+Object DirMap {
+	"<serverId>" : []DirInfo
+}
+
+*/
 const Base64 = require('base64-arraybuffer');
 const createClient = require("webdav-client");
 const regeneratorRuntime = require('babel-regenerator-runtime')
@@ -16,7 +45,7 @@ function WebdavFileManager(settings) {
 		getChosenDatabaseFile: getChosenDatabaseFile,
 		supportedFeatures: ['ingognito', 'listDatabases'],
 		title: 'WebDAV',
-		icon: 'icon-upload',
+		icon: 'icon-folder',
 		chooseTitle: 'WebDAV',
 		chooseDescription: 'Choose a database from any WebDAV file server.  Tusk will always keep your database in sync with the server and automatically pull new versions.  WARNING: If you require username/password to use webdav, Tusk will store them unencrypted on disk.',
 		login: enable,
@@ -27,16 +56,6 @@ function WebdavFileManager(settings) {
 		removeServer: removeServer,
 		listServers: listServers
 	};
-
-	/*
-	 
-	Object ServerInfo {
-		url string
-		username string
-		password string
-	}
-
-	*/
 
 	function enable() {
 		return chromePromise.storage.local.set({
@@ -56,34 +75,52 @@ function WebdavFileManager(settings) {
 		})
 	}
 
+	/** 
+	 * returns promise -> Object:[]DBInfo
+	*/
 	function listDatabases() {
-		return listServers().then(servers => {
-			let promises = []
-			servers.forEach(s => {
-				promises.push(searchServer(s))
-			})
-			return Promise.all(promises).then(results => {
-				// flatten results
-				return [].concat.apply([], results)
+		return isEnabled().then(enabled => {
+			if (!enabled )
+				return Promise.resolve([])
+			return settings.getSetWebdavDirectoryMap().then(dirMap => {
+				let promises = []
+				console.log(dirMap)
+				// For each server, for each directory in the server.
+				for (let serverId in dirMap)
+					dirMap[serverId].forEach(dirInfo => {
+						promises.push(searchDirectory(serverId, dirInfo.path))
+					})	
+
+				return Promise.all(promises).then(results => {
+					// flatten results
+					return [].concat.apply([], results)
+				})
 			})
 		})
 	}
 
 	/**
-	 * Returns promise --> nil when search is complete.
+	 * Find directories where keepass files are likely to exist, 
+	 * and save to local storage.  
+	 * 
+	 * Returns Promise -> Object:DirMap
 	 * @param {string} serverId 
 	 */
-	async function searchServer(serverInfo) {
-		if (!serverInfo.url || !serverInfo.username || !serverInfo.password){
-			console.error("serverInfo is corrupted"); 
+	async function searchServer(serverId) {
+		let serverInfo = await getServer(serverId)
+		if (serverInfo === null){
+			console.error("serverInfo not found");
 			return
 		}
 		let client = createClient(serverInfo.url, serverInfo.username, serverInfo.password)
 		createClient.setFetchMethod(window.fetch);
 
+		/** 
+		 * returns Object:[]DirInfo
+		*/
 		let bfs = async function() {
 			let queue = [ '/' ]
-			let foundFiles = []
+			let foundDirectories = []
 
 			while (queue.length) {
 				let path = queue.shift()
@@ -92,39 +129,79 @@ function WebdavFileManager(settings) {
 				if (path.split('/').length > SEARCH_DEPTH) 
 					break; // We've exceeded search depth
 				let contents = await client.getDirectoryContents(path)
+				let foundKDBXInDir = false
 				contents.forEach(item => {
 					if (item.type === 'directory')
 						queue.push(item.filename)
-					else if (item.filename.indexOf('.kdbx') >= 1)
-						foundFiles.push({
-							path: item.filename,
-							title: item.filename,
+					else if (item.filename.indexOf('.kdbx') >= 1 && !foundKDBXInDir){
+						foundDirectories.push({
+							path: path, // the parent.
 							serverId: serverInfo.serverId
-						})						
+						})
+						foundKDBXInDir = true
+					}
 				})
 			}
 
-			return foundFiles
+			return foundDirectories
 		}
 
-		return bfs()
+		let bfsPromise = bfs()
+		let dirMapPromise = settings.getSetWebdavDirectoryMap()
+		return Promise.all([bfsPromise, dirMapPromise]).then(resolves => {
+			let foundDirectories = resolves[0]
+			let dirMap = resolves[1]
+			dirMap[serverInfo.serverId] = foundDirectories
+			return settings.getSetWebdavDirectoryMap(dirMap)
+		})	
 	}
 
 	//get the minimum information needed to identify this file for future retrieval
 	function getDatabaseChoiceData(dbInfo) {
 		return {
 			serverId: dbInfo.serverId,
+			title: dbInfo.title,
 			path: dbInfo.path
 		}
 	}
 
-	//given minimal file information, retrieve the actual file
+	/**
+	 * returns promise -> ArrayBuffer
+	 * @param {object:DBInfo} dbInfo 
+	 */
 	function getChosenDatabaseFile(dbInfo) {
-		getServer(dbInfo.serverId).then(serverInfo => {
+		return getServer(dbInfo.serverId).then(serverInfo => {
+			if (serverInfo === null)
+				throw 'Database no longer exists'
 			let client = createClient(serverInfo.url, serverInfo.username, serverInfo.password)
 			createClient.setFetchMethod(window.fetch)
-			return client.getFileContents(dbInfo.path).then(bin=> {
-				console.log(bin)
+			return client.getFileContents(dbInfo.path)
+		})
+	}
+
+	/**
+	 * Returns promise -> Object:[]DBInfo
+	 * @param {string} serverId 
+	 * @param {string} directory 
+	 */
+	function searchDirectory(serverId, directory) {
+		console.log('searchDirectory', directory)
+		return getServer(serverId).then(serverInfo => {
+			if (serverInfo === null)
+				return []
+			let client = createClient(serverInfo.url, serverInfo.username, serverInfo.password)
+			createClient.setFetchMethod(window.fetch);
+			return client.getDirectoryContents(directory).then(contents => {
+				// map from directory contents to DBInfo type.
+				return contents.filter(element => {
+					return element.filename.indexOf('.kdbx') >= 1
+				}).map(element => {
+					return {
+						title: element.basename,
+						path: element.filename,
+						serverId: serverId
+					}
+				})
 			})
 		})
 	}
@@ -177,6 +254,7 @@ function WebdavFileManager(settings) {
 	 */
 	function getServer(serverId) {
 		return listServers().then(serverList => {
+			console.log(serverList)
 			return serverList.filter((e, i, a) => {
 				return e.serverId === serverId
 			})
@@ -192,8 +270,19 @@ function WebdavFileManager(settings) {
 	 * @param {string} serverId 
 	 */
 	function removeServer(serverId) {
-		// TODO: implement
-		console.log("REMOVE " + serverId)
+		console.log(serverId)
+		return settings.getSetWebdavServerList().then(servers => {
+			for (var i = 0; i < servers.length; i++)
+				if (servers[i].serverId === serverId)
+					servers.splice(i, 1)
+			return settings.getSetWebdavServerList(servers)
+		}).then(() => {
+			// clean up DirMap
+			settings.getSetWebdavDirectoryMap().then(dirMap => {
+				delete dirMap[serverId]
+				return settings.getSetWebdavDirectoryMap(dirMap)
+			})
+		})
 	}
 
 	return exports;
