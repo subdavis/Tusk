@@ -147,7 +147,7 @@
 					},
 					{
 						time: -1,
-						text: "Until Chrome exits."
+						text: "Until browser exits."
 					}
 				],
 				slider_int: 0
@@ -255,7 +255,7 @@
 					this.unlockedMessages['error'] = "No matches found for this site."
 				}
 
-				// Cache in memory 
+				// Cache in memory
 				this.unlockedState.cacheSet('allEntries', allEntries)
 				this.unlockedState.cacheSet('priorityEntries', priorityEntries)
 				this.$forceUpdate()
@@ -294,7 +294,7 @@
 						if (this.rememberPeriod !== 0) {
 							let check_time = 60000 * this.rememberPeriod // milliseconds / min
 							// Save the password in memory independently.
-							this.settings.cacheMasterPassword(passwordKey, { 
+							this.settings.cacheMasterPassword(passwordKey, {
 								forgetTime: check_time > 0 ? Date.now() + check_time : check_time
 							})
 						} else {

@@ -15,10 +15,10 @@ function LocalChromePasswordFileManager() {
 		saveDatabase: saveDatabase,
 		deleteDatabase: deleteDatabase,
 		supportedFeatures: ['ingognito', 'listDatabases', 'saveDatabase', 'deleteDatabase'],
-		title: 'Chrome Storage',
+		title: 'Local Storage',
 		icon: 'icon-upload',
 		chooseTitle: 'File System',
-		chooseDescription: 'Upload files from your local or remote file-system.  A one-time copy of the file(s) will be saved in Chrome local storage.  If you update the database on your local system then you will have to re-upload it in order to see the changes.',
+		chooseDescription: 'Upload files from your local or remote file-system.  A one-time copy of the file(s) will be saved in your browser\'s local storage.  If you update the database on your local system then you will have to re-upload it in order to see the changes.',
 		login: enable,
 		logout: disable,
 		isLoggedIn: isEnabled
