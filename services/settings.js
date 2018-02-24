@@ -282,6 +282,10 @@ function Settings(secureCache) {
 		return keyGetSetter('webdavServers', serverList, [], 'object')
 	}
 
+	exports.getSetWebdavDirectoryMap = function(dirMap) {
+		return keyGetSetter('webdavDirectoryMap', dirMap, {}, 'object')
+	}
+
 	return exports;
 }
 

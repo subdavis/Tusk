@@ -13,22 +13,29 @@
 			:toggle-login="toggleLogin" 
 			:removeable="false"></generic-provider-ui>
 		<div class="top-padding" v-if="loggedIn">
-			<table>
+			<table v-if="serverList.length">
 				<tr>
 					<th>Server List:</th>
 				</tr>
 				<tr v-for="(server, index) in serverList">
 					<td>{{server.username}}</td>
 					<td>{{server.url}}</td>
-					<td><a @click="scan">re-scan</a></td>
-					<td><a @click="remove(server.serverId)">remove</a></td>
+					<td>
+						<a v-show="!server.scanBusy" class="selectable" @click="scan(server.serverId)">
+						<i class="fa fa-search"></i> scan</a>
+						<a v-show="server.scanBusy"><i class="fa fa-spinner fa-pulse"></i></a>
+					</td>
+					<td>
+						<a class="selectable" @click="remove(server.serverId)">
+						<i class="fa fa-times-circle selectable"></i> remove</a>
+					</td>
 				</tr>
 			</table>
 			<div class="url-form shared-link-box" v-if="loggedIn">
 				
 				<input id="webdav-server" type="text" v-model="webdav.url" placeholder="http://server:port/remote.php/webdav/">
 				<input id="webdav-username" type="text" v-model="webdav.username" placeholder="Username">
-				<input id="webdav-password" type="text" v-model="webdav.password" placeholder="Password">
+				<input id="webdav-password" type="password" v-model="webdav.password" placeholder="Password">
 				<a class="waves-effect waves-light btn" @click="addServer">Add server</a>
 			</div>
 		</div>
@@ -55,7 +62,8 @@
 					url:"",
 					password:""
 				},
-				serverList: []
+				serverList: [],
+				serverListMeta: {}
 			}
 		},
 		components: {
@@ -82,18 +90,30 @@
 					this.messages.error = err.toString()
 				})
 			},
-			scan() {
-				this.providerManager.listDatabases().then(databases => {
-					this.databases = databases
+			scan(serverId) {
+				let serverListItem = this.serverList.filter(elem => {
+					return elem.serverId === serverId
+				})[0]
+				serverListItem.scanBusy = true
+
+				this.providerManager.searchServer(serverId).then(dirMap => {
+					this.providerManager.listDatabases().then(databases => {
+						this.databases = databases
+					})
+				}).then(() => {
+					serverListItem.scanBusy = false
+				}).catch(err => {
+					this.messages.error = err.toString()
+					serverListItem.scanBusy = false
 				})
 			},
 			remove(serverId) {
-				this.providerManager.removeServer(serverId)
+				this.providerManager.removeServer(serverId).then(this.updateServerList)
 			},
 			updateServerList () {
 				this.providerManager.listServers().then(servers => {
-					this.serverList = servers
 					console.log(servers)
+					this.serverList = servers
 				})
 			},
 			toggleLogin() {
@@ -111,7 +131,9 @@
 			},
 			onLogin() {
 				/* Other things to do when a successful login happens... */
-				this.scan()
+				this.providerManager.listDatabases().then(databases => {
+					this.databases = databases
+				})
 				this.updateServerList()
 			}
 		},
@@ -128,10 +150,24 @@
 	@import "../styles/settings.scss";
 
 	input#webdav-server {
-		width: 45%;
+		width: 55%;
 	}
 
 	.top-padding {
 		padding: 20px 0px;
+	}
+
+	table {
+		font-size: 14px;
+		td {
+			padding: 5px 5px;
+			border-radius: 0px;
+		}
+		th {
+			background-color: $light-background-color;
+		} 
+		tr {
+			background-color: $background-color;
+		}
 	}
 </style>
