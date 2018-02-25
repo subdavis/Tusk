@@ -46,7 +46,7 @@ function WebdavFileManager(settings) {
 		supportedFeatures: ['ingognito', 'listDatabases'],
 		title: 'WebDAV (beta)',
 		icon: 'icon-folder',
-		chooseTitle: 'WebDAV',
+		chooseTitle: 'WebDAV (beta)',
 		chooseDescription: 'Choose a database from any WebDAV file server.  Tusk will always keep your database in sync with the server and automatically pull new versions.  WARNING: If you require username/password to use webdav, Tusk will store them unencrypted on disk.',
 		login: enable,
 		logout: disable,

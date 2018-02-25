@@ -13,6 +13,9 @@
 			:toggle-login="toggleLogin" 
 			:removeable="false"></generic-provider-ui>
 		<div class="top-padding" v-if="loggedIn">
+			<div class="warning-box">
+				<p>Wait! Stop!  Did you read the <a href="https://github.com/subdavis/Tusk/wiki/WebDAV-Support">best practices guide</a>?  Do that first!</p>
+			</div>
 			<table v-if="serverList.length">
 				<tr>
 					<th>Server List:</th>
@@ -32,7 +35,6 @@
 				</tr>
 			</table>
 			<div class="url-form shared-link-box" v-if="loggedIn">
-				
 				<input id="webdav-server" type="text" v-model="webdav.url" placeholder="http://server:port/remote.php/webdav/">
 				<input id="webdav-username" type="text" v-model="webdav.username" placeholder="Username">
 				<input id="webdav-password" type="password" v-model="webdav.password" placeholder="Password">
@@ -122,11 +124,7 @@
 					this.providerManager.logout().then(() => {
 						this.loggedIn = false
 					})
-<<<<<<< HEAD
 				} else if (confirm("WebDAV is a beta feature. If you use it, the username and password to the webdav SERVER will be stored on disk.  \n\nTusk will never store you master database password.  \n\nSelect OK to continue.")) {
-=======
-				} else {
->>>>>>> 87388cd7802ede66d5e87d614d12ba62b989bd58
 					this.providerManager.login().then(() => {
 						this.loggedIn = true
 						this.onLogin()
@@ -173,5 +171,12 @@
 		tr {
 			background-color: $background-color;
 		}
+	}
+
+	.warning-box {
+		p {
+			margin: 4px;
+		}
+		border: 3px solid red;
 	}
 </style>
