@@ -25,7 +25,7 @@
 	"browser_action": {
 		"default_icon": "dist/logo_38.png",
 		"default_popup": "popup.html",
-    "default_title": "KeePass Tusk"
+    	"default_title": "KeePass Tusk"
 	},
 	"options_ui": {
 		"page": "options.html",
@@ -40,7 +40,8 @@
 				"chromeos": "Ctrl+Shift+Space",
 				"linux": "Ctrl+Shift+Space",
 				"default": "Ctrl+Shift+Space"
-			}
+			},
+			"global": true
 		}
 	},
 	"permissions": [

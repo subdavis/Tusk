@@ -15,6 +15,7 @@
 		<oauth-provider :provider-manager="onedriveManager" :settings="settings"></oauth-provider>
 		<oauth-provider :provider-manager="sampleManager" :settings="settings"></oauth-provider>
 		<shared-link-provider :provider-manager="sharedUrlManager" :settings="settings"></shared-link-provider>
+		<webdav-provider :provider-manager="webdavManager" :settings="settings"></webdav-provider>
 		<local-password-file-provider :provider-manager="localFileManager" :settings="settings"></local-password-file-provider>
 	</div>
 </template>
@@ -23,6 +24,7 @@
 	import OauthProvider from '@/components/OauthProvider'
 	import SharedLinkProvider from '@/components/SharedLinkProvider'
 	import LocalPasswordFileProvider from '@/components/LocalPasswordFileProvider'
+	import WebdavProvider from '@/components/WebdavProvider'
 	import VirtualRouter from '$lib/virtual-router.js'
 
 	export default {
@@ -32,13 +34,15 @@
 			localFileManager: Object,
 			onedriveManager: Object,
 			sampleManager: Object,
+			webdavManager: Object,
 			sharedUrlManager: Object,
 			settings: Object,
 		},
 		components: {
 			OauthProvider,
 			SharedLinkProvider,
-			LocalPasswordFileProvider
+			LocalPasswordFileProvider,
+			WebdavProvider
 		},
 		data() {
 			return {

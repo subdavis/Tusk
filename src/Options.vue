@@ -14,6 +14,7 @@
 					:onedrive-manager="services.oneDriveFileManager" 
 					:sample-manager="services.sampleDatabaseFileManager" 
 					:shared-url-manager="services.sharedUrlFileManager" 
+					:webdav-manager="services.webdavFileManager"
 					:settings="services.settings"></manage-databases>
 				<manage-keyfiles id="/manage/keyfiles" v-if="show.manageKeyfiles.visible" 
 					:settings="services.settings" 
@@ -45,6 +46,7 @@
 	import {OneDriveFileManager} from '$services/oneDriveFileManager.js'
 	import {SharedUrlFileManager} from '$services/sharedUrlFileManager.js'
 	import {SampleDatabaseFileManager} from '$services/sampleDatabaseFileManager.js'
+	import {WebdavFileManager} from '$services/webdavFileManager.js'
 	// Components
 	import OptionsNavbar from '@/components/Navbar'
 	import OptionsStartup from '@/components/OptionsStartup'
@@ -66,6 +68,7 @@
 	const sharedUrlFileManager = new SharedUrlFileManager()
 	const oneDriveFileManager = new OneDriveFileManager(settings)
 	const sampleDatabaseFileManager = new SampleDatabaseFileManager()
+	const webdavFileManager = new WebdavFileManager(settings)
 
 	const passwordFileStoreRegistry = new PasswordFileStoreRegistry(
 		localChromePasswordFileManager, 
@@ -100,7 +103,8 @@
 					sampleDatabaseFileManager,
 					sharedUrlFileManager,
 					keyFileParser,
-					secureCacheMemory
+					secureCacheMemory,
+					webdavFileManager
 				},
 				show: {
 					startup: {
