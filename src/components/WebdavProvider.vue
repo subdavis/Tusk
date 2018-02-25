@@ -114,7 +114,6 @@
 			},
 			updateServerList () {
 				this.providerManager.listServers().then(servers => {
-					console.log(servers)
 					this.serverList = servers
 				})
 			},

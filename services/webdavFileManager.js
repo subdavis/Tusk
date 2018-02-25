@@ -84,7 +84,6 @@ function WebdavFileManager(settings) {
 				return Promise.resolve([])
 			return settings.getSetWebdavDirectoryMap().then(dirMap => {
 				let promises = []
-				console.log(dirMap)
 				// For each server, for each directory in the server.
 				for (let serverId in dirMap)
 					dirMap[serverId].forEach(dirInfo => {
@@ -185,7 +184,6 @@ function WebdavFileManager(settings) {
 	 * @param {string} directory 
 	 */
 	function searchDirectory(serverId, directory) {
-		console.log('searchDirectory', directory)
 		return getServer(serverId).then(serverInfo => {
 			if (serverInfo === null)
 				return []
@@ -254,7 +252,6 @@ function WebdavFileManager(settings) {
 	 */
 	function getServer(serverId) {
 		return listServers().then(serverList => {
-			console.log(serverList)
 			return serverList.filter((e, i, a) => {
 				return e.serverId === serverId
 			})
@@ -270,7 +267,6 @@ function WebdavFileManager(settings) {
 	 * @param {string} serverId 
 	 */
 	function removeServer(serverId) {
-		console.log(serverId)
 		return settings.getSetWebdavServerList().then(servers => {
 			for (var i = 0; i < servers.length; i++)
 				if (servers[i].serverId === serverId)
