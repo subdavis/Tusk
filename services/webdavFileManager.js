@@ -232,7 +232,7 @@ function WebdavFileManager(settings) {
 					serverInfo['serverId'] = newId
 					serverList.push(serverInfo)
 					return settings.getSetWebdavServerList(serverList).then(() => {
-						return newId
+						return serverInfo
 					})
 				}
 			})

@@ -26,7 +26,7 @@
 					<td>
 						<a v-show="!server.scanBusy" class="selectable" @click="scan(server.serverId)">
 						<i class="fa fa-search"></i> scan</a>
-						<a v-show="server.scanBusy"><i class="fa fa-spinner fa-pulse"></i></a>
+						<a v-show="server.scanBusy"><i class="fa fa-spinner fa-pulse"></i> scanning</a>
 					</td>
 					<td>
 						<a class="selectable" @click="remove(server.serverId)">
@@ -80,9 +80,11 @@
 				chromePromise.permissions.request({
 					origins: [this.webdav.url] //FLAGHERE TODO
 				}).then(() => {
-					this.providerManager.addServer(this.webdav.url, this.webdav.username, this.webdav.password).then(success => {
+					this.providerManager.addServer(this.webdav.url, this.webdav.username, this.webdav.password).then(serverInfo => {
 						// do somethings
-						this.updateServerList()
+						return this.updateServerList().then(() => {
+							this.scan(serverInfo.serverId)
+						})
 					}).catch(err => {
 						console.error(err)
 						this.messages.error = err.toString()
@@ -92,28 +94,30 @@
 					this.messages.error = err.toString()
 				})
 			},
-			scan(serverId) {
+			setBusy(serverId, busy){
 				let serverListItem = this.serverList.filter(elem => {
 					return elem.serverId === serverId
 				})[0]
-				serverListItem.scanBusy = true
-
-				this.providerManager.searchServer(serverId).then(dirMap => {
+				serverListItem.scanBusy = busy
+			},
+			scan(serverId) {
+				this.setBusy(serverId, true)
+				return this.providerManager.searchServer(serverId).then(dirMap => {
 					this.providerManager.listDatabases().then(databases => {
 						this.databases = databases
 					})
-				}).then(() => {
-					serverListItem.scanBusy = false
 				}).catch(err => {
 					this.messages.error = err.toString()
-					serverListItem.scanBusy = false
+				}).then(() => {
+					// READ: finally.
+					this.setBusy(serverId, false)
 				})
 			},
 			remove(serverId) {
-				this.providerManager.removeServer(serverId).then(this.updateServerList)
+				return this.providerManager.removeServer(serverId).then(this.updateServerList)
 			},
 			updateServerList () {
-				this.providerManager.listServers().then(servers => {
+				return this.providerManager.listServers().then(servers => {
 					this.serverList = servers
 				})
 			},
