@@ -62,6 +62,20 @@ In chrome, these permissions requests are __always__ promted to the user upon fi
 
 Because of Firefox's implementation of `browser.permissions`, it was necessary to request all permissions at install time to avoid code rot.  A deeper explanation of the firefox permissions can be found [on stackoverflow](https://stackoverflow.com/questions/47723297/firefox-extension-api-permissions-request-may-only-be-called-from-a-user-input)
 
-## Looking for CKPX?
+## FAQ
 
-You found it!  CKPX has been rebranded as Tusk to mark its Firefox release.  The C in CKPX stood for 'Chrome'.
+> Why is it called Tusk?!
+
+I originally wanted to call it *Elephant*, as in *An elephant never forgets.*  I tried this name on a couple of friends and they were unimpressed. I wanted to find a name that was more concise but keep the elephant imagery.  Ergo, tusk.
+
+> What happened to CKPX?
+
+This is it! CKPX has been rebranded as Tusk to mark its Firefox release.  The C in CKPX stood for 'Chrome'.
+
+> Can I donate money?
+
+I don't want your money.  Take whatever you would have given me and find a local charity.  None of this multinational wounded-warrior-project-farse nonsense either.  Find a local food bank or a women's shelter or an animal shelter.  Enjoy your free software. 
+
+> Can I support Tusk?
+
+If you <3 Tusk, please consider leaving a positive review on [the Firefox Add-on store](https://addons.mozilla.org/en-GB/firefox/addon/keepass-tusk/) or [the Chrome webstore](https://chrome.google.com/webstore/detail/fmhmiaejopepamlcjkncpgpdjichnecm) - I'll be eternally grateful.
