@@ -9,16 +9,20 @@
 
 **Chrome:** https://chrome.google.com/webstore/detail/fmhmiaejopepamlcjkncpgpdjichnecm
 
-#### User Guide + Other Docs
+## User Guide
 
-* Wiki https://github.com/subdavis/Tusk/wiki
-* Website https://subdavis.com/Tusk
+This section provides how-to instructions for various features of Tusk.
 
-## Tusk Custom Fields
+* [WebDAV Support](https://github.com/subdavis/Tusk/wiki/WebDAV-Support) - Support for WebDAV file servers.
+* [Custom Fields](https://github.com/subdavis/Tusk/wiki/Custom-Fields) - list of custom fields that Tusk supports.
+* [Warnings and Errors](https://github.com/subdavis/Tusk/wiki/Warnings-and-Errors) - An explanation of the messages you may encounter.
 
-The following custom fields in a keepass entry are supported and affect the behavior of Tusk.
+#### How it works: Implementation Details
 
-* `TUSK_URLS`: a comma separated list of URLs or hostnames to which the entry should always match.  For example, active directory login credentials that must match several sites.  e.g. `my.login.domain.com,https://github.com,foobar.net`
+This section provides in-depth information about how tusk works under the hood.  We aim to provide better transparency and give users peace-of-mind.  Tusk may not be perfect, but it's better than proprietary black-box applications that hide design flaws from the community.
+
+* [Credential Cache Memory](https://github.com/subdavis/Tusk/wiki/Credential-Cache-Memory) - How Tusk can optionally keep your master password cached.
+* [Sensitive Data](https://github.com/subdavis/Tusk/wiki/Sensitive-Data) - How Tusk handles sensitive data like KeePass databases and keyfiles.
 
 ## Build Setup
 
