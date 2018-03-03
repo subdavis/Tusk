@@ -7,7 +7,7 @@
   "private": true,
   "scripts": {
     "prebuild": "npm run clean",
-    "build": "cross-env NODE_ENV=production webpack --progress --hide-modules",
+    "build": "cross-env NODE_ENV=production webpack --progress --hide-modules --profile --json > profile.json",
     "build-tests": "cross-env NODE_ENV=test webpack --config webpack.test.config.js --progress",
     "bundle": "./packer.sh chrome && ./packer.sh firefox",
     "clean": "rm -rf dist/ *.zip manifest.json demo*",
