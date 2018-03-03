@@ -11,8 +11,8 @@ module.exports = {
         'inject': './background/inject.js'
     },
     output: {
-        publicPath: '/dist/',
-        path: path.resolve(__dirname, './dist'),
+        publicPath: '/build/',
+        path: path.resolve(__dirname, './build'),
         filename: '[name].build.js'
     },
     module: {
@@ -54,27 +54,9 @@ module.exports = {
         }, {
             test: /\.js$/,
             loader: 'babel-loader',
-            exclude: /node_modules/
+            include: [ path.join(__dirname, './src'), path.join(__dirname, './lib'), path.join(__dirname, './services'), path.join(__dirname, './background') ],
         }, {
             test: /\.wasm$/,
-            loader: 'file-loader',
-            options: {
-                name: '[name].[ext]'
-            }
-        }, {
-            test: /\.html$/,
-            loader: 'file-loader',
-            options: {
-                name: '[name].[ext]'.replace('_page', '')
-            }
-        }, {
-            test: /manifest\.json$/,
-            loader: 'file-loader',
-            options: {
-                name: 'manifest.json'
-            }
-        }, {
-            test: /\.(png|jpg|gif|svg|kdbx)$/,
             loader: 'file-loader',
             options: {
                 name: '[name].[ext]'
@@ -116,7 +98,7 @@ module.exports = {
             }
         }),
     ],
-    devtool: '#source-map'
+    devtool: "#cheap-module-eval-source-map"
 }
 
 if (process.env.NODE_ENV === 'production') {
@@ -128,9 +110,9 @@ if (process.env.NODE_ENV === 'production') {
                 NODE_ENV: '"production"'
             }
         }),
-        new UglifyJSPlugin({
-            sourceMap: true
-        }),
+        // new UglifyJSPlugin({
+        //     sourceMap: true
+        // }),
         new webpack.LoaderOptionsPlugin({
             minimize: true
         })
