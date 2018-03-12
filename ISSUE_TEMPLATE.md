@@ -17,10 +17,10 @@
   explain what steps you took and how to reproduce your issue.
 -->
 
-eg. "I cannot use files kept in Mega.co.nz"
+EXAMPLE: "I cannot use files kept in Mega.co.nz"
 
 ### Please describe how you think it should change.
 
-eg. "Please consider adding Mega.co.nz support for Tusk"
+EXAMPLE: "Please consider adding Mega.co.nz support for Tusk"
 
 ### Anything else?
