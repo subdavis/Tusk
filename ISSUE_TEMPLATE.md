@@ -11,6 +11,12 @@
 
 ### Please describe the current behavior, and explain why it's bad.
 
+<!-- 
+  First, read https://github.com/subdavis/Tusk/wiki/Troubleshooting 
+  If you have an issue covered in the troubleshooting guide, please
+  explain what steps you took and how to reproduce your issue.
+-->
+
 eg. "I cannot use files kept in Mega.co.nz"
 
 ### Please describe how you think it should change.
