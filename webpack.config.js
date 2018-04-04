@@ -98,6 +98,8 @@ module.exports = {
             }
         }),
         new webpack.DllReferencePlugin({
+            context: path.join(__dirname, 'dll'),
+            name: './dll.vendor.js',
             manifest: require("./dll/vendor-manifest.json")
         }),
     ],
