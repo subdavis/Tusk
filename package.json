@@ -11,7 +11,7 @@
     "build-tests": "cross-env NODE_ENV=test webpack --config webpack.test.config.js --progress",
     "build-dll": "cross-env NODE_ENV=dll webpack --config webpack.dll.js --progress",
     "bundle": "./packer.sh chrome && ./packer.sh firefox",
-    "clean": "rm -rf dist/ *.zip manifest.json demo*",
+    "clean": "rm -rf build/ *.zip manifest.json demo*",
     "watch": "gulp watch",
     "watch-tests": "gulp watchtests"
   },
