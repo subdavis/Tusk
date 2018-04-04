@@ -97,6 +97,9 @@ module.exports = {
                 return getPath('css/[name].css').replace('css', 'css');
             }
         }),
+        new webpack.DllReferencePlugin({
+            manifest: require("./dll/vendor-manifest.json")
+        }),
     ],
     devtool: "#cheap-module-eval-source-map"
 }

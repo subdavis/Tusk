@@ -36,6 +36,9 @@ Tusk requires:
 # install dependencies
 yarn install
 
+# Build static DLL resources
+yarn build-dll
+
 # static reload with file watch
 yarn watch
 
