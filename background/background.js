@@ -52,7 +52,7 @@ function Background(protectedMemory, settings) {
 		if (message.m == "showMessage") {
 			chrome.notifications.create({
 				'type': 'basic',
-				'iconUrl': '/build/logo_48.png',
+				'iconUrl': '/assets/icons/logo_48.png',
 				'title': 'Tusk',
 				'message': message.text
 			}, function(notificationId) {
@@ -157,7 +157,7 @@ function Background(protectedMemory, settings) {
 							clearClipboard();
 							chrome.notifications.create({
 								'type': 'basic',
-								'iconUrl': 'build/logo_48.png',
+								'iconUrl': '/assets/icons/logo_48.png',
 								'title': 'Tusk',
 								'message': 'Clipboard cleared'
 							}, function(notificationId) {
@@ -171,7 +171,7 @@ function Background(protectedMemory, settings) {
 								forgetPassword().then(function() {
 									chrome.notifications.create({
 										'type': 'basic',
-										'iconUrl': 'build/logo_48.png',
+										'iconUrl': '/assets/icons/logo_48.png',
 										'title': 'Tusk',
 										'message': 'Remembered password expired'
 									}, function(notificationId) {

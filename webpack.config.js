@@ -98,9 +98,8 @@ module.exports = {
             }
         }),
         new webpack.DllReferencePlugin({
-            context: path.join(__dirname, 'dll'),
-            name: './dll.vendor.js',
-            manifest: require("./dll/vendor-manifest.json")
+            context: __dirname,
+            manifest: require('./dll/library-manifest.json')
         }),
     ],
     devtool: "#cheap-module-eval-source-map"

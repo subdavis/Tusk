@@ -2,11 +2,30 @@ var path = require("path");
 var webpack = require("webpack");
 
 module.exports = {
+    context: process.cwd(),
+    resolve: {
+        extensions: ['.js', '.jsx', '.json', '.less', '.css'],
+        modules: [__dirname, 'node_modules']
+     },
     entry: {
-        vendor: [path.join(__dirname, "src", "vendor.js")]
+        library: [
+            "axios",
+            "babel-regenerator-runtime",
+            "base64-arraybuffer",
+            "case",
+            "jquery",
+            "json-formatter-js",
+            "kdbxweb",
+            "materialize-css",
+            "pako",
+            "vue",
+            "vue-simple-spinner",
+            "webdav-client",
+            "xmldom",
+        ]
     },
     output: {
-        path: path.join(__dirname, "build", "dll"),
+        path: path.join(__dirname, "dll"),
         filename: "dll.[name].js",
         library: "[name]"
     },
@@ -14,7 +33,6 @@ module.exports = {
         new webpack.DllPlugin({
             path: path.join(__dirname, "dll", "[name]-manifest.json"),
             name: "[name]",
-            context: path.resolve(__dirname)
         }),
         new webpack.optimize.UglifyJsPlugin()
     ]
