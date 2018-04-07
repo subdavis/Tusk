@@ -50,6 +50,9 @@
 		},
 		"gdrive": {
 			"client_id": "876467817034-rlas0hnb5jc9dt1qmp11l6g4724ktoqn.apps.googleusercontent.com"
+		},
+		"pcloud": {
+			"client_id": "GninEWCc4jX"
 		}
 	},
 	"permissions": [
