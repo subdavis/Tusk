@@ -1,5 +1,5 @@
 {
-	"name": "KeePass Tusk - A better password manager",
+	"name": "KeePass Tusk - Password Access and Autofill",
 	"short_name": "KeePass Tusk",
 	"version": "2018.2.17",
 	"manifest_version": 2,
@@ -18,6 +18,7 @@
 	"key":"MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAhoF/A6nYIxSHW2AekTQRJga9QodwEJBTeAA5r0tW9djrTHY3Ei0FdnUE1FrH2Hx03tsj4RjXMWDHtsqMg4REJdFNzndsRKWvliGomXtxE8XByawJf/NGx0/imAtVBrHc846D/Bn4q1dRaRauqkPMKgpcHoPeg+uLTBIfAn5qPgLlvLLqNSKRg6zGYkm0iBYFiyLd1cqWjsDrVhant90W5rE7qmGQPXZudkc2ejtijuMJL4CF9BeQXOVv/9a0XzAwNbArSr+zHnNOicZPyeEnT7mujFDvLRzXvi7OPW+8mdEsm3AeagKZ6bGUuqyzwxs8XlysWqJsXBoX6tjZCGGVpQIDAQAB",
 	"background": {
 		"scripts": [
+			"dll/dll.library.js",
 			"build/background.build.js"
 		]
 	},

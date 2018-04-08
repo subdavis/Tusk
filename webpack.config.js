@@ -102,7 +102,7 @@ module.exports = {
             manifest: require('./dll/library-manifest.json')
         }),
     ],
-    devtool: "#cheap-module-eval-source-map"
+    devtool: undefined
 }
 
 if (process.env.NODE_ENV === 'production') {

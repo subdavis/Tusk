@@ -21,7 +21,6 @@
     "base64-arraybuffer": "^0.1.5",
     "case": "^1.5.4",
     "font-awesome": "^4.7.0",
-    "jquery": "^3.2.1",
     "json-formatter-js": "^2.2.0",
     "kdbxweb": "^1.1.0",
     "keeweb": "https://github.com/keeweb/keeweb",

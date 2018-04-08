@@ -13,7 +13,6 @@ module.exports = {
             "babel-regenerator-runtime",
             "base64-arraybuffer",
             "case",
-            "jquery",
             "json-formatter-js",
             "kdbxweb",
             "materialize-css",
