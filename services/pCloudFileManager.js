@@ -16,7 +16,6 @@ function PCloudFileManager(settings) {
     var state = {
         loggedIn: false
     }
-    console.info("Init pCloud")
 
     var oauth = {
         key: accessTokenType,
@@ -31,7 +30,6 @@ function PCloudFileManager(settings) {
     };
 
     oauth.searchRequestFunction = function(token) {
-        console.info("searchRequestFunction " + token)
         return axios({
             method: 'GET',
             url: 'https://api.pcloud.com/listfolder',
@@ -50,7 +48,6 @@ function PCloudFileManager(settings) {
     }
 
     oauth.searchRequestHandler = function(response) {
-        console.info("searchRequestHandler")
 
         var walk = function(files, contents, path) {
             contents.forEach( (file) => {
@@ -78,7 +75,6 @@ function PCloudFileManager(settings) {
 
     //get the minimum information needed to identify this file for future retrieval
     oauth.getDatabaseChoiceData = function(dbInfo) {
-        console.info("getDatabaseChoiceData", dbInfo)
         return {
             title: dbInfo.title,
             id: dbInfo.id
@@ -87,9 +83,6 @@ function PCloudFileManager(settings) {
 
     //given minimal file information, retrieve the actual file
     oauth.fileRequestFunction = function(dbInfo, token) {
-        console.info("fileRequestFunction " + JSON.stringify(dbInfo))
-        console.info("id " + dbInfo.id)
-        console.info("token " + token)
         return axios({
             method: 'GET',
             url: 'https://api.pcloud.com/getfilelink',
@@ -100,7 +93,6 @@ function PCloudFileManager(settings) {
                 'Authorization': 'Bearer ' + token,
             },
         }).then(function(response) {
-            console.info("fileRequestFunction " + JSON.stringify(response))
             var url = `https://${response.data.hosts[0]}${response.data.path}`
             return axios({
                 method: 'GET',
@@ -111,12 +103,10 @@ function PCloudFileManager(settings) {
     }
 
     oauth.revokeAuth = function() {
-        console.info("RevokeAuth")
         return Promise.resolve()
     }
 
     oauth.handleAuthRedirectURI = function(redirect_url, randomState, resolve, reject) {
-        console.info("redirect_url " + redirect_url)
         function parseAuthInfoFromUrl(url) {
             var hash = /#(.+)$/.exec(url);
             if (!hash) {
