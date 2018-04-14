@@ -94,7 +94,7 @@ function PCloudFileManager(settings) {
             method: 'GET',
             url: 'https://api.pcloud.com/getfilelink',
             params: {
-                fileid: dbInfo.id,
+                path: dbInfo.title,
             },
             headers: {
                 'Authorization': 'Bearer ' + token,
