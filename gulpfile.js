@@ -10,7 +10,7 @@ gulp.task('webpack', function() {
 				console.log(err);
 				this.emit('end');
 			}))
-		.pipe(gulp.dest('dist'));
+		.pipe(gulp.dest('build'));
 });
 
 gulp.task('webpacktests', function () {

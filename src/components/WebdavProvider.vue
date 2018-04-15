@@ -8,7 +8,7 @@
 			:busy="busy" 
 			:databases="databases" 
 			:loggedIn="loggedIn" 
-			:error="messages.error" 
+			:error="messages.error"
 			:provider-manager="providerManager" 
 			:toggle-login="toggleLogin" 
 			:removeable="false"></generic-provider-ui>

@@ -1,6 +1,6 @@
 "use strict";
 
-import axios from 'axios/dist/axios.min.js'
+const axios = require('axios')
 import {
 	ChromePromiseApi
 } from '$lib/chrome-api-promise.js'
@@ -57,7 +57,7 @@ function SampleDatabaseFileManager() {
 	function getChosenDatabaseFile(dbInfo) {
 		return axios({
 			method: 'GET',
-			url: chrome.extension.getURL('/dist/Sample123.kdbx'),
+			url: chrome.extension.getURL('/assets/Sample123.kdbx'),
 			responseType: 'arraybuffer'
 		}).then(function(response) {
 			return response.data;

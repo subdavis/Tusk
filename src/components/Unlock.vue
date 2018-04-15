@@ -19,7 +19,7 @@
 			</div>
 
 			<div class="unlockLogo stack-item">
-				<img src="../assets/logo.png">
+				<img src="assets/icons/logo.png">
 				<span>KeePass Tusk</span>
 			</div>
 
