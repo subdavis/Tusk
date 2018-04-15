@@ -75,10 +75,10 @@ var filler = (function() {
 		lonelyPasswords = [];
 		priorityPair = null;
 		var inputPattern = "input[type='text'], input[type='email'], input[type='password'], input:not([type])";
+		var inputList = Array.from(document.getElementsByTagName('INPUT'));
 
 		// Method 1 - based on focused field (the thing your cursor is in)
 		var activeElem = document.activeElement
-		var inputList = Array.from(document.getElementsByTagName('INPUT'));
 		var focusedIndex = inputList.indexOf(activeElem)
 		if (inputList.length && focusedIndex >= 0) {
 			var pair = {}, focusedPassword = false;
@@ -107,34 +107,33 @@ var filler = (function() {
 		}
 
 		// Methods 2 - based on types of fields and visibility
-		// var possibleUserName;
-		// var lastFieldWasPassword = false; //used to detect registration forms which have 2 password fields, one after the other
-		// $(inputPattern).each(function() {
-		// 	var field = $(this);
-		// 	if (isElementInViewport(field) && field.is(':visible')) {
-		// 		if (isPasswordField(field)) {
-		// 			if (possibleUserName) {
-		// 				userPasswordPairs.push({
-		// 					'u': possibleUserName,
-		// 					'p': field
-		// 				});
-		// 				possibleUserName = null;
-		// 				lastFieldWasPassword = true;
-		// 			} else if (lastFieldWasPassword) {
-		// 				//special case - two passwords in a row means it is a registration form, so remove last-added pair
-		// 				userPasswordPairs.pop();
-		// 				lastFieldWasPassword = false;
-		// 			} else {
-		// 				//special case = password by itself
-		// 				lonelyPasswords.push(field);
-		// 			}
-		// 		}
-		// 		else {
-		// 			possibleUserName = field;
-		// 			lastFieldWasPassword = false;
-		// 		}
-		// 	}
-		// });
+		var possibleUserName;
+		var lastFieldWasPassword = false; //used to detect registration forms which have 2 password fields, one after the other
+		inputList.forEach(field => {
+			if (isElementInViewport(field) && isVisible(field)) {
+				if (isPasswordField(field)) {
+					if (possibleUserName) {
+						userPasswordPairs.push({
+							'u': possibleUserName,
+							'p': field
+						});
+						possibleUserName = null;
+						lastFieldWasPassword = true;
+					} else if (lastFieldWasPassword) {
+						//special case - two passwords in a row means it is a registration form, so remove last-added pair
+						userPasswordPairs.pop();
+						lastFieldWasPassword = false;
+					} else {
+						//special case = password by itself
+						lonelyPasswords.push(field);
+					}
+				}
+				else {
+					possibleUserName = field;
+					lastFieldWasPassword = false;
+				}
+			}
+		});
 	}
 
 	function isPasswordField(field) {
@@ -164,9 +163,9 @@ var filler = (function() {
 			for (var i = 0; i < userPasswordPairs.length; i++) {
 				var pair = userPasswordPairs[i];
 				if (!filled && isElementInViewport(pair.u) && isElementInViewport(pair.p)
-				&& pair.p.is(":visible")) {
+				&& isVisible(pair.p)) {
 					filled = fillField(pair.p, password);
-					if (pair.u.is(":visible")) {
+					if (isVisible(pair.u)) {
 						//sometimes the username is invisible, i.e. google login
 						fillField(pair.u, username);
 					}
@@ -177,7 +176,7 @@ var filler = (function() {
 		if (!filled) {
 			for (var i=0; i<lonelyPasswords.length; i++) {
 				var lonelyPassword = lonelyPasswords[i];
-				if (!filled && isElementInViewport(lonelyPassword) && lonelyPassword.is(':visible')) {
+				if (!filled && isElementInViewport(lonelyPassword) && isVisible(lonelyPassword)) {
 					filled = fillField(lonelyPassword, password);
 				}
 			}
@@ -213,11 +212,6 @@ var filler = (function() {
 	 * function to determine if element is in the part of the screen on the monitor
 	 */
 	function isElementInViewport(el) {
-		//special bonus for those using jQuery
-		if (el instanceof $) {
-			el = el[0];
-		}
-
 		var rect = el.getBoundingClientRect();
 		return (
 			rect.top >= 0 && rect.left >= 0 && rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&  /*or $(window).height() */
