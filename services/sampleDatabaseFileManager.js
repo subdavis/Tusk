@@ -13,7 +13,7 @@ function SampleDatabaseFileManager() {
 		listDatabases: listDatabases,
 		getDatabaseChoiceData: getDatabaseChoiceData,
 		getChosenDatabaseFile: getChosenDatabaseFile,
-		supportedFeatures: ['ingognito', 'listDatabases'],
+		supportedFeatures: ['incognito', 'listDatabases'],
 		title: 'Sample',
 		permissions: [],
 		icon: 'icon-flask',

@@ -14,7 +14,7 @@ function LocalChromePasswordFileManager() {
 		getChosenDatabaseFile: getChosenDatabaseFile,
 		saveDatabase: saveDatabase,
 		deleteDatabase: deleteDatabase,
-		supportedFeatures: ['ingognito', 'listDatabases', 'saveDatabase', 'deleteDatabase'],
+		supportedFeatures: ['incognito', 'listDatabases', 'saveDatabase', 'deleteDatabase'],
 		title: 'Local Storage',
 		icon: 'icon-upload',
 		chooseTitle: 'File System',

@@ -22,9 +22,9 @@ function PCloudFileManager(settings) {
         accessTokenType: accessTokenType,
         origins: ['https://*.pcloud.com/'],
         authUrl: 'https://my.pcloud.com/oauth2/authorize?response_type=token&force_reapprove=true',
-        supportedFeatures: ['ingognito', 'listDatabases'],
+        supportedFeatures: ['incognito', 'listDatabases'],
         title: 'pCloud',
-        icon: '',
+        icon: 'icon-pcloud',
         chooseTitle: 'pCloud',
         chooseDescription: 'Access password files stored on pCloud. Files will be retrieved from pCould each time they are used.',
     };
