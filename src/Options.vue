@@ -80,7 +80,7 @@
 		sharedUrlFileManager, 
 		sampleDatabaseFileManager, 
 		oneDriveFileManager,
-        pCloudFileManager)
+		pCloudFileManager)
 	/* beautify preserve:end */
 
 	export default {
@@ -104,7 +104,7 @@
 					googleDrivePasswordFileManager,
 					localChromePasswordFileManager,
 					oneDriveFileManager,
-                    pCloudFileManager,
+					pCloudFileManager,
 					sampleDatabaseFileManager,
 					sharedUrlFileManager,
 					keyFileParser,
