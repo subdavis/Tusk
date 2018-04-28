@@ -13,8 +13,9 @@
 
 <!-- 
   First, read https://github.com/subdavis/Tusk/wiki/Troubleshooting 
-  If you have an issue covered in the troubleshooting guide, please
-  explain what steps you took and how to reproduce your issue.
+  
+  If this issue is a bug, please explain what steps you took 
+  and how to reproduce your issue.
 -->
 
 EXAMPLE: "I cannot use files kept in Mega.co.nz"
