@@ -96,6 +96,10 @@ button.action-button {
   &.plain {
     border-bottom: 0px;
   }
+
+  &.nopad {
+    padding: 0px;
+  }
 }
 
 .unlockLogo {
