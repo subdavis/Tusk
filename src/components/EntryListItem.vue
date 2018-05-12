@@ -1,5 +1,5 @@
 <template>
-	<div class="entry-list-item selectable between flair" v-on:click="details">
+	<div class="entry-list-item selectable between flair" v-bind:class="{ active: entry.view_is_active }" v-on:click="details">
 		<div class="text-info" v-bind:class="{ strike: entry.is_expired }">
 			<span class="header">{{ header }}</span>
 			<br>
@@ -31,6 +31,17 @@
 				if (this.entry.title.length > 0)
 					return this.entry.title
 				return this.entry.url
+			}
+		},
+		watch: {
+			// When the element becomes active, scroll it into view.
+			entry: function(val) {
+				if (val.view_is_active){
+					this.$el.scrollIntoView({
+						block: "end", 
+						inline: "nearest", 
+						behavior: "smooth"});
+				}
 			}
 		},
 		methods: {
@@ -87,6 +98,10 @@
 		.copy:hover,
 		.autofill:hover {
 			opacity: .8;
+		}
+		&.active {
+			background-color: $highlighted;
+			padding-left: 20px;
 		}
 	}
 

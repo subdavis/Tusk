@@ -7,11 +7,17 @@
 		<messenger :messages="allMessages"></messenger>
 		<div class="entries">
 			<div v-if="priorityEntries && searchTerm.length == 0">
-				<entry-list-item v-for="entry in priorityEntries" :key="entry.id" :entry="entry" :unlocked-state="unlockedState">
+				<entry-list-item v-for="entry in priorityEntries" 
+					:key="entry.id" 
+					:entry="entry" 
+					:unlocked-state="unlockedState">
 				</entry-list-item>
 			</div>
-			<div v-if="filteredEntries && searchTerm.length">
-				<entry-list-item v-for="entry in filteredEntries" :key="entry.id" :entry="entry" :unlocked-state="unlockedState">
+			<div v-if="filteredEntries && searchTerm.length > 0">
+				<entry-list-item v-for="entry in filteredEntries" 
+					:key="entry.id" 
+					:entry="entry"
+					:unlocked-state="unlockedState">
 				</entry-list-item>
 			</div>
 		</div>
@@ -34,8 +40,10 @@
 					this.filteredEntries = this.allEntries.filter(entry => {
 						let result = entry.filterKey.indexOf(val.toLocaleLowerCase())
 						return (result > -1)
-					})
+					})	
 				}
+				// Regardless of result, reset the active entry.
+				this.setActive(0)
 			}
 		},
 		components: {
@@ -48,7 +56,21 @@
 				filteredEntries: this.unlockedState.cacheGet('allEntries'),
 				priorityEntries: this.unlockedState.cacheGet('priorityEntries'),
 				allEntries: this.unlockedState.cacheGet('allEntries'),
-				allMessages: this.messages
+				allMessages: this.messages,
+				activeEntry: null,
+				activeEntryIndex: 0,
+				keyHandler: evt => {
+					switch (evt.keyCode){
+					case 9: //TAB
+						this.setActive(this.activeEntryIndex + 1)
+						evt.preventDefault()
+						break
+					case 13: //ENTER
+						if (this.activeEntry !== null)
+							this.unlockedState.autofill(this.activeEntry)
+						break
+					}
+				}
 			}
 		},
 		methods: {
@@ -72,10 +94,28 @@
 					this.collectFilters(entry, filters)
 					entry.filterKey = filters.join(" ")
 				})
+			},
+			setActive(index) {
+				// Unset the current active entry
+				if (this.activeEntry !== null){
+					this.activeEntry.view_is_active = false
+				}
+				let activeList;
+				if (this.filteredEntries.length > 0 && this.searchTerm.length > 0)
+					activeList = this.filteredEntries
+				else if (this.priorityEntries.length > 0)
+					activeList = this.priorityEntries
+				else // Neither list has entries
+					return
+				
+				index = index % activeList.length
+				this.activeEntry = activeList[index]
+				this.$set(this.activeEntry, 'view_is_active', true)
+				this.activeEntryIndex = index
 			}
 		},
 		mounted() {
-			// Autofocus
+			// Autofocus searchbox
 			this.$nextTick(function() {
 				this.$refs.searchbox.focus();
 			})
@@ -87,6 +127,13 @@
 			let um = this.unlockedState.cacheGet('unlockedMessages')
 			if (um !== undefined)
 				this.allMessages = um
+			// Initialize the active entry
+			this.setActive(0)
+			// Listen for key events.
+			window.addEventListener("keydown", this.keyHandler)
+		},
+		beforeDestroy() {
+			window.removeEventListener("keydown", this.keyHandler)
 		}
 	}
 </script>
