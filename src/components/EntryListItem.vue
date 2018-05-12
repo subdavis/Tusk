@@ -1,5 +1,5 @@
 <template>
-	<div class="entry-list-item selectable between flair" v-bind:class="{ active: isActive }" v-on:click="details">
+	<div class="entry-list-item selectable between flair" v-bind:class="{ active: entry.view_is_active }" v-on:click="details">
 		<div class="text-info" v-bind:class="{ strike: entry.is_expired }">
 			<span class="header">{{ header }}</span>
 			<br>
@@ -24,7 +24,6 @@
 	export default {
 		props: {
 			entry: Object,
-			isActive: Boolean,
 			unlockedState: Object
 		},
 		computed: {
@@ -35,8 +34,14 @@
 			}
 		},
 		watch: {
-			entry: function(val){
-				console.log(val)
+			// When the element becomes active, scroll it into view.
+			entry: function(val) {
+				if (val.view_is_active){
+					this.$el.scrollIntoView({
+						block: "end", 
+						inline: "nearest", 
+						behavior: "smooth"});
+				}
 			}
 		},
 		methods: {

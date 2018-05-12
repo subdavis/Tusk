@@ -7,11 +7,17 @@
 		<messenger :messages="allMessages"></messenger>
 		<div class="entries">
 			<div v-if="priorityEntries && searchTerm.length == 0">
-				<entry-list-item v-for="entry in priorityEntries" :key="entry.id" :entry="entry" :is-active="entry.view_is_active" :unlocked-state="unlockedState">
+				<entry-list-item v-for="entry in priorityEntries" 
+					:key="entry.id" 
+					:entry="entry" 
+					:unlocked-state="unlockedState">
 				</entry-list-item>
 			</div>
 			<div v-if="filteredEntries && searchTerm.length > 0">
-				<entry-list-item v-for="entry in filteredEntries" :key="entry.id" :entry="entry" :is-active="entry.view_is_active" :unlocked-state="unlockedState">
+				<entry-list-item v-for="entry in filteredEntries" 
+					:key="entry.id" 
+					:entry="entry"
+					:unlocked-state="unlockedState">
 				</entry-list-item>
 			</div>
 		</div>
@@ -54,12 +60,15 @@
 				activeEntry: null,
 				activeEntryIndex: 0,
 				keyHandler: evt => {
-					console.log(evt)
-					var e = event || evt; // for trans-browser compatibility
-					var charCode = e.which || e.keyCode;
-
-					if (charCode === 9) { // TAB
+					switch (evt.keyCode){
+					case 9: //TAB
 						this.setActive(this.activeEntryIndex + 1)
+						evt.preventDefault()
+						break
+					case 13: //ENTER
+						if (this.activeEntry !== null)
+							this.unlockedState.autofill(this.activeEntry)
+						break
 					}
 				}
 			}
@@ -100,10 +109,9 @@
 					return
 				
 				index = index % activeList.length
-				console.log(activeList, index)
 				this.activeEntry = activeList[index]
 				this.$set(this.activeEntry, 'view_is_active', true)
-				this.activeEntryIndex = index	
+				this.activeEntryIndex = index
 			}
 		},
 		mounted() {
