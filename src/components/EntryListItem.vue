@@ -1,5 +1,5 @@
 <template>
-	<div class="entry-list-item selectable between flair" v-on:click="details">
+	<div class="entry-list-item selectable between flair" v-bind:class="{ active: isActive }" v-on:click="details">
 		<div class="text-info" v-bind:class="{ strike: entry.is_expired }">
 			<span class="header">{{ header }}</span>
 			<br>
@@ -24,6 +24,7 @@
 	export default {
 		props: {
 			entry: Object,
+			isActive: Boolean,
 			unlockedState: Object
 		},
 		computed: {
@@ -31,6 +32,11 @@
 				if (this.entry.title.length > 0)
 					return this.entry.title
 				return this.entry.url
+			}
+		},
+		watch: {
+			entry: function(val){
+				console.log(val)
 			}
 		},
 		methods: {
@@ -87,6 +93,10 @@
 		.copy:hover,
 		.autofill:hover {
 			opacity: .8;
+		}
+		&.active {
+			background-color: $highlighted;
+			padding-left: 20px;
 		}
 	}
 
