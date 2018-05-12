@@ -9,13 +9,13 @@
 		</div>
 		<div class="buttons">
 			<span class="fa-stack copy" v-on:click="copy">
-        <i class="fa fa-circle fa-stack-2x"></i>
-        <i class="fa fa-clipboard fa-stack-1x fa-inverse"></i>
-      </span>
+				<i class="fa fa-circle fa-stack-2x"></i>
+				<i class="fa fa-clipboard fa-stack-1x fa-inverse"></i>
+			</span>
 			<span class="fa-stack autofill" v-on:click="autofill">
-        <i class="fa fa-circle fa-stack-2x"></i>
-        <i class="fa fa-magic fa-stack-1x fa-inverse"></i>
-      </span>
+				<i class="fa fa-circle fa-stack-2x"></i>
+				<i class="fa fa-magic fa-stack-1x fa-inverse"></i>
+			</span>
 		</div>
 	</div>
 </template>
