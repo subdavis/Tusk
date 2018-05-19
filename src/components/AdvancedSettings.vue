@@ -16,6 +16,21 @@
 		</div>
 
 		<div class="box-bar roomy">
+			<h4>Enable Hotkey Navigation</h4>
+			<p>If enabled, you will be able to use [TAB] and [ENTER] to navigate and autofill your passwords when the tusk UI is open.  By default, [CTRL]+[SHIFT]+[SPACE] will open the Tusk popup</p>
+		</div>
+		<div class="box-bar roomy lighter">
+			<div>
+				<div class="switch">
+					<label>Enabled
+			      		<input type="checkbox" v-model="hotkeyNavEnabled">
+			      		<span class="lever"></span>
+			    	</label>
+				</div>
+			</div>
+		</div>
+
+		<div class="box-bar roomy">
 			<h4>Stored Data</h4>
 			<p>The following objects represent the current data cached in local storage. This data is only available to Tusk, and is never sent over any network connection.</p>
 		</div>
@@ -41,6 +56,7 @@
 			return {
 				busy: false,
 				expireTime: 2,
+				hotkeyNavEnabled: false,
 				jsonState: [{
 						k: 'databaseUsages',                    // key
 						f: this.settings.getSetDatabaseUsages,  // getter
@@ -105,32 +121,30 @@
 		watch: {
 			expireTime(newval, oldval) {
 				this.settings.getSetClipboardExpireInterval(parseInt(newval))
-			}
-		},
-		methods: {
-			triggerForgetStuffAlarm(event) {
-				this.secureCacheMemory.forgetStuff()
 			},
-			init() {
-				this.settings.getSetClipboardExpireInterval().then(val => {
-					this.expireTime = val;
-				})
-				this.jsonState.forEach(blob => {
-					blob.f().then(result => {
-						if (result && Object.keys(result).length) {
-							let formatter = new JSONFormatter(result)
-							let place = document.getElementById(blob.k)
-							while (place.firstChild) place.removeChild(place.firstChild);
-							place.appendChild(formatter.render())
-						} else {
-							document.getElementById(blob.k).parentNode.parentNode.remove()
-						}
-					})
-				})
+			hotkeyNavEnabled(newval, oldval) {
+				this.settings.getSetHotkeyNavEnabled(newval)
 			}
 		},
 		mounted() {
-			this.init()
+			this.settings.getSetClipboardExpireInterval().then(val => {
+				this.expireTime = val;
+			})
+			this.settings.getSetHotkeyNavEnabled().then(val => {
+				this.hotkeyNavEnabled = val;
+			})
+			this.jsonState.forEach(blob => {
+				blob.f().then(result => {
+					if (result && Object.keys(result).length) {
+						let formatter = new JSONFormatter(result)
+						let place = document.getElementById(blob.k)
+						while (place.firstChild) place.removeChild(place.firstChild);
+						place.appendChild(formatter.render())
+					} else {
+						document.getElementById(blob.k).parentNode.parentNode.remove()
+					}
+				})
+			})
 		}
 	}
 </script>

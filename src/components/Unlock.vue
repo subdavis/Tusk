@@ -6,7 +6,10 @@
 		</div>
 
 		<!-- Entry List -->
-		<entry-list v-if="!busy && isUnlocked()" :messages="unlockedMessages" :unlocked-state="unlockedState"></entry-list>
+		<entry-list v-if="!busy && isUnlocked()" 
+			:messages="unlockedMessages" 
+			:unlocked-state="unlockedState"
+			:settings="settings"></entry-list>
 
 		<!-- General Messenger -->
 		<messenger :messages="generalMessages" v-show="!busy"></messenger>

@@ -286,6 +286,10 @@ function Settings(secureCache) {
 		return keyGetSetter('webdavDirectoryMap', dirMap, {}, 'object')
 	}
 
+	exports.getSetHotkeyNavEnabled = function(enabled) {
+		return keyGetSetter('hotkeyNavEnabled', enabled, false, 'boolean')
+	}
+
 	return exports;
 }
 
