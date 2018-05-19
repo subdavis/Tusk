@@ -254,6 +254,7 @@ function Settings(secureCache) {
 			})
 		else
 			return chromePromise.storage.local.get(key).then(oldval => {
+				console.log(oldval);
 				if (oldval[key] !== undefined)
 					if (typeof(oldval[key]) === value_type)
 						return oldval[key]
@@ -284,6 +285,10 @@ function Settings(secureCache) {
 
 	exports.getSetWebdavDirectoryMap = function(dirMap) {
 		return keyGetSetter('webdavDirectoryMap', dirMap, {}, 'object')
+	}
+
+	exports.getSetHotkeyNavEnabled = function(enabled) {
+		return keyGetSetter('hotkeyNavEnabled', enabled, false, 'boolean')
 	}
 
 	return exports;

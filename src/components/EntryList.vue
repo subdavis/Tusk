@@ -30,6 +30,7 @@
 
 	export default {
 		props: {
+			settings: Object,
 			messages: Object,
 			unlockedState: Object
 		},
@@ -56,16 +57,18 @@
 				filteredEntries: this.unlockedState.cacheGet('allEntries'),
 				priorityEntries: this.unlockedState.cacheGet('priorityEntries'),
 				allEntries: this.unlockedState.cacheGet('allEntries'),
+				hotkeyNavEnabled: false,
 				allMessages: this.messages,
 				activeEntry: null,
 				activeEntryIndex: 0,
 				keyHandler: evt => {
 					switch (evt.keyCode){
-					case 9: //TAB
+					case 9:  // TAB
+					case 40: // DOWN arrow
 						this.setActive(this.activeEntryIndex + 1)
 						evt.preventDefault()
 						break
-					case 13: //ENTER
+					case 13: // ENTER
 						if (this.activeEntry !== null)
 							this.unlockedState.autofill(this.activeEntry)
 						break
@@ -96,6 +99,7 @@
 				})
 			},
 			setActive(index) {
+				if (!this.hotkeyNavEnabled) return;
 				// Unset the current active entry
 				if (this.activeEntry !== null){
 					this.activeEntry.view_is_active = false
@@ -127,10 +131,16 @@
 			let um = this.unlockedState.cacheGet('unlockedMessages')
 			if (um !== undefined)
 				this.allMessages = um
-			// Initialize the active entry
-			this.setActive(0)
-			// Listen for key events.
-			window.addEventListener("keydown", this.keyHandler)
+			this.settings.getSetHotkeyNavEnabled().then(enabled => {
+				this.hotkeyNavEnabled = enabled
+				if (enabled){
+					// Initialize the active entry
+					this.setActive(0)
+					// Listen for key events.
+					window.addEventListener("keydown", this.keyHandler)
+				}
+			})
+			
 		},
 		beforeDestroy() {
 			window.removeEventListener("keydown", this.keyHandler)
