@@ -7,26 +7,27 @@
   "private": true,
   "scripts": {
     "prebuild": "npm run clean",
-    "build": "cross-env NODE_ENV=production webpack --progress --hide-modules",
-    "build-tests": "cross-env NODE_ENV=test webpack --config webpack.test.config.js --progress",
+    "build": "cross-env NODE_ENV=production webpack --progress --config webpack.config.js",
+    "build-dll": "cross-env NODE_ENV=dll webpack --config webpack.dll.js --progress",
+    "dev": "webpack --progress --watch --config webpack.config.js",
+    "dev-tests": "cross-env NODE_ENV=test webpack --watch --config webpack.test.config.js --progress",
     "bundle": "./packer.sh chrome && ./packer.sh firefox",
-    "clean": "rm -rf dist/ *.zip manifest.json demo*",
-    "watch": "gulp watch",
-    "watch-tests": "gulp watchtests"
+    "clean": "rm -rf build/ *.zip manifest.json demo*"
   },
   "dependencies": {
     "axios": "^0.17.1",
+    "babel-regenerator-runtime": "^6.5.0",
     "base64-arraybuffer": "^0.1.5",
     "case": "^1.5.4",
     "font-awesome": "^4.7.0",
-    "jquery": "^3.2.1",
     "json-formatter-js": "^2.2.0",
-    "kdbxweb": "^1.0.2",
+    "kdbxweb": "^1.1.0",
     "keeweb": "https://github.com/keeweb/keeweb",
     "materialize-css": "^0.100.2",
     "pako": "^1.0.6",
     "vue": "^2.4.4",
     "vue-simple-spinner": "^1.2.8",
+    "webdav-client": "subdavis/webdav-client#master",
     "xmldom": "^0.1.27"
   },
   "browserslist": [

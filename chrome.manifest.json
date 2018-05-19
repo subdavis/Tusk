@@ -1,13 +1,13 @@
 {
-	"name": "KeePass Tusk - A better password manager",
+	"name": "KeePass Tusk - Password Access and Autofill",
 	"short_name": "KeePass Tusk",
 	"version": "2018.2.12",
 	"manifest_version": 2,
 	"minimum_chrome_version": "48",
 	"description": "Readonly KeePass password database integration for Chrome™",
 	"icons": {
-		"16": "dist/logo_16.png",
-		"48": "dist/logo_48.png"
+		"16": "assets/icons/logo_16.png",
+		"48": "assets/icons/logo_48.png"
 	},
 	"oauth2": {
 		"client_id": "876467817034-al13p9m2bphgregs0rij76n1tumakcqr.apps.googleusercontent.com",
@@ -18,14 +18,15 @@
 	"key":"MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAhoF/A6nYIxSHW2AekTQRJga9QodwEJBTeAA5r0tW9djrTHY3Ei0FdnUE1FrH2Hx03tsj4RjXMWDHtsqMg4REJdFNzndsRKWvliGomXtxE8XByawJf/NGx0/imAtVBrHc846D/Bn4q1dRaRauqkPMKgpcHoPeg+uLTBIfAn5qPgLlvLLqNSKRg6zGYkm0iBYFiyLd1cqWjsDrVhant90W5rE7qmGQPXZudkc2ejtijuMJL4CF9BeQXOVv/9a0XzAwNbArSr+zHnNOicZPyeEnT7mujFDvLRzXvi7OPW+8mdEsm3AeagKZ6bGUuqyzwxs8XlysWqJsXBoX6tjZCGGVpQIDAQAB",
 	"background": {
 		"scripts": [
-			"dist/background.build.js"
+			"dll/dll.library.js",
+			"build/background.build.js"
 		]
 	},
 	"incognito": "split",
 	"browser_action": {
-		"default_icon": "dist/logo_38.png",
+		"default_icon": "assets/icons/logo_38.png",
 		"default_popup": "popup.html",
-    "default_title": "KeePass Tusk"
+    	"default_title": "KeePass Tusk"
 	},
 	"options_ui": {
 		"page": "options.html",
@@ -40,7 +41,8 @@
 				"chromeos": "Ctrl+Shift+Space",
 				"linux": "Ctrl+Shift+Space",
 				"default": "Ctrl+Shift+Space"
-			}
+			},
+			"global": true
 		}
 	},
 	"permissions": [
@@ -65,6 +67,9 @@
 		},
 		"gdrive": {
 			"client_id": "876467817034-rlas0hnb5jc9dt1qmp11l6g4724ktoqn.apps.googleusercontent.com"
+		},
+		"pcloud": {
+			"client_id": "1NklWhTApYR"
 		}
 	}
 }

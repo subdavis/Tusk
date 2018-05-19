@@ -18,8 +18,15 @@ function KeepassService(keepassHeader, settings, passwordFileStoreRegistry, keep
 		new DataView(buffer).setInt16(0, 256, true);
 		return new Int16Array(buffer)[0] === 256;
 	})();
+	
+	/** 
+	 * return Promise(arrayBufer)
+	 */
+	my.getChosenDatabaseFile = function() {
+		return passwordFileStoreRegistry.getChosenDatabaseFile(settings)
+	}
 
-	my.getMasterKey = function(masterPassword, keyFileInfo) {
+	my.getMasterKey = function(bufferPromise, masterPassword, keyFileInfo) {
 		/**
 		 * Validate that one of the following is true:
 		 * (password isn't empty OR keyfile isn't empty)
@@ -35,15 +42,15 @@ function KeepassService(keepassHeader, settings, passwordFileStoreRegistry, keep
 			masterPassword = undefined;
 		}
 		var fileKey = keyFileInfo ? Base64.decode(keyFileInfo.encodedKey) : null;
-		return passwordFileStoreRegistry.getChosenDatabaseFile(settings).then(function(buf) {
+		return bufferPromise.then(function(buf) {
 			var h = keepassHeader.readHeader(buf);
 			return getKey(h.kdbx, masterPassword, fileKey);
 		});
 	}
 
-	my.getDecryptedData = function(masterKey) {
+	my.getDecryptedData = function(bufferPromise, masterKey) {
 		var majorVersion;
-		return passwordFileStoreRegistry.getChosenDatabaseFile(settings).then(function(buf) {
+		return bufferPromise.then(function(buf) {
 			var h = keepassHeader.readHeader(buf);
 			if (!h) throw new Error('Failed to read file header');
 

@@ -4,7 +4,7 @@
 		<div class="box-bar roomy">
 
 			<div class="unlockLogo stack-item optionsheader">
-				<img src="../assets/logo.png">
+				<img src="assets/icons/logo.png">
 				<span>Getting Started with Tusk</span>
 			</div>
 

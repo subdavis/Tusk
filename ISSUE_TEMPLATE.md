@@ -11,10 +11,17 @@
 
 ### Please describe the current behavior, and explain why it's bad.
 
-eg. "I cannot use files kept in Mega.co.nz"
+<!-- 
+  First, read https://github.com/subdavis/Tusk/wiki/Troubleshooting 
+  
+  If this issue is a bug, please explain what steps you took 
+  and how to reproduce your issue.
+-->
+
+EXAMPLE: "I cannot use files kept in Mega.co.nz"
 
 ### Please describe how you think it should change.
 
-eg. "Please consider adding Mega.co.nz support for Tusk"
+EXAMPLE: "Please consider adding Mega.co.nz support for Tusk"
 
 ### Anything else?

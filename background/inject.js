@@ -1,5 +1,10 @@
-let $ = require('jquery')
+import { isVisible } from '$lib/utils.js'
+/* 
+Inject script
 
+- Invoked when Tusk popup 'autofill' action is selected.
+- Background will attempt to inject this script into the page, and the script will listen for a user/pass combo from background.
+*/
 chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 	"use strict";
 
@@ -70,39 +75,42 @@ var filler = (function() {
 		lonelyPasswords = [];
 		priorityPair = null;
 		var inputPattern = "input[type='text'], input[type='email'], input[type='password'], input:not([type])";
+		var inputList = Array.from(document.getElementsByTagName('INPUT'));
 
-		//algorithm 1 - based on focused field
-		var focusedField = $(inputPattern).filter(':focus');
-		if (focusedField.length) {
+		// Method 1 - based on focused field (the thing your cursor is in)
+		var activeElem = document.activeElement
+		var focusedIndex = inputList.indexOf(activeElem)
+		if (inputList.length && focusedIndex >= 0) {
 			var pair = {}, focusedPassword = false;
-			if (isPasswordField(focusedField)) {
-				pair.p = focusedField;
+			if (isPasswordField(activeElem)) {
+				pair.p = activeElem;
 				focusedPassword = true;
 			} else {
-				pair.u = focusedField;
+				pair.u = activeElem;
 			}
 
-			var all = $(inputPattern);
-			var focusedIndex = all.index(focusedField);
-			if (focusedIndex > -1 && focusedIndex < all.length) {
+			// Assumption: 
+			// * username will always come before password
+			// * username and password will always be adjacent
+			if (focusedIndex >= 0) {
 				if (focusedPassword && focusedIndex > 0) {
 					//field before the password is the username
-					pair.u = all.eq(focusedIndex - 1);
-				} else if (!focusedPassword && focusedIndex < all.length) {
+					pair.u = inputList[focusedIndex - 1]
+				} else if (!focusedPassword && focusedIndex < (inputList.length - 1)) {
 					//field after the username is the password
-					pair.p = all.eq(focusedIndex + 1);
+					let passwordFieldCandidate = inputList[focusedIndex + 1]
+					if (isPasswordField(passwordFieldCandidate))
+						pair.p = passwordFieldCandidate
 				}
 			}
-
 			priorityPair = pair;
 		}
 
-		//algorithm 2 - based on types of fields and visibility
+		// Methods 2 - based on types of fields and visibility
 		var possibleUserName;
 		var lastFieldWasPassword = false; //used to detect registration forms which have 2 password fields, one after the other
-		$(inputPattern).each(function() {
-			var field = $(this);
-			if (isElementInViewport(field) && field.is(':visible')) {
+		inputList.forEach(field => {
+			if (isElementInViewport(field) && isVisible(field)) {
 				if (isPasswordField(field)) {
 					if (possibleUserName) {
 						userPasswordPairs.push({
@@ -129,9 +137,9 @@ var filler = (function() {
 	}
 
 	function isPasswordField(field) {
-		if (field.attr('type') && field.attr('type').toLowerCase() == 'password')
+		let type_attr = field.getAttribute('type')
+		if (type_attr && type_attr.toLowerCase() == 'password')
 			return true;
-
 		return false;
 	}
 
@@ -141,10 +149,10 @@ var filler = (function() {
 
 		if (priorityPair) {
 			//don't bother with the others, this is the one
-			if (priorityPair.u && priorityPair.u.is(':visible'))
+			if (priorityPair.u && isVisible(priorityPair.u))
 				fillField(priorityPair.u, username);
 
-			if (priorityPair.p && priorityPair.p.is(':visible'))
+			if (priorityPair.p && isVisible(priorityPair.p))
 				fillField(priorityPair.p, password);
 
 			return;
@@ -155,9 +163,9 @@ var filler = (function() {
 			for (var i = 0; i < userPasswordPairs.length; i++) {
 				var pair = userPasswordPairs[i];
 				if (!filled && isElementInViewport(pair.u) && isElementInViewport(pair.p)
-				&& pair.p.is(":visible")) {
+				&& isVisible(pair.p)) {
 					filled = fillField(pair.p, password);
-					if (pair.u.is(":visible")) {
+					if (isVisible(pair.u)) {
 						//sometimes the username is invisible, i.e. google login
 						fillField(pair.u, username);
 					}
@@ -168,7 +176,7 @@ var filler = (function() {
 		if (!filled) {
 			for (var i=0; i<lonelyPasswords.length; i++) {
 				var lonelyPassword = lonelyPasswords[i];
-				if (!filled && isElementInViewport(lonelyPassword) && lonelyPassword.is(':visible')) {
+				if (!filled && isElementInViewport(lonelyPassword) && isVisible(lonelyPassword)) {
 					filled = fillField(lonelyPassword, password);
 				}
 			}
@@ -176,9 +184,9 @@ var filler = (function() {
 	}
 
 	function fillField(field, val) {
+		field.value = val;
+		var filled = (field.value === val);
 		sendKeyEvent(field);
-		field.val(val);
-		var filled = (field.val() === val);
 		return filled;
 	}
 
@@ -195,20 +203,15 @@ var filler = (function() {
 			for (var i in eventsToFire) {
 				var evt = document.createEvent(eventsToFire[i]);
 				evt.initEvent(i, true, true);
-				field.get(0).dispatchEvent(evt);
+				field.dispatchEvent(evt);
 			}
 		});
 	}
 
 	/**
-	function to determine if element is visible
-	*/
+	 * function to determine if element is in the part of the screen on the monitor
+	 */
 	function isElementInViewport(el) {
-		//special bonus for those using jQuery
-		if (el instanceof $) {
-			el = el[0];
-		}
-
 		var rect = el.getBoundingClientRect();
 		return (
 			rect.top >= 0 && rect.left >= 0 && rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&  /*or $(window).height() */

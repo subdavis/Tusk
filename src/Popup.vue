@@ -18,6 +18,7 @@
 			:keepass-service="services.keepassService"></unlock>
 		<entry-details id="/entry-details/:entryId" v-if="show.entryDetails.visible" 
 			:unlocked-state="services.unlockedState" 
+			:links="services.links"
 			:settings="services.settings"></entry-details>
 		<!-- End Router View -->
 	</div>
@@ -40,8 +41,10 @@
 	import { GoogleDrivePasswordFileManager } from '$services/googleDrivePasswordFileManager.js'
 	import { DropboxFileManager } from '$services/dropboxFileManager.js'
 	import { OneDriveFileManager } from '$services/oneDriveFileManager.js'
+	import { PCloudFileManager } from '$services/pCloudFileManager.js'
 	import { SharedUrlFileManager } from '$services/sharedUrlFileManager.js'
 	import { SampleDatabaseFileManager } from '$services/sampleDatabaseFileManager.js'
+	import { WebdavFileManager } from '$services/webdavFileManager.js'
 	// Components
 	import Unlock from '@/components/Unlock'
 	import Startup from '@/components/Startup'
@@ -62,9 +65,19 @@
 	const googleDrivePasswordFileManager = new GoogleDrivePasswordFileManager(settings)
 	const sharedUrlFileManager = new SharedUrlFileManager()
 	const oneDriveFileManager = new OneDriveFileManager(settings)
+	const pCloudFileManager = new PCloudFileManager(settings)
 	const sampleDatabaseFileManager = new SampleDatabaseFileManager()
+	const webdavFileManager = new WebdavFileManager(settings)
 
-	const passwordFileStoreRegistry = new PasswordFileStoreRegistry(localChromePasswordFileManager, dropboxFileManager, googleDrivePasswordFileManager, sharedUrlFileManager, sampleDatabaseFileManager, oneDriveFileManager)
+	const passwordFileStoreRegistry = new PasswordFileStoreRegistry(
+		localChromePasswordFileManager, 
+		dropboxFileManager, 
+		googleDrivePasswordFileManager, 
+		sharedUrlFileManager, 
+		sampleDatabaseFileManager, 
+		oneDriveFileManager,
+		pCloudFileManager,
+		webdavFileManager)
 	const keepassService = new KeepassService(keepassHeader, settings, passwordFileStoreRegistry, keepassReference)
 	/* beautify preserve:end */
 

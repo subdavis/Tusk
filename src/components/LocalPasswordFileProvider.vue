@@ -51,7 +51,7 @@
 					this.providerManager.logout().then(() => {
 						this.loggedIn = false
 					})
-				} else {
+				} else if (confirm("Do you understand that Tusk cannot keep your local database file up to date?  \n\nIf you change it, you'll have to re-upload the file again. \n\nSelect OK to continue.")) {
 					this.providerManager.login().then(() => {
 						this.loggedIn = true
 					})

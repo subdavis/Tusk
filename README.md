@@ -32,6 +32,9 @@ Tusk requires:
 # install dependencies
 yarn install
 
+# Build static DLL resources
+yarn build-dll
+
 # static reload with file watch
 yarn watch
 
@@ -62,6 +65,20 @@ In chrome, these permissions requests are __always__ promted to the user upon fi
 
 Because of Firefox's implementation of `browser.permissions`, it was necessary to request all permissions at install time to avoid code rot.  A deeper explanation of the firefox permissions can be found [on stackoverflow](https://stackoverflow.com/questions/47723297/firefox-extension-api-permissions-request-may-only-be-called-from-a-user-input)
 
-## Looking for CKPX?
+## FAQ
+
+> Why is it called Tusk?!
+
+I originally wanted to call it *Elephant*, as in *An elephant never forgets.*  I tried this name on a couple of friends and they were unimpressed. I wanted to find a name that was more concise but keep the elephant imagery.  Ergo, tusk.
+
+> What happened to CKPX?
+
+This is it! CKPX has been rebranded as Tusk to mark its Firefox release.  The C in CKPX stood for 'Chrome'.
+
+> Can I donate money?
+
+I don't want your money.  Take whatever you would have given me and find a local charity -- a food bank, a women's shelter or an animal shelter, for example.  Enjoy your free software.
+
+> So how can I support Tusk?
 
 You found it!  CKPX has been rebranded as Tusk to mark its Firefox release.  The C in CKPX stood for 'Chrome'.

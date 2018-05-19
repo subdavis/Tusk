@@ -1,6 +1,6 @@
 "use strict";
 
-import axios from 'axios/dist/axios.min.js'
+const axios = require('axios')
 import {
 	ChromePromiseApi
 } from '$lib/chrome-api-promise.js'
@@ -17,7 +17,7 @@ function SharedUrlFileManager() {
 		title: 'Shared Link',
 		icon: 'icon-link',
 		chooseTitle: 'Shared Link',
-		chooseDescription: 'Rather than granting full access to your cloud storage provider, get a shared link and paste it in.  Google Drive is unsupported.',
+		chooseDescription: 'Rather than granting full access to your cloud storage provider, get a shared link and paste it in.  Any direct HTTP link will do, and Dropbox and OwnCloud are supported.',
 		setUrls: setUrls,
 		getUrls: getUrls,
 		login: enable,

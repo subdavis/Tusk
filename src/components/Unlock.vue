@@ -6,7 +6,10 @@
 		</div>
 
 		<!-- Entry List -->
-		<entry-list v-if="!busy && isUnlocked()" :messages="unlockedMessages" :unlocked-state="unlockedState"></entry-list>
+		<entry-list v-if="!busy && isUnlocked()" 
+			:messages="unlockedMessages" 
+			:unlocked-state="unlockedState"
+			:settings="settings"></entry-list>
 
 		<!-- General Messenger -->
 		<messenger :messages="generalMessages" v-show="!busy"></messenger>
@@ -19,7 +22,7 @@
 			</div>
 
 			<div class="unlockLogo stack-item">
-				<img src="../assets/logo.png">
+				<img src="assets/icons/logo.png">
 				<span>KeePass Tusk</span>
 			</div>
 
@@ -39,8 +42,8 @@
 					<transition name="keyfile-picker">
 						<div>
 							<span class="selectable" v-for="(kf, kf_index) in keyFiles" :keyfile-index="kf_index" @click="chooseKeyFile(kf_index)">
-                <i class="fa fa-file fa-fw" aria-hidden="true"></i>
-                {{ kf.name }}
+								<i class="fa fa-file fa-fw" aria-hidden="true"></i>
+                				{{ kf.name }}
 							</span>
 							<span @click="links.openOptionsKeyfiles" class="selectable"><i class="fa fa-wrench fa-fw" aria-hidden="true"></i> Manage Keyfiles</span>
 						</div>
@@ -147,7 +150,7 @@
 					},
 					{
 						time: -1,
-						text: "Until Chrome exits."
+						text: "Until browser exits."
 					}
 				],
 				slider_int: 0
@@ -255,7 +258,7 @@
 					this.unlockedMessages['error'] = "No matches found for this site."
 				}
 
-				// Cache in memory 
+				// Cache in memory
 				this.unlockedState.cacheSet('allEntries', allEntries)
 				this.unlockedState.cacheSet('priorityEntries', priorityEntries)
 				this.$forceUpdate()
@@ -271,8 +274,9 @@
 				this.busy = true
 				this.generalMessages.error = ""
 				let passwordKeyPromise;
+				let bufferPromise = this.keepassService.getChosenDatabaseFile()
 				if (passwordKey === undefined)
-					passwordKeyPromise = this.keepassService.getMasterKey(this.masterPassword, this.selectedKeyFile)
+					passwordKeyPromise = this.keepassService.getMasterKey(bufferPromise, this.masterPassword, this.selectedKeyFile)
 				else
 					passwordKeyPromise = Promise.resolve(passwordKey)
 
@@ -280,7 +284,7 @@
 					this.selectedKeyFile.name :
 					undefined
 				passwordKeyPromise.then(passwordKey => {
-					this.keepassService.getDecryptedData(passwordKey).then(decryptedData => {
+					this.keepassService.getDecryptedData(bufferPromise, passwordKey).then(decryptedData => {
 						let entries = decryptedData.entries
 						let version = decryptedData.version
 						let dbUsage = {
@@ -294,7 +298,7 @@
 						if (this.rememberPeriod !== 0) {
 							let check_time = 60000 * this.rememberPeriod // milliseconds / min
 							// Save the password in memory independently.
-							this.settings.cacheMasterPassword(passwordKey, { 
+							this.settings.cacheMasterPassword(passwordKey, {
 								forgetTime: check_time > 0 ? Date.now() + check_time : check_time
 							})
 						} else {

@@ -1,6 +1,5 @@
 const Base64 = require('base64-arraybuffer')
-
-import axios from 'axios/dist/axios.min.js'
+const axios = require('axios')
 import {
 	ChromePromiseApi
 } from '$lib/chrome-api-promise.js'
@@ -24,8 +23,7 @@ function GoogleDrivePasswordFileManager(settings) {
 		key: accessTokenType,
 		accessTokenType: accessTokenType,
 		supportedFeatures: ['listDatabases'],
-		authUrl: 'https://accounts.google.com/o/oauth2/v2/auth?response_type=token' +
-			'&scope=' + encodeURIComponent('https://www.googleapis.com/auth/drive.readonly'),
+		authUrl: `https://accounts.google.com/o/oauth2/v2/auth?response_type=token&scope=${encodeURIComponent('https://www.googleapis.com/auth/drive.readonly')}`,
 		origins: [
 			"https://www.googleapis.com/*",
 			"https://accounts.google.com/*",
@@ -34,7 +32,7 @@ function GoogleDrivePasswordFileManager(settings) {
 		title: 'Google Drive',
 		icon: 'icon-google',
 		chooseTitle: 'Google Drive',
-		chooseDescription: 'Access password files stored on your Google Drive.  The file(s) will be fetched from Google Drive each time they are used.',
+		chooseDescription: 'Access password files stored on Google Drive.  Files will be fetched from Google Drive each time they are used.',
 	};
 
 	oauth.searchRequestFunction = function(token) {

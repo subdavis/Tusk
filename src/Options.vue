@@ -12,8 +12,10 @@
 					:google-drive-manager="services.googleDrivePasswordFileManager" 
 					:local-file-manager="services.localChromePasswordFileManager"
 					:onedrive-manager="services.oneDriveFileManager" 
+					:p-cloud-file-manager="services.pCloudFileManager"
 					:sample-manager="services.sampleDatabaseFileManager" 
 					:shared-url-manager="services.sharedUrlFileManager" 
+					:webdav-manager="services.webdavFileManager"
 					:settings="services.settings"></manage-databases>
 				<manage-keyfiles id="/manage/keyfiles" v-if="show.manageKeyfiles.visible" 
 					:settings="services.settings" 
@@ -23,7 +25,7 @@
 					:secure-cache-memory="services.secureCacheMemory"></advanced-settings>
 				<reauthorize id="/reauthorize" v-if="show.reauthorize.visible"
 					:settings="services.settings"
-					:providers="[services.dropboxFileManager,services.googleDrivePasswordFileManager,services.oneDriveFileManager]"></reauthorize>
+					:providers="[services.dropboxFileManager,services.googleDrivePasswordFileManager,services.oneDriveFileManager,services.pCloudFileManager]"></reauthorize>
 			</div>
 		</div>
 	</div>
@@ -44,7 +46,9 @@
 	import {DropboxFileManager} from '$services/dropboxFileManager.js'
 	import {OneDriveFileManager} from '$services/oneDriveFileManager.js'
 	import {SharedUrlFileManager} from '$services/sharedUrlFileManager.js'
+	import {PCloudFileManager} from '$services/pCloudFileManager.js'
 	import {SampleDatabaseFileManager} from '$services/sampleDatabaseFileManager.js'
+	import {WebdavFileManager} from '$services/webdavFileManager.js'
 	// Components
 	import OptionsNavbar from '@/components/Navbar'
 	import OptionsStartup from '@/components/OptionsStartup'
@@ -65,7 +69,9 @@
 	const googleDrivePasswordFileManager = new GoogleDrivePasswordFileManager(settings)
 	const sharedUrlFileManager = new SharedUrlFileManager()
 	const oneDriveFileManager = new OneDriveFileManager(settings)
+	const pCloudFileManager = new PCloudFileManager(settings)
 	const sampleDatabaseFileManager = new SampleDatabaseFileManager()
+	const webdavFileManager = new WebdavFileManager(settings)
 
 	const passwordFileStoreRegistry = new PasswordFileStoreRegistry(
 		localChromePasswordFileManager, 
@@ -73,7 +79,8 @@
 		googleDrivePasswordFileManager, 
 		sharedUrlFileManager, 
 		sampleDatabaseFileManager, 
-		oneDriveFileManager)
+		oneDriveFileManager,
+		pCloudFileManager)
 	/* beautify preserve:end */
 
 	export default {
@@ -97,10 +104,12 @@
 					googleDrivePasswordFileManager,
 					localChromePasswordFileManager,
 					oneDriveFileManager,
+					pCloudFileManager,
 					sampleDatabaseFileManager,
 					sharedUrlFileManager,
 					keyFileParser,
-					secureCacheMemory
+					secureCacheMemory,
+					webdavFileManager
 				},
 				show: {
 					startup: {
