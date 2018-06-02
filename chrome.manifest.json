@@ -41,7 +41,7 @@
 				"chromeos": "Ctrl+Shift+Space",
 				"linux": "Ctrl+Shift+Space",
 				"default": "Ctrl+Shift+Space"
-			},
+			}
 		}
 	},
 	"permissions": [
