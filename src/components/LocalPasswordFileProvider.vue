@@ -45,7 +45,7 @@
 			settings: Object
 		},
 		methods: {
-			toggleLogin() {
+			toggleLogin(e) {
 				if (this.loggedIn) {
 					this.settings.disableDatabaseProvider(this.providerManager)
 					this.providerManager.logout().then(() => {
@@ -55,6 +55,8 @@
 					this.providerManager.login().then(() => {
 						this.loggedIn = true
 					})
+				} else {
+					e.preventDefault();
 				}
 			},
 			selectFile(event) {
