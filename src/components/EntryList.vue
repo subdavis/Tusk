@@ -78,6 +78,11 @@
 						this.setActive(this.activeEntryIndex + 1)
 						evt.preventDefault()
 						break
+					case 38: // UP arrow
+						if (this.activeEntryIndex > 0)
+							this.setActive(this.activeEntryIndex - 1);
+						evt.preventDefault()
+						break
 					case 13: // ENTER
 						if (this.activeEntry !== null)
 							this.unlockedState.autofill(this.activeEntry)
