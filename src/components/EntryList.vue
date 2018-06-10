@@ -63,6 +63,11 @@
 				activeEntryIndex: 0,
 				keyHandler: evt => {
 					switch (evt.keyCode){
+					case 67: // C
+						if (evt.ctrlKey || evt.metaKey) {
+							this.unlockedState.copyPassword(this.activeEntry)
+						}
+						break
 					case 9:  // TAB
 					case 40: // DOWN arrow
 						this.setActive(this.activeEntryIndex + 1)
