@@ -20,6 +20,7 @@ function UnlockedState($router, keepassReference, protectedMemory, settings) {
 		clipboardStatus: "" //status message about clipboard, used when copying password to the clipboard
 	};
 	var copyEntry;
+	var copyPart;
 	var cacheTimeoutId;
 
 	//determine current url:
@@ -141,7 +142,7 @@ function UnlockedState($router, keepassReference, protectedMemory, settings) {
 
 	//listens for the copy event and does the copy
 	document.addEventListener('copy', function(e) {
-		if (!copyEntry) {
+		if (!copyEntry && !copyPart) {
 			return; //listener can get registered multiple times
 		}
 
