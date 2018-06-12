@@ -31,6 +31,21 @@
 		</div>
 
 		<div class="box-bar roomy">
+			<h4>Enable notifications</h4>
+			<p>If enabled, you will be be shown notifications regarding the password copying to clipboard.</p>
+		</div>
+		<div class="box-bar roomy lighter">
+			<div>
+				<div class="switch">
+					<label>Enabled
+			      		<input type="checkbox" v-model="notificationsEnabled">
+			      		<span class="lever"></span>
+			    	</label>
+				</div>
+			</div>
+		</div>
+
+		<div class="box-bar roomy">
 			<h4>Stored Data</h4>
 			<p>The following objects represent the current data cached in local storage. This data is only available to Tusk, and is never sent over any network connection.</p>
 		</div>
@@ -57,6 +72,7 @@
 				busy: false,
 				expireTime: 2,
 				hotkeyNavEnabled: false,
+                notificationsEnabled: false,
 				jsonState: [{
 						k: 'databaseUsages',                    // key
 						f: this.settings.getSetDatabaseUsages,  // getter
@@ -124,15 +140,21 @@
 			},
 			hotkeyNavEnabled(newval, oldval) {
 				this.settings.getSetHotkeyNavEnabled(newval)
+			},
+            notificationsEnabled(newval) {
+				this.settings.getSetNotificationsEnabled(newval)
 			}
 		},
 		mounted() {
 			this.settings.getSetClipboardExpireInterval().then(val => {
 				this.expireTime = val;
-			})
+			});
 			this.settings.getSetHotkeyNavEnabled().then(val => {
 				this.hotkeyNavEnabled = val;
-			})
+			});
+			this.settings.getSetNotificationsEnabled().then(val => {
+				this.notificationsEnabled = val;
+			});
 			this.jsonState.forEach(blob => {
 				blob.f().then(result => {
 					if (result && Object.keys(result).length) {

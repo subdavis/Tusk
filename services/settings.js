@@ -8,7 +8,7 @@ const links = new Links()
  * Settings for Tusk  */
 function Settings(secureCache) {
 	"use strict";
-	
+
 	var exports = {}
 
 	//upgrade old settings.  Called on install.
@@ -288,6 +288,10 @@ function Settings(secureCache) {
 
 	exports.getSetHotkeyNavEnabled = function(enabled) {
 		return keyGetSetter('hotkeyNavEnabled', enabled, false, 'boolean')
+	}
+
+	exports.getSetNotificationsEnabled = function(enabled) {
+		return keyGetSetter('notificationsEnabled', enabled, false, 'boolean')
 	}
 
 	return exports;
