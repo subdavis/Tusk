@@ -146,12 +146,10 @@ function UnlockedState($router, keepassReference, protectedMemory, settings) {
 		e.preventDefault();
 
 		settings.getSetClipboardExpireInterval().then(interval => {
-			settings.setForgetTime('clearClipboard', Date.now() + interval * 60000)
-			chrome.runtime.sendMessage({
-				m: "showMessage",
-				text: 'Password copied to clipboard.  Clipboard will clear in '+ interval +' minute(s).'
-			});
-			window.close(); //close the popup
+			settings.setForgetTime('clearClipboard', Date.now() + interval * 60000);
+			ChromePromiseApi.notification.push({
+                text: 'Password copied to clipboard.  Clipboard will clear in '+ interval +' minute(s).'
+			}).then(() => window.close());
 		});
 
 	});
