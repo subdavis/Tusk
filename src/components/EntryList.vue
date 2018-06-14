@@ -63,9 +63,24 @@
 				activeEntryIndex: 0,
 				keyHandler: evt => {
 					switch (evt.keyCode){
+					case 67: // C
+					case 66: // B
+						if (evt.ctrlKey || evt.metaKey) {
+							if (evt.keyCode === 67) {
+								this.unlockedState.copyPassword(this.activeEntry)
+							} else if (evt.keyCode === 66) {
+								this.unlockedState.copyUsername(this.activeEntry)
+							}
+						}
+						break
 					case 9:  // TAB
 					case 40: // DOWN arrow
 						this.setActive(this.activeEntryIndex + 1)
+						evt.preventDefault()
+						break
+					case 38: // UP arrow
+						if (this.activeEntryIndex > 0)
+							this.setActive(this.activeEntryIndex - 1);
 						evt.preventDefault()
 						break
 					case 13: // ENTER
