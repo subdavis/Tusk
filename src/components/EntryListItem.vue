@@ -35,13 +35,12 @@
 		},
 		watch: {
 			// When the element becomes active, scroll it into view.
-			entry: function(val) {
-				if (val.view_is_active){
+			'entry.view_is_active': function(val) {
+				if (val)
 					this.$el.scrollIntoView({
 						block: "end", 
 						inline: "nearest", 
 						behavior: "smooth"});
-				}
 			}
 		},
 		methods: {

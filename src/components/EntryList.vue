@@ -117,7 +117,7 @@
 				if (!this.hotkeyNavEnabled) return;
 				// Unset the current active entry
 				if (this.activeEntry !== null){
-					this.activeEntry.view_is_active = false
+					this.$set(this.activeEntry, 'view_is_active', false)
 				}
 				let activeList;
 				if (this.filteredEntries.length > 0 && this.searchTerm.length > 0)
