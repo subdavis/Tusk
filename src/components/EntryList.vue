@@ -79,8 +79,7 @@
 						evt.preventDefault()
 						break
 					case 38: // UP arrow
-						if (this.activeEntryIndex > 0)
-							this.setActive(this.activeEntryIndex - 1);
+						this.setActive(this.activeEntryIndex - 1);
 						evt.preventDefault()
 						break
 					case 13: // ENTER
@@ -126,7 +125,8 @@
 					activeList = this.priorityEntries
 				else // Neither list has entries
 					return
-				
+				if (index < 0)
+					index = activeList.length + index
 				index = index % activeList.length
 				this.activeEntry = activeList[index]
 				this.$set(this.activeEntry, 'view_is_active', true)
