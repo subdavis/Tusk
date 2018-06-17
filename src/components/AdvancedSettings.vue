@@ -147,14 +147,14 @@
 		},
 		mounted() {
 			this.settings.getSetClipboardExpireInterval().then(val => {
-				this.expireTime = val;
-			});
+				this.expireTime = val
+			})
 			this.settings.getSetHotkeyNavEnabled().then(val => {
-				this.hotkeyNavEnabled = val;
-			});
+				this.hotkeyNavEnabled = val
+			})
 			this.settings.getSetNotificationsEnabled().then(val => {
-				this.notificationsEnabled = val;
-			});
+				this.notificationsEnabled = val
+			})
 			this.jsonState.forEach(blob => {
 				blob.f().then(result => {
 					if (result && Object.keys(result).length) {
