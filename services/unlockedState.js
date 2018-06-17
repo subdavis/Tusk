@@ -20,6 +20,7 @@ function UnlockedState($router, keepassReference, protectedMemory, settings) {
 		clipboardStatus: "" //status message about clipboard, used when copying password to the clipboard
 	};
 	var copyEntry;
+	var copyPart;
 	var cacheTimeoutId;
 
 	//determine current url:
@@ -117,15 +118,20 @@ function UnlockedState($router, keepassReference, protectedMemory, settings) {
 	}
 
 	//get clear-text password from entry
-	function getPassword(entry) {
-		return my.getDecryptedAttribute(entry, 'password');
+	function getAttribute(entry, attr = 'password') {
+		return my.getDecryptedAttribute(entry, attr);
 	}
 
 	my.copyPassword = function(entry) {
+		copyPart = 'password';
 		copyEntry = entry;
 		document.execCommand('copy');
 	}
-
+	my.copyUsername = function(entry) {
+		copyPart = 'username';
+		copyEntry = entry;
+		document.execCommand('copy');
+	}
 	my.gotoDetails = function(entry) {
 		$router.route('/entry-details/' + entry.id);
 	}
@@ -136,19 +142,21 @@ function UnlockedState($router, keepassReference, protectedMemory, settings) {
 
 	//listens for the copy event and does the copy
 	document.addEventListener('copy', function(e) {
-		if (!copyEntry) {
+		if (!copyEntry && !copyPart) {
 			return; //listener can get registered multiple times
 		}
 
-		var textToPutOnClipboard = getPassword(copyEntry);
+		var textToPutOnClipboard = getAttribute(copyEntry, copyPart);
+		var fieldName = copyPart.charAt(0).toUpperCase() + copyPart.slice(1); // https://stackoverflow.com/a/1026087
 		copyEntry = null;
+		copyPart = null;
 		e.clipboardData.setData('text/plain', textToPutOnClipboard);
 		e.preventDefault();
 
 		settings.getSetClipboardExpireInterval().then(interval => {
 			settings.setForgetTime('clearClipboard', Date.now() + interval * 60000);
 			ChromePromiseApi.notification.push({
-                text: 'Password copied to clipboard.  Clipboard will clear in '+ interval +' minute(s).'
+                text: fieldName +' copied to clipboard.  Clipboard will clear in '+ interval +' minute(s).'
 			}).then(() => window.close());
 		});
 

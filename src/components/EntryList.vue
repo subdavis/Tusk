@@ -63,9 +63,23 @@
 				activeEntryIndex: 0,
 				keyHandler: evt => {
 					switch (evt.keyCode){
+					case 67: // C
+					case 66: // B
+						if (evt.ctrlKey || evt.metaKey) {
+							if (evt.keyCode === 67) {
+								this.unlockedState.copyPassword(this.activeEntry)
+							} else if (evt.keyCode === 66) {
+								this.unlockedState.copyUsername(this.activeEntry)
+							}
+						}
+						break
 					case 9:  // TAB
 					case 40: // DOWN arrow
 						this.setActive(this.activeEntryIndex + 1)
+						evt.preventDefault()
+						break
+					case 38: // UP arrow
+						this.setActive(this.activeEntryIndex - 1);
 						evt.preventDefault()
 						break
 					case 13: // ENTER
@@ -102,7 +116,7 @@
 				if (!this.hotkeyNavEnabled) return;
 				// Unset the current active entry
 				if (this.activeEntry !== null){
-					this.activeEntry.view_is_active = false
+					this.$set(this.activeEntry, 'view_is_active', false)
 				}
 				let activeList;
 				if (this.filteredEntries.length > 0 && this.searchTerm.length > 0)
@@ -111,7 +125,8 @@
 					activeList = this.priorityEntries
 				else // Neither list has entries
 					return
-				
+				if (index < 0)
+					index = activeList.length + index
 				index = index % activeList.length
 				this.activeEntry = activeList[index]
 				this.$set(this.activeEntry, 'view_is_active', true)
