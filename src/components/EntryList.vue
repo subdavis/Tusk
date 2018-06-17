@@ -7,15 +7,15 @@
 		<messenger :messages="allMessages"></messenger>
 		<div class="entries">
 			<div v-if="priorityEntries && searchTerm.length == 0">
-				<entry-list-item v-for="entry in priorityEntries" 
-					:key="entry.id" 
-					:entry="entry" 
+				<entry-list-item v-for="entry in priorityEntries"
+					:key="entry.id"
+					:entry="entry"
 					:unlocked-state="unlockedState">
 				</entry-list-item>
 			</div>
 			<div v-if="filteredEntries && searchTerm.length > 0">
-				<entry-list-item v-for="entry in filteredEntries" 
-					:key="entry.id" 
+				<entry-list-item v-for="entry in filteredEntries"
+					:key="entry.id"
 					:entry="entry"
 					:unlocked-state="unlockedState">
 				</entry-list-item>
@@ -41,7 +41,7 @@
 					this.filteredEntries = this.allEntries.filter(entry => {
 						let result = entry.filterKey.indexOf(val.toLocaleLowerCase())
 						return (result > -1)
-					})	
+					})
 				}
 				// Regardless of result, reset the active entry.
 				this.setActive(0)
@@ -74,6 +74,10 @@
 						}
 						break
 					case 9:  // TAB
+						const modifier = !evt.shiftKey ? 1 : -1;
+                        this.setActive(this.activeEntryIndex + modifier)
+                        evt.preventDefault()
+						break
 					case 40: // DOWN arrow
 						this.setActive(this.activeEntryIndex + 1)
 						evt.preventDefault()
