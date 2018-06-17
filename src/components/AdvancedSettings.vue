@@ -37,8 +37,12 @@
 		<div class="box-bar roomy lighter">
 			<div>
 				<div class="switch">
-					<label>Expiration
+					<label>Expired password
 						<input type="checkbox" value="expiration" v-model="notificationsEnabled">
+						<span class="lever"></span>
+					</label>
+					<label>Clipboard
+						<input type="checkbox" value="clipboard" v-model="notificationsEnabled">
 						<span class="lever"></span>
 					</label>
 				</div>

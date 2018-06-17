@@ -156,7 +156,8 @@ function UnlockedState($router, keepassReference, protectedMemory, settings, not
 		settings.getSetClipboardExpireInterval().then(interval => {
 			settings.setForgetTime('clearClipboard', Date.now() + interval * 60000);
 			notifications.push({
-				text: fieldName +' copied to clipboard.  Clipboard will clear in '+ interval +' minute(s).'
+				text: fieldName +' copied to clipboard.  Clipboard will clear in '+ interval +' minute(s).',
+				type: 'clipboard',
 			}).then(() => window.close());
 		});
 
