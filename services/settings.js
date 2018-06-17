@@ -289,7 +289,7 @@ function Settings(secureCache) {
 	}
 
 	exports.getSetNotificationsEnabled = function(enabledTypes) {
-		return keyGetSetter('notificationsEnabled', enabledTypes, ['clipboard','expiration'], 'Array')
+		return keyGetSetter('notificationsEnabled', enabledTypes, ['clipboard','expiration'], 'object')
 	}
 
 	return exports;
