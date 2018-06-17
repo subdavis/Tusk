@@ -3,14 +3,15 @@
 /*
   This page runs as an Background page, not an event
 
-  Be careful using settings.  
+  Be careful using settings.
   Settings can call secureCacheMemory, which in turn can open new ports to this script.
 */
 
 import { ProtectedMemory } from '$services/protectedMemory.js'
 import { Settings } from '$services/settings.js'
+import { Notifications} from "$services/notifications";
 
-function Background(protectedMemory, settings) {
+function Background(protectedMemory, settings, notifications) {
 	chrome.runtime.onInstalled.addListener(settings.upgrade);
 	chrome.runtime.onStartup.addListener(forgetStuff);
 
@@ -50,15 +51,14 @@ function Background(protectedMemory, settings) {
 		if (!message || !message.m) return; //message format unrecognized
 
 		if (message.m == "showMessage") {
+			const expire = typeof message.expire !== 'undefined' ? message.expire * 1000 : 60000;
 			chrome.notifications.create({
 				'type': 'basic',
 				'iconUrl': '/assets/icons/logo_48.png',
 				'title': 'Tusk',
 				'message': message.text
 			}, function(notificationId) {
-				chrome.alarms.create('clearNotification-'+notificationId, {
-					delayInMinutes: 1
-				});
+				setTimeout(() => chrome.notifications.clear(notificationId), expire)
 			})
 		}
 
@@ -112,13 +112,13 @@ function Background(protectedMemory, settings) {
 	function alreadyInjected(tabId) {
 		return new Promise( (resolve, reject) => {
 			chrome.tabs.sendMessage(tabId, {m: 'ping'}, response => {
-				if (response) 
+				if (response)
 					resolve(true);
 				else {
 					let err = chrome.runtime.lastError;
-					resolve(false); 
-				} 
-			})	
+					resolve(false);
+				}
+			})
 		})
 	}
 
@@ -135,11 +135,6 @@ function Background(protectedMemory, settings) {
 			forgetStuff();
 			return;
 		}
-
-		var notificationClear = alarm.name.match(/^clearNotification-(.*)$/)
-		if (notificationClear.length == 2) {
-			chrome.notifications.clear(notificationClear[1])
-		}
 	});
 
 	function forgetStuff() {
@@ -155,30 +150,19 @@ function Background(protectedMemory, settings) {
 					switch (key) {
 						case 'clearClipboard':
 							clearClipboard();
-							chrome.notifications.create({
-								'type': 'basic',
-								'iconUrl': '/assets/icons/logo_48.png',
-								'title': 'Tusk',
-								'message': 'Clipboard cleared'
-							}, function(notificationId) {
-								setTimeout(function() {
-									chrome.notifications.clear(notificationId);
-								}, 2000);
-							})
+							notifications.push({
+								text: 'Clipboard cleared',
+								type: 'expiration',
+								expire: 2
+							});
 							break;
 						default:
 							if (key.indexOf('password') >= 0) {
-								forgetPassword().then(function() {
-									chrome.notifications.create({
-										'type': 'basic',
-										'iconUrl': '/assets/icons/logo_48.png',
-										'title': 'Tusk',
-										'message': 'Remembered password expired'
-									}, function(notificationId) {
-										chrome.alarms.create('clearNotification-'+notificationId, {
-											delayInMinutes: 1
-										});
-									})
+								forgetPassword().then(() => {
+									notifications.push({
+										text: 'Remember password expired',
+										type: 'expiration'
+									});
 								})
 							} else {
 								console.error("I don't know what to do with key", key)
@@ -206,8 +190,8 @@ function Background(protectedMemory, settings) {
 	function forgetPassword() {
 		return settings
 			.getCurrentDatabaseChoice()
-			.then(info => { 
-				let key = info.passwordFile.title + "__" + info.providerKey + ".password"; 
+			.then(info => {
+				let key = info.passwordFile.title + "__" + info.providerKey + ".password";
 				return key
 			})
 			.then(protectedMemory.clearData)
@@ -215,4 +199,4 @@ function Background(protectedMemory, settings) {
 
 }
 
-Background(new ProtectedMemory(), new Settings())
+Background(new ProtectedMemory(), new Settings(), new Notifications(settings))
