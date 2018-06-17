@@ -109,7 +109,7 @@ function UnlockedState($router, keepassReference, protectedMemory, settings, not
 				m: "autofill",
 				tabId: my.tabId,
 				u: entry.userName,
-				p: getPassword(entry),
+				p: getAttribute(entry, 'password'),
 				o: my.origin
 			}
 		});
