@@ -9,7 +9,7 @@
 
 import { ProtectedMemory } from '$services/protectedMemory.js'
 import { Settings } from '$services/settings.js'
-import { Notifications} from "$services/notifications";
+import { Notifications } from "$services/notifications";
 
 function Background(protectedMemory, settings, notifications) {
 	chrome.runtime.onInstalled.addListener(settings.upgrade);
@@ -199,4 +199,8 @@ function Background(protectedMemory, settings, notifications) {
 
 }
 
-Background(new ProtectedMemory(), new Settings(), new Notifications(settings))
+const settings = new Settings()
+const notifications = new Notifications(settings)
+const protectedMemory = new ProtectedMemory()
+
+Background(protectedMemory, settings, notifications)
