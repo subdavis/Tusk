@@ -290,8 +290,8 @@ function Settings(secureCache) {
 		return keyGetSetter('hotkeyNavEnabled', enabled, false, 'boolean')
 	}
 
-	exports.getSetNotificationsEnabled = function(enabled) {
-		return keyGetSetter('notificationsEnabled', enabled, false, 'boolean')
+	exports.getSetNotificationsEnabled = function(enabledTypes) {
+		return keyGetSetter('notificationsEnabled', enabledTypes, ['clipboard','expiration'], 'Array')
 	}
 
 	return exports;

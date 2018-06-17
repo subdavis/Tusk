@@ -23,9 +23,9 @@
 			<div>
 				<div class="switch">
 					<label>Enabled
-			      		<input type="checkbox" v-model="hotkeyNavEnabled">
-			      		<span class="lever"></span>
-			    	</label>
+						<input type="checkbox" v-model="hotkeyNavEnabled">
+						<span class="lever"></span>
+					</label>
 				</div>
 			</div>
 		</div>
@@ -37,10 +37,10 @@
 		<div class="box-bar roomy lighter">
 			<div>
 				<div class="switch">
-					<label>Enabled
-			      		<input type="checkbox" v-model="notificationsEnabled">
-			      		<span class="lever"></span>
-			    	</label>
+					<label>Expiration
+						<input type="checkbox" value="expiration" v-model="notificationsEnabled">
+						<span class="lever"></span>
+					</label>
 				</div>
 			</div>
 		</div>
@@ -72,7 +72,7 @@
 				busy: false,
 				expireTime: 2,
 				hotkeyNavEnabled: false,
-                notificationsEnabled: false,
+				notificationsEnabled: ['expiration'],
 				jsonState: [{
 						k: 'databaseUsages',                    // key
 						f: this.settings.getSetDatabaseUsages,  // getter
@@ -141,7 +141,7 @@
 			hotkeyNavEnabled(newval, oldval) {
 				this.settings.getSetHotkeyNavEnabled(newval)
 			},
-            notificationsEnabled(newval) {
+			notificationsEnabled(newval) {
 				this.settings.getSetNotificationsEnabled(newval)
 			}
 		},
