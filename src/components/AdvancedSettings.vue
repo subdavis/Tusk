@@ -41,6 +41,8 @@
 						<input type="checkbox" value="expiration" v-model="notificationsEnabled">
 						<span class="lever"></span>
 					</label>
+				</div>
+				<div class="switch">
 					<label>Clipboard
 						<input type="checkbox" value="clipboard" v-model="notificationsEnabled">
 						<span class="lever"></span>
