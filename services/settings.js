@@ -249,9 +249,7 @@ function Settings(secureCache) {
 		let update_obj = {}
 		update_obj[key] = val
 		if (val !== undefined && (typeof(val) === value_type || val === null) )
-			return chromePromise.storage.local.set(update_obj).then(nil => {
-				return val
-			})
+			return chromePromise.storage.local.set(update_obj).then(() => val)
 		else
 			return chromePromise.storage.local.get(key).then(oldval => {
 				if (oldval[key] !== undefined)
