@@ -128,7 +128,7 @@ function UnlockedState($router, keepassReference, protectedMemory, settings) {
 		document.execCommand('copy');
 	}
 	my.copyUsername = function(entry) {
-		copyPart = 'username';
+		copyPart = 'userName';
 		copyEntry = entry;
 		document.execCommand('copy');
 	}
