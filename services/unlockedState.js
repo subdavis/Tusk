@@ -158,8 +158,8 @@ function UnlockedState($router, keepassReference, protectedMemory, settings, not
 			notifications.push({
 				text: fieldName +' copied to clipboard.  Clipboard will clear in '+ interval +' minute(s).',
 				type: 'clipboard',
-			}).then(() => window.close());
-		});
+			}).then(() => window.close())
+		})
 
 	});
 

@@ -11,13 +11,7 @@ export class Notifications {
 						m: "showMessage",
 						text,
 						expire,
-					}, response => {
-						if (typeof response === "undefined" && chrome.runtime.lastError) {
-							reject(chrome.runtime.lastError.message);
-						} else {
-							resolve(response);
-						}
-					});
+					}, response => resolve(response));
 				} else {
 					resolve();
 				}
