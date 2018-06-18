@@ -37,7 +37,7 @@
 		<div class="box-bar roomy lighter">
 			<div>
 				<div class="switch">
-					<label>Password Expiration
+					<label>Password expiration
 						<input type="checkbox" value="expiration" v-model="notificationsEnabled">
 						<span class="lever"></span>
 					</label>
