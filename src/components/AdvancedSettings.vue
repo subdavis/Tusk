@@ -31,19 +31,19 @@
 		</div>
 
 		<div class="box-bar roomy">
-			<h4>Enable notifications</h4>
-			<p>If enabled, you will be be shown notifications regarding the password copying to clipboard.</p>
+			<h4>Notification</h4>
+			<p>Choose which type of notification do you want to receive from Tusk.</p>
 		</div>
 		<div class="box-bar roomy lighter">
 			<div>
 				<div class="switch">
-					<label>Expired password
+					<label>Password Expiration
 						<input type="checkbox" value="expiration" v-model="notificationsEnabled">
 						<span class="lever"></span>
 					</label>
 				</div>
 				<div class="switch">
-					<label>Clipboard
+					<label>Clipboard events
 						<input type="checkbox" value="clipboard" v-model="notificationsEnabled">
 						<span class="lever"></span>
 					</label>
