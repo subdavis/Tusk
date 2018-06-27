@@ -28,9 +28,8 @@
 
 			<form v-on:submit="clickUnlock">
 
-				<div class="stack-item masterPasswordInput">
-					<input :type="isMasterPasswordInputVisible ? 'text' : 'password'" id="masterPassword" v-model="masterPassword" placeholder="🔒 master password" ref="masterPassword">
-					<i @click="isMasterPasswordInputVisible = !isMasterPasswordInputVisible" :class="['fa', isMasterPasswordInputVisible ? 'fa-eye-slash' : 'fa-eye', 'fa-fw']" aria-hidden="true"></i> 
+				<div class="stack-item">
+					<input type="password" id="masterPassword" v-model="masterPassword" placeholder="🔒 master password" ref="masterPassword">
 				</div>
 
 				<div class="stack-item">
@@ -118,7 +117,6 @@
 				},
 				busy: false,
 				masterPassword: "",
-				isMasterPasswordInputVisible: false,
 				keyFiles: [], // list of all available
 				selectedKeyFile: undefined, // chosen keyfile object
 				rememberPeriod: 0, // in minutes. default: do not remember
@@ -442,17 +440,7 @@
 			width: 80px;
 			float: left;
 		}
-		.masterPasswordInput {
-			position: relative;
-			i {
-				position: absolute;
-				font-size: 14px;
-				top: calc(50% - 0.5em);
-				right: 10px;
-				cursor: pointer;
-			}
-		}
-		input[type=text], input[type=password] {
+		input[type=password] {
 			width: 100%;
 			box-sizing: border-box;
 			font-size: 18px;
