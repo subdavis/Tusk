@@ -3668,9 +3668,9 @@ just-extend@^1.1.27:
   version "1.1.27"
   resolved "https://registry.yarnpkg.com/just-extend/-/just-extend-1.1.27.tgz#ec6e79410ff914e472652abfa0e603c03d60e905"
 
-kdbxweb@^1.1.0:
-  version "1.2.3"
-  resolved "https://registry.yarnpkg.com/kdbxweb/-/kdbxweb-1.2.3.tgz#4191766c42e187d7ee7e002ee7008808e458c4a3"
+kdbxweb@^1.2.4:
+  version "1.2.4"
+  resolved "https://registry.yarnpkg.com/kdbxweb/-/kdbxweb-1.2.4.tgz#b9add7a1af60e56298732015fd425bcd95c4859b"
   dependencies:
     pako "github:keeweb/pako#653c0b00d8941c89d09ed4546d2179001ec44efc"
     text-encoding "github:keeweb/text-encoding#4dfb7cb0954c222852092f8b06ae4f6b4f60bfbb"
