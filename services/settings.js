@@ -290,6 +290,10 @@ function Settings(secureCache) {
 		return keyGetSetter('hotkeyNavEnabled', enabled, false, 'boolean')
 	}
 
+	exports.getSetStrictModeEnabled = function(enabled) {
+		return keyGetSetter('strictMatchModeEnabled', enabled, false, 'boolean')
+	}
+
 	return exports;
 }
 

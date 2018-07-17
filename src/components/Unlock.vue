@@ -227,44 +227,53 @@
 				this.unlockedState.clearCache() // new
 			},
 			showResults(entries) {
-
-				let siteUrl = parseUrl(this.unlockedState.url)
-				let title = this.unlockedState.title
-				let siteTokens = getValidTokens(siteUrl.hostname + '.' + this.unlockedState.title)
-				this.keepassService.rankEntries(entries, siteUrl, title, siteTokens) // in-place
-
-				let allEntries = entries
-				let priorityEntries = entries
-
-				//save short term (in-memory) filtered results
-				priorityEntries = entries.filter(function(entry) {
-					return (entry.matchRank >= 100)
-				});
-				if (priorityEntries.length == 0) {
-					priorityEntries = entries.filter(function(entry) {
-						return (entry.matchRank > 0.8 && !entry.URL); //a good match for an entry without a url
-					});
+				let getMatchesForThreshold = (threshold, entries, requireEmptyURL=false) => {
+					return entries.filter(e => (e.matchRank >= threshold) && (requireEmptyURL ? !e.URL : true));
 				}
-				if (priorityEntries.length == 0) {
-					priorityEntries = entries.filter(function(entry) {
-						return (entry.matchRank >= 0.4);
-					});
+				this.settings.getSetStrictModeEnabled().then(strictMode => {
+					let siteUrl = parseUrl(this.unlockedState.url)
+					let title = this.unlockedState.title
+					let siteTokens = getValidTokens(siteUrl.hostname + '.' + this.unlockedState.title)
+					this.keepassService.rankEntries(entries, siteUrl, title, siteTokens) // in-place
 
-					if (priorityEntries.length) {
-						this.unlockedMessages['warn'] = "No close matches, showing " + priorityEntries.length + " partial matches.";
+					let allEntries = entries
+
+					//save short term (in-memory) filtered results
+					let priorityEntries = getMatchesForThreshold(100, entries)
+					
+					if (priorityEntries.length == 0) {
+						priorityEntries = getMatchesForThreshold(10, entries)
+
+						// in strict mode, good matches are considered partial matches.
+						if (strictMode && priorityEntries.length) {
+							this.unlockedMessages['warn'] = "No perfect origin matches, showing " + priorityEntries.length + " partial matches.";
+						}
 					}
-				}
-				if (priorityEntries.length == 0) {
-					this.unlockedMessages['error'] = "No matches found for this site."
-				}
+					if (!strictMode && priorityEntries.length == 0) {
+						priorityEntries = getMatchesForThreshold(0.8, entries, true)
 
-				// Cache in memory
-				this.unlockedState.cacheSet('allEntries', allEntries)
-				this.unlockedState.cacheSet('priorityEntries', priorityEntries)
-				this.$forceUpdate()
-				//save longer term (in encrypted storage)
-				this.secureCache.save('secureCache.entries', entries);
-				this.busy = false
+					}
+					if (!strictMode && priorityEntries.length == 0) {
+						priorityEntries = entries.filter(function(entry) {
+							return (entry.matchRank >= 0.4);
+						});
+
+						if (priorityEntries.length) {
+							this.unlockedMessages['warn'] = "No close matches, showing " + priorityEntries.length + " partial matches.";
+						}
+					}
+					if (priorityEntries.length == 0) {
+						this.unlockedMessages['error'] = "No matches found for this site."
+					}
+
+					// Cache in memory
+					this.unlockedState.cacheSet('allEntries', allEntries)
+					this.unlockedState.cacheSet('priorityEntries', priorityEntries)
+					this.$forceUpdate()
+					//save longer term (in encrypted storage)
+					this.secureCache.save('secureCache.entries', entries);
+					this.busy = false
+				})
 			},
 			clickUnlock(event) {
 				event.preventDefault()
