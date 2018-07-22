@@ -31,6 +31,21 @@
 		</div>
 
 		<div class="box-bar roomy">
+			<h4>Grant permission on all websites</h4>
+			<p><strong style="color:#d9534f">Only proceed if you know what you're doing.</strong> If enabled, the extension prompts once for permission to access and change data on all websites and never again. <strong style="color:#d9534f">This is irreversible</strong> and has <a href="https://github.com/subdavis/Tusk/issues/168">serious security implications</a></p>
+		</div>
+		<div class="box-bar roomy lighter">
+			<div>
+				<div class="switch">
+					<label>Enabled
+			      		<input type="checkbox" v-model="grantAllPermissions" v-bind:disabled="grantAllPermissions">
+			      		<span class="lever"></span>
+			    	</label>
+				</div>
+			</div>
+		</div>
+
+		<div class="box-bar roomy">
 			<h4>Stored Data</h4>
 			<p>The following objects represent the current data cached in local storage. This data is only available to Tusk, and is never sent over any network connection.</p>
 		</div>
@@ -57,6 +72,13 @@
 				busy: false,
 				expireTime: 2,
 				hotkeyNavEnabled: false,
+				grantAllPermissions: false,
+				perms: {
+                    origins: [
+                        "https://*/*",
+                        "http://*/*"
+                    ]
+                },
 				jsonState: [{
 						k: 'databaseUsages',                    // key
 						f: this.settings.getSetDatabaseUsages,  // getter
@@ -124,6 +146,12 @@
 			},
 			hotkeyNavEnabled(newval, oldval) {
 				this.settings.getSetHotkeyNavEnabled(newval)
+			},
+			grantAllPermissions() {
+				chrome.runtime.sendMessage({
+					m: "requestPermission",
+					perms: this.perms
+				});
 			}
 		},
 		mounted() {
@@ -133,6 +161,9 @@
 			this.settings.getSetHotkeyNavEnabled().then(val => {
 				this.hotkeyNavEnabled = val;
 			})
+            chrome.permissions.contains(this.perms, granted => {
+				this.grantAllPermissions = !!granted;
+            });
 			this.jsonState.forEach(blob => {
 				blob.f().then(result => {
 					if (result && Object.keys(result).length) {
