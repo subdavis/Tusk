@@ -147,19 +147,11 @@
 			hotkeyNavEnabled(newval, oldval) {
 				this.settings.getSetHotkeyNavEnabled(newval)
 			},
-			allOriginPermission() {
-				if (!this.allOriginPermission) {
-                    chrome.permissions.request(this.allOriginPerms, granted => {
-                        if (!granted) {
-                            //log error
-                        }
-                    })
+			allOriginPermission(val) {
+				if (val) {
+                    chrome.permissions.request(this.allOriginPerms);
                 } else {
-                    chrome.permissions.remove(this.allOriginPerms, removed => {
-                        if (!removed) {
-                            //log error
-                        }
-                    })
+                    chrome.permissions.remove(this.allOriginPerms)
                 }
 			}
 		},
