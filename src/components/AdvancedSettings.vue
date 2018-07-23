@@ -148,10 +148,19 @@
 				this.settings.getSetHotkeyNavEnabled(newval)
 			},
 			grantAllPermissions() {
-				chrome.runtime.sendMessage({
-					m: "requestPermission",
-					perms: this.perms
-				});
+				if (!this.grantAllPermissions) {
+                    chrome.permissions.request(this.perms, granted => {
+                        if (!granted) {
+                            //log error
+                        }
+                    })
+                } else {
+                    chrome.permissions.remove(this.perms, removed => {
+                        if (!removed) {
+                            //log error
+                        }
+                    })
+                }
 			}
 		},
 		mounted() {
