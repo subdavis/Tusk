@@ -32,7 +32,7 @@
 
 		<div class="box-bar roomy">
 			<h4>Grant permission on all websites</h4>
-			<p><strong style="color:#d9534f">Only proceed if you know what you're doing.</strong> If enabled, the extension prompts once for permission to access and change data on all websites and never again. <strong style="color:#d9534f">This is irreversible</strong> and has <a href="https://github.com/subdavis/Tusk/issues/168">serious security implications</a></p>
+			<p><strong style="color:#d9534f">Only proceed if you know what you're doing.</strong> If enabled, the extension prompts once for permission to access and change data on all websites which disables the permissions popup on each new website. This has <a href="https://github.com/subdavis/Tusk/issues/168">serious security implications</a></p>
 		</div>
 		<div class="box-bar roomy lighter">
 			<div>
