@@ -38,7 +38,7 @@
 			<div>
 				<div class="switch">
 					<label>Enabled
-			      		<input type="checkbox" v-model="grantAllPermissions" v-bind:disabled="grantAllPermissions">
+			      		<input type="checkbox" v-model="grantAllPermissions">
 			      		<span class="lever"></span>
 			    	</label>
 				</div>
