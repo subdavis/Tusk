@@ -23,9 +23,9 @@
 			<div>
 				<div class="switch">
 					<label>Enabled
-			      		<input type="checkbox" v-model="hotkeyNavEnabled">
-			      		<span class="lever"></span>
-			    	</label>
+						<input type="checkbox" v-model="hotkeyNavEnabled">
+						<span class="lever"></span>
+					</label>
 				</div>
 			</div>
 		</div>
@@ -38,9 +38,9 @@
 			<div>
 				<div class="switch">
 					<label>Enabled
-			      		<input type="checkbox" v-model="allOriginPermission">
-			      		<span class="lever"></span>
-			    	</label>
+						<input type="checkbox" v-model="allOriginPermission">
+						<span class="lever"></span>
+					</label>
 				</div>
 			</div>
 		</div>
@@ -74,11 +74,11 @@
 				hotkeyNavEnabled: false,
 				allOriginPermission: false,
 				allOriginPerms: {
-                    origins: [
-                        "https://*/*",
-                        "http://*/*"
-                    ]
-                },
+					origins: [
+						"https://*/*",
+						"http://*/*"
+					]
+				},
 				jsonState: [{
 						k: 'databaseUsages',                    // key
 						f: this.settings.getSetDatabaseUsages,  // getter
@@ -149,10 +149,10 @@
 			},
 			allOriginPermission(val) {
 				if (val) {
-                    chrome.permissions.request(this.allOriginPerms);
-                } else {
-                    chrome.permissions.remove(this.allOriginPerms)
-                }
+					chrome.permissions.request(this.allOriginPerms);
+				} else {
+					chrome.permissions.remove(this.allOriginPerms)
+				}
 			}
 		},
 		mounted() {
@@ -162,9 +162,9 @@
 			this.settings.getSetHotkeyNavEnabled().then(val => {
 				this.hotkeyNavEnabled = val;
 			})
-            chrome.permissions.contains(this.allOriginPerms, granted => {
+			chrome.permissions.contains(this.allOriginPerms, granted => {
 				this.allOriginPermission = !!granted;
-            });
+			});
 			this.jsonState.forEach(blob => {
 				blob.f().then(result => {
 					if (result && Object.keys(result).length) {
