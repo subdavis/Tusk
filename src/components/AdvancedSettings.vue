@@ -31,6 +31,21 @@
 		</div>
 
 		<div class="box-bar roomy">
+			<h4>Grant permission on all websites</h4>
+			<p><strong style="color:#d9534f">Only proceed if you know what you're doing.</strong> If enabled, the extension prompts once for permission to access and change data on all websites which disables the permissions popup on each new website. This has <a href="https://github.com/subdavis/Tusk/issues/168">serious security implications</a></p>
+		</div>
+		<div class="box-bar roomy lighter">
+			<div>
+				<div class="switch">
+					<label>Enabled
+						<input type="checkbox" v-model="allOriginPermission">
+						<span class="lever"></span>
+					</label>
+				</div>
+			</div>
+		</div>
+
+		<div class="box-bar roomy">
 			<h4>Notification</h4>
 			<p>Choose which type of notification do you want to receive from Tusk.</p>
 		</div>
@@ -93,6 +108,13 @@
 				busy: false,
 				expireTime: 2,
 				hotkeyNavEnabled: false,
+				allOriginPermission: false,
+				allOriginPerms: {
+					origins: [
+						"https://*/*",
+						"http://*/*"
+					]
+				},
 				strictMatchEnabled: false,
 				notificationsEnabled: ['expiration'],
 				jsonState: [{
@@ -163,6 +185,13 @@
 			hotkeyNavEnabled(newval, oldval) {
 				this.settings.getSetHotkeyNavEnabled(newval)
 			},
+			allOriginPermission(val) {
+				if (val) {
+					chrome.permissions.request(this.allOriginPerms);
+				} else {
+					chrome.permissions.remove(this.allOriginPerms)
+				}
+			},
 			strictMatchEnabled(newval, oldval) {
 				this.settings.getSetStrictModeEnabled(newval)
 			},
@@ -183,6 +212,9 @@
 			this.settings.getSetStrictModeEnabled().then(val => {
 				this.strictMatchEnabled = val;
 			})
+			chrome.permissions.contains(this.allOriginPerms, granted => {
+				this.allOriginPermission = !!granted;
+			});
 			this.jsonState.forEach(blob => {
 				blob.f().then(result => {
 					if (result && Object.keys(result).length) {
