@@ -1,8 +1,7 @@
 "use strict";
 
-import {
-	ChromePromiseApi
-} from '$lib/chrome-api-promise.js'
+import { ChromePromiseApi } from '$lib/chrome-api-promise.js'
+import { parseUrl } from '$lib/utils.js'
 
 const chromePromise = ChromePromiseApi()
 
@@ -37,7 +36,7 @@ function UnlockedState($router, keepassReference, protectedMemory, settings, not
 					my.title = tabs[0].title;
 
 					var parsedUrl = parseUrl(tabs[0].url);
-					my.origin = parsedUrl.protocol + '//' + parsedUrl.hostname + '/';
+					my.origin = parsedUrl.origin;
 
 					chromePromise.permissions.contains({
 							origins: [my.origin]
@@ -162,24 +161,6 @@ function UnlockedState($router, keepassReference, protectedMemory, settings, not
 		})
 
 	});
-
-	function parseUrl(url) {
-		//from https://gist.github.com/jlong/2428561
-		var parser = document.createElement('a');
-		parser.href = url;
-
-		/*
-	parser.protocol; // => "http:"
-	parser.hostname; // => "example.com"
-	parser.port;     // => "3000"
-	parser.pathname; // => "/pathname/"
-	parser.search;   // => "?search=test"
-	parser.hash;     // => "#hash"
-	parser.host;     // => "example.com:3000"
-	*/
-
-		return parser;
-	}
 
 	return my;
 }

@@ -4,14 +4,12 @@ import { Links } from '$services/links.js'
 const chromePromise = ChromePromiseApi()
 const links = new Links()
 
-/**
- * Settings for Tusk  */
 function Settings(secureCache) {
 	"use strict";
 
 	var exports = {}
 
-	//upgrade old settings.  Called on install.
+	// upgrade old settings.  Called on install.
 	exports.upgrade = function() {
 		// Patch https://subdavis.com/blog/jekyll/update/2017/01/02/ckp-security-flaw.html
 		exports.getSetDatabaseUsages().then(usages => {
@@ -264,8 +262,7 @@ function Settings(secureCache) {
 	}
 
 	exports.getSetAccessToken = function(type, accessToken) {
-		let key = type + 'AccessToken';
-		return keyGetSetter(key, accessToken, null, 'string')
+		return keyGetSetter(type + 'AccessToken', accessToken, null, 'string')
 	}
 
 	exports.getSetDatabaseUsages = function(usages) {
@@ -286,6 +283,10 @@ function Settings(secureCache) {
 
 	exports.getSetHotkeyNavEnabled = function(enabled) {
 		return keyGetSetter('hotkeyNavEnabled', enabled, false, 'boolean')
+	}
+
+	exports.getSetStrictModeEnabled = function(enabled) {
+		return keyGetSetter('strictMatchModeEnabled', enabled, false, 'boolean')
 	}
 
 	exports.getSetNotificationsEnabled = function(enabledTypes) {

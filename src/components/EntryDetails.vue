@@ -134,7 +134,10 @@
 				}
 				switch (key) {
 					case 'url':
-						returnMap['href'] = parseUrl(this.entry[key]).href
+						let parsed = parseUrl(this.entry[key])
+						if (parsed !== null){
+							returnMap['href'] = parsed.href
+						}
 						break;
 					case 'notes':
 						returnMap['value'] = this.entry[key]
