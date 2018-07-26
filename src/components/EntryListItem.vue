@@ -21,6 +21,7 @@
 </template>
 `
 <script>
+	import { parseUrl } from '$lib/utils.js'
 	export default {
 		props: {
 			entry: Object,
@@ -56,12 +57,6 @@
 				e.stopPropagation()
 				console.log("copy")
 				this.unlockedState.copyPassword(this.entry);
-			},
-			parseUrl(url) {
-				url = url.indexOf('http') < 0 ? 'http://' + url : url
-				let a = document.createElement('a')
-				a.href = url
-				return a
 			}
 		}
 	}

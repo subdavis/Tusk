@@ -46,6 +46,42 @@
 		</div>
 
 		<div class="box-bar roomy">
+			<h4>Notification</h4>
+			<p>Choose which type of notification do you want to receive from Tusk.</p>
+		</div>
+		<div class="box-bar roomy lighter">
+			<div>
+				<div class="switch">
+					<label>Password expiration
+						<input type="checkbox" value="expiration" v-model="notificationsEnabled">
+						<span class="lever"></span>
+					</label>
+				</div>
+				<div class="switch">
+					<label>Clipboard events
+						<input type="checkbox" value="clipboard" v-model="notificationsEnabled">
+						<span class="lever"></span>
+					</label>
+				</div>
+			</div>
+		</div>
+
+		<div class="box-bar roomy">
+			<h4>Enable Strict Matching</h4>
+			<p>If enabled, only entries whose origins match exactly will be suggested for input.  Titles and other tab information will not be considered in matching.  For example, <pre>www.google.com</pre> will not match <pre>https://google.com</pre></p>
+		</div>
+		<div class="box-bar roomy lighter">
+			<div>
+				<div class="switch">
+					<label>Enabled
+			      		<input type="checkbox" v-model="strictMatchEnabled">
+			      		<span class="lever"></span>
+			    	</label>
+				</div>
+			</div>
+		</div>
+
+		<div class="box-bar roomy">
 			<h4>Stored Data</h4>
 			<p>The following objects represent the current data cached in local storage. This data is only available to Tusk, and is never sent over any network connection.</p>
 		</div>
@@ -79,9 +115,11 @@
 						"http://*/*"
 					]
 				},
+				strictMatchEnabled: false,
+				notificationsEnabled: ['expiration'],
 				jsonState: [{
-						k: 'databaseUsages',                    // key
-						f: this.settings.getSetDatabaseUsages,  // getter
+						k: 'databaseUsages',                      // key
+						f: this.settings.getSetDatabaseUsages,    // getter
 						delete: {
 							f: this.settings.destroyLocalStorage, // remover
 							arg: 'databaseUsages',                // remover args
@@ -129,8 +167,8 @@
 						f: this.settings.getAllForgetTimes
 					},
 					{
-						k: 'sharedUrlList', // key
-						f: this.settings.getSharedUrlList, // getter
+						k: 'sharedUrlList',
+						f: this.settings.getSharedUrlList,
 						delete: {
 							f: this.settings.destroyLocalStorage,
 							arg: 'sharedUrlList',
@@ -153,14 +191,26 @@
 				} else {
 					chrome.permissions.remove(this.allOriginPerms)
 				}
+			},
+			strictMatchEnabled(newval, oldval) {
+				this.settings.getSetStrictModeEnabled(newval)
+			},
+			notificationsEnabled(newval) {
+				this.settings.getSetNotificationsEnabled(newval)
 			}
 		},
 		mounted() {
 			this.settings.getSetClipboardExpireInterval().then(val => {
-				this.expireTime = val;
+				this.expireTime = val
 			})
 			this.settings.getSetHotkeyNavEnabled().then(val => {
-				this.hotkeyNavEnabled = val;
+				this.hotkeyNavEnabled = val
+			})
+			this.settings.getSetNotificationsEnabled().then(val => {
+				this.notificationsEnabled = val
+			})
+			this.settings.getSetStrictModeEnabled().then(val => {
+				this.strictMatchEnabled = val;
 			})
 			chrome.permissions.contains(this.allOriginPerms, granted => {
 				this.allOriginPermission = !!granted;

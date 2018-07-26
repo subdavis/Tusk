@@ -6,7 +6,7 @@ module.exports = {
     resolve: {
         extensions: ['.js', '.jsx', '.json', '.less', '.css'],
         modules: [__dirname, 'node_modules']
-     },
+    },
     entry: {
         library: [
             "axios",
@@ -17,7 +17,7 @@ module.exports = {
             "kdbxweb",
             "materialize-css",
             "pako",
-            "vue",
+            "vue/dist/vue.runtime.esm.js",
             "vue-simple-spinner",
             "webdav-client",
             "xmldom",
@@ -33,6 +33,11 @@ module.exports = {
             path: path.join(__dirname, "dll", "[name]-manifest.json"),
             name: "[name]",
         }),
-        new webpack.optimize.UglifyJsPlugin()
+        new webpack.optimize.UglifyJsPlugin(),
+        new webpack.DefinePlugin({
+            'process.env': {
+                NODE_ENV: '"production"'
+            }
+        })
     ]
 };
