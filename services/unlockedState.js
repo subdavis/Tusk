@@ -9,7 +9,7 @@ const chromePromise = ChromePromiseApi()
 /**
  * Shared state and methods for an unlocked password file.
  */
-function UnlockedState($router, keepassReference, protectedMemory, settings) {
+function UnlockedState($router, keepassReference, protectedMemory, settings, notifications) {
 	var my = {
 		tabId: "", //tab id of current tab
 		url: "", //url of current tab
@@ -154,13 +154,12 @@ function UnlockedState($router, keepassReference, protectedMemory, settings) {
 		e.preventDefault();
 
 		settings.getSetClipboardExpireInterval().then(interval => {
-			settings.setForgetTime('clearClipboard', Date.now() + interval * 60000)
-			chrome.runtime.sendMessage({
-				m: "showMessage",
-				text: fieldName +' copied to clipboard.  Clipboard will clear in '+ interval +' minute(s).'
-			});
-			window.close(); //close the popup
-		});
+			settings.setForgetTime('clearClipboard', Date.now() + interval * 60000);
+			notifications.push({
+				text: fieldName +' copied to clipboard.  Clipboard will clear in '+ interval +' minute(s).',
+				type: 'clipboard',
+			}).then(() => window.close())
+		})
 
 	});
 
@@ -170,14 +169,14 @@ function UnlockedState($router, keepassReference, protectedMemory, settings) {
 		parser.href = url;
 
 		/*
-    parser.protocol; // => "http:"
-    parser.hostname; // => "example.com"
-    parser.port;     // => "3000"
-    parser.pathname; // => "/pathname/"
-    parser.search;   // => "?search=test"
-    parser.hash;     // => "#hash"
-    parser.host;     // => "example.com:3000"
-    */
+	parser.protocol; // => "http:"
+	parser.hostname; // => "example.com"
+	parser.port;     // => "3000"
+	parser.pathname; // => "/pathname/"
+	parser.search;   // => "?search=test"
+	parser.hash;     // => "#hash"
+	parser.host;     // => "example.com:3000"
+	*/
 
 		return parser;
 	}

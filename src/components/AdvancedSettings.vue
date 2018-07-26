@@ -23,9 +23,30 @@
 			<div>
 				<div class="switch">
 					<label>Enabled
-			      		<input type="checkbox" v-model="hotkeyNavEnabled">
-			      		<span class="lever"></span>
-			    	</label>
+						<input type="checkbox" v-model="hotkeyNavEnabled">
+						<span class="lever"></span>
+					</label>
+				</div>
+			</div>
+		</div>
+
+		<div class="box-bar roomy">
+			<h4>Notification</h4>
+			<p>Choose which type of notification do you want to receive from Tusk.</p>
+		</div>
+		<div class="box-bar roomy lighter">
+			<div>
+				<div class="switch">
+					<label>Password expiration
+						<input type="checkbox" value="expiration" v-model="notificationsEnabled">
+						<span class="lever"></span>
+					</label>
+				</div>
+				<div class="switch">
+					<label>Clipboard events
+						<input type="checkbox" value="clipboard" v-model="notificationsEnabled">
+						<span class="lever"></span>
+					</label>
 				</div>
 			</div>
 		</div>
@@ -57,6 +78,7 @@
 				busy: false,
 				expireTime: 2,
 				hotkeyNavEnabled: false,
+				notificationsEnabled: ['expiration'],
 				jsonState: [{
 						k: 'databaseUsages',                    // key
 						f: this.settings.getSetDatabaseUsages,  // getter
@@ -124,14 +146,20 @@
 			},
 			hotkeyNavEnabled(newval, oldval) {
 				this.settings.getSetHotkeyNavEnabled(newval)
+			},
+			notificationsEnabled(newval) {
+				this.settings.getSetNotificationsEnabled(newval)
 			}
 		},
 		mounted() {
 			this.settings.getSetClipboardExpireInterval().then(val => {
-				this.expireTime = val;
+				this.expireTime = val
 			})
 			this.settings.getSetHotkeyNavEnabled().then(val => {
-				this.hotkeyNavEnabled = val;
+				this.hotkeyNavEnabled = val
+			})
+			this.settings.getSetNotificationsEnabled().then(val => {
+				this.notificationsEnabled = val
 			})
 			this.jsonState.forEach(blob => {
 				blob.f().then(result => {

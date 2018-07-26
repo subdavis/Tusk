@@ -8,7 +8,7 @@ const links = new Links()
  * Settings for Tusk  */
 function Settings(secureCache) {
 	"use strict";
-	
+
 	var exports = {}
 
 	//upgrade old settings.  Called on install.
@@ -249,9 +249,7 @@ function Settings(secureCache) {
 		let update_obj = {}
 		update_obj[key] = val
 		if (val !== undefined && (typeof(val) === value_type || val === null) )
-			return chromePromise.storage.local.set(update_obj).then(nil => {
-				return val
-			})
+			return chromePromise.storage.local.set(update_obj).then(() => val)
 		else
 			return chromePromise.storage.local.get(key).then(oldval => {
 				if (oldval[key] !== undefined)
@@ -288,6 +286,10 @@ function Settings(secureCache) {
 
 	exports.getSetHotkeyNavEnabled = function(enabled) {
 		return keyGetSetter('hotkeyNavEnabled', enabled, false, 'boolean')
+	}
+
+	exports.getSetNotificationsEnabled = function(enabledTypes) {
+		return keyGetSetter('notificationsEnabled', enabledTypes, ['clipboard','expiration'], 'object')
 	}
 
 	return exports;

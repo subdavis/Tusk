@@ -3,21 +3,21 @@
 		<!-- SVG Defs -->
 		<svg-defs></svg-defs>
 		<!-- Router View -->
-		<startup id="/" v-if="show.startup.visible" 
-			:settings="services.settings" 
+		<startup id="/" v-if="show.startup.visible"
+			:settings="services.settings"
 			:password-file-store-registry="services.passwordFileStoreRegistry"></startup>
-		<file-picker id="/choose" v-if="show.filePicker.visible" 
-			:password-file-store-registry="services.passwordFileStoreRegistry" 
-			:settings="services.settings" 
+		<file-picker id="/choose" v-if="show.filePicker.visible"
+			:password-file-store-registry="services.passwordFileStoreRegistry"
+			:settings="services.settings"
 			:links="services.links"></file-picker>
-		<unlock id="/unlock/:provider/:title" v-if="show.unlock.visible" 
-			:unlocked-state="services.unlockedState" 
-			:secure-cache="services.secureCache" 
-			:links="services.links" 
-			:settings="services.settings" 
+		<unlock id="/unlock/:provider/:title" v-if="show.unlock.visible"
+			:unlocked-state="services.unlockedState"
+			:secure-cache="services.secureCache"
+			:links="services.links"
+			:settings="services.settings"
 			:keepass-service="services.keepassService"></unlock>
-		<entry-details id="/entry-details/:entryId" v-if="show.entryDetails.visible" 
-			:unlocked-state="services.unlockedState" 
+		<entry-details id="/entry-details/:entryId" v-if="show.entryDetails.visible"
+			:unlocked-state="services.unlockedState"
 			:links="services.links"
 			:settings="services.settings"></entry-details>
 		<!-- End Router View -->
@@ -36,6 +36,7 @@
 	import { SecureCacheMemory } from '$services/secureCacheMemory.js'
 	import { PasswordFileStoreRegistry } from '$services/passwordFileStore.js'
 	import { Links } from '$services/links.js'
+	import { Notifications } from '$services/notifications.js'
 	// File Managers
 	import { LocalChromePasswordFileManager } from '$services/localChromePasswordFileManager.js'
 	import { GoogleDrivePasswordFileManager } from '$services/googleDrivePasswordFileManager.js'
@@ -58,6 +59,7 @@
 	const settings = new Settings(secureCacheMemory)
 	const keepassHeader = new KeepassHeader(settings)
 	const keepassReference = new KeepassReference()
+	const notifications = new Notifications(settings)
 
 	// File Managers
 	const localChromePasswordFileManager = new LocalChromePasswordFileManager()
@@ -70,11 +72,11 @@
 	const webdavFileManager = new WebdavFileManager(settings)
 
 	const passwordFileStoreRegistry = new PasswordFileStoreRegistry(
-		localChromePasswordFileManager, 
-		dropboxFileManager, 
-		googleDrivePasswordFileManager, 
-		sharedUrlFileManager, 
-		sampleDatabaseFileManager, 
+		localChromePasswordFileManager,
+		dropboxFileManager,
+		googleDrivePasswordFileManager,
+		sharedUrlFileManager,
+		sampleDatabaseFileManager,
 		oneDriveFileManager,
 		pCloudFileManager,
 		webdavFileManager)
@@ -99,7 +101,7 @@
 					passwordFileStoreRegistry,
 					keepassService,
 					links,
-					unlockedState: new UnlockedState(this.$router, keepassReference, protectedMemory, settings)
+					unlockedState: new UnlockedState(this.$router, keepassReference, protectedMemory, settings, notifications)
 				},
 				show: {
 					unlock: {
