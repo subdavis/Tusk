@@ -17,7 +17,7 @@ module.exports = {
             "kdbxweb",
             "materialize-css",
             "pako",
-            "vue",
+            "vue/dist/vue.runtime.esm.js",
             "vue-simple-spinner",
             "webdav-client",
             "xmldom",

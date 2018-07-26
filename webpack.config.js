@@ -74,7 +74,7 @@ module.exports = {
     },
     resolve: {
         alias: {
-            'vue$': 'vue/dist/vue.esm.js',
+            'vue$': 'vue/dist/vue.runtime.esm.js',
             '$lib': path.resolve(__dirname, 'lib/'),
             '$services': path.resolve(__dirname, 'services/'),
             '$bwr': path.resolve(__dirname, 'bower_components/'),

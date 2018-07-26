@@ -18,22 +18,19 @@ function ProtectedMemory() {
 		hydrate: deserialize //not encrypted
 	}
 
-	var enckey, keyPromise;
 	var dataMap = {};
 	var AES = {
 		name: "AES-CBC",
 		iv: window.crypto.getRandomValues(new Uint8Array(16))
 	};
 
-	keyPromise = initNewKey();
+	var keyPromise = initNewKey();
 
 	function initNewKey() {
 		return window.crypto.subtle.generateKey({
 			name: "AES-CBC",
 			length: 256
-		}, false, ["encrypt", "decrypt"]).then(function(k) {
-			enckey = k;
-		});
+		}, false, ["encrypt", "decrypt"]);
 	}
 
 	function getData(key) {
@@ -41,9 +38,9 @@ function ProtectedMemory() {
 		if (encData === undefined || typeof(encData) !== 'string')
 			return Promise.resolve(undefined);
 
-		return keyPromise.then(function() {
+		return keyPromise.then( key => {
 			var encBytes = Base64.decode(encData);
-			return window.crypto.subtle.decrypt(AES, enckey, encBytes);
+			return window.crypto.subtle.decrypt(AES, key, encBytes);
 		}).then(function(data) {
 			var decoder = new TextDecoder();
 			var decoded = decoder.decode(new Uint8Array(data));
@@ -56,8 +53,8 @@ function ProtectedMemory() {
 		var preppedData = prepData(data);
 		var encoder = new TextEncoder();
 		var dataBytes = encoder.encode(JSON.stringify(preppedData));
-		return keyPromise.then(function() {
-			return window.crypto.subtle.encrypt(AES, enckey, dataBytes);
+		return keyPromise.then( key => {
+			return window.crypto.subtle.encrypt(AES, key, dataBytes);
 		}).then(function(encData) {
 			var dataString = Base64.encode(encData);
 			dataMap[key] = dataString;
