@@ -237,8 +237,6 @@
 					this.keepassService.rankEntries(entries, siteUrl, title, siteTokens) // in-place
 
 					let allEntries = entries
-
-					//save short term (in-memory) filtered results
 					let priorityEntries = getMatchesForThreshold(100, entries)
 					
 					if (priorityEntries.length == 0) {
@@ -251,12 +249,9 @@
 					}
 					if (!strictMode && priorityEntries.length == 0) {
 						priorityEntries = getMatchesForThreshold(0.8, entries, true)
-
 					}
 					if (!strictMode && priorityEntries.length == 0) {
-						priorityEntries = entries.filter(function(entry) {
-							return (entry.matchRank >= 0.4);
-						});
+						priorityEntries = getMatchesForThreshold(0.4, entries)
 
 						if (priorityEntries.length) {
 							this.unlockedMessages['warn'] = "No close matches, showing " + priorityEntries.length + " partial matches.";
