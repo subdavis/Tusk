@@ -7,9 +7,9 @@
 			<div class="user">
 				{{ entry.userName || '&#60;empty&#62;' }}
 			</div>
-			<div class="otp" v-if="entry.view_is_active">
-				{{ entry.otp_value }}
-			</div>
+		</div>
+		<div class="otp-block" v-bind:class="{ hidden: !entry.view_is_active }">
+			{{ otp_value }}
 		</div>
 		<div class="buttons">
 			<span class="fa-stack otp" v-if="otp" v-on:click="copyOtp">
@@ -30,7 +30,7 @@
 `
 <script>
 	import { parseUrl } from '$lib/utils.js'
-    const OTP = require('keeweb/app/scripts/util/otp.js')
+    const OTP = require('keeweb/app/scripts/util/otp.js');
 
 	export default {
 		props: {
@@ -58,10 +58,8 @@
 		  return {
               // OTP
               otp: false,
-              otp_timeleft: 0,
               otp_loop: undefined,
               otp_value: "",
-              otp_height: 0
           }
 		},
         beforeDestroy(){
@@ -72,13 +70,11 @@
 				this.$router.route("/entry-details/" + this.entry.id)
 			},
             setupOTP(url) {
-                let otpobj = OTP.parseUrl(url)
-                this.otp = true
+                let totp = OTP.parseUrl(url)
+				this.otp = typeof totp.key === "undefined"
                 let do_otp = () => {
-                    otpobj.next((code, timeleft)=>{
+                    totp.next(code => {
                         this.otp_value = code;
-                        this.otp_timeleft = (timeleft / 1000) | 0;
-                        this.otp_height = Math.floor(timeleft / 300) + "%"
                     })
                 }
                 this.otp_loop = setInterval(do_otp, 2000)
@@ -94,6 +90,9 @@
 				console.log("copy")
 				this.unlockedState.copyPassword(this.entry);
             },
+            copyOtp(e) {
+			    e.stopPropagation()
+			},
             parseUrl(url) {
                 url = url.indexOf('http') < 0 ? 'http://' + url : url
                 let a = document.createElement('a')
@@ -102,7 +101,10 @@
             }
 		},
 		mounted() {
-            this.setupOTP(this.unlockedState.getDecryptedAttribute(this.entry, "otp"))
+		    const otpUrl = this.unlockedState.getDecryptedAttribute(this.entry, "otp");
+		    if (otpUrl.length) {
+                this.setupOTP(otpUrl)
+            }
 		}
 	}
 </script>
@@ -130,6 +132,9 @@
 			box-sizing: border-box;
 			min-width: 80px;
 		}
+		.otp-block {
+			font: 16px monospace;
+		}
 		.copy,
 		.autofill,
 		.otp {
@@ -139,6 +144,9 @@
 		.autofill:hover,
 		.otp:hover {
 			opacity: .8;
+		}
+		.hidden {
+			display: none;
 		}
 		&.active {
 			background-color: $highlighted;
