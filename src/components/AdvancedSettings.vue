@@ -23,9 +23,30 @@
 			<div>
 				<div class="switch">
 					<label>Enabled
-			      		<input type="checkbox" v-model="hotkeyNavEnabled">
-			      		<span class="lever"></span>
-			    	</label>
+						<input type="checkbox" v-model="hotkeyNavEnabled">
+						<span class="lever"></span>
+					</label>
+				</div>
+			</div>
+		</div>
+
+		<div class="box-bar roomy">
+			<h4>Notification</h4>
+			<p>Choose which type of notification do you want to receive from Tusk.</p>
+		</div>
+		<div class="box-bar roomy lighter">
+			<div>
+				<div class="switch">
+					<label>Password expiration
+						<input type="checkbox" value="expiration" v-model="notificationsEnabled">
+						<span class="lever"></span>
+					</label>
+				</div>
+				<div class="switch">
+					<label>Clipboard events
+						<input type="checkbox" value="clipboard" v-model="notificationsEnabled">
+						<span class="lever"></span>
+					</label>
 				</div>
 			</div>
 		</div>
@@ -73,9 +94,10 @@
 				expireTime: 2,
 				hotkeyNavEnabled: false,
 				strictMatchEnabled: false,
+				notificationsEnabled: ['expiration'],
 				jsonState: [{
-						k: 'databaseUsages',                    // key
-						f: this.settings.getSetDatabaseUsages,  // getter
+						k: 'databaseUsages',                      // key
+						f: this.settings.getSetDatabaseUsages,    // getter
 						delete: {
 							f: this.settings.destroyLocalStorage, // remover
 							arg: 'databaseUsages',                // remover args
@@ -123,8 +145,8 @@
 						f: this.settings.getAllForgetTimes
 					},
 					{
-						k: 'sharedUrlList', // key
-						f: this.settings.getSharedUrlList, // getter
+						k: 'sharedUrlList',
+						f: this.settings.getSharedUrlList,
 						delete: {
 							f: this.settings.destroyLocalStorage,
 							arg: 'sharedUrlList',
@@ -142,15 +164,21 @@
 				this.settings.getSetHotkeyNavEnabled(newval)
 			},
 			strictMatchEnabled(newval, oldval) {
-				this.settings.getSetStrictModeEnabled(newval);
+				this.settings.getSetStrictModeEnabled(newval)
+			},
+			notificationsEnabled(newval) {
+				this.settings.getSetNotificationsEnabled(newval)
 			}
 		},
 		mounted() {
 			this.settings.getSetClipboardExpireInterval().then(val => {
-				this.expireTime = val;
+				this.expireTime = val
 			})
 			this.settings.getSetHotkeyNavEnabled().then(val => {
-				this.hotkeyNavEnabled = val;
+				this.hotkeyNavEnabled = val
+			})
+			this.settings.getSetNotificationsEnabled().then(val => {
+				this.notificationsEnabled = val
 			})
 			this.settings.getSetStrictModeEnabled().then(val => {
 				this.strictMatchEnabled = val;
