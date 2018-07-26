@@ -1,14 +1,18 @@
 <template>
 	<div class="entry-list-item selectable between flair" v-bind:class="{ active: entry.view_is_active }" v-on:click="details">
 		<div class="text-info" v-bind:class="{ strike: entry.is_expired }">
-			<span class="header">{{ header }}</span>
-			<br>
-			<span class="user">
-        {{ entry.userName || '&#60;empty&#62;' }}
-      </span>
+			<div class="header">
+				{{ header }}
+			</div>
+			<div class="user">
+				{{ entry.userName || '&#60;empty&#62;' }}
+			</div>
+			<div class="otp" v-if="entry.view_is_active">
+				{{ entry.otp_value }}
+			</div>
 		</div>
 		<div class="buttons">
-			<span class="fa-stack otp" v-if="otp">
+			<span class="fa-stack otp" v-if="otp" v-on:click="copyOtp">
 				<i class="fa fa-circle fa-stack-2x"></i>
 				<i class="fa fa-clock-o fa-stack-1x fa-inverse"></i>
 			</span>
@@ -127,11 +131,13 @@
 			min-width: 80px;
 		}
 		.copy,
-		.autofill {
+		.autofill,
+		.otp {
 			opacity: .2;
 		}
 		.copy:hover,
-		.autofill:hover {
+		.autofill:hover,
+		.otp:hover {
 			opacity: .8;
 		}
 		&.active {
