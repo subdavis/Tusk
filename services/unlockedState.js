@@ -2,7 +2,6 @@
 
 import { ChromePromiseApi } from '$lib/chrome-api-promise.js'
 import { parseUrl } from '$lib/utils.js'
-import { parse } from 'path';
 
 const chromePromise = ChromePromiseApi()
 
