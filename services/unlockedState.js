@@ -36,7 +36,7 @@ function UnlockedState($router, keepassReference, protectedMemory, settings, not
 					my.title = tabs[0].title;
 
 					var parsedUrl = parseUrl(tabs[0].url);
-					my.origin = parsedUrl.origin;
+					my.origin = parsedUrl.protocol + '//' + parsedUrl.hostname + '/';
 
 					chromePromise.permissions.contains({
 							origins: [my.origin]
