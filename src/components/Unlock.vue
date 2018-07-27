@@ -29,7 +29,7 @@
 			<form v-on:submit="clickUnlock">
 
 				<div class="stack-item masterPasswordInput">
-					<input :type="isMasterPasswordInputVisible ? 'text' : 'password'" id="masterPassword" v-model="masterPassword" placeholder="🔒 master password" ref="masterPassword">
+					<input :type="isMasterPasswordInputVisible ? 'text' : 'password'" id="masterPassword" v-model="masterPassword" placeholder="🔒 master password" ref="masterPassword" autocomplete="off">
 					<i @click="isMasterPasswordInputVisible = !isMasterPasswordInputVisible" :class="['fa', isMasterPasswordInputVisible ? 'fa-eye-slash' : 'fa-eye', 'fa-fw']" aria-hidden="true"></i> 
 				</div>
 
