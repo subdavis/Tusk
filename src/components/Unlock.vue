@@ -17,9 +17,7 @@
 		<!-- Unlock input group -->
 		<div id="masterPasswordGroup" v-if="!busy && !isUnlocked()">
 
-			<div class="box-bar small selectable" @click="$router.route('/choose')">
-				<span><b>{{ databaseFileName }}</b></span> <span class="right-align">change...</span>
-			</div>
+
 
 			<div class="unlockLogo stack-item">
 				<img src="assets/icons/logo.png">
@@ -28,6 +26,9 @@
 
 			<form class="unlock-form" v-on:submit="clickUnlock">
 
+				<div class="small selectable">
+					<b>{{ databaseFileName }}</b> <span @click="$router.route('/choose')" class="muted-color">change...</span>
+				</div>
 				<div class="stack">
 					<div class="stack-item masterPasswordInput">
 						<input :type="isMasterPasswordInputVisible ? 'text' : 'password'" id="masterPassword" v-model="masterPassword" placeholder="Master password" ref="masterPassword" autocomplete="off">
@@ -52,8 +53,8 @@
 				</div>
 
 				<div class="form-item keyfile-add-button">
-					<span @click="links.openOptionsKeyfiles" class="muted-color right" v-if="(!keyFiles.length)">
-						Add a keyfile...
+					<span @click="links.openOptionsKeyfiles" class="muted-color selectable right" v-if="(!keyFiles.length)">
+						Add a keyfile
 					</span>
 				</div>
 
@@ -410,12 +411,12 @@
 			}
 
 			// modify unlockedState internal state
-			this.unlockedState.getTabDetails().then(nil => {
-				if (this.unlockedState.sitePermission){
+			this.unlockedState.getTabDetails().then(() => {
+				if (this.unlockedState.sitePermission) {
 					this.generalMessages.success = "You have previously granted Tusk permission to fill passwords on " + this.unlockedState.origin
-				}
-				else
-					this.generalMessages.warn = "This site is not yet known to Tusk."
+				} else if (this.isUnlocked()) {
+                    this.generalMessages.warn = "This site is not yet known to Tusk."
+                }
 			})
 			//set knowlege from the URL
 			this.databaseFileName = decodeURIComponent(this.$router.getRoute().title)
@@ -442,9 +443,6 @@
 		}
 		.keyfile-add-button {
 			height: 10px;
-			> span {
-				cursor: pointer
-			}
 		}
 		.keyFile {
 			font-size: 14px
