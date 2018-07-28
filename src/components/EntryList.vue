@@ -65,7 +65,7 @@
 					switch (evt.keyCode){
 					case 67: // C
 					case 66: // B
-						if (evt.ctrlKey || evt.metaKey) {
+						if ((evt.ctrlKey || evt.metaKey) && !evt.shiftKey && !evt.altKey) {
 							if (evt.keyCode === 67) {
 								this.unlockedState.copyPassword(this.activeEntry)
 							} else if (evt.keyCode === 66) {

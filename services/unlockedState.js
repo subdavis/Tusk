@@ -131,6 +131,11 @@ function UnlockedState($router, keepassReference, protectedMemory, settings, not
 		copyEntry = entry;
 		document.execCommand('copy');
 	}
+	my.copyTotp = function(entry) {
+		copyPart = 'TOTP';
+		copyEntry = entry;
+		document.execCommand('copy');
+	}
 	my.gotoDetails = function(entry) {
 		$router.route('/entry-details/' + entry.id);
 	}

@@ -60,6 +60,14 @@
               otp: false,
               otp_loop: undefined,
               otp_value: "",
+			  keyHandler: e => {
+                  if ((e.ctrlKey || e.metaKey) && e.key == "/" && !e.altKey && !e.shiftKey)  {
+                      copyPlain = this.otp_value;
+                      document.execCommand('copy')
+					  copyPlain = undefined;
+                      e.stopPropagation
+                  }
+			  }
           }
 		},
         beforeDestroy(){
@@ -105,6 +113,7 @@
 		    if (otpUrl.length) {
                 this.setupOTP(otpUrl)
             }
+            window.addEventListener("keydown", this.keyHandler);
 		}
 	}
 </script>
