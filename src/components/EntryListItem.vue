@@ -8,7 +8,7 @@
 				{{ entry.userName || '&#60;empty&#62;' }}
 			</div>
 		</div>
-		<div class="otp-block" v-bind:class="{ hidden: !entry.view_is_active }">
+		<div class="otp-block valign-wrapper" v-bind:class="{ hidden: !entry.view_is_active }">
 			{{ otp_value }}
 		</div>
 		<div class="buttons">
@@ -79,7 +79,7 @@
 			},
             setupOTP(url) {
                 let totp = OTP.parseUrl(url)
-				this.otp = typeof totp.key === "undefined"
+				this.otp = typeof totp.key !== "undefined"
                 let do_otp = () => {
                     totp.next(code => {
                         this.otp_value = code;
