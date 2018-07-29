@@ -62,10 +62,7 @@
               otp_value: "",
 			  keyHandler: e => {
                   if ((e.ctrlKey || e.metaKey) && e.key == "/" && !e.altKey && !e.shiftKey)  {
-                      copyPlain = this.otp_value;
-                      document.execCommand('copy')
-					  copyPlain = undefined;
-                      e.stopPropagation
+                      this.copyOtp(e);
                   }
 			  }
           }
@@ -100,6 +97,7 @@
             },
             copyOtp(e) {
 			    e.stopPropagation()
+				this.unlockedState.copyTotp(this.otp_value);
 			},
             parseUrl(url) {
                 url = url.indexOf('http') < 0 ? 'http://' + url : url
