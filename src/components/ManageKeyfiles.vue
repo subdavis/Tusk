@@ -1,10 +1,21 @@
 <template>
 	<div id="key-file-manager">
 		<div class="box-bar about roomy">
-			<p>Key files are an <b>optional authentication method</b>. More info on key files is available on the <a href="http://keepass.info/help/base/keys.html#keyfiles" target="_blank">KeePass site</a>
-				<p>Tusk can store your key files locally in your browser's storage, and apply them when opening your password database. Websites and other browser extensions do not have access to these files. However, they are <b>stored unencrypted</b> in your local browser profile and someone with access to your device could read them.</p>
+				<p>
+					Key files are an <b>optional authentication method</b>.
+					More info on key files is available on the
+					<a href="http://keepass.info/help/base/keys.html#keyfiles" target="_blank">
+						KeePass site
+					</a>
+				</p>
+				<p>
+					Tusk can store your key files locally in your browser's storage, and apply them when opening your password database. Websites and other browser extensions do not have access to these files. However, they are <b>stored unencrypted</b> in your local browser profile and someone with access to your device could read them.
+				</p>
 				<input multiple type="file" style="display:none;" id="file" name='file' @change="handleAdd" />
 				<a @click="selectFileInput" class="waves-effect waves-light btn">Add Key File</a>
+				<p class="box-bar error white-text" v-if="errorMessage">
+					{{ errorMessage }}
+				</p>
 		</div>
 		<div v-for="(file, file_index) in keyFiles" class="box-bar roomy small lighter">
 			<span>{{ file.name }} <i @click="removeKeyFile(file_index)" class="fa fa-times-circle selectable" aria-hidden="true"></i></span>
@@ -51,6 +62,8 @@
 						this.keyFileParser.getKeyFromFile(e.target.result).then(key => {
 							this.settings.addKeyFile(fp.name, key)
 								.then(this.loadKeyFiles)
+						}).catch(err => {
+							this.errorMessage = err.message;
 						})
 					};
 					reader.readAsArrayBuffer(fp)
