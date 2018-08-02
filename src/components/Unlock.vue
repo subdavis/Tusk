@@ -17,50 +17,63 @@
 		<!-- Unlock input group -->
 		<div id="masterPasswordGroup" v-if="!busy && !isUnlocked()">
 
-			<div class="box-bar small selectable" @click="$router.route('/choose')">
-				<span><b>{{ databaseFileName }}</b> ( click to change <i class="fa fa-database" aria-hidden="true"></i> )</span>
-			</div>
+
 
 			<div class="unlockLogo stack-item">
 				<img src="assets/icons/logo.png">
 				<span>KeePass Tusk</span>
 			</div>
 
-			<form v-on:submit="clickUnlock">
+			<form class="unlock-form" v-on:submit="clickUnlock">
 
-				<div class="stack-item masterPasswordInput">
-					<input :type="isMasterPasswordInputVisible ? 'text' : 'password'" id="masterPassword" v-model="masterPassword" placeholder="🔒 master password" ref="masterPassword" autocomplete="off">
-					<i @click="isMasterPasswordInputVisible = !isMasterPasswordInputVisible" :class="['fa', isMasterPasswordInputVisible ? 'fa-eye-slash' : 'fa-eye', 'fa-fw']" aria-hidden="true"></i> 
+				<div class="small selectable">
+					<b>{{ databaseFileName }}</b> <span @click="$router.route('/choose')" class="muted-color">change...</span>
 				</div>
-
-				<div class="stack-item">
-					<div id="select-keyfile" class="selectable" @click="selectedKeyFile = undefined; keyFilePicker = !keyFilePicker">
-						<i class="fa fa-key" aria-hidden="true"></i> {{selectedKeyFileName}}
+				<div class="stack">
+					<div class="stack-item masterPasswordInput">
+						<input :type="isMasterPasswordInputVisible ? 'text' : 'password'" id="masterPassword" v-model="masterPassword" placeholder="Master password" ref="masterPassword" autocomplete="off">
+						<i @click="isMasterPasswordInputVisible = !isMasterPasswordInputVisible" :class="['fa', isMasterPasswordInputVisible ? 'fa-eye-slash' : 'fa-eye', 'fa-fw']" aria-hidden="true"></i>
+					</div>
+					<div class="stack-item keyFile" v-if="(keyFiles.length)">
+						<div id="select-keyfile" class="selectable" @click="selectedKeyFile = undefined; keyFilePicker = !keyFilePicker">
+							<i class="fa fa-key" aria-hidden="true"></i> {{selectedKeyFileName}}
+						</div>
+						<div class="stack-item keyfile-picker" v-if="keyFilePicker">
+							<transition name="keyfile-picker">
+								<div>
+									<span class="selectable" v-for="(kf, kf_index) in keyFiles" :keyfile-index="kf_index" @click="chooseKeyFile(kf_index)">
+										<i class="fa fa-file fa-fw" aria-hidden="true"></i>
+										{{ kf.name }}
+									</span>
+									<span @click="links.openOptionsKeyfiles" class="selectable"><i class="fa fa-wrench fa-fw" aria-hidden="true"></i> Manage Keyfiles</span>
+								</div>
+							</transition>
+						</div>
 					</div>
 				</div>
 
-				<div class="stack-item keyfile-picker" v-if="keyFilePicker">
-					<transition name="keyfile-picker">
-						<div>
-							<span class="selectable" v-for="(kf, kf_index) in keyFiles" :keyfile-index="kf_index" @click="chooseKeyFile(kf_index)">
-								<i class="fa fa-file fa-fw" aria-hidden="true"></i>
-                				{{ kf.name }}
-							</span>
-							<span @click="links.openOptionsKeyfiles" class="selectable"><i class="fa fa-wrench fa-fw" aria-hidden="true"></i> Manage Keyfiles</span>
-						</div>
-					</transition>
-				</div>
-
-				<div class="box-bar small plain remember-period-picker">
-					<span>
-            <label for="rememberPeriodLength">
-              <span>{{rememberPeriodText}} (slide to choose)</span></label>
-					<input id="rememberPeriodLength" type="range" min="0" :max="slider_options.length - 1" step="1" v-model="slider_int" v-on:input="setRememberPeriod(undefined)" />
+				<div class="form-item keyfile-add-button">
+					<span @click="links.openOptionsKeyfiles" class="muted-color selectable right" v-if="(!keyFiles.length)">
+						Add a keyfile
 					</span>
 				</div>
 
-				<div class="stack-item">
-					<button class="action-button selectable" v-on:click="clickUnlock">Unlock Database</button>
+
+
+				<div class="form-item box-bar small plain remember-period-picker center">
+					<div class="col">
+						<label for="rememberPeriodLength">
+							<span>{{rememberPeriodText}}</span>
+						</label>
+					</div>
+					<div class="col">
+						<input id="rememberPeriodLength" type="range" min="0" :max="slider_options.length - 1" step="1" v-model="slider_int" v-on:input="setRememberPeriod(undefined)" />
+
+					</div>
+				</div>
+
+				<div class="form-item stack-item center">
+					<button class="action-button selectable" v-on:click="clickUnlock">Unlock</button>
 				</div>
 			</form>
 
@@ -69,13 +82,20 @@
 		<!-- Footer -->
 		<div class="box-bar medium between footer" v-show="!busy">
 			<span class="selectable" @click="links.openOptions">
-        <i class="fa fa-cog" aria-hidden="true"></i> Settings</span>
+        		<i class="fa fa-cog" aria-hidden="true"></i>
+				Settings
+			</span>
 			<span class="selectable" v-if="isUnlocked()" @click="forgetPassword()">
-        <i class="fa fa-lock" aria-hidden="true" ></i> Lock Database</span>
+        		<i class="fa fa-lock" aria-hidden="true"></i>
+				Lock Database
+			</span>
 			<span class="selectable" v-else @click="closeWindow">
-        <i class="fa fa-times-circle" aria-hidden="true"></i> Close Window</span>
+        		<i class="fa fa-times-circle" aria-hidden="true"></i>
+				Close
+			</span>
 			<span class="selectable" @click="links.openHomepage">
-        <i class="fa fa-info-circle" aria-hidden="true"></i> v{{ appVersion }}</span>
+				v{{ appVersion }}
+			</span>
 		</div>
 
 	</div>
@@ -165,7 +185,7 @@
 			selectedKeyFileName: function() {
 				if (this.selectedKeyFile !== undefined)
 					return this.selectedKeyFile.name
-				return "No keyfile selected.  (click to change)"
+				return "Choose a keyfile..."
 			}
 		},
 		watch: {
@@ -391,12 +411,12 @@
 			}
 
 			// modify unlockedState internal state
-			this.unlockedState.getTabDetails().then(nil => {
-				if (this.unlockedState.sitePermission){
+			this.unlockedState.getTabDetails().then(() => {
+				if (this.unlockedState.sitePermission) {
 					this.generalMessages.success = "You have previously granted Tusk permission to fill passwords on " + this.unlockedState.origin
-				}
-				else
-					this.generalMessages.warn = "This may be a new site to Tusk. Before filling in a password, double check that this is the correct site."
+				} else if (this.isUnlocked()) {
+                    this.generalMessages.warn = "This site is not yet known to Tusk."
+                }
 			})
 			//set knowlege from the URL
 			this.databaseFileName = decodeURIComponent(this.$router.getRoute().title)
@@ -407,17 +427,32 @@
 <style lang="scss">
 	@import "../styles/settings.scss";
 	#masterPasswordGroup {
+		.unlock-form {
+			padding: 0 40px;
+			& > .form-item {
+				margin-bottom: 10px
+			}
+		}
+		.stack {
+			border: 1px solid $light-gray;
+			font-size: 18px;
+		}
+		.action-button {
+			padding: 4px 30px;
+			width: initial
+		}
+		.keyfile-add-button {
+			height: 10px;
+		}
+		.keyFile {
+			font-size: 14px
+		}
 		.keyfile-picker {
-			background-color: $light-background-color;
-			box-sizing: border-box;
-			transition: all .2s linear;
+			transition: all .1s linear;
 			max-height: 200px;
 			overflow-y: auto;
 			opacity: 1;
-			border-top: 1px solid $light-gray;
-			border-bottom: 1px solid $light-gray;
 			padding: 5px $wall-padding;
-			margin: 5px 0px;
 			&.keyfile-picker-enter,
 			&.keyfile-picker-leave-to {
 				max-height: 0px;
@@ -434,7 +469,6 @@
 		#select-keyfile {
 			padding: 8px $wall-padding;
 			background-color: $light-background-color;
-			border-bottom: 1px solid $light-gray;
 			i {
 				font-size: 14px;
 			}
@@ -444,7 +478,6 @@
 		}
 		#rememberPeriodLength {
 			width: 80px;
-			float: left;
 		}
 		.masterPasswordInput {
 			position: relative;
@@ -459,20 +492,26 @@
 		input[type=text], input[type=password] {
 			width: 100%;
 			box-sizing: border-box;
-			font-size: 18px;
 			border-width: 0px 0px;
 			padding: 5px $wall-padding;
-			border-top: 1px solid $light-gray;
 			&:focus {
 				outline: none;
 			}
 		}
 		.remember-period-picker {
-			margin: 6px 0px;
+			&:after {
+				display:table;
+				content:" ";
+				clear:both
+			}
+			.col {
+				display: inline-block;
+				padding: 0 5px;
+				width: 50%;
+				float: left
+			}
 			input[type=range] {
 				-webkit-appearance: none;
-				margin: 6px;
-				margin-left: 0px;
 			}
 		}
 		input[type=range]:focus {
