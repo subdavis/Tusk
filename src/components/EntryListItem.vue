@@ -137,7 +137,6 @@
 			display: flex;
 			justify-content: space-between;
 			box-sizing: border-box;
-			min-width: 80px;
 		}
 		.otp-block {
 			font: 16px monospace;
