@@ -17,16 +17,16 @@
 		<!-- Unlock input group -->
 		<div id="masterPasswordGroup" v-if="!busy && !isUnlocked()">
 
-			<div class="box-bar small selectable" @click="$router.route('/choose')">
-				<span><b>{{ databaseFileName }}</b> ( click to change <i class="fa fa-database" aria-hidden="true"></i> )</span>
-			</div>
-
 			<div class="unlockLogo stack-item">
 				<img src="assets/icons/logo.png">
 				<span>KeePass Tusk</span>
 			</div>
 
 			<form v-on:submit="clickUnlock">
+
+				<div class="small selectable">
+					<b>{{ databaseFileName }}</b> <span @click="$router.route('/choose')" class="muted-color">change...</span>
+				</div>
 
 				<div class="stack-item masterPasswordInput">
 					<input :type="isMasterPasswordInputVisible ? 'text' : 'password'" id="masterPassword" v-model="masterPassword" placeholder="🔒 master password" ref="masterPassword" autocomplete="off">
