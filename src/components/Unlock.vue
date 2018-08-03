@@ -256,11 +256,11 @@
 						priorityEntries = getMatchesForThreshold(0.4, entries)
 
 						if (priorityEntries.length) {
-							this.unlockedMessages['warn'] = "No close matches, showing " + priorityEntries.length + " partial matches.";
+							this.unlockedMessages.warn = "No close matches, showing " + priorityEntries.length + " partial matches.";
 						}
 					}
 					if (priorityEntries.length == 0) {
-						this.unlockedMessages['error'] = "No matches found for this site."
+						this.unlockedMessages.warn = "No matches found for this site."
 					}
 
 					// Cache in memory
@@ -394,9 +394,9 @@
 			this.unlockedState.getTabDetails().then(nil => {
 				if (this.unlockedState.sitePermission){
 					this.generalMessages.success = "You have previously granted Tusk permission to fill passwords on " + this.unlockedState.origin
-				}
-				else
-					this.generalMessages.warn = "This may be a new site to Tusk. Before filling in a password, double check that this is the correct site."
+				} else if (this.isUnlocked()) {
+                    this.generalMessages.warn = "This may be a new site to Tusk. Before filling in a password, double check that this is the correct site."
+                }
 			})
 			//set knowlege from the URL
 			this.databaseFileName = decodeURIComponent(this.$router.getRoute().title)

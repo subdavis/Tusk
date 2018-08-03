@@ -6,7 +6,7 @@
 <template>
 	<div class="messenger">
 		<div class="box-bar small warn" v-show="messages.warn">
-			<span><i class="fa fa-exclamation-triangle fa-fw dashicon warn" aria-hidden="true"></i> {{ messages.warn }}</span></div>
+			<span><i class="fa fa-exclamation-triangle fa-fw dashicon" aria-hidden="true"></i> {{ messages.warn }}</span></div>
 		<div class="box-bar small error" v-show="messages.error">
 			<span><i class="fa fa-times-circle fa-fw" aria-hidden="true"></i> {{ messages.error }}</span></div>
 		<div class="box-bar small success" v-show="messages.success">
@@ -24,4 +24,7 @@
 
 <style lang="scss">
 	@import "../styles/settings.scss";
+	.box-bar {
+		padding-left: 4px
+	}
 </style>
