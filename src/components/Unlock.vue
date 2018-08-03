@@ -365,7 +365,7 @@
 				}
 
 				let focus = () => {
-					this.$nextTick(nil => {
+					this.$nextTick(() => {
 						let mp = this.$refs.masterPassword;
 						if (mp !== undefined)
 							mp.focus()
@@ -379,11 +379,11 @@
 					} else {
 						try_autounlock()
 					}
-				}).catch(err => {
+				}).catch(() => {
 					//this is fine - it just means the cache expired.  Clear the cache to be sure.
 					this.secureCache.clear('secureCache.entries')
 					try_autounlock()
-				}).then(nil => {
+				}).then(() => {
 					// state settled
 					this.busy = false
 					focus()
@@ -391,7 +391,7 @@
 			}
 
 			// modify unlockedState internal state
-			this.unlockedState.getTabDetails().then(nil => {
+			this.unlockedState.getTabDetails().then(() => {
 				if (this.unlockedState.sitePermission){
 					this.generalMessages.success = "You have previously granted Tusk permission to fill passwords on " + this.unlockedState.origin
 				} else if (this.isUnlocked()) {
