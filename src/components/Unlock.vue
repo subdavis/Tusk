@@ -24,7 +24,7 @@
 
 			<form v-on:submit="clickUnlock">
 
-				<div class="small selectable">
+				<div class="small selectable databaseChoose">
 					<b>{{ databaseFileName }}</b> <span @click="$router.route('/choose')" class="muted-color">change...</span>
 				</div>
 
@@ -510,4 +510,8 @@
 			background-color: $dark-background-color;
 		}
 	}
+
+    .databaseChoose {
+        padding-left: 5px;
+    }
 </style>
