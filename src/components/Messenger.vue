@@ -23,8 +23,4 @@
 </script>
 
 <style lang="scss">
-	@import "../styles/settings.scss";
-	.box-bar {
-		padding-left: 4px
-	}
 </style>

@@ -24,8 +24,8 @@
 
 			<form v-on:submit="clickUnlock">
 
-				<div class="small selectable databaseChoose">
-					<b>{{ databaseFileName }}</b> <span @click="$router.route('/choose')" class="muted-color">change...</span>
+				<div class="small selectable databaseChoose" @click="$router.route('/choose')">
+					<b>{{ databaseFileName }}</b> <span class="muted-color">change...</span>
 				</div>
 
 				<div class="stack-item masterPasswordInput">
@@ -392,9 +392,10 @@
 
 			// modify unlockedState internal state
 			this.unlockedState.getTabDetails().then(() => {
+
 				if (this.unlockedState.sitePermission){
 					this.generalMessages.success = "You have previously granted Tusk permission to fill passwords on " + this.unlockedState.origin
-				} else if (this.isUnlocked()) {
+				} else {
                     this.generalMessages.warn = "This may be a new site to Tusk. Before filling in a password, double check that this is the correct site."
                 }
 			})
