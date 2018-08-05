@@ -17,16 +17,16 @@
 		<!-- Unlock input group -->
 		<div id="masterPasswordGroup" v-if="!busy && !isUnlocked()">
 
-			<div class="box-bar small selectable" @click="$router.route('/choose')">
-				<span><b>{{ databaseFileName }}</b> ( click to change <i class="fa fa-database" aria-hidden="true"></i> )</span>
-			</div>
-
 			<div class="unlockLogo stack-item">
 				<img src="assets/icons/logo.png">
 				<span>KeePass Tusk</span>
 			</div>
 
 			<form v-on:submit="clickUnlock">
+
+				<div class="small selectable databaseChoose" @click="$router.route('/choose')">
+					<b>{{ databaseFileName }}</b> <span class="muted-color">change...</span>
+				</div>
 
 				<div class="stack-item masterPasswordInput">
 					<input :type="isMasterPasswordInputVisible ? 'text' : 'password'" id="masterPassword" v-model="masterPassword" placeholder="🔒 master password" ref="masterPassword" autocomplete="off">
@@ -256,11 +256,11 @@
 						priorityEntries = getMatchesForThreshold(0.4, entries)
 
 						if (priorityEntries.length) {
-							this.unlockedMessages['warn'] = "No close matches, showing " + priorityEntries.length + " partial matches.";
+							this.unlockedMessages.warn = "No close matches, showing " + priorityEntries.length + " partial matches.";
 						}
 					}
 					if (priorityEntries.length == 0) {
-						this.unlockedMessages['error'] = "No matches found for this site."
+						this.unlockedMessages.warn = "No matches found for this site."
 					}
 
 					// Cache in memory
@@ -365,7 +365,7 @@
 				}
 
 				let focus = () => {
-					this.$nextTick(nil => {
+					this.$nextTick(() => {
 						let mp = this.$refs.masterPassword;
 						if (mp !== undefined)
 							mp.focus()
@@ -379,11 +379,11 @@
 					} else {
 						try_autounlock()
 					}
-				}).catch(err => {
+				}).catch(() => {
 					//this is fine - it just means the cache expired.  Clear the cache to be sure.
 					this.secureCache.clear('secureCache.entries')
 					try_autounlock()
-				}).then(nil => {
+				}).then(() => {
 					// state settled
 					this.busy = false
 					focus()
@@ -391,12 +391,13 @@
 			}
 
 			// modify unlockedState internal state
-			this.unlockedState.getTabDetails().then(nil => {
+			this.unlockedState.getTabDetails().then(() => {
+
 				if (this.unlockedState.sitePermission){
 					this.generalMessages.success = "You have previously granted Tusk permission to fill passwords on " + this.unlockedState.origin
-				}
-				else
-					this.generalMessages.warn = "This may be a new site to Tusk. Before filling in a password, double check that this is the correct site."
+				} else {
+                    this.generalMessages.warn = "This may be a new site to Tusk. Before filling in a password, double check that this is the correct site."
+                }
 			})
 			//set knowlege from the URL
 			this.databaseFileName = decodeURIComponent(this.$router.getRoute().title)
@@ -510,4 +511,8 @@
 			background-color: $dark-background-color;
 		}
 	}
+
+    .databaseChoose {
+        padding-left: 5px;
+    }
 </style>

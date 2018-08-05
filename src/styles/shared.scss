@@ -30,15 +30,15 @@
 }
 
 .error {
-  background-color: $light-red;
+  border-left: 4px solid $light-red;
 }
 
 .warn {
-  background-color: $warn-yellow;
+  border-left: 4px solid $warn-yellow;
 }
 
 .success {
-  background-color: $green;
+  border-left: 4px solid $green;
 }
 
 button.action-button {
