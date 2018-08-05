@@ -1,7 +1,9 @@
 # Tusk
-> A modern, clean keepass browser extension built with Vue.js and kdbxweb.  Rebooted from perfectapi/CKP
 
 <p align="center"><img src="https://i.imgur.com/iCRotcg.png"></p>
+
+> A modern, clean keepass browser extension built with Vue.js and kdbxweb.  Rebooted from perfectapi/CKP
+
 
 ## Installation
 
