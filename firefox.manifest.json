@@ -6,8 +6,8 @@
 	"minimum_chrome_version": "48",
 	"description": "Readonly KeePass password database integration for Firefox",
 	"icons": {
-		"16": "assets/icons/logo_16.png",
-		"48": "assets/icons/logo_48.png"
+		"16": "/assets/icons/exported/16x16.png",
+		"48": "/assets/icons/exported/48x48.png"
 	},
 	"background": {
 		"scripts": [
@@ -16,7 +16,7 @@
 		]
 	},
 	"browser_action": {
-		"default_icon": "assets/icons/logo_38.png",
+		"default_icon": "assets/icons/exported/38x38.png",
 		"default_popup": "popup.html",
     "default_title": "KeePass Tusk"
 	},

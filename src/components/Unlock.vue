@@ -18,7 +18,7 @@
 		<div id="masterPasswordGroup" v-if="!busy && !isUnlocked()">
 
 			<div class="unlockLogo stack-item">
-				<img src="assets/icons/logo.png">
+				<img src="assets/icons/exported/128x128.svg">
 				<span>KeePass Tusk</span>
 			</div>
 

@@ -185,8 +185,8 @@
 			hotkeyNavEnabled(newval, oldval) {
 				this.settings.getSetHotkeyNavEnabled(newval)
 			},
-			allOriginPermission(val) {
-				if (val) {
+			allOriginPermission(newval) {
+				if (newval) {
 					chrome.permissions.request(this.allOriginPerms);
 				} else {
 					chrome.permissions.remove(this.allOriginPerms)
