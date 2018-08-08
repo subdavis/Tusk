@@ -187,9 +187,17 @@
 			},
 			allOriginPermission(val) {
 				if (val) {
-					chrome.permissions.request(this.allOriginPerms);
+					chrome.permissions.request(this.allOriginPerms, () => {
+					    if (chrome.runtime.lastError) {
+					        console.warn(chrome.runtime.lastError.message)
+						}
+					})
 				} else {
-					chrome.permissions.remove(this.allOriginPerms)
+					chrome.permissions.remove(this.allOriginPerms, () => {
+                        if (chrome.runtime.lastError) {
+                            console.warn(chrome.runtime.lastError.message)
+                        }
+					})
 				}
 			},
 			strictMatchEnabled(newval, oldval) {
