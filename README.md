@@ -29,7 +29,6 @@ This section provides in-depth information about how tusk works under the hood. 
 Tusk requires:
 * `node`
 * `npm`
-* `gulp`
 * `yarn`
 
 ```bash
@@ -38,9 +37,6 @@ yarn install
 
 # Build static DLL resources
 yarn build-dll
-
-# static reload with file watch
-yarn watch
 
 # build for production with minification
 yarn build
@@ -59,13 +55,13 @@ For detailed explanation on how things work, consult the [docs for vue-loader](h
 
 ## Running tests
 
-To run tests, first build them with `yarn build-tests` or `yarn watch-tests` then open `tests/test.html` in a browser.s
+To run tests, first build them with `yarn build-tests` or `yarn watch-tests` then open `tests/test.html` in a browser.
 
 ## Browser Permissions
 
 > Tusk requires cross-origin permissions in order to inject credentials and query the storage backends on the user's behalf.
 
-In chrome, these permissions requests are __always__ promted to the user upon first use.
+In chrome, these permissions requests are __always__ prompted to the user upon first use.
 
 Because of Firefox's implementation of `browser.permissions`, it was necessary to request all permissions at install time to avoid code rot.  A deeper explanation of the firefox permissions can be found [on stackoverflow](https://stackoverflow.com/questions/47723297/firefox-extension-api-permissions-request-may-only-be-called-from-a-user-input)
 

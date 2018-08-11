@@ -1,6 +1,6 @@
 # Contribution Guidelines
 
-A more thorough set of contributing guidelines is fourthcoming, but here are the basics:
+A more thorough set of contributing guidelines is forthcoming, but here are the basics:
 
 * We welcome new contributors, but always review code.
 * Pull requests must address an issue in the issue tracker and be well-documented.
