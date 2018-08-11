@@ -1,27 +1,45 @@
-## This issue is a 
+### This issue is a 
 
-- [ ] bug
-- [ ] feature
-- [ ] question
+bug / feature / question 
 
-<!-- 
-- [x] is a checked box 
-- [ ] is an empty box
--->
+<!-- Please leave only one -->
 
-### Please describe the current behavior, and explain why it's bad.
+### Steps to reproduce - current behaviour
 
 <!-- 
   First, read https://github.com/subdavis/Tusk/wiki/Troubleshooting 
   
   If this issue is a bug, please explain what steps you took 
   and how to reproduce your issue.
+  
+  For example: 
+  1. I open Tusk
+  1. I input the password
+  1. It doesn't unlock
 -->
 
-EXAMPLE: "I cannot use files kept in Mega.co.nz"
+### What is the expected behaviour
 
-### Please describe how you think it should change.
+<!--
+  For example:
+  Please enable unlocking in Tusk!
+--> 
 
-EXAMPLE: "Please consider adding Mega.co.nz support for Tusk"
+#### Additional remarks
 
-### Anything else?
+<!-- This is optional --> 
+
+#### Environment 
+
+**Operating System:**
+
+**Browser:**
+
+**Storage:**
+
+<!-- 
+  For example: 
+  Operating System: macOS 10.XX.X / Windows 10 Pro
+  Browser: Chrome XX.XXX.XXX / Firefox XX.XXX
+  Storage: Nextcloud / Google Drive / Dropbox
+-->
