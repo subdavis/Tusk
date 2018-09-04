@@ -1,128 +1,128 @@
 <html>
 
 <head>
-  <title>CKPX - Sample Entry</title>
-  <style>
-    input {
+    <title>CKPX - Sample Entry</title>
+    <style>
+        input {
       display: none;
     }
     legend {
       cursor: pointer;
     }
   </style>
-  <script src="jquery.min.js"></script>
+    <script src="jquery.min.js"></script>
 </head>
 
 <body>
-  <form action="#">
-    <fieldset>
-      <legend>
-        Simple login
-      </legend>
-      <input type="text" placeholder="username" class="show">
-      <input type="password" class="show">
-    </fieldset>
-    <fieldset>
-      <legend>
-        Registration form
-      </legend>
-      <input type="text" placeholder="username" class="show">
-      <input type="password" class="show">
-      <input type="password" placeholder="repeat password" class="show">
-    </fieldset>
-    <fieldset>
-      <legend>
-        Login with non-sibling inputs
-      </legend>
-      <div>
-        <input type="text" placeholder="username" class="show">
-      </div>
-      <div>
-        <input type="password" class="show">
-      </div>
-    </fieldset>
-    <fieldset>
-      <legend>
-        Orphaned username field
-      </legend>
-      <div>
-        <input type="text" placeholder="username" class="show">
-      </div>
-    </fieldset>
-    <fieldset>
-      <legend>
-        email login
-      </legend>
-      <input type="email" placeholder="email" class="show">
-      <input type="password" class="show">
-    </fieldset>
-    <fieldset>
-      <legend>
-        Non-specified input type
-      </legend>
-      <input placeholder="username" class="show">
-      <input type="password" class="show">
-    </fieldset>
-    <fieldset>
-      <legend>
-        Visible password. We don't fill in "shown" passwords, they have to be a true password type.
-      </legend>
-      <input placeholder="username" class="show">
-      <div class="uk-form-password">
-        <input type="text" class="show">
-      </div>
-    </fieldset>
-    <fieldset>
-      <legend>
-        Hidden password field. (Should not fill in)
-      </legend>
-      <input type="text" placeholder="username" class="show">
-      <input type="password" style="display:none;">
-    </fieldset>
-    <fieldset>
-      <legend>
-        Hidden username field. (Should fill in, but not guaranteed in all scenarios)
-      </legend>
-      <input type="text" style="display:none;" placeholder="username">
-      <input type="password" class="show">
-    </fieldset>
-    <fieldset>
-      <legend>
-        Lonely password field
-      </legend>
-      <input type="password" class="show">
-    </fieldset>
-    <fieldset>
-      <legend>
-        Detects filled in (turns yellow). So far, no way I can find that a content script can trigger this.
-      </legend>
-      <input type="text" placeholder="username" class="show js-detect-yellow">
-      <input type="password" class="show detect-yellow">
-    </fieldset>
-    <fieldset>
-      <legend>
-        iframe - should fill out since it is in the same origin, but won't trigger the action icon, because it is not https
-      </legend>
-      <iframe src="iframecontent.html" height="60">
-      </iframe>
-    </fieldset>
-  </form>
+    <form action="#">
+        <fieldset>
+            <legend>
+                Simple login
+            </legend>
+            <input type="text" placeholder="username" class="show">
+            <input type="password" class="show">
+        </fieldset>
+        <fieldset>
+            <legend>
+                Registration form
+            </legend>
+            <input type="text" placeholder="username" class="show">
+            <input type="password" class="show">
+            <input type="password" placeholder="repeat password" class="show">
+        </fieldset>
+        <fieldset>
+            <legend>
+                Login with non-sibling inputs
+            </legend>
+            <div>
+                <input type="text" placeholder="username" class="show">
+            </div>
+            <div>
+                <input type="password" class="show">
+            </div>
+        </fieldset>
+        <fieldset>
+            <legend>
+                Orphaned username field
+            </legend>
+            <div>
+                <input type="text" placeholder="username" class="show">
+            </div>
+        </fieldset>
+        <fieldset>
+            <legend>
+                email login
+            </legend>
+            <input type="email" placeholder="email" class="show">
+            <input type="password" class="show">
+        </fieldset>
+        <fieldset>
+            <legend>
+                Non-specified input type
+            </legend>
+            <input placeholder="username" class="show">
+            <input type="password" class="show">
+        </fieldset>
+        <fieldset>
+            <legend>
+                Visible password. We don't fill in "shown" passwords, they have to be a true password type.
+            </legend>
+            <input placeholder="username" class="show">
+            <div class="uk-form-password">
+                <input type="text" class="show">
+            </div>
+        </fieldset>
+        <fieldset>
+            <legend>
+                Hidden password field. (Should not fill in)
+            </legend>
+            <input type="text" placeholder="username" class="show">
+            <input type="password" style="display:none;">
+        </fieldset>
+        <fieldset>
+            <legend>
+                Hidden username field. (Should fill in, but not guaranteed in all scenarios)
+            </legend>
+            <input type="text" style="display:none;" placeholder="username">
+            <input type="password" class="show">
+        </fieldset>
+        <fieldset>
+            <legend>
+                Lonely password field
+            </legend>
+            <input type="password" class="show">
+        </fieldset>
+        <fieldset>
+            <legend>
+                Detects filled in (turns yellow). So far, no way I can find that a content script can trigger this.
+            </legend>
+            <input type="text" placeholder="username" class="show js-detect-yellow">
+            <input type="password" class="show detect-yellow">
+        </fieldset>
+        <fieldset>
+            <legend>
+                iframe - should fill out since it is in the same origin, but won't trigger the action icon, because it is not https
+            </legend>
+            <iframe src="iframecontent.html" height="60">
+            </iframe>
+        </fieldset>
+    </form>
 
-  <script type="text/javascript">
-    $('legend').on('click', function() {
-      $(this).closest('fieldset').find('input.show').toggle();
-    });
+    <script type="text/javascript">
+        $('legend').on('click', function() {
+            $(this).closest('fieldset').find('input.show').toggle();
+        });
 
-    function turnYellow(input) {
-      $(this).css({
-        'background': 'yellow'
-      });
-    }
+        function turnYellow(input) {
+            $(this).css({
+                'background': 'yellow'
+            });
+        }
 
-    //$('input.js-detect-yellow').on('keypress', turnYellow);
-    $('input.js-detect-yellow').on('keydown', turnYellow);
-    //$('input.js-detect-yellow').on('keyup', turnYellow);
-  </script>
+        //$('input.js-detect-yellow').on('keypress', turnYellow);
+        $('input.js-detect-yellow').on('keydown', turnYellow);
+        //$('input.js-detect-yellow').on('keyup', turnYellow);
+    </script>
 </body>
 
 </html>
