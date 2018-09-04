@@ -140,17 +140,17 @@ function GoogleDrivePasswordFileManager(settings) {
 		}
 	}
 
-	function chrome_auth (interactive){
+	function chrome_auth(interactive) {
 		// chrome_auth is an alternative auth function run when the 
 		// browser is Chrome.  It uses chrome.identity.getAuthToken rather than
 		// a standard Oauth flow.
 		interactive = !!interactive;
 		return new Promise(function(resolve, reject) {
 			chrome.identity.getAuthToken({
-				interactive : interactive
+				interactive: interactive
 			}, function(token) {
 				if (token)
-				  settings.getSetAccessToken(accessTokenType, token).then(function() {
+					settings.getSetAccessToken(accessTokenType, token).then(function() {
 						resolve(token);
 					});
 				else {
@@ -171,11 +171,10 @@ function GoogleDrivePasswordFileManager(settings) {
 
 	// If this browser has the getAuthToken function.  Hack for #64
 	try {
-		if (chrome.identity.getAuthToken !== undefined){
+		if (chrome.identity.getAuthToken !== undefined) {
 			oauth['auth'] = chrome_auth;
 		}
-	} 
-	catch (e) {
+	} catch (e) {
 		console.info("Firefox mobile detected.")
 	}
 

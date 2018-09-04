@@ -1,8 +1,10 @@
 const should = require('should')
 
-import { KeepassReference } from '$services/keepassReference.js'
+import {
+	KeepassReference
+} from '../../services/keepassReference'
 
-describe('Keepass References', function () {
+describe('Keepass References', function() {
 
 	// http://keepass.info/help/base/fieldrefs.html
 
@@ -145,13 +147,13 @@ describe('Keepass References', function () {
 	describe('checking if field has references', function() {
 		it('should return true if has simple reference', function() {
 			refService.hasReferences('{REF:I@O:something}', entry, entries).should.be.true;
-		})		
+		})
 		it('should return true if has embedded simple reference', function() {
 			refService.hasReferences('something {TITLE} something', entry, entries).should.be.true;
-		})		
+		})
 		it('should return false if no reference', function() {
 			refService.hasReferences('something something', entry, entries).should.be.false;
-		})		
+		})
 	})
 
 	describe('interpolating multiple references', function() {

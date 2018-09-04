@@ -146,7 +146,9 @@ function OauthManager(settings, oauth) {
 			}).catch(function(error) {
 				console.error("Get chosen file failure:", error)
 				if (error.response === undefined)
-					return Promise.reject({message:"No network connection"})
+					return Promise.reject({
+						message: "No network connection"
+					})
 				if (error.response.status == 401) {
 					//unauthorized, means the token is bad.  retry with new token.
 					console.error("Stale token sent for " + oauth.accessTokenType + ": trying passive Oauth Refresh.")
@@ -182,7 +184,7 @@ function OauthManager(settings, oauth) {
 			return new Promise(function(resolve, reject) {
 				chromePromise.runtime.getManifest().then(manifest => {
 					//random state, protects against CSRF
-					var randomState = Base64.encode(window.crypto.getRandomValues(new Uint8Array(16))); 
+					var randomState = Base64.encode(window.crypto.getRandomValues(new Uint8Array(16)));
 					var authUrl = oauth.authUrl +
 						'&client_id=' + manifest.static_data[oauth.accessTokenType].client_id +
 						'&state=' + encodeURIComponent(randomState) +

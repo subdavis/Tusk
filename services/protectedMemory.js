@@ -38,7 +38,7 @@ function ProtectedMemory() {
 		if (encData === undefined || typeof(encData) !== 'string')
 			return Promise.resolve(undefined);
 
-		return keyPromise.then( key => {
+		return keyPromise.then(key => {
 			var encBytes = Base64.decode(encData);
 			return window.crypto.subtle.decrypt(AES, key, encBytes);
 		}).then(function(data) {
@@ -53,7 +53,7 @@ function ProtectedMemory() {
 		var preppedData = prepData(data);
 		var encoder = new TextEncoder();
 		var dataBytes = encoder.encode(JSON.stringify(preppedData));
-		return keyPromise.then( key => {
+		return keyPromise.then(key => {
 			return window.crypto.subtle.encrypt(AES, key, dataBytes);
 		}).then(function(encData) {
 			var dataString = Base64.encode(encData);
@@ -63,8 +63,8 @@ function ProtectedMemory() {
 	}
 
 	function clearData(key) {
-		if (key !== undefined){
-			delete dataMap[key]	
+		if (key !== undefined) {
+			delete dataMap[key]
 		} else {
 			dataMap = {};
 			keyPromise = initNewKey();

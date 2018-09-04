@@ -7,8 +7,13 @@ let Case = require('case'),
 	pako = require('pako'),
 	kdbxweb = require('kdbxweb')
 
-import { argon2 } from '$lib/argon2.js'
-import { parseUrl, getValidTokens } from '$lib/utils.js'
+import {
+	argon2
+} from '$lib/argon2.js'
+import {
+	parseUrl,
+	getValidTokens
+} from '$lib/utils.js'
 
 function KeepassService(keepassHeader, settings, passwordFileStoreRegistry, keepassReference) {
 	var my = {};
@@ -18,7 +23,7 @@ function KeepassService(keepassHeader, settings, passwordFileStoreRegistry, keep
 		new DataView(buffer).setInt16(0, 256, true);
 		return new Int16Array(buffer)[0] === 256;
 	})();
-	
+
 	/** 
 	 * return Promise(arrayBufer)
 	 */
@@ -77,20 +82,20 @@ function KeepassService(keepassHeader, settings, passwordFileStoreRegistry, keep
 	my.rankEntries = (entries, siteUrl, title, siteTokens) => {
 		entries.forEach(function(entry) {
 			//apply a ranking algorithm to find the best matches
-			var entryOrigins = [ parseUrl(entry.url) ]
-			
-			if (entry.keys.indexOf('tuskUrls') >= 0){
+			var entryOrigins = [parseUrl(entry.url)]
+
+			if (entry.keys.indexOf('tuskUrls') >= 0) {
 				let others = entry.tuskUrls
 					.split(',')
 					.map(val => {
 						return parseUrl(val)
 					})
-					entryOrigins = entryOrigins.concat(others)
+				entryOrigins = entryOrigins.concat(others)
 			}
 			if (entryOrigins.length && entryOrigins.some(a => a && (a.origin == siteUrl.origin)))
 				entry.matchRank = 100 // perfect match
 			else if (entryOrigins.length && entryOrigins.some(a => a && (a.host == siteUrl.host)))
-				entry.matchRank = 10  // possible match
+				entry.matchRank = 10 // possible match
 			else if (entryOrigins.length && entryOrigins.some(a => a && (a.hostname == siteUrl.hostname)))
 				entry.matchRank = -100 // phishing?
 			else
@@ -109,7 +114,7 @@ function KeepassService(keepassHeader, settings, passwordFileStoreRegistry, keep
 					if (token1 == token2) {
 						entry.matchRank += 0.2;
 					}
-					
+
 				}
 			}
 		})

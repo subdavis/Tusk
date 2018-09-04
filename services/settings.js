@@ -1,6 +1,10 @@
 const Base64 = require('base64-arraybuffer')
-import { ChromePromiseApi } from '$lib/chrome-api-promise.js'
-import { Links } from '$services/links.js'
+import {
+	ChromePromiseApi
+} from '$lib/chrome-api-promise.js'
+import {
+	Links
+} from '$services/links.js'
 const chromePromise = ChromePromiseApi()
 const links = new Links()
 
@@ -246,7 +250,7 @@ function Settings(secureCache) {
 	let keyGetSetter = function(key, val, defaultval, value_type) {
 		let update_obj = {}
 		update_obj[key] = val
-		if (val !== undefined && (typeof(val) === value_type || val === null) )
+		if (val !== undefined && (typeof(val) === value_type || val === null))
 			return chromePromise.storage.local.set(update_obj).then(() => val)
 		else
 			return chromePromise.storage.local.get(key).then(oldval => {
@@ -290,7 +294,7 @@ function Settings(secureCache) {
 	}
 
 	exports.getSetNotificationsEnabled = function(enabledTypes) {
-		return keyGetSetter('notificationsEnabled', enabledTypes, ['clipboard','expiration'], 'object')
+		return keyGetSetter('notificationsEnabled', enabledTypes, ['clipboard', 'expiration'], 'object')
 	}
 
 	return exports;

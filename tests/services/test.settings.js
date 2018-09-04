@@ -1,4 +1,6 @@
-import { Settings } from '$services/settings'
+import {
+	Settings
+} from '$services/settings'
 const should = require('should')
 var disk = {};
 
@@ -15,17 +17,17 @@ window.chrome.storage.local = {
 		callback()
 	}
 }
-describe('Settings', function () {
+describe('Settings', function() {
 	"use strict";
 
 	let settings = new Settings();
 
 	beforeEach(function() {
-    disk = {};
-  })
+		disk = {};
+	})
 
 	describe('forget times', function() {
-		
+
 		it('should set a simple time', function() {
 			return settings.setForgetTime(new Date());
 		});
@@ -94,7 +96,7 @@ describe('Settings', function () {
 				return settings.getAllForgetTimes()
 			}).then(function(allTimes) {
 				(allTimes.test === undefined).should.be.true;
-			});			
+			});
 		})
 
 		it('should not error on deleting invalid key', function() {
@@ -103,7 +105,7 @@ describe('Settings', function () {
 	})
 
 	describe("Remember Options", function() {
-		
+
 		it('should support setting default remember period', function() {
 			let rememberPeriod = 1234;
 			return settings.getSetDefaultRememberPeriod(rememberPeriod).then(function() {
@@ -115,13 +117,13 @@ describe('Settings', function () {
 
 		it('should support setting the clipboard expire interval', function() {
 			let expireInterval = 8;
-			return settings.getSetClipboardExpireInterval(expireInterval).then(function(){
+			return settings.getSetClipboardExpireInterval(expireInterval).then(function() {
 				return settings.getSetClipboardExpireInterval().then(interval => {
 					interval.should.equal(expireInterval).which.is.a.Number();
 				})
 			})
 		})
-	
+
 	})
-	
+
 });
