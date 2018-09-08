@@ -37,11 +37,7 @@
 		<div class="box-bar roomy lighter">
 			<div>
 				<div class="switch">
-<<<<<<< Updated upstream
-					<label>Enabled
-=======
 					<label v-on:click="toggleOriginPermissions">Enabled
->>>>>>> Stashed changes
 						<input type="checkbox" v-model="allOriginPermission">
 						<span class="lever" @click.prevent></span>
 					</label>
