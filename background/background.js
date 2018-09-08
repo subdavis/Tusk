@@ -54,7 +54,7 @@ function Background(protectedMemory, settings, notifications) {
 			const expire = typeof message.expire !== 'undefined' ? message.expire * 1000 : 60000;
 			chrome.notifications.create({
 				'type': 'basic',
-				'iconUrl': '/assets/icons/logo_48.png',
+				'iconUrl': '/assets/icons/exported/48x48.png',
 				'title': 'Tusk',
 				'message': message.text
 			}, function(notificationId) {

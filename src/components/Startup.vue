@@ -7,7 +7,7 @@
 		<div v-else>
 			<div class="box-bar plain">
 				<div class="unlockLogo stack-item">
-					<img src="assets/icons/logo.png">
+					<img src="assets/icons/exported/128x128.svg">
 					<span>KeePass Tusk</span>
 				</div>
 				<p>Tusk is an extension that uses your existing KeePass database files to autofill passwords on websites. In order to continue, you must add your KeePass database file(s).</p>

@@ -57,7 +57,7 @@ function SampleDatabaseFileManager() {
 	function getChosenDatabaseFile(dbInfo) {
 		return axios({
 			method: 'GET',
-			url: chrome.extension.getURL('/assets/Sample123.kdbx'),
+			url: chrome.extension.getURL('/assets/other/Sample123.kdbx'),
 			responseType: 'arraybuffer'
 		}).then(function(response) {
 			return response.data;
