@@ -32,14 +32,18 @@
 
 		<div class="box-bar roomy">
 			<h4>Grant Permission on All Websites</h4>
-			<p><strong style="color:#d9534f">Only proceed if you know what you're doing.</strong> If enabled, the extension prompts once for permission to access and change data on all websites which disables the permissions popup on each new website. This has <a href="https://github.com/subdavis/Tusk/issues/168">serious security implications</a>.</p>
+			<p><strong style="color:#d9534f">Only proceed if you know what you're doing.</strong> If enabled, the extension prompts once for permission to access and change data on all websites which disables the permissions popup on each new website. This has <a href="https://github.com/subdavis/Tusk/issues/168">serious security implications</a>.  Only applies to Chrome.  Because of a Chrome bug, it is currently impossible to revoke this permission again after it is enabled.  If you turn this ON, Tusk must be reinstalled to reset.</p>
 		</div>
 		<div class="box-bar roomy lighter">
 			<div>
 				<div class="switch">
+<<<<<<< Updated upstream
 					<label>Enabled
+=======
+					<label v-on:click="toggleOriginPermissions">Enabled
+>>>>>>> Stashed changes
 						<input type="checkbox" v-model="allOriginPermission">
-						<span class="lever"></span>
+						<span class="lever" @click.prevent></span>
 					</label>
 				</div>
 			</div>
@@ -185,19 +189,24 @@
 			hotkeyNavEnabled(newval, oldval) {
 				this.settings.getSetHotkeyNavEnabled(newval)
 			},
-			allOriginPermission(newval) {
-				if (newval) {
-					chrome.permissions.request(this.allOriginPerms);
-				} else {
-					chrome.permissions.remove(this.allOriginPerms)
-				}
-			},
 			strictMatchEnabled(newval, oldval) {
 				this.settings.getSetStrictModeEnabled(newval)
 			},
 			notificationsEnabled(newval) {
 				this.settings.getSetNotificationsEnabled(newval)
 			}
+		},
+		methods: {
+			toggleOriginPermissions(evt) {
+				// Negated because this function will call before the vue model update.
+				if (!this.allOriginPermission) {
+					chrome.permissions.request(this.allOriginPerms);
+				} else {
+					chrome.permissions.remove(this.allOriginPerms)
+				}
+				this.settings.getSetOriginPermissionEnabled(!this.allOriginPermission);
+				this.allOriginPermission = !this.allOriginPermission;
+			},
 		},
 		mounted() {
 			this.settings.getSetClipboardExpireInterval().then(val => {
