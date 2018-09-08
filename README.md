@@ -1,7 +1,7 @@
 # Tusk
 > A modern, clean keepass browser extension built with Vue.js and kdbxweb.  Rebooted from perfectapi/CKP
 
-![Tusk](https://github.com/subdavis/Tusk/blob/develop/assets/icons/sizes/256x256/256x256.png "Tusk Logo"))
+![Tusk](https://github.com/subdavis/Tusk/blob/develop/assets/icons/sizes/256x256/256x256.png "Tusk Logo")
 
 ## Installation
 
