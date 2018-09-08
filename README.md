@@ -82,3 +82,7 @@ I don't want your money.  Take whatever you would have given me and find a local
 > So how can I support Tusk?
 
 If you ❤️ Tusk, please consider leaving a positive review on [the Firefox Add-on store](https://addons.mozilla.org/en-GB/firefox/addon/keepass-tusk/) or [the Chrome webstore](https://chrome.google.com/webstore/detail/fmhmiaejopepamlcjkncpgpdjichnecm) - I'll be eternally grateful.
+
+> Who made that awesome logo?
+
+A super cool artist and graphic designer named [Gabriel Garcia](https://github.com/ggabogarcia)!  Thanks for our logo!
