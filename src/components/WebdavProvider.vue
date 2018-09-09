@@ -13,8 +13,11 @@
 			:toggle-login="toggleLogin" 
 			:removeable="false"></generic-provider-ui>
 		<div class="top-padding" v-if="loggedIn">
-			<div class="warning-box">
+			<div class="warn pill">
 				<p>Wait! Stop!  Did you read the <a href="https://github.com/subdavis/Tusk/wiki/WebDAV-Support">best practices guide</a>?  Do that first!</p>
+			</div>
+			<div>
+				<p>The URL below should have the path of a FOLDER, not an individual FILE.  The webDAV provider works by recursively scanning all files within the folder you specify.  Your keepass databases will be discovered by their file extension (.kdbx).</p>
 			</div>
 			<table v-if="serverList.length">
 				<tr>
