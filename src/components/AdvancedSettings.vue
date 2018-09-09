@@ -30,11 +30,11 @@
 			</div>
 		</div>
 
-		<div class="box-bar roomy">
+		<div class="box-bar roomy" v-if="!isFirefox()">
 			<h4>Grant Permission on All Websites</h4>
 			<p><strong style="color:#d9534f">Only proceed if you know what you're doing.</strong> If enabled, the extension prompts once for permission to access and change data on all websites which disables the permissions popup on each new website. This has <a href="https://github.com/subdavis/Tusk/issues/168">serious security implications</a>.  Only applies to Chrome.  Because of a Chrome bug, it is currently impossible to revoke this permission again after it is enabled.  If you turn this ON, Tusk must be reinstalled to reset.</p>
 		</div>
-		<div class="box-bar roomy lighter">
+		<div class="box-bar roomy lighter" v-if="!isFirefox()">
 			<div>
 				<div class="switch">
 					<label v-on:click="toggleOriginPermissions">Enabled
@@ -97,6 +97,7 @@
 
 <script>
 	import JSONFormatter from 'json-formatter-js'
+	import { isFirefox } from '$lib/utils'
 
 	export default {
 		props: {
@@ -193,12 +194,13 @@
 			}
 		},
 		methods: {
+			isFirefox: isFirefox,
 			toggleOriginPermissions(evt) {
 				// Negated because this function will call before the vue model update.
 				if (!this.allOriginPermission) {
 					chrome.permissions.request(this.allOriginPerms);
 				} else {
-					chrome.permissions.remove(this.allOriginPerms)
+					chrome.permissions.remove(this.allOriginPerms);
 				}
 				this.settings.getSetOriginPermissionEnabled(!this.allOriginPermission);
 				this.allOriginPermission = !this.allOriginPermission;
@@ -216,9 +218,11 @@
 				this.settings.getSetStrictModeEnabled().then(val => {
 					this.strictMatchEnabled = val;
 				})
-				chrome.permissions.contains(this.allOriginPerms, granted => {
-					this.allOriginPermission = !!granted;
-				});
+				if (!isFirefox()) {
+					chrome.permissions.contains(this.allOriginPerms, granted => {
+						this.allOriginPermission = !!granted;
+					});
+				}
 				this.jsonState.forEach(blob => {
 					blob.f().then(result => {
 						if (result && Object.keys(result).length) {
