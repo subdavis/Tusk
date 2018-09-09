@@ -89,7 +89,7 @@
 			<p>{{blob.k}}</p>
 			<div class="between">
 				<div class="json" :id="blob.k"></div>
-				<a v-if="blob.delete !== undefined" class="waves-effect waves-light btn" @click="blob.delete.f(blob.delete.arg); init()">{{ blob.delete.op }}</a>
+				<a v-if="blob.delete !== undefined" class="waves-effect waves-light btn" @click="blob.delete.f(blob.delete.arg); init();">{{ blob.delete.op }}</a>
 			</div>
 		</div>
 	</div>
@@ -148,8 +148,8 @@
 						k: 'selectedDatabase',
 						f: this.settings.getCurrentDatabaseChoice,
 						delete: {
-							f: this.settings.saveCurrentDatabase,
-							arg: this.settings.destroyLocalStorage,
+							f: this.settings.destroyLocalStorage,
+							arg: 'selectedDatabase',
 							op: 'Delete'
 						}
 					},
@@ -203,35 +203,38 @@
 				this.settings.getSetOriginPermissionEnabled(!this.allOriginPermission);
 				this.allOriginPermission = !this.allOriginPermission;
 			},
+			init() {
+				this.settings.getSetClipboardExpireInterval().then(val => {
+					this.expireTime = val
+				})
+				this.settings.getSetHotkeyNavEnabled().then(val => {
+					this.hotkeyNavEnabled = val
+				})
+				this.settings.getSetNotificationsEnabled().then(val => {
+					this.notificationsEnabled = val
+				})
+				this.settings.getSetStrictModeEnabled().then(val => {
+					this.strictMatchEnabled = val;
+				})
+				chrome.permissions.contains(this.allOriginPerms, granted => {
+					this.allOriginPermission = !!granted;
+				});
+				this.jsonState.forEach(blob => {
+					blob.f().then(result => {
+						if (result && Object.keys(result).length) {
+							let formatter = new JSONFormatter(result)
+							let place = document.getElementById(blob.k)
+							while (place.firstChild) place.removeChild(place.firstChild);
+							place.appendChild(formatter.render())
+						} else {
+							document.getElementById(blob.k).parentNode.parentNode.remove();
+						}
+					});
+				});
+			}
 		},
 		mounted() {
-			this.settings.getSetClipboardExpireInterval().then(val => {
-				this.expireTime = val
-			})
-			this.settings.getSetHotkeyNavEnabled().then(val => {
-				this.hotkeyNavEnabled = val
-			})
-			this.settings.getSetNotificationsEnabled().then(val => {
-				this.notificationsEnabled = val
-			})
-			this.settings.getSetStrictModeEnabled().then(val => {
-				this.strictMatchEnabled = val;
-			})
-			chrome.permissions.contains(this.allOriginPerms, granted => {
-				this.allOriginPermission = !!granted;
-			});
-			this.jsonState.forEach(blob => {
-				blob.f().then(result => {
-					if (result && Object.keys(result).length) {
-						let formatter = new JSONFormatter(result)
-						let place = document.getElementById(blob.k)
-						while (place.firstChild) place.removeChild(place.firstChild);
-						place.appendChild(formatter.render())
-					} else {
-						document.getElementById(blob.k).parentNode.parentNode.remove()
-					}
-				})
-			})
+			this.init();
 		}
 	}
 </script>
