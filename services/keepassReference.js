@@ -15,7 +15,6 @@ function KeepassReference() {
 	 * Process all references found in fieldValue to their final values
 	 */
 	my.processAllReferences = function(majorVersion, fieldValue, currentEntry, allEntries) {
-		console.log("invoked", fieldValue, currentEntry, allEntries)
 		my.majorVersion = majorVersion; //update the major version if it changed.
 		var re = /(\{[^\{\}]+\})/g;
 		var expressions = re.exec(fieldValue || '');
@@ -35,7 +34,6 @@ function KeepassReference() {
 		if (lastIndex < fieldValue.length) {
 			result += fieldValue.substring(lastIndex, fieldValue.length);
 		}
-		console.log(result)
 		return result;
 	}
 
