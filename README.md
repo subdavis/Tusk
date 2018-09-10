@@ -35,13 +35,14 @@ Tusk requires:
 # install dependencies
 yarn install
 
-# Build static DLL resources
+# build static DLL resources (optional)
 yarn build-dll
 
 # build for production with minification
 yarn build
 
-# run the packer script targeted for 'chrome' or 'firefox' after build
+# run the packer script targeted for 'chrome' and 'firefox' after build.
+# this step generates the zip archives submitted to Chrome/Firefox addon marketplaces.
 yarn bundle
 
 # build the tests
