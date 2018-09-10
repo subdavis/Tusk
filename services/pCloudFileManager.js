@@ -50,11 +50,10 @@ function PCloudFileManager(settings) {
     oauth.searchRequestHandler = function(response) {
 
         var walk = function(files, contents, path) {
-            contents.forEach( (file) => {
-                if(file.isfolder) {
+            contents.forEach((file) => {
+                if (file.isfolder) {
                     walk(files, file.contents, path + file.name + "/")
-                }
-                else {
+                } else {
                     file.path = path + file.name
                     files.push(file)
                 }

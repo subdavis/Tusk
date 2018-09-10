@@ -2,66 +2,66 @@
 
 //simple service to link to the options page
 function Links() {
-	var my = {
-		openOptions: openOptions,
-		openWebstore: openWebstore,
-		openHomepage: openHomepage,
-		openOptionsReauth: openOptionsReauth,
-		openOptionsKeyfiles: openOptionsKeyfiles,
-		openOptionsDatabases: openOptionsDatabases,
-		open: openGeneric
-	}
-	
-	function openGeneric(url) {
-		// Given some URL, open it in a new tab
-		chrome.tabs.create({
-			url: url
-		})
-	}
+    var my = {
+        openOptions: openOptions,
+        openWebstore: openWebstore,
+        openHomepage: openHomepage,
+        openOptionsReauth: openOptionsReauth,
+        openOptionsKeyfiles: openOptionsKeyfiles,
+        openOptionsDatabases: openOptionsDatabases,
+        open: openGeneric
+    }
 
-	function openOptionsPath(path) {
-		// A hack to figure out what the browser uses to point to us.
-		// For example, chrome says we will always be chrome-extension://fmhmiaejopepamlcjkncpgpdjichnecm/...
-		let loc = window.location.origin;
-		chrome.tabs.create({
-			url: loc + path
-		})
-	}
+    function openGeneric(url) {
+        // Given some URL, open it in a new tab
+        chrome.tabs.create({
+            url: url
+        })
+    }
 
-	function openOptions() {
-		openOptionsWelcome()
-	}
+    function openOptionsPath(path) {
+        // A hack to figure out what the browser uses to point to us.
+        // For example, chrome says we will always be chrome-extension://fmhmiaejopepamlcjkncpgpdjichnecm/...
+        let loc = window.location.origin;
+        chrome.tabs.create({
+            url: loc + path
+        })
+    }
 
-	function openOptionsWelcome() {
-		chrome.runtime.openOptionsPage();
-	}
+    function openOptions() {
+        openOptionsWelcome()
+    }
 
-	function openOptionsDatabases() {
-		openOptionsPath("/options.html#/manage/databases");
-	}
+    function openOptionsWelcome() {
+        chrome.runtime.openOptionsPage();
+    }
 
-	function openOptionsKeyfiles() {
-		openOptionsPath("/options.html#/manage/keyfiles")
-	}
+    function openOptionsDatabases() {
+        openOptionsPath("/options.html#/manage/databases");
+    }
 
-	function openOptionsReauth(reauth_id) {
-		openOptionsPath("/options.html#/reauthorize/" + reauth_id)
-	}
+    function openOptionsKeyfiles() {
+        openOptionsPath("/options.html#/manage/keyfiles")
+    }
 
-	function openWebstore() {
-		chrome.tabs.create({
-			url: "https://chrome.google.com/webstore/detail/ckpx-chrome-keepass-exten/fmhmiaejopepamlcjkncpgpdjichnecm"
-		})
-	}
+    function openOptionsReauth(reauth_id) {
+        openOptionsPath("/options.html#/reauthorize/" + reauth_id)
+    }
 
-	function openHomepage() {
-		chrome.tabs.create({
-			url: "https://subdavis.com/Tusk"
-		})
-	}
+    function openWebstore() {
+        chrome.tabs.create({
+            url: "https://chrome.google.com/webstore/detail/ckpx-chrome-keepass-exten/fmhmiaejopepamlcjkncpgpdjichnecm"
+        })
+    }
 
-	return my;
+    function openHomepage() {
+        chrome.tabs.create({
+            url: "https://subdavis.com/Tusk"
+        })
+    }
+
+    return my;
 }
 export {
-	Links
+    Links
 }

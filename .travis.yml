@@ -1,0 +1,85 @@
+# jobs run in parallel, stages in sequence.
+# stick to one job for simplicity.
+jobs:
+    include:
+        # 
+        # minification / optimization stage
+        # verify everything is minified
+        - stage: test
+          name: "Beautification"
+          env: TUSK_REPO_PATH=$(readlink -f ./)
+          # dependencies
+          before_script: 
+            # Install NPM
+              - sudo apt-get install -y npm
+            # prevent ssl errors on travis-ci build machines
+              - sudo npm conf set strict-ssl false
+            # Install n - nodejs version manager
+              - sudo npm cache clean -f
+              - sudo npm install -g n
+            # Install Latest NodeJS Version
+              - sudo n 8.11.4
+            # Upgrade NPM
+              - sudo npm install -g npm
+            # install deps
+              - sudo npm install -g cross-env js-beautify
+              - yarn
+              - sudo chmod 777 -R ./ci
+          script: ./ci/beautify.sh
+        #
+        # Test
+        - stage: test
+          name: "Test & Coverage"
+          before_script: 
+            # Install NPM
+              - sudo apt-get install -y npm
+            # prevent ssl errors on travis-ci build machines
+              - sudo npm conf set strict-ssl false
+            # Install n - nodejs version manager
+              - sudo npm cache clean -f
+              - sudo npm install -g n
+            # Install Latest NodeJS Version
+              - sudo n 8.11.4
+            # Upgrade NPM
+              - sudo npm install -g npm
+            # install deps
+              - sudo npm install -g cross-env
+              - yarn
+              - sudo chmod 777 -R ./ci
+          script: 
+            - yarn test-cli
+            - yarn cover
+        # 
+        # Release Stage. Bundle all dependencies, zip files et all before publishing artifacts to GH Release.
+        # Manual intervention is needed to publish to Chrome Store.
+        - stage: build-and-release
+          if: branch = master
+          name: "Deploy to Github Releases"
+          before_script: 
+            # Install NPM
+              - sudo apt-get install -y npm
+            # prevent ssl errors on travis-ci build machines
+              - sudo npm conf set strict-ssl false
+            # Install n - nodejs version manager
+              - sudo npm cache clean -f
+              - sudo npm install -g n
+            # Install Latest NodeJS Version
+              - sudo n 8.11.4
+            # Upgrade NPM
+              - sudo npm install -g npm
+            # install deps
+              - sudo npm install -g cross-env
+              - yarn
+              - sudo chmod 777 -R ./ci
+          script: yarn bundle
+          before_deploy:
+            - git config --local user.name "Travis CI"
+            - git config --local user.email "noreply@noreply.com"
+            - git tag "$(date +'%d-%M-%Y')"
+          deploy:
+              provider: releases
+              api_key: $GITHUB_OAUTH_TOKEN
+              file:
+                - "chrome.tusk.zip"
+                - "firefox.tusk.zip"
+              skip_cleanup: true
