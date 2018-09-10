@@ -15,6 +15,7 @@ function KeepassReference() {
 	 * Process all references found in fieldValue to their final values
 	 */
 	my.processAllReferences = function(majorVersion, fieldValue, currentEntry, allEntries) {
+		console.log("invoked", fieldValue, currentEntry, allEntries)
 		my.majorVersion = majorVersion; //update the major version if it changed.
 		var re = /(\{[^\{\}]+\})/g;
 		var expressions = re.exec(fieldValue || '');
@@ -34,7 +35,7 @@ function KeepassReference() {
 		if (lastIndex < fieldValue.length) {
 			result += fieldValue.substring(lastIndex, fieldValue.length);
 		}
-
+		console.log(result)
 		return result;
 	}
 
@@ -91,13 +92,15 @@ function KeepassReference() {
 			var wantedField = getPropertyNameFromCode(refString[1]);
 			var searchIn = getPropertyNameFromCode(refString[2]);
 			var text = refString[3];
-
+			
 			var matches = allEntries.filter(function(e) {
 				if (searchIn === '*') {
 					var customFieldMatches = e.keys.filter(function(key) {
 						return String(e[key] || '').indexOf(text) !== -1;
 					});
 					return customFieldMatches.length > 0;
+				} else if (searchIn === 'id') {
+					return String(e[searchIn]).toLowerCase() === text.toLowerCase();
 				} else {
 					return String(e[searchIn] || '').indexOf(text) !== -1;
 				}

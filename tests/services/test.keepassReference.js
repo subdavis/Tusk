@@ -8,7 +8,7 @@ describe('Keepass References', function () {
 
 	var refService = KeepassReference();
 	var entry = {
-		id: 1,
+		id: "1",
 		title: 'Sample Title',
 		userName: 'UserX',
 		url: 'http://keepass.info/',
@@ -24,7 +24,7 @@ describe('Keepass References', function () {
 		}
 	};
 	var entry2 = {
-		id: 2,
+		id: "2b",
 		title: 'Sample Title2',
 		userName: 'UserX2',
 		url: 'http://keepass.info/2',
@@ -87,25 +87,25 @@ describe('Keepass References', function () {
 
 	describe('All entries', function() {
 		it('should resolve wanted title', function() {
-			refService.resolveReference('{REF:T@I:2}', entry, entries).should.equal(entry2.title);
+			refService.resolveReference('{REF:T@I:2B}', entry, entries).should.equal(entry2.title);
 		})
 		it('should resolve wanted username', function() {
-			refService.resolveReference('{REF:U@I:2}', entry, entries).should.equal(entry2.userName);
+			refService.resolveReference('{REF:U@I:2B}', entry, entries).should.equal(entry2.userName);
 		})
 		it('should resolve wanted url', function() {
-			refService.resolveReference('{REF:A@I:2}', entry, entries).should.equal(entry2.url);
+			refService.resolveReference('{REF:A@I:2b}', entry, entries).should.equal(entry2.url);
 		})
 		it('should resolve wanted password', function() {
-			refService.resolveReference('{REF:P@I:2}', entry, entries).should.equal("Password");
+			refService.resolveReference('{REF:P@I:2b}', entry, entries).should.equal("Password");
 		})
 		it('should resolve wanted notes', function() {
-			refService.resolveReference('{REF:N@I:2}', entry, entries).should.equal(entry2.notes);
+			refService.resolveReference('{REF:N@I:2b}', entry, entries).should.equal(entry2.notes);
 		})
 		it('should resolve wanted id', function() {
-			refService.resolveReference('{REF:I@I:2}', entry, entries).should.equal(entry2.id);
+			refService.resolveReference('{REF:I@I:2B}', entry, entries).should.equal(entry2.id);
 		})
 		it('should return expression back when unknown wanted field', function() {
-			refService.resolveReference('{REF:Z@I:2}', entry, entries).should.equal('{REF:Z@I:2}');
+			refService.resolveReference('{REF:Z@I:2b}', entry, entries).should.equal('{REF:Z@I:2b}');
 		})
 		it('should return expression back when unmatched text', function() {
 			refService.resolveReference('{REF:Z@I:3333}', entry, entries).should.equal('{REF:Z@I:3333}');
@@ -130,7 +130,7 @@ describe('Keepass References', function () {
 			refService.resolveReference('{REF:I@I:' + entry2.id + '}', entry, entries).should.equal(entry2.id);
 		})
 		it('should return expression back when unknown search field', function() {
-			refService.resolveReference('{REF:I@Z:2}', entry, entries).should.equal('{REF:I@Z:2}');
+			refService.resolveReference('{REF:I@Z:2b}', entry, entries).should.equal('{REF:I@Z:2b}');
 		})
 		it('should return expression back when unmatched text', function() {
 			refService.resolveReference('{REF:I@I:3333}', entry, entries).should.equal('{REF:I@I:3333}');
