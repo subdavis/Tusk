@@ -130,7 +130,14 @@ function KeepassService(keepassHeader, settings, passwordFileStoreRegistry, keep
 				entry.keys.forEach(function(key) {
 					var fieldRefs = keepassReference.hasReferences(entry[key]);
 					if (fieldRefs) {
-						entry[key] = keepassReference.processAllReferences(majorVersion, entry[key], entry, entries)
+						let value = keepassReference.processAllReferences(majorVersion, entry[key], entry, entries);
+						if (['password', 'otp'].indexOf(key) >= 0) {
+							let newProtectedVal = kdbxweb.ProtectedValue.fromString(value);
+							entry.protectedData[Case.camel(key)] = protectedValueToJSON(newProtectedVal);
+							delete entry[key];
+						} else {
+							entry[key] = value;
+						}
 					}
 				});
 			}
@@ -183,7 +190,7 @@ function KeepassService(keepassHeader, settings, passwordFileStoreRegistry, keep
 					var field_keys = Object.keys(db_entry.fields);
 					for (let k = 0; k < field_keys.length; k++) {
 						var field = field_keys[k];
-						if (typeof db_entry.fields[field] == "object") {
+						if (typeof db_entry.fields[field] === 'object') {
 							// type = object ? protected value
 							entry.protectedData[Case.camel(field)] = protectedValueToJSON(db_entry.fields[field]);
 						} else {

@@ -11,9 +11,11 @@ PROPS
 	links: Object
 */
 
-chrome.runtime.getManifest = function() {
-	return {
-		version: "1.0.0"
+chrome.runtime = {
+	getManifest() {
+		return {
+			version: "1.0.0"
+		}
 	}
 }
 
