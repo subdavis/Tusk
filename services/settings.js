@@ -293,7 +293,11 @@ function Settings(secureCache) {
 		return keyGetSetter('notificationsEnabled', enabledTypes, ['clipboard','expiration'], 'object')
 	}
 
-	return exports;
+	exports.getSetOriginPermissionEnabled = function(enabled) {
+		return keyGetSetter('originPermissionsEnabled', enabled, false, 'boolean')
+	}
+
+	return exports
 }
 
 export {

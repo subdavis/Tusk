@@ -19,7 +19,7 @@
 				<pre v-if="attr.key === 'notes'" class="attribute-value">{{ attr.value }}</pre>
 				<!-- URL -->
 				<span v-else-if="attr.key === 'url'" class="attribute-value">
-					<a @click="links.open(attr.href)" v-bind:href="attr.href">{{ attr.value }}</a>
+					<a @click="links.open(attr.href)" href="javascript:void(0)">{{ attr.value }}</a>
 				</span>
 				<!-- other -->
 				<span v-else-if="!attr.protected" class="attribute-value">{{ attr.value }}</span>

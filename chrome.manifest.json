@@ -1,13 +1,13 @@
 {
 	"name": "KeePass Tusk - Password Access and Autofill",
 	"short_name": "KeePass Tusk",
-	"version": "2018.7.13",
+	"version": "2018.9.8",
 	"manifest_version": 2,
 	"minimum_chrome_version": "48",
 	"description": "Readonly KeePass password database integration for Chrome™",
 	"icons": {
-		"16": "assets/icons/logo_16.png",
-		"48": "assets/icons/logo_48.png"
+		"16": "/assets/icons/exported/16x16.png",
+		"48": "/assets/icons/exported/48x48.png"
 	},
 	"oauth2": {
 		"client_id": "876467817034-al13p9m2bphgregs0rij76n1tumakcqr.apps.googleusercontent.com",
@@ -24,7 +24,7 @@
 	},
 	"incognito": "split",
 	"browser_action": {
-		"default_icon": "assets/icons/logo_38.png",
+		"default_icon": "/assets/icons/exported/38x38.png",
 		"default_popup": "popup.html",
     	"default_title": "KeePass Tusk"
 	},

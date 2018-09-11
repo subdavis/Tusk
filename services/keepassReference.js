@@ -26,7 +26,7 @@ function KeepassReference() {
 			if (expressions.index >= lastIndex) {
 				result += fieldValue.substring(lastIndex, expressions.index);
 			}
-			result += resolveReference(expressions[1], currentEntry, allEntries);
+			result += my.resolveReference(expressions[1], currentEntry, allEntries);
 			lastIndex = expressions.index + expressions[1].length;
 			expressions = re.exec(fieldValue || '');
 		}
@@ -34,18 +34,16 @@ function KeepassReference() {
 		if (lastIndex < fieldValue.length) {
 			result += fieldValue.substring(lastIndex, fieldValue.length);
 		}
-
 		return result;
 	}
 
 	my.keewebGetDecryptedFieldValue = function(entry, fieldName) {
-		if (entry.protectedData === undefined || !entry.protectedData[fieldName]) {
+		if (entry.protectedData === undefined || !(fieldName in entry['protectedData'])) {
 			return entry[fieldName] || ""; //not an encrypted field
 		}
-		let keewebProtectedValue = new kdbxweb.ProtectedValue(
+		return new kdbxweb.ProtectedValue(
 			entry['protectedData'][fieldName].value,
-			entry['protectedData'][fieldName].salt);
-		return keewebProtectedValue.getText();
+			entry['protectedData'][fieldName].salt).getText();
 	}
 
 	my.getFieldValue = function(currentEntry, fieldName, allEntries) {
@@ -55,7 +53,7 @@ function KeepassReference() {
 		return my.processAllReferences(my.majorVersion, plainText, currentEntry, allEntries);
 	}
 
-	function resolveReference(referenceText, currentEntry, allEntries) {
+	my.resolveReference = function(referenceText, currentEntry, allEntries) {
 		var localParts = /^\{([a-zA-Z]+)\}$/.exec(referenceText)
 		if (localParts) {
 			// local field
@@ -91,29 +89,30 @@ function KeepassReference() {
 			var wantedField = getPropertyNameFromCode(refString[1]);
 			var searchIn = getPropertyNameFromCode(refString[2]);
 			var text = refString[3];
-
+			
 			var matches = allEntries.filter(function(e) {
 				if (searchIn === '*') {
 					var customFieldMatches = e.keys.filter(function(key) {
 						return String(e[key] || '').indexOf(text) !== -1;
 					});
 					return customFieldMatches.length > 0;
+				} else if (searchIn === 'id') {
+					return String(e[searchIn]).toLowerCase() === text.toLowerCase();
 				} else {
 					return String(e[searchIn] || '').indexOf(text) !== -1;
 				}
 			});
 			if (matches.length) {
-				if (my.majorVersion >= 3)
+				if (my.majorVersion >= 3) {
 					return my.keewebGetDecryptedFieldValue(matches[0], wantedField);
-				else
+				} else {
 					throw "Database Version Not Supported";
+				}
 			}
 		}
 
 		return referenceText;
 	}
-
-	my.resolveReference = resolveReference;
 
 	function getPropertyNameFromCode(code) {
 		switch (code) {

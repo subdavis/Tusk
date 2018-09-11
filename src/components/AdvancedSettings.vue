@@ -30,16 +30,16 @@
 			</div>
 		</div>
 
-		<div class="box-bar roomy">
+		<div class="box-bar roomy" v-if="!isFirefox()">
 			<h4>Grant Permission on All Websites</h4>
-			<p><strong style="color:#d9534f">Only proceed if you know what you're doing.</strong> If enabled, the extension prompts once for permission to access and change data on all websites which disables the permissions popup on each new website. This has <a href="https://github.com/subdavis/Tusk/issues/168">serious security implications</a>.</p>
+			<p><strong style="color:#d9534f">Only proceed if you know what you're doing.</strong> If enabled, the extension prompts once for permission to access and change data on all websites which disables the permissions popup on each new website. This has <a href="https://github.com/subdavis/Tusk/issues/168">serious security implications</a>.  Only applies to Chrome.  Because of a Chrome bug, it is currently impossible to revoke this permission again after it is enabled.  If you turn this ON, Tusk must be reinstalled to reset.</p>
 		</div>
-		<div class="box-bar roomy lighter">
+		<div class="box-bar roomy lighter" v-if="!isFirefox()">
 			<div>
 				<div class="switch">
-					<label>Enabled
+					<label v-on:click="toggleOriginPermissions">Enabled
 						<input type="checkbox" v-model="allOriginPermission">
-						<span class="lever"></span>
+						<span class="lever" @click.prevent></span>
 					</label>
 				</div>
 			</div>
@@ -89,7 +89,7 @@
 			<p>{{blob.k}}</p>
 			<div class="between">
 				<div class="json" :id="blob.k"></div>
-				<a v-if="blob.delete !== undefined" class="waves-effect waves-light btn" @click="blob.delete.f(blob.delete.arg); init()">{{ blob.delete.op }}</a>
+				<a v-if="blob.delete !== undefined" class="waves-effect waves-light btn" @click="blob.delete.f(blob.delete.arg); init();">{{ blob.delete.op }}</a>
 			</div>
 		</div>
 	</div>
@@ -97,6 +97,7 @@
 
 <script>
 	import JSONFormatter from 'json-formatter-js'
+	import { isFirefox } from '$lib/utils'
 
 	export default {
 		props: {
@@ -148,8 +149,8 @@
 						k: 'selectedDatabase',
 						f: this.settings.getCurrentDatabaseChoice,
 						delete: {
-							f: this.settings.saveCurrentDatabase,
-							arg: this.settings.destroyLocalStorage,
+							f: this.settings.destroyLocalStorage,
+							arg: 'selectedDatabase',
 							op: 'Delete'
 						}
 					},
@@ -185,13 +186,6 @@
 			hotkeyNavEnabled(newval, oldval) {
 				this.settings.getSetHotkeyNavEnabled(newval)
 			},
-			allOriginPermission(val) {
-				if (val) {
-					chrome.permissions.request(this.allOriginPerms);
-				} else {
-					chrome.permissions.remove(this.allOriginPerms)
-				}
-			},
 			strictMatchEnabled(newval, oldval) {
 				this.settings.getSetStrictModeEnabled(newval)
 			},
@@ -199,34 +193,52 @@
 				this.settings.getSetNotificationsEnabled(newval)
 			}
 		},
-		mounted() {
-			this.settings.getSetClipboardExpireInterval().then(val => {
-				this.expireTime = val
-			})
-			this.settings.getSetHotkeyNavEnabled().then(val => {
-				this.hotkeyNavEnabled = val
-			})
-			this.settings.getSetNotificationsEnabled().then(val => {
-				this.notificationsEnabled = val
-			})
-			this.settings.getSetStrictModeEnabled().then(val => {
-				this.strictMatchEnabled = val;
-			})
-			chrome.permissions.contains(this.allOriginPerms, granted => {
-				this.allOriginPermission = !!granted;
-			});
-			this.jsonState.forEach(blob => {
-				blob.f().then(result => {
-					if (result && Object.keys(result).length) {
-						let formatter = new JSONFormatter(result)
-						let place = document.getElementById(blob.k)
-						while (place.firstChild) place.removeChild(place.firstChild);
-						place.appendChild(formatter.render())
-					} else {
-						document.getElementById(blob.k).parentNode.parentNode.remove()
-					}
+		methods: {
+			isFirefox: isFirefox,
+			toggleOriginPermissions(evt) {
+				// Negated because this function will call before the vue model update.
+				if (!this.allOriginPermission) {
+					chrome.permissions.request(this.allOriginPerms);
+				} else {
+					chrome.permissions.remove(this.allOriginPerms);
+				}
+				this.settings.getSetOriginPermissionEnabled(!this.allOriginPermission);
+				this.allOriginPermission = !this.allOriginPermission;
+			},
+			init() {
+				this.settings.getSetClipboardExpireInterval().then(val => {
+					this.expireTime = val
 				})
-			})
+				this.settings.getSetHotkeyNavEnabled().then(val => {
+					this.hotkeyNavEnabled = val
+				})
+				this.settings.getSetNotificationsEnabled().then(val => {
+					this.notificationsEnabled = val
+				})
+				this.settings.getSetStrictModeEnabled().then(val => {
+					this.strictMatchEnabled = val;
+				})
+				if (!isFirefox()) {
+					chrome.permissions.contains(this.allOriginPerms, granted => {
+						this.allOriginPermission = !!granted;
+					});
+				}
+				this.jsonState.forEach(blob => {
+					blob.f().then(result => {
+						if (result && Object.keys(result).length) {
+							let formatter = new JSONFormatter(result)
+							let place = document.getElementById(blob.k)
+							while (place.firstChild) place.removeChild(place.firstChild);
+							place.appendChild(formatter.render())
+						} else {
+							document.getElementById(blob.k).parentNode.parentNode.remove();
+						}
+					});
+				});
+			}
+		},
+		mounted() {
+			this.init();
 		}
 	}
 </script>

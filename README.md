@@ -1,7 +1,7 @@
 # Tusk
 > A modern, clean keepass browser extension built with Vue.js and kdbxweb.  Rebooted from perfectapi/CKP
 
-![Tusk](https://github.com/subdavis/Tusk/blob/develop/assets/icons/logo_256.png "Tusk Logo")
+![Tusk](https://user-images.githubusercontent.com/25948390/45255427-a466f300-b386-11e8-9321-931934faafb4.png "Tusk Logo")
 
 ## Installation
 
@@ -35,13 +35,14 @@ Tusk requires:
 # install dependencies
 yarn install
 
-# Build static DLL resources
+# build static DLL resources (optional)
 yarn build-dll
 
 # build for production with minification
 yarn build
 
-# run the packer script targeted for 'chrome' or 'firefox' after build
+# run the packer script targeted for 'chrome' and 'firefox' after build.
+# this step generates the zip archives submitted to Chrome/Firefox addon marketplaces.
 yarn bundle
 
 # build the tests
@@ -82,3 +83,7 @@ I don't want your money.  Take whatever you would have given me and find a local
 > So how can I support Tusk?
 
 If you ❤️ Tusk, please consider leaving a positive review on [the Firefox Add-on store](https://addons.mozilla.org/en-GB/firefox/addon/keepass-tusk/) or [the Chrome webstore](https://chrome.google.com/webstore/detail/fmhmiaejopepamlcjkncpgpdjichnecm) - I'll be eternally grateful.
+
+> Who made that awesome logo?
+
+A super cool artist and graphic designer named [Gabriel Garcia](https://github.com/ggabogarcia)!  Thanks for our logo!
