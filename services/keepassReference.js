@@ -26,7 +26,7 @@ function KeepassReference() {
 			if (expressions.index >= lastIndex) {
 				result += fieldValue.substring(lastIndex, expressions.index);
 			}
-			result += resolveReference(expressions[1], currentEntry, allEntries);
+			result += my.resolveReference(expressions[1], currentEntry, allEntries);
 			lastIndex = expressions.index + expressions[1].length;
 			expressions = re.exec(fieldValue || '');
 		}
@@ -38,13 +38,12 @@ function KeepassReference() {
 	}
 
 	my.keewebGetDecryptedFieldValue = function(entry, fieldName) {
-		if (entry.protectedData === undefined || !entry.protectedData[fieldName]) {
+		if (entry.protectedData === undefined || !(fieldName in entry['protectedData'])) {
 			return entry[fieldName] || ""; //not an encrypted field
 		}
-		let keewebProtectedValue = new kdbxweb.ProtectedValue(
+		return new kdbxweb.ProtectedValue(
 			entry['protectedData'][fieldName].value,
-			entry['protectedData'][fieldName].salt);
-		return keewebProtectedValue.getText();
+			entry['protectedData'][fieldName].salt).getText();
 	}
 
 	my.getFieldValue = function(currentEntry, fieldName, allEntries) {
@@ -54,7 +53,7 @@ function KeepassReference() {
 		return my.processAllReferences(my.majorVersion, plainText, currentEntry, allEntries);
 	}
 
-	function resolveReference(referenceText, currentEntry, allEntries) {
+	my.resolveReference = function(referenceText, currentEntry, allEntries) {
 		var localParts = /^\{([a-zA-Z]+)\}$/.exec(referenceText)
 		if (localParts) {
 			// local field
@@ -104,17 +103,16 @@ function KeepassReference() {
 				}
 			});
 			if (matches.length) {
-				if (my.majorVersion >= 3)
+				if (my.majorVersion >= 3) {
 					return my.keewebGetDecryptedFieldValue(matches[0], wantedField);
-				else
+				} else {
 					throw "Database Version Not Supported";
+				}
 			}
 		}
 
 		return referenceText;
 	}
-
-	my.resolveReference = resolveReference;
 
 	function getPropertyNameFromCode(code) {
 		switch (code) {
