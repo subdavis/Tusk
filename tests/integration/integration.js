@@ -2,21 +2,36 @@ const puppeteer = require('puppeteer');
 const should = require('should');
 
 const pathToExtension = require('path').join(__dirname, '../..', 'demo-chrome');
-
-// TODO: Move CSS selectors to a different - mapper - file, to make it more BDD
-
 const extensionUrl = "chrome-extension://fmhmiaejopepamlcjkncpgpdjichnecm/";
-
 const extensionPath = {
     options: extensionUrl + 'options.html',
     popup: extensionUrl + 'popup.html',
 };
-
 const delayArg = {
     delay: 100
 };
 
-describe('user acceptance test', async function() {
+const pageSelectors = {
+    options: {
+        nav: {
+            notActiveItem: ".nav-content > ul > li:not(.active) a",
+            manageDatabases: ".nav-content > ul > li:nth-child(2) a",
+        },
+        manageDatabases: {
+            checkboxes: "input[type='checkbox']",
+        },
+        document: {
+            nav: "nav",
+            container: "#contentbox",
+        }
+    },
+    popup: {
+        unlockLogo: ".unlockLogo",
+        button: "button",
+    }
+};
+
+describe('user acceptance test - views and setup', async function() {
     this.timeout(2 * 60 * 1000);
     let browser;
 
@@ -52,26 +67,27 @@ describe('user acceptance test', async function() {
         });
 
         it('should have one nav element', async () => {
-            (await page.$$("nav")).length.should.be.exactly(1);
+            (await page.$$(pageSelectors.options.document.nav)).length.should.be.exactly(1);
         });
 
         it('should change view after nav click', async () => {
-            const prev = await page.$("#contentbox");
+            const bodySelector = pageSelectors.options.document.container;
+            const prev = await page.$(bodySelector);
             const prevBody = await page.evaluate((el) => el.textContent, prev);
-            await page.click(".nav-content > ul > li:not(.active) a", delayArg);
+            await page.click(pageSelectors.options.nav.notActiveItem, delayArg);
             await page.waitFor(1000);
-            const next = await page.$("#contentbox");
+            const next = await page.$(bodySelector);
             (await page.evaluate((el) => el.textContent, next)).should.not.be.equal(prevBody);
         });
 
         it('should have more than one checkbox in manage databases view', async () => {
             try {
-                await page.click(".nav-content > ul > li:nth-child(2) a", delayArg);
+                await page.click(pageSelectors.options.nav.manageDatabases, delayArg);
             } catch (e) {
                 throw new Error("Manage databases nav item not found")
             }
             await page.waitFor(500);
-            (await page.$$("input[type='checkbox']")).length.should.be.greaterThan(1);
+            (await page.$$(pageSelectors.options.manageDatabases.checkboxes)).length.should.be.greaterThan(1);
         });
     });
 
@@ -89,11 +105,11 @@ describe('user acceptance test', async function() {
         });
 
         it('should have only one button', async () => {
-            (await page.$$("button")).length.should.be.exactly(1);
+            (await page.$$(pageSelectors.popup.button)).length.should.be.exactly(1);
         });
 
         it('should have the name of the extension', async () => {
-            const logo = await page.$(".unlockLogo");
+            const logo = await page.$(pageSelectors.popup.unlockLogo);
             (await page.evaluate((el) => el.textContent, logo)).includes("KeePass Tusk").should.be.true();
         });
 
