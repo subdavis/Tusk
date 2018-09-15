@@ -211,12 +211,9 @@ function WebdavFileManager(settings) {
 	function addServer(url, username, password) {
 		let client = createClient(url, username, password)
 		createClient.setFetchMethod((a, b) => {
-			console.log(a, b);
 			return window.fetch(a, b);
 		})
-		console.log('before')
 		return client.getDirectoryContents('/', {credentials:'omit'}).then(contents => {
-			console.log('after')
 			// success!
 			let serverInfo = {
 				url: url,
