@@ -1,5 +1,6 @@
 var path = require("path");
 var webpack = require("webpack");
+var UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 
 module.exports = {
     context: process.cwd(),
@@ -19,7 +20,7 @@ module.exports = {
             "pako",
             "vue/dist/vue.runtime.esm.js",
             "vue-simple-spinner",
-            "webdav-client",
+            "webdav",
             "xmldom",
         ]
     },
@@ -33,7 +34,7 @@ module.exports = {
             path: path.join(__dirname, "dll", "[name]-manifest.json"),
             name: "[name]",
         }),
-        new webpack.optimize.UglifyJsPlugin(),
+        new UglifyJSPlugin({}),
         new webpack.DefinePlugin({
             'process.env': {
                 NODE_ENV: '"production"'
