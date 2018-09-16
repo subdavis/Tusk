@@ -3,7 +3,7 @@
   <title>Tusk - Modern KeePass for the browser</title>
   <meta charset="UTF-8">
   <meta name="description" content="This extension adds KeePass autofill functionality to Google Chrome without compromising security for convenience.">
-  <meta name="keywords" content="keepass,keepassxc,chrome,extension,firefox,addon,tusk,ckp,ckpx,standalone,without,desktop,independent,free">
+  <meta name="keywords" content="keepass,keepassxc,chrome,extension,firefox,addon,tusk,ckp,ckpx,standalone,without,desktop,independent,free,open source">
   <meta name="author" content="Brandon Davis">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" href="img/logo.png">
@@ -55,7 +55,7 @@
       font-weight: 700;
     }
     img.screenshot {
-      box-shadow: 10px 10px 5px #ccc;
+      /* box-shadow: 10px 10px 5px #ccc; */
       /*border: 10px solid #236863;*/
       border-radius: 10px;
       /*border: 1px solid black;*/
@@ -104,13 +104,13 @@
       }
     }
   </style>
+  <script type="text/javascript" src="siema.min.js"></script>
   <!-- Global site tag (gtag.js) - Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=UA-108248206-1"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-
     gtag('config', 'UA-108248206-1');
   </script>
 </head>
@@ -120,13 +120,22 @@
   <div class="content-container">
   
     <h2 id="title"><img class='logo' src="https://user-images.githubusercontent.com/25948390/45255427-a466f300-b386-11e8-9321-931934faafb4.png"> Keepass Tusk: Access + Autofill</h2>
-    <p>This extension adds KeePass autofill functionality to Chrome and Firefox without compromising security for convenience.  Tusk is Open Source Software and free forever.</p>
-    <p>Tusk is a fork of <a href="https://github.com/perfectapi/ckp">CKP</a>, and seeks to provide improvements to the UI, <a href="https://subdavis.com/blog/jekyll/update/2017/01/02/ckp-security-flaw.html">better security practices</a>, and KDBX version 4 support using the <a href="https://github.com/keeweb/kdbxweb">KdbxWeb</a> library.  Tusk is formerly known as CKPX.  More information and a user guide can be found on the <a href="https://github.com/subdavis/Tusk/wiki">Wiki</a></p>
+    <p>This extension adds KeePass autofill functionality to Chrome and 
+      Firefox without compromising security for convenience.  Tusk is 
+      Open Source Software and free forever.
+    </p>
+    <p>Tusk is a fork of <a href="https://github.com/perfectapi/ckp">CKP</a>, 
+      and seeks to provide improvements to the UI, 
+      <a href="https://subdavis.com/blog/jekyll/update/2017/01/02/ckp-security-flaw.html">better security practices</a>,
+      and KDBX version 4 support using the <a href="https://github.com/keeweb/kdbxweb">KdbxWeb</a>
+      library.  Tusk is formerly known as CKPX.  More information and a user guide can be found on the
+      <a href="https://github.com/subdavis/Tusk/wiki">Wiki</a>.
+    </p>
     
     <a class="button install" href="https://chrome.google.com/webstore/detail/fmhmiaejopepamlcjkncpgpdjichnecm"><i class="fa fa-chrome fa-fw" aria-hidden="true"></i> Install Tusk from the Google Web Store</a>
-    <a class="button ffinstall" href="https://addons.mozilla.org/en-US/firefox/addon/keepass-tusk/"><i class="fa fa-firefox fa-fw" aria-hidden="true"></i> Install Tusk Add-on for Firefox</a><br>
-    <a class="button source" href="https://github.com/suBDavis/Tusk">Download Source Code</a>
-    <a class="button problem" href="https://github.com/suBDavis/Tusk/issues/new">Report a Problem</a>
+    <a class="button ffinstall" href="https://addons.mozilla.org/en-US/firefox/addon/keepass-tusk/"><i class="fa fa-firefox fa-fw" aria-hidden="true"></i> Install Tusk Add-on for Firefox</a>
+    <a class="button source" href="https://github.com/suBDavis/Tusk"><i class="fa fa-download fa-fw"></i> Download Source Code</a>
+    <a class="button problem" href="https://github.com/suBDavis/Tusk/issues/new"><i class="fa fa-exclamation-circle fa-fw"></i> Report a Problem</a>
 
     <h1 id="features">Features</h1>
     <table>
@@ -196,17 +205,29 @@
     <p>Tusk provides security bug fixes and improved practices compared to CKP.  It is not vulnerable to <a href="https://subdavis.com/blog/jekyll/update/2017/01/02/ckp-security-flaw.html">this bug</a> where your master key can be recovered from disk.  Tusk uses <a href="https://github.com/keeweb/kdbxweb">KdbxWeb</a> for crypto operations.</p>
 
     <h1 id="Screenshots">Screenshots</h1>
-    <img class="screenshot" src="img/unlock_1280.png" width="100%"/>
-    <p>Unlock screen. Enter your master password to decrypt your password file.</p>
 
-    <img class="screenshot" src="img/list_640.png" width="100%"/>
-    <p>List view.  Select one of the matched passwords or search your entire database.</p>
-
-    <img class="screenshot" src="img/welcome_1280.png" width="100%"/>
-    <p>Settings welcome page.</p>
-
-    <img class="screenshot" src="img/providers_1280.png" width="100%"/>
-    <p>Enable database providers like Google Drive, Dropbox, Onedrive, etc.</p>
+    <div class="siema">
+      <div>
+        <img class="screenshot" src="img/unlock_1280.png" width="100%"/>
+        <p>Unlock screen. Enter your master password to decrypt your password file.</p>
+      </div>   
+      <div>
+        <img class="screenshot" src="img/list_640.png" width="100%"/>
+        <p>List view.  Select one of the matched passwords or search your entire database.</p>
+      </div>
+      <div>
+        <img class="screenshot" src="img/welcome_1280.png" width="100%"/>
+        <p>Settings welcome page.</p>
+      </div>
+      <div>
+        <img class="screenshot" src="img/providers_1280.png" width="100%"/>
+        <p>Enable database providers like Google Drive, Dropbox, Onedrive, etc.</p>
+      </div>
+    </div>
+    <div class="carousel-buttons">
+      <button class="prev button"><i class="fa fa-arrow-circle-left fa-fw"></i> prev</button>
+      <button class="next button">next <i class="fa fa-arrow-circle-right fa-fw"></i></button>
+    </div>
 
     <h1 id="contribution">Contribution</h1>
     <p>Tusk is open source.  We use GitHub for source control, and contributions are welcome.</p>
@@ -225,7 +246,11 @@
       </li><li>When Tusk scans a webpage, it is for the sole purpose of identifying username and password fields, so that they may be automatically filled at the user's request.
       </li>
     </ul>
-
   </div>
+  <script>
+    const carousel = new Siema();
+    document.querySelector('.prev').addEventListener('click', () => carousel.prev());
+    document.querySelector('.next').addEventListener('click', () => carousel.next());
+  </script>
 </body>
 </html>
