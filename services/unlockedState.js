@@ -23,12 +23,12 @@ function UnlockedState($router, keepassReference, protectedMemory, settings, not
 	var cacheTimeoutId;
 
 	//determine current url:
-	my.getTabDetails = function() {
-		return new Promise(function(resolve, reject) {
+	my.getTabDetails = function () {
+		return new Promise(function (resolve, reject) {
 			chrome.tabs.query({
 				active: true,
 				currentWindow: true
-			}, function(tabs) {
+			}, function (tabs) {
 				if (tabs && tabs.length) {
 					my.tabId = tabs[0].id;
 					var url = tabs[0].url.split('?');
@@ -39,15 +39,15 @@ function UnlockedState($router, keepassReference, protectedMemory, settings, not
 					my.origin = parsedUrl.protocol + '//' + parsedUrl.hostname + '/';
 
 					chromePromise.permissions.contains({
-							origins: [my.origin]
-						})
-						.then(function() {
+						origins: [my.origin]
+					})
+						.then(function () {
 							my.sitePermission = true;
 						})
-						.catch(function(err) {
+						.catch(function (err) {
 							my.sitePermission = false;
 						})
-						.then(function() {
+						.then(function () {
 							resolve();
 						})
 				} else {
@@ -57,12 +57,12 @@ function UnlockedState($router, keepassReference, protectedMemory, settings, not
 		});
 	};
 
-	my.clearCache = function() {
+	my.clearCache = function () {
 		// Destroys an object in memory.
 		function destroy(obj) {
 			for (var prop in obj) {
 				var property = obj[prop];
-				if (property != null && typeof(property) == 'object') {
+				if (property != null && typeof (property) == 'object') {
 					destroy(property);
 				} else {
 					obj[prop] = null;
@@ -73,32 +73,32 @@ function UnlockedState($router, keepassReference, protectedMemory, settings, not
 		my.cache = {}
 	}
 
-	my.cacheSet = function(key, val) {
+	my.cacheSet = function (key, val) {
 		// Refresh cache
 		clearTimeout(cacheTimeoutId)
-		cacheTimeoutId = setTimeout(function() {
+		cacheTimeoutId = setTimeout(function () {
 			my.clearCache()
 			window.close()
 		}, 120000);
 		my.cache[key] = val;
 	}
 
-	my.cacheGet = function(key) {
+	my.cacheGet = function (key) {
 		// Refresh cache
 		clearTimeout(cacheTimeoutId)
-		cacheTimeoutId = setTimeout(function() {
+		cacheTimeoutId = setTimeout(function () {
 			my.clearCache()
 			window.close()
 		}, 120000);
 		return my.cache[key];
 	}
 
-	my.clearClipboardState = function() {
+	my.clearClipboardState = function () {
 		my.clipboardStatus = "";
 	}
 	setTimeout(my.clearClipboardState, 60000); //clear backgroundstate after 1 minutes live - we should never be alive that long
 
-	my.autofill = function(entry) {
+	my.autofill = function (entry) {
 		chrome.runtime.sendMessage({
 			m: "requestPermission",
 			perms: {
@@ -121,26 +121,26 @@ function UnlockedState($router, keepassReference, protectedMemory, settings, not
 		return my.getDecryptedAttribute(entry, attr);
 	}
 
-	my.copyPassword = function(entry) {
+	my.copyPassword = function (entry) {
 		copyPart = 'password';
 		copyEntry = entry;
 		document.execCommand('copy');
 	}
-	my.copyUsername = function(entry) {
+	my.copyUsername = function (entry) {
 		copyPart = 'userName';
 		copyEntry = entry;
 		document.execCommand('copy');
 	}
-	my.gotoDetails = function(entry) {
+	my.gotoDetails = function (entry) {
 		$router.route('/entry-details/' + entry.id);
 	}
 
-	my.getDecryptedAttribute = function(entry, attributeName) {
+	my.getDecryptedAttribute = function (entry, attributeName) {
 		return keepassReference.getFieldValue(entry, attributeName, my.cache.allEntries);
 	}
 
 	//listens for the copy event and does the copy
-	document.addEventListener('copy', function(e) {
+	document.addEventListener('copy', function (e) {
 		if (!copyEntry && !copyPart) {
 			return; //listener can get registered multiple times
 		}
@@ -155,7 +155,7 @@ function UnlockedState($router, keepassReference, protectedMemory, settings, not
 		settings.getSetClipboardExpireInterval().then(interval => {
 			settings.setForgetTime('clearClipboard', Date.now() + interval * 60000);
 			notifications.push({
-				text: fieldName +' copied to clipboard.  Clipboard will clear in '+ interval +' minute(s).',
+				text: fieldName + ' copied to clipboard.  Clipboard will clear in ' + interval + ' minute(s).',
 				type: 'clipboard',
 			}).then(() => window.close())
 		})

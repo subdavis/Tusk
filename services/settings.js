@@ -10,7 +10,7 @@ function Settings(secureCache) {
 	var exports = {}
 
 	// upgrade old settings.  Called on install.
-	exports.upgrade = function() {
+	exports.upgrade = function () {
 		// Patch https://subdavis.com/blog/jekyll/update/2017/01/02/ckp-security-flaw.html
 		exports.getSetDatabaseUsages().then(usages => {
 			let keys = Object.keys(usages)
@@ -21,7 +21,7 @@ function Settings(secureCache) {
 		})
 	}
 
-	exports.handleProviderError = function(err, provider) {
+	exports.handleProviderError = function (err, provider) {
 		exports.getCurrentDatabaseChoice().then(info => {
 			let providerKey = provider === undefined ? info.providerKey : provider.key;
 			let errmsg = err.message || ""
@@ -32,15 +32,15 @@ function Settings(secureCache) {
 		})
 	}
 
-	exports.getKeyFiles = function() {
-		return chromePromise.storage.local.get(['keyFiles']).then(function(items) {
+	exports.getKeyFiles = function () {
+		return chromePromise.storage.local.get(['keyFiles']).then(function (items) {
 			return items.keyFiles || [];
 		});
 	}
 
-	exports.deleteKeyFile = function(name) {
-		return exports.getKeyFiles().then(function(keyFiles) {
-			keyFiles.forEach(function(keyFile, index) {
+	exports.deleteKeyFile = function (name) {
+		return exports.getKeyFiles().then(function (keyFiles) {
+			keyFiles.forEach(function (keyFile, index) {
 				if (keyFile.name === name) {
 					keyFiles.splice(index, 1);
 				}
@@ -52,19 +52,19 @@ function Settings(secureCache) {
 		});
 	}
 
-	exports.deleteAllKeyFiles = function() {
+	exports.deleteAllKeyFiles = function () {
 		return chromePromise.storage.local.remove('keyFiles')
 	}
 
-	exports.destroyLocalStorage = function(key) {
+	exports.destroyLocalStorage = function (key) {
 		if (key.length) {
 			return chromePromise.storage.local.remove(key)
 		}
 	}
 
-	exports.addKeyFile = function(name, key) {
-		return exports.getKeyFiles().then(function(keyFiles) {
-			var matches = keyFiles.filter(function(keyFile) {
+	exports.addKeyFile = function (name, key) {
+		return exports.getKeyFiles().then(function (keyFiles) {
+			var matches = keyFiles.filter(function (keyFile) {
 				return keyFile.name === name;
 			})
 
@@ -86,8 +86,8 @@ function Settings(secureCache) {
 		});
 	}
 
-	exports.saveCurrentDatabaseChoice = function(passwordFile, provider) {
-		let shallowCopy = function(obj) {
+	exports.saveCurrentDatabaseChoice = function (passwordFile, provider) {
+		let shallowCopy = function (obj) {
 			let clone = {}
 			clone.prototype = obj.prototype
 			Object.keys(obj).forEach(property => {
@@ -106,8 +106,8 @@ function Settings(secureCache) {
 		});
 	}
 
-	exports.getCurrentDatabaseChoice = function() {
-		return chromePromise.storage.local.get(['selectedDatabase']).then(function(items) {
+	exports.getCurrentDatabaseChoice = function () {
+		return chromePromise.storage.local.get(['selectedDatabase']).then(function (items) {
 			if (items.selectedDatabase) {
 				return items.selectedDatabase;
 			} else {
@@ -116,7 +116,7 @@ function Settings(secureCache) {
 		});
 	}
 
-	exports.disableDatabaseProvider = function(provider) {
+	exports.disableDatabaseProvider = function (provider) {
 		return chromePromise.storage.local.get(['selectedDatabase']).then(items => {
 			if (items.selectedDatabase)
 				if (items.selectedDatabase.providerKey === provider.key)
@@ -125,7 +125,7 @@ function Settings(secureCache) {
 		})
 	}
 
-	exports.getCurrentMasterPasswordCacheKey = function() {
+	exports.getCurrentMasterPasswordCacheKey = function () {
 		return exports.getCurrentDatabaseChoice().then(info => {
 			if (info !== null)
 				return info.passwordFile.title + "__" + info.providerKey + ".password"
@@ -133,7 +133,7 @@ function Settings(secureCache) {
 		});
 	}
 
-	exports.cacheMasterPassword = function(pw, args) {
+	exports.cacheMasterPassword = function (pw, args) {
 		return exports.getCurrentMasterPasswordCacheKey().then(key => {
 			return secureCache.save(key, pw).then(nil => {
 				let forgetTime = args['forgetTime']
@@ -145,9 +145,9 @@ function Settings(secureCache) {
 	/*
 	 * Sets a time to forget something
 	 */
-	exports.setForgetTime = function(key, time) {
+	exports.setForgetTime = function (key, time) {
 		var storageKey = 'forgetTimes';
-		return chromePromise.storage.local.get(storageKey).then(function(items) {
+		return chromePromise.storage.local.get(storageKey).then(function (items) {
 			var forgetTimes = {}
 			if (items[storageKey]) {
 				forgetTimes = items[storageKey];
@@ -162,9 +162,9 @@ function Settings(secureCache) {
 		});
 	}
 
-	exports.getForgetTime = function(key) {
+	exports.getForgetTime = function (key) {
 		var storageKey = 'forgetTimes';
-		return chromePromise.storage.local.get(storageKey).then(function(items) {
+		return chromePromise.storage.local.get(storageKey).then(function (items) {
 			var forgetTimes = {}
 			if (items[storageKey]) {
 				forgetTimes = items[storageKey];
@@ -174,9 +174,9 @@ function Settings(secureCache) {
 		});
 	}
 
-	exports.getAllForgetTimes = function() {
+	exports.getAllForgetTimes = function () {
 		var storageKey = 'forgetTimes';
-		return chromePromise.storage.local.get(storageKey).then(function(items) {
+		return chromePromise.storage.local.get(storageKey).then(function (items) {
 			var forgetTimes = {}
 			if (items[storageKey]) {
 				forgetTimes = items[storageKey];
@@ -186,14 +186,14 @@ function Settings(secureCache) {
 		})
 	}
 
-	exports.clearForgetTimes = function(keysArray) {
+	exports.clearForgetTimes = function (keysArray) {
 		var storageKey = 'forgetTimes';
-		return chromePromise.storage.local.get(storageKey).then(function(items) {
+		return chromePromise.storage.local.get(storageKey).then(function (items) {
 			var forgetTimes = {}
 			if (items[storageKey]) {
 				forgetTimes = items[storageKey];
 			}
-			keysArray.forEach(function(key) {
+			keysArray.forEach(function (key) {
 				if (forgetTimes[key])
 					delete forgetTimes[key];
 			})
@@ -208,9 +208,9 @@ function Settings(secureCache) {
 	 * Saves information about how the database was opened, so we can optimize the
 	 * UI next time by hiding the irrelevant options and remembering the keyfile
 	 */
-	exports.saveCurrentDatabaseUsage = function(usage) {
-		return exports.getCurrentDatabaseChoice().then(function(info) {
-			return exports.getSetDatabaseUsages().then(function(usages) {
+	exports.saveCurrentDatabaseUsage = function (usage) {
+		return exports.getCurrentDatabaseChoice().then(function (info) {
+			return exports.getSetDatabaseUsages().then(function (usages) {
 				var key = info.passwordFile.title + "__" + info.providerKey;
 				usages[key] = usage;
 
@@ -223,9 +223,9 @@ function Settings(secureCache) {
 	 * Retrieves information about how the database was opened, so we can optimize the
 	 * UI by hiding the irrelevant options and remembering the keyfile
 	 */
-	exports.getCurrentDatabaseUsage = function() {
-		return exports.getCurrentDatabaseChoice().then(function(info) {
-			return exports.getSetDatabaseUsages().then(function(usages) {
+	exports.getCurrentDatabaseUsage = function () {
+		return exports.getCurrentDatabaseChoice().then(function (info) {
+			return exports.getSetDatabaseUsages().then(function (usages) {
 				var key = info.passwordFile.title + "__" + info.providerKey;
 				var usage = usages[key] || {};
 
@@ -237,63 +237,63 @@ function Settings(secureCache) {
 		})
 	}
 
-	exports.getSharedUrlList = function() {
+	exports.getSharedUrlList = function () {
 		return chromePromise.storage.local.get('sharedUrlList').then(links => {
 			return links || false;
 		})
 	}
 
-	let keyGetSetter = function(key, val, defaultval, value_type) {
+	let keyGetSetter = function (key, val, defaultval, value_type) {
 		let update_obj = {}
 		update_obj[key] = val
-		if (val !== undefined && (typeof(val) === value_type || val === null) )
+		if (val !== undefined && (typeof (val) === value_type || val === null))
 			return chromePromise.storage.local.set(update_obj).then(() => val)
 		else
 			return chromePromise.storage.local.get(key).then(oldval => {
 				if (oldval[key] !== undefined)
-					if (typeof(oldval[key]) === value_type)
+					if (typeof (oldval[key]) === value_type)
 						return oldval[key]
 				return defaultval
 			})
 	}
 
-	exports.getSetClipboardExpireInterval = function(interval) {
+	exports.getSetClipboardExpireInterval = function (interval) {
 		return keyGetSetter('expireInterval', interval, 2, 'number')
 	}
 
-	exports.getSetAccessToken = function(type, accessToken) {
+	exports.getSetAccessToken = function (type, accessToken) {
 		return keyGetSetter(type + 'AccessToken', accessToken, null, 'string')
 	}
 
-	exports.getSetDatabaseUsages = function(usages) {
+	exports.getSetDatabaseUsages = function (usages) {
 		return keyGetSetter('databaseUsages', usages, {}, 'object')
 	}
 
-	exports.getSetDefaultRememberPeriod = function(rememberPeriod) {
+	exports.getSetDefaultRememberPeriod = function (rememberPeriod) {
 		return keyGetSetter('rememberPeriod', rememberPeriod, 0, 'number')
 	}
 
-	exports.getSetWebdavServerList = function(serverList) {
+	exports.getSetWebdavServerList = function (serverList) {
 		return keyGetSetter('webdavServerList', serverList, [], 'object')
 	}
 
-	exports.getSetWebdavDirectoryMap = function(dirMap) {
+	exports.getSetWebdavDirectoryMap = function (dirMap) {
 		return keyGetSetter('webdavDirectoryMap', dirMap, {}, 'object')
 	}
 
-	exports.getSetHotkeyNavEnabled = function(enabled) {
+	exports.getSetHotkeyNavEnabled = function (enabled) {
 		return keyGetSetter('hotkeyNavEnabled', enabled, false, 'boolean')
 	}
 
-	exports.getSetStrictModeEnabled = function(enabled) {
+	exports.getSetStrictModeEnabled = function (enabled) {
 		return keyGetSetter('strictMatchModeEnabled', enabled, false, 'boolean')
 	}
 
-	exports.getSetNotificationsEnabled = function(enabledTypes) {
-		return keyGetSetter('notificationsEnabled', enabledTypes, ['clipboard','expiration'], 'object')
+	exports.getSetNotificationsEnabled = function (enabledTypes) {
+		return keyGetSetter('notificationsEnabled', enabledTypes, ['clipboard', 'expiration'], 'object')
 	}
 
-	exports.getSetOriginPermissionEnabled = function(enabled) {
+	exports.getSetOriginPermissionEnabled = function (enabled) {
 		return keyGetSetter('originPermissionsEnabled', enabled, false, 'boolean')
 	}
 

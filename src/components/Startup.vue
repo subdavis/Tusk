@@ -1,3 +1,53 @@
+<script>
+/* beautify preserve:start */
+import { Links } from '$services/links.js'
+import Spinner from 'vue-simple-spinner'
+/* beautify preserve:end */
+export default {
+	props: {
+		settings: Object,
+		passwordFileStoreRegistry: Object
+	},
+	data() {
+		return {
+			links: Links(),
+			busy: true
+		}
+	},
+	components: {
+		Spinner
+	},
+	mounted: function () {
+		this.settings.getCurrentDatabaseChoice().then(info => {
+			//use the last chosen database
+			if (info) {
+				this.$router.route('/unlock/' + info.providerKey + '/' + encodeURIComponent(info.passwordFile.title));
+			} else {
+				//user has not yet chosen a database.  Lets see if there are any available to choose...
+				var readyPromises = [];
+				this.passwordFileStoreRegistry.listFileManagers('listDatabases').forEach(provider => {
+					readyPromises.push(provider.listDatabases());
+				});
+
+				return Promise.all(readyPromises).then(filesArrays => {
+					var availableFiles = filesArrays.reduce((prev, curr) => {
+						return prev.concat(curr);
+					});
+
+					if (availableFiles.length) {
+						//choose one of the files
+						this.$router.route('/choose')
+					} else {
+						//no files available - allow the user to link to the options page
+						this.busy = false;
+					}
+				});
+			}
+		})
+	}
+}
+</script>
+
 <template>
 	<div>
 		<!-- Busy Spinner -->
@@ -22,61 +72,11 @@
 	</div>
 </template>
 
-<script>
-	/* beautify preserve:start */
-import { Links } from '$services/links.js'
-import Spinner from 'vue-simple-spinner'
-/* beautify preserve:end */
-	export default {
-		props: {
-			settings: Object,
-			passwordFileStoreRegistry: Object
-		},
-		data() {
-			return {
-				links: Links(),
-				busy: true
-			}
-		},
-		components: {
-			Spinner
-		},
-		mounted: function() {
-			this.settings.getCurrentDatabaseChoice().then(info => {
-				//use the last chosen database
-				if (info) {
-					this.$router.route('/unlock/' + info.providerKey + '/' + encodeURIComponent(info.passwordFile.title));
-				} else {
-					//user has not yet chosen a database.  Lets see if there are any available to choose...
-					var readyPromises = [];
-					this.passwordFileStoreRegistry.listFileManagers('listDatabases').forEach(provider => {
-						readyPromises.push(provider.listDatabases());
-					});
-
-					return Promise.all(readyPromises).then(filesArrays => {
-						var availableFiles = filesArrays.reduce((prev, curr) => {
-							return prev.concat(curr);
-						});
-
-						if (availableFiles.length) {
-							//choose one of the files
-							this.$router.route('/choose')
-						} else {
-							//no files available - allow the user to link to the options page
-							this.busy = false;
-						}
-					});
-				}
-			})
-		}
-	}
-</script>
-
 <style lang="scss">
-	@import "../styles/settings.scss";
-	p {
-		width: 100%;
-		margin: 10px 0px 0px 0px;
-		font-size: 14px;
-	}
+@import "../styles/settings.scss";
+p {
+  width: 100%;
+  margin: 10px 0px 0px 0px;
+  font-size: 14px;
+}
 </style>

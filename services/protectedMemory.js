@@ -35,13 +35,13 @@ function ProtectedMemory() {
 
 	function getData(key) {
 		var encData = dataMap[key];
-		if (encData === undefined || typeof(encData) !== 'string')
+		if (encData === undefined || typeof (encData) !== 'string')
 			return Promise.resolve(undefined);
 
-		return keyPromise.then( key => {
+		return keyPromise.then(key => {
 			var encBytes = Base64.decode(encData);
 			return window.crypto.subtle.decrypt(AES, key, encBytes);
-		}).then(function(data) {
+		}).then(function (data) {
 			var decoder = new TextDecoder();
 			var decoded = decoder.decode(new Uint8Array(data));
 			var parsed = JSON.parse(decoded)
@@ -53,9 +53,9 @@ function ProtectedMemory() {
 		var preppedData = prepData(data);
 		var encoder = new TextEncoder();
 		var dataBytes = encoder.encode(JSON.stringify(preppedData));
-		return keyPromise.then( key => {
+		return keyPromise.then(key => {
 			return window.crypto.subtle.encrypt(AES, key, dataBytes);
-		}).then(function(encData) {
+		}).then(function (encData) {
 			var dataString = Base64.encode(encData);
 			dataMap[key] = dataString;
 			return Promise.resolve();
@@ -63,8 +63,8 @@ function ProtectedMemory() {
 	}
 
 	function clearData(key) {
-		if (key !== undefined){
-			delete dataMap[key]	
+		if (key !== undefined) {
+			delete dataMap[key]
 		} else {
 			dataMap = {};
 			keyPromise = initNewKey();
@@ -80,7 +80,7 @@ function ProtectedMemory() {
 	}
 
 	function deserialize(serializedData) {
-		if (serializedData === undefined || typeof(serializedData) !== 'string' || serializedData === "")
+		if (serializedData === undefined || typeof (serializedData) !== 'string' || serializedData === "")
 			return undefined;
 
 		var dataBytes = Base64.decode(serializedData);
@@ -96,7 +96,7 @@ function ProtectedMemory() {
 	 */
 	var randomString = "Ựៅ" // Base64.encode(window.crypto.getRandomValues(new Uint8Array(4)));
 	function prepData(data) {
-		if (data === null || data === undefined || typeof(data) !== 'object')
+		if (data === null || data === undefined || typeof (data) !== 'object')
 			return data;
 
 		if (data.constructor == ArrayBuffer || data.constructor == Uint8Array) {
@@ -117,10 +117,10 @@ function ProtectedMemory() {
 	}
 
 	function dePrepData(data) {
-		if (data === null || data === undefined || (typeof(data) !== 'object' && typeof(data) !== 'string'))
+		if (data === null || data === undefined || (typeof (data) !== 'object' && typeof (data) !== 'string'))
 			return data;
 
-		if (typeof(data) === "string") {
+		if (typeof (data) === "string") {
 			if (data.indexOf(randomString) == 0) {
 				data = data.slice(randomString.length);
 				return new Uint8Array(Base64.decode(data));

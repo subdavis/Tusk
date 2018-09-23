@@ -11,7 +11,7 @@ function Links() {
 		openOptionsDatabases: openOptionsDatabases,
 		open: openGeneric
 	}
-	
+
 	function openGeneric(url) {
 		// Given some URL, open it in a new tab
 		chrome.tabs.create({

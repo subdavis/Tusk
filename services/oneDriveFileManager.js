@@ -27,7 +27,7 @@ function OneDriveFileManager(settings) {
 		chooseDescription: 'Access password files stored on OneDrive.  Files will be retrieved from OneDrive each time they are used.',
 	};
 
-	oauth.searchRequestFunction = function(token) {
+	oauth.searchRequestFunction = function (token) {
 		var query = 'kdbx';
 		var filter = encodeURIComponent('file ne null');
 		var url = 'https://api.onedrive.com/v1.0/drive/root/view.search?q=' + query + '&filter=' + filter;
@@ -40,7 +40,7 @@ function OneDriveFileManager(settings) {
 		})
 	}
 
-	oauth.searchRequestHandler = function(response) {
+	oauth.searchRequestHandler = function (response) {
 
 		function transformFile(file) {
 			var path = "";
@@ -74,7 +74,7 @@ function OneDriveFileManager(settings) {
 		}
 
 		// only return files that have a .kdbx extension
-		var files = response.data.value.filter(function(file) {
+		var files = response.data.value.filter(function (file) {
 			return file.name && /\.kdbx?$/.exec(file.name);
 		});
 
@@ -82,7 +82,7 @@ function OneDriveFileManager(settings) {
 	}
 
 	//get the minimum information needed to identify this file for future retrieval
-	oauth.getDatabaseChoiceData = function(dbInfo) {
+	oauth.getDatabaseChoiceData = function (dbInfo) {
 		return {
 			url: dbInfo.url,
 			title: dbInfo.title
@@ -90,7 +90,7 @@ function OneDriveFileManager(settings) {
 	}
 
 	//given minimal file information, retrieve the actual file
-	oauth.fileRequestFunction = function(dbInfo, token) {
+	oauth.fileRequestFunction = function (dbInfo, token) {
 		return axios({
 			method: 'GET',
 			url: dbInfo.url,
@@ -101,7 +101,7 @@ function OneDriveFileManager(settings) {
 		})
 	}
 
-	oauth.revokeAuth = function() {
+	oauth.revokeAuth = function () {
 		return chromePromise.runtime.getManifest().then(manifest => {
 			let url = 'https://login.live.com/oauth20_logout.srf?client_id=' +
 				manifest.static_data.onedrive.client_id
@@ -109,7 +109,7 @@ function OneDriveFileManager(settings) {
 		})
 	}
 
-	oauth.handleAuthRedirectURI = function(redirect_url, randomState, resolve, reject) {
+	oauth.handleAuthRedirectURI = function (redirect_url, randomState, resolve, reject) {
 
 		function parseAuthInfoFromUrl(url) {
 			var hash = /#(.+)$/.exec(url);
@@ -117,7 +117,7 @@ function OneDriveFileManager(settings) {
 				return null;
 			}
 			hash = hash[1];
-			return JSON.parse('{"' + hash.replace(/&/g, '","').replace(/=/g, '":"') + '"}', function(key, value) {
+			return JSON.parse('{"' + hash.replace(/&/g, '","').replace(/=/g, '":"') + '"}', function (key, value) {
 				return key === "" ? value : decodeURIComponent(value);
 			});
 		}
