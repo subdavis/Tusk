@@ -30,15 +30,29 @@
 }
 
 .error {
-  background-color: $light-red;
+  border-left: 4px solid $light-red;
+  
+  &.pill {
+    border-left: 0px;
+    background-color: $light-red;
+    border-radius: 4px;
+    padding: 0px 4px;
+  };
 }
 
 .warn {
-  background-color: $warn-yellow;
+  border-left: 4px solid $warn-yellow;
+
+  &.pill {
+    border-left: 0px;
+    background-color: $warn-yellow;
+    border-radius: 4px;
+    padding: 0px 4px;
+  };
 }
 
 .success {
-  background-color: $green;
+  border-left: 4px solid $green;
 }
 
 button.action-button {

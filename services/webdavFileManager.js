@@ -28,7 +28,7 @@ Object DirMap {
 
 */
 const Base64 = require('base64-arraybuffer');
-const createClient = require("webdav-client");
+const createClient = require("webdav");
 const regeneratorRuntime = require('babel-regenerator-runtime')
 import { guid } from '$lib/utils.js'
 import { ChromePromiseApi } from '$lib/chrome-api-promise.js'
@@ -127,8 +127,8 @@ function WebdavFileManager(settings) {
 				// TODO: Implement depth better
 				if (path.split('/').length > SEARCH_DEPTH) 
 					break; // We've exceeded search depth
-				let contents = await client.getDirectoryContents(path)
-				let foundKDBXInDir = false
+				let contents = await client.getDirectoryContents(path, {credentials: 'omit'});
+				let foundKDBXInDir = false;
 				contents.forEach(item => {
 					if (item.type === 'directory')
 						queue.push(item.filename)
@@ -174,7 +174,7 @@ function WebdavFileManager(settings) {
 				throw 'Database no longer exists'
 			let client = createClient(serverInfo.url, serverInfo.username, serverInfo.password)
 			createClient.setFetchMethod(window.fetch)
-			return client.getFileContents(dbInfo.path)
+			return client.getFileContents(dbInfo.path, {credentials: 'omit'})
 		})
 	}
 
@@ -189,7 +189,7 @@ function WebdavFileManager(settings) {
 				return []
 			let client = createClient(serverInfo.url, serverInfo.username, serverInfo.password)
 			createClient.setFetchMethod(window.fetch);
-			return client.getDirectoryContents(directory).then(contents => {
+			return client.getDirectoryContents(directory, {credentials: 'omit'}).then(contents => {
 				// map from directory contents to DBInfo type.
 				return contents.filter(element => {
 					return element.filename.indexOf('.kdbx') >= 1
@@ -210,8 +210,10 @@ function WebdavFileManager(settings) {
 	 */
 	function addServer(url, username, password) {
 		let client = createClient(url, username, password)
-		createClient.setFetchMethod(window.fetch)
-		return client.getDirectoryContents('/').then(contents => {
+		createClient.setFetchMethod((a, b) => {
+			return window.fetch(a, b);
+		})
+		return client.getDirectoryContents('/', {credentials:'omit'}).then(contents => {
 			// success!
 			let serverInfo = {
 				url: url,

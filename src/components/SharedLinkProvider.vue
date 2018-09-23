@@ -170,7 +170,6 @@
 					}).then(nil => {
 						// on accepted
 						this.busy = false;
-						console.log(this.links)
 						this.links.push(lnk);
 						this.providerManager.setUrls(this.links);
 					}, reason => {

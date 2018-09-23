@@ -114,9 +114,9 @@ if (process.env.NODE_ENV === 'production') {
                 NODE_ENV: '"production"'
             }
         }),
-        // new UglifyJSPlugin({
-        //     sourceMap: true
-        // }),
+        new UglifyJSPlugin({
+            sourceMap: true
+        }),
         new webpack.LoaderOptionsPlugin({
             minimize: true
         })
