@@ -80,7 +80,7 @@ function WebdavFileManager(settings) {
 	*/
 	function listDatabases() {
 		return isEnabled().then(enabled => {
-			if (!enabled )
+			if (!enabled)
 				return Promise.resolve([])
 			return settings.getSetWebdavDirectoryMap().then(dirMap => {
 				let promises = []
@@ -88,7 +88,7 @@ function WebdavFileManager(settings) {
 				for (let serverId in dirMap)
 					dirMap[serverId].forEach(dirInfo => {
 						promises.push(searchDirectory(serverId, dirInfo.path))
-					})	
+					})
 
 				return Promise.all(promises).then(results => {
 					// flatten results
@@ -107,7 +107,7 @@ function WebdavFileManager(settings) {
 	 */
 	async function searchServer(serverId) {
 		let serverInfo = await getServer(serverId)
-		if (serverInfo === null){
+		if (serverInfo === null) {
 			console.error("serverInfo not found");
 			return
 		}
@@ -117,22 +117,22 @@ function WebdavFileManager(settings) {
 		/** 
 		 * returns Object:[]DirInfo
 		*/
-		let bfs = async function() {
-			let queue = [ '/' ]
+		let bfs = async function () {
+			let queue = ['/']
 			let foundDirectories = []
 
 			while (queue.length) {
 				let path = queue.shift()
 
 				// TODO: Implement depth better
-				if (path.split('/').length > SEARCH_DEPTH) 
+				if (path.split('/').length > SEARCH_DEPTH)
 					break; // We've exceeded search depth
-				let contents = await client.getDirectoryContents(path, {credentials: 'omit'});
+				let contents = await client.getDirectoryContents(path, { credentials: 'omit' });
 				let foundKDBXInDir = false;
 				contents.forEach(item => {
 					if (item.type === 'directory')
 						queue.push(item.filename)
-					else if (item.filename.indexOf('.kdbx') >= 1 && !foundKDBXInDir){
+					else if (item.filename.indexOf('.kdbx') >= 1 && !foundKDBXInDir) {
 						foundDirectories.push({
 							path: path, // the parent.
 							serverId: serverInfo.serverId
@@ -152,7 +152,7 @@ function WebdavFileManager(settings) {
 			let dirMap = resolves[1]
 			dirMap[serverInfo.serverId] = foundDirectories
 			return settings.getSetWebdavDirectoryMap(dirMap)
-		})	
+		})
 	}
 
 	//get the minimum information needed to identify this file for future retrieval
@@ -174,7 +174,7 @@ function WebdavFileManager(settings) {
 				throw 'Database no longer exists'
 			let client = createClient(serverInfo.url, serverInfo.username, serverInfo.password)
 			createClient.setFetchMethod(window.fetch)
-			return client.getFileContents(dbInfo.path, {credentials: 'omit'})
+			return client.getFileContents(dbInfo.path, { credentials: 'omit' })
 		})
 	}
 
@@ -189,7 +189,7 @@ function WebdavFileManager(settings) {
 				return []
 			let client = createClient(serverInfo.url, serverInfo.username, serverInfo.password)
 			createClient.setFetchMethod(window.fetch);
-			return client.getDirectoryContents(directory, {credentials: 'omit'}).then(contents => {
+			return client.getDirectoryContents(directory, { credentials: 'omit' }).then(contents => {
 				// map from directory contents to DBInfo type.
 				return contents.filter(element => {
 					return element.filename.indexOf('.kdbx') >= 1
@@ -213,7 +213,7 @@ function WebdavFileManager(settings) {
 		createClient.setFetchMethod((a, b) => {
 			return window.fetch(a, b);
 		})
-		return client.getDirectoryContents('/', {credentials:'omit'}).then(contents => {
+		return client.getDirectoryContents('/', { credentials: 'omit' }).then(contents => {
 			// success!
 			let serverInfo = {
 				url: url,
@@ -223,9 +223,9 @@ function WebdavFileManager(settings) {
 			return settings.getSetWebdavServerList().then(serverList => {
 				serverList = serverList.length ? serverList : []
 				let matches = serverList.filter((elem, i, a) => {
-					return (elem.url == serverInfo.url 
-					&& elem.username == serverInfo.username 
-					&& elem.password == serverInfo.password)
+					return (elem.url == serverInfo.url
+						&& elem.username == serverInfo.username
+						&& elem.password == serverInfo.password)
 				})
 				if (matches.length == 1) {
 					return matches[0].serverId
@@ -247,7 +247,7 @@ function WebdavFileManager(settings) {
 	function listServers() {
 		return settings.getSetWebdavServerList()
 	}
-	
+
 	/**
 	 * return Promise --> Object:ServerInfo
 	 * @param {string} serverId 

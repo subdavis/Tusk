@@ -1,149 +1,149 @@
 <script>
-	import JSONFormatter from 'json-formatter-js'
-	import { isFirefox } from '$lib/utils'
+import JSONFormatter from 'json-formatter-js'
+import { isFirefox } from '$lib/utils'
 
-	export default {
-		props: {
-			settings: Object,
-			secureCacheMemory: Object
-		},
-		data() {
-			return {
-				busy: false,
-				expireTime: 2,
-				hotkeyNavEnabled: false,
-				allOriginPermission: false,
-				allOriginPerms: {
-					origins: [
-						"https://*/*",
-						"http://*/*"
-					]
-				},
-				strictMatchEnabled: false,
-				notificationsEnabled: ['expiration'],
-				jsonState: [{
-						k: 'databaseUsages',                      // key
-						f: this.settings.getSetDatabaseUsages,    // getter
-						delete: {
-							f: this.settings.destroyLocalStorage, // remover
-							arg: 'databaseUsages',                // remover args
-							op: 'Delete'                          // remover button name
-						}
-					},
-					{
-						k: 'webdavServerList',
-						f: this.settings.getSetWebdavServerList,
-						delete: {
-							f: this.settings.destroyLocalStorage,
-							arg: 'webdavServerList',
-							op: 'Delete'
-						}
-					},
-					{
-						k: 'webdavDirectoryMap',
-						f: this.settings.getSetWebdavDirectoryMap,
-						delete: {
-							f: this.settings.destroyLocalStorage,
-							arg: 'webdavDirectoryMap',
-							op: 'Delete'
-						}
-					},
-					{
-						k: 'selectedDatabase',
-						f: this.settings.getCurrentDatabaseChoice,
-						delete: {
-							f: this.settings.destroyLocalStorage,
-							arg: 'selectedDatabase',
-							op: 'Delete'
-						}
-					},
-					{
-						k: 'keyFiles',
-						f: this.settings.getKeyFiles,
-						delete: {
-							f: this.settings.deleteAllKeyFiles,
-							arg: undefined,
-							op: 'Delete'
-						}
-					},
-					{
-						k: 'forgetTimes',
-						f: this.settings.getAllForgetTimes
-					},
-					{
-						k: 'sharedUrlList',
-						f: this.settings.getSharedUrlList,
-						delete: {
-							f: this.settings.destroyLocalStorage,
-							arg: 'sharedUrlList',
-							op: 'Delete'
-						}
-					},
+export default {
+	props: {
+		settings: Object,
+		secureCacheMemory: Object
+	},
+	data() {
+		return {
+			busy: false,
+			expireTime: 2,
+			hotkeyNavEnabled: false,
+			allOriginPermission: false,
+			allOriginPerms: {
+				origins: [
+					"https://*/*",
+					"http://*/*"
 				]
-			}
-		},
-		watch: {
-			expireTime(newval, oldval) {
-				this.settings.getSetClipboardExpireInterval(parseInt(newval))
 			},
-			hotkeyNavEnabled(newval, oldval) {
-				this.settings.getSetHotkeyNavEnabled(newval)
-			},
-			strictMatchEnabled(newval, oldval) {
-				this.settings.getSetStrictModeEnabled(newval)
-			},
-			notificationsEnabled(newval) {
-				this.settings.getSetNotificationsEnabled(newval)
-			}
-		},
-		methods: {
-			isFirefox: isFirefox,
-			toggleOriginPermissions(evt) {
-				// Negated because this function will call before the vue model update.
-				if (!this.allOriginPermission) {
-					chrome.permissions.request(this.allOriginPerms);
-				} else {
-					chrome.permissions.remove(this.allOriginPerms);
+			strictMatchEnabled: false,
+			notificationsEnabled: ['expiration'],
+			jsonState: [{
+				k: 'databaseUsages',                      // key
+				f: this.settings.getSetDatabaseUsages,    // getter
+				delete: {
+					f: this.settings.destroyLocalStorage, // remover
+					arg: 'databaseUsages',                // remover args
+					op: 'Delete'                          // remover button name
 				}
-				this.settings.getSetOriginPermissionEnabled(!this.allOriginPermission);
-				this.allOriginPermission = !this.allOriginPermission;
 			},
-			init() {
-				this.settings.getSetClipboardExpireInterval().then(val => {
-					this.expireTime = val
-				})
-				this.settings.getSetHotkeyNavEnabled().then(val => {
-					this.hotkeyNavEnabled = val
-				})
-				this.settings.getSetNotificationsEnabled().then(val => {
-					this.notificationsEnabled = val
-				})
-				this.settings.getSetStrictModeEnabled().then(val => {
-					this.strictMatchEnabled = val;
-				})
-				if (!isFirefox()) {
-					chrome.permissions.contains(this.allOriginPerms, granted => {
-						this.allOriginPermission = !!granted;
-					});
+			{
+				k: 'webdavServerList',
+				f: this.settings.getSetWebdavServerList,
+				delete: {
+					f: this.settings.destroyLocalStorage,
+					arg: 'webdavServerList',
+					op: 'Delete'
 				}
-				this.jsonState.forEach(blob => {
-					blob.f().then(result => {
-						if (result && Object.keys(result).length) {
-							let formatter = new JSONFormatter(result)
-							let place = document.getElementById(blob.k)
-							while (place.firstChild) place.removeChild(place.firstChild);
-							place.appendChild(formatter.render())
-						} else {
-							document.getElementById(blob.k).parentNode.parentNode.remove();
-						}
-					});
+			},
+			{
+				k: 'webdavDirectoryMap',
+				f: this.settings.getSetWebdavDirectoryMap,
+				delete: {
+					f: this.settings.destroyLocalStorage,
+					arg: 'webdavDirectoryMap',
+					op: 'Delete'
+				}
+			},
+			{
+				k: 'selectedDatabase',
+				f: this.settings.getCurrentDatabaseChoice,
+				delete: {
+					f: this.settings.destroyLocalStorage,
+					arg: 'selectedDatabase',
+					op: 'Delete'
+				}
+			},
+			{
+				k: 'keyFiles',
+				f: this.settings.getKeyFiles,
+				delete: {
+					f: this.settings.deleteAllKeyFiles,
+					arg: undefined,
+					op: 'Delete'
+				}
+			},
+			{
+				k: 'forgetTimes',
+				f: this.settings.getAllForgetTimes
+			},
+			{
+				k: 'sharedUrlList',
+				f: this.settings.getSharedUrlList,
+				delete: {
+					f: this.settings.destroyLocalStorage,
+					arg: 'sharedUrlList',
+					op: 'Delete'
+				}
+			},
+			]
+		}
+	},
+	watch: {
+		expireTime(newval, oldval) {
+			this.settings.getSetClipboardExpireInterval(parseInt(newval))
+		},
+		hotkeyNavEnabled(newval, oldval) {
+			this.settings.getSetHotkeyNavEnabled(newval)
+		},
+		strictMatchEnabled(newval, oldval) {
+			this.settings.getSetStrictModeEnabled(newval)
+		},
+		notificationsEnabled(newval) {
+			this.settings.getSetNotificationsEnabled(newval)
+		}
+	},
+	methods: {
+		isFirefox: isFirefox,
+		toggleOriginPermissions(evt) {
+			// Negated because this function will call before the vue model update.
+			if (!this.allOriginPermission) {
+				chrome.permissions.request(this.allOriginPerms);
+			} else {
+				chrome.permissions.remove(this.allOriginPerms);
+			}
+			this.settings.getSetOriginPermissionEnabled(!this.allOriginPermission);
+			this.allOriginPermission = !this.allOriginPermission;
+		},
+		init() {
+			this.settings.getSetClipboardExpireInterval().then(val => {
+				this.expireTime = val
+			})
+			this.settings.getSetHotkeyNavEnabled().then(val => {
+				this.hotkeyNavEnabled = val
+			})
+			this.settings.getSetNotificationsEnabled().then(val => {
+				this.notificationsEnabled = val
+			})
+			this.settings.getSetStrictModeEnabled().then(val => {
+				this.strictMatchEnabled = val;
+			})
+			if (!isFirefox()) {
+				chrome.permissions.contains(this.allOriginPerms, granted => {
+					this.allOriginPermission = !!granted;
 				});
 			}
-		},
-		mounted() {
-			this.init();
+			this.jsonState.forEach(blob => {
+				blob.f().then(result => {
+					if (result && Object.keys(result).length) {
+						let formatter = new JSONFormatter(result)
+						let place = document.getElementById(blob.k)
+						while (place.firstChild) place.removeChild(place.firstChild);
+						place.appendChild(formatter.render())
+					} else {
+						document.getElementById(blob.k).parentNode.parentNode.remove();
+					}
+				});
+			});
 		}
+	},
+	mounted() {
+		this.init();
 	}
+}
 </script>
 
 <template>
@@ -248,12 +248,12 @@
 </template>
 
 <style lang="scss">
-	@import "../styles/settings.scss";
-	.json {
-		font-size: 12px;
-	}
+@import "../styles/settings.scss";
+.json {
+  font-size: 12px;
+}
 
-	h4 {
-		font-size: 24px;
-	}
+h4 {
+  font-size: 24px;
+}
 </style>

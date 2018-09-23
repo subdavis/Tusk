@@ -21,7 +21,7 @@ function KeyFileParser() {
 		}
 	}
 
-	exports.getKeyFromFile = function(keyFileBytes) {
+	exports.getKeyFromFile = function (keyFileBytes) {
 		var arr = new Uint8Array(keyFileBytes);
 		if (arr.byteLength == 0) {
 			return Promise.reject(new Error('The key file cannot be empty'));

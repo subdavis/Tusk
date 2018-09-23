@@ -35,7 +35,7 @@ function GoogleDrivePasswordFileManager(settings) {
 		chooseDescription: 'Access password files stored on Google Drive.  Files will be fetched from Google Drive each time they are used.',
 	};
 
-	oauth.searchRequestFunction = function(token) {
+	oauth.searchRequestFunction = function (token) {
 		var request = {
 			method: 'GET',
 			url: "https://www.googleapis.com/drive/v2/files?q=" + urlencode("fileExtension = 'kdbx' and trashed=false"),
@@ -46,8 +46,8 @@ function GoogleDrivePasswordFileManager(settings) {
 		return axios(request)
 	}
 
-	oauth.searchRequestHandler = function(response) {
-		return response.data.items.map(function(entry) {
+	oauth.searchRequestHandler = function (response) {
+		return response.data.items.map(function (entry) {
 			return {
 				title: entry.title,
 				url: entry.selfLink
@@ -56,7 +56,7 @@ function GoogleDrivePasswordFileManager(settings) {
 	}
 
 	//get the minimum information needed to identify this file for future retrieval
-	oauth.getDatabaseChoiceData = function(dbInfo) {
+	oauth.getDatabaseChoiceData = function (dbInfo) {
 		return {
 			title: dbInfo.title,
 			url: dbInfo.url
@@ -64,7 +64,7 @@ function GoogleDrivePasswordFileManager(settings) {
 	}
 
 	//given minimal file information, retrieve the actual file
-	oauth.fileRequestFunction = function(dbInfo, token) {
+	oauth.fileRequestFunction = function (dbInfo, token) {
 		function getFileFromDatabase(attempt) {
 			var requestmeta = {
 				method: "GET",
@@ -83,8 +83,8 @@ function GoogleDrivePasswordFileManager(settings) {
 					}
 				};
 				return axios(requestfile).then(response => {
-						return response
-					})
+					return response
+				})
 					.catch(err => {
 						attempt = attempt || 0;
 						if (attempt == 0) {
@@ -99,8 +99,8 @@ function GoogleDrivePasswordFileManager(settings) {
 		return getFileFromDatabase(0)
 	}
 
-	oauth.revokeAuth = function() {
-		return settings.getSetAccessToken(accessTokenType).then(function(accessToken) {
+	oauth.revokeAuth = function () {
+		return settings.getSetAccessToken(accessTokenType).then(function (accessToken) {
 			if (accessToken) {
 				var url = 'https://accounts.google.com/o/oauth2/revoke?token=' + accessToken
 				return axios({
@@ -117,7 +117,7 @@ function GoogleDrivePasswordFileManager(settings) {
 		})
 	}
 
-	oauth.handleAuthRedirectURI = function(redirect_url, randomState, resolve, reject) {
+	oauth.handleAuthRedirectURI = function (redirect_url, randomState, resolve, reject) {
 		var tokenMatches = /access_token=([^&]+)/.exec(redirect_url);
 		var stateMatches = /state=([^&]+)/.exec(redirect_url);
 
@@ -125,7 +125,7 @@ function GoogleDrivePasswordFileManager(settings) {
 			var access_token = tokenMatches[1];
 			var checkState = decodeURIComponent(stateMatches[1]);
 			if (checkState === randomState) {
-				settings.getSetAccessToken(accessTokenType, access_token).then(function() {
+				settings.getSetAccessToken(accessTokenType, access_token).then(function () {
 					resolve(access_token);
 				});
 			} else {
@@ -140,17 +140,17 @@ function GoogleDrivePasswordFileManager(settings) {
 		}
 	}
 
-	function chrome_auth (interactive){
+	function chrome_auth(interactive) {
 		// chrome_auth is an alternative auth function run when the 
 		// browser is Chrome.  It uses chrome.identity.getAuthToken rather than
 		// a standard Oauth flow.
 		interactive = !!interactive;
-		return new Promise(function(resolve, reject) {
+		return new Promise(function (resolve, reject) {
 			chrome.identity.getAuthToken({
-				interactive : interactive
-			}, function(token) {
+				interactive: interactive
+			}, function (token) {
 				if (token)
-				  settings.getSetAccessToken(accessTokenType, token).then(function() {
+					settings.getSetAccessToken(accessTokenType, token).then(function () {
 						resolve(token);
 					});
 				else {
@@ -171,10 +171,10 @@ function GoogleDrivePasswordFileManager(settings) {
 
 	// If this browser has the getAuthToken function.  Hack for #64
 	try {
-		if (chrome.identity.getAuthToken !== undefined){
+		if (chrome.identity.getAuthToken !== undefined) {
 			oauth['auth'] = chrome_auth;
 		}
-	} 
+	}
 	catch (e) {
 		console.info("Firefox mobile detected.")
 	}

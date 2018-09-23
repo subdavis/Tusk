@@ -58,7 +58,7 @@ function OauthManager(settings, oauth) {
 	function getToken() {
 		return ensureOriginPermissions().then(ensured => {
 			if (ensured) {
-				return settings.getSetAccessToken(accessTokenType).then(function(stored_token) {
+				return settings.getSetAccessToken(accessTokenType).then(function (stored_token) {
 					if (stored_token) {
 						state.loggedIn = true;
 						return stored_token;
@@ -75,7 +75,7 @@ function OauthManager(settings, oauth) {
 
 	//lists databases if a token is already stored
 	function listDatabasesSafe() {
-		return settings.getSetAccessToken(accessTokenType).then(function(stored_token) {
+		return settings.getSetAccessToken(accessTokenType).then(function (stored_token) {
 			if (stored_token) {
 				return listDatabases();
 			} else {
@@ -131,8 +131,8 @@ function OauthManager(settings, oauth) {
 	}
 
 	function logout() {
-		return oauth.revokeAuth().then(function() {
-			return removeToken().then(function() {
+		return oauth.revokeAuth().then(function () {
+			return removeToken().then(function () {
 				state.loggedIn = false
 			})
 		})
@@ -140,17 +140,17 @@ function OauthManager(settings, oauth) {
 
 	//given minimal file information, retrieve the actual file
 	function getChosenDatabaseFile(dbInfo, attempt) {
-		return getToken().then(function(accessToken) {
-			return oauth.fileRequestFunction(dbInfo, accessToken).then(function(response) {
+		return getToken().then(function (accessToken) {
+			return oauth.fileRequestFunction(dbInfo, accessToken).then(function (response) {
 				return response.data
-			}).catch(function(error) {
+			}).catch(function (error) {
 				console.error("Get chosen file failure:", error)
 				if (error.response === undefined)
-					return Promise.reject({message:"No network connection"})
+					return Promise.reject({ message: "No network connection" })
 				if (error.response.status == 401) {
 					//unauthorized, means the token is bad.  retry with new token.
 					console.error("Stale token sent for " + oauth.accessTokenType + ": trying passive Oauth Refresh.")
-					return auth(false).then(function() {
+					return auth(false).then(function () {
 						return getChosenDatabaseFile(dbInfo);
 					})
 				}
@@ -161,14 +161,14 @@ function OauthManager(settings, oauth) {
 	function ensureOriginPermissions() {
 		return chromePromise.permissions.contains({
 			origins: oauth.origins
-		}).then(function() {
+		}).then(function () {
 			return true;
-		}).catch(function() {
+		}).catch(function () {
 			return chromePromise.permissions.request({
 				origins: oauth.origins
-			}).then(function() {
+			}).then(function () {
 				return true;
-			}).catch(function(err) {
+			}).catch(function (err) {
 				return false;
 			})
 		});
@@ -179,10 +179,10 @@ function OauthManager(settings, oauth) {
 		console.info("Authenticating for ", oauth.accessTokenType, interactive)
 
 		let authfunction = is_interactive => {
-			return new Promise(function(resolve, reject) {
+			return new Promise(function (resolve, reject) {
 				chromePromise.runtime.getManifest().then(manifest => {
 					//random state, protects against CSRF
-					var randomState = Base64.encode(window.crypto.getRandomValues(new Uint8Array(16))); 
+					var randomState = Base64.encode(window.crypto.getRandomValues(new Uint8Array(16)));
 					var authUrl = oauth.authUrl +
 						'&client_id=' + manifest.static_data[oauth.accessTokenType].client_id +
 						'&state=' + encodeURIComponent(randomState) +
@@ -193,7 +193,7 @@ function OauthManager(settings, oauth) {
 						'interactive': is_interactive
 					}).then(redirect_url => {
 						oauth.handleAuthRedirectURI(redirect_url, randomState, resolve, reject);
-					}).catch(function(err) {
+					}).catch(function (err) {
 						console.error("Error from webauthflow for", oauth.accessTokenType, err);
 						reject(err);
 					});
