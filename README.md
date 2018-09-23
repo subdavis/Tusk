@@ -45,9 +45,6 @@ yarn build
 # this step generates the zip archives submitted to Chrome/Firefox addon marketplaces.
 yarn bundle
 
-# build the tests
-yarn build-tests
-
 # static reload with file watch for tests
 yarn watch-tests
 ```
