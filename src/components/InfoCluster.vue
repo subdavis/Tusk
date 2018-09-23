@@ -15,7 +15,7 @@
 	}
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 	@import "../styles/settings.scss";
 	p {
 		width: 100%;

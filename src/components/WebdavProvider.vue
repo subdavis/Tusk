@@ -2,51 +2,6 @@
 	SharedLinkProvider:
 	Simple http provider that can also handle Dropbox Shared Links
 -->
-<template>
-	<div class="box-bar roomy database-manager">
-		<generic-provider-ui 
-			:busy="busy" 
-			:databases="databases" 
-			:loggedIn="loggedIn" 
-			:error="messages.error"
-			:provider-manager="providerManager" 
-			:toggle-login="toggleLogin" 
-			:removeable="false"></generic-provider-ui>
-		<div class="top-padding" v-if="loggedIn">
-			<div class="warn pill">
-				<p>Wait! Stop!  Did you read the <a href="https://github.com/subdavis/Tusk/wiki/WebDAV-Support">best practices guide</a>?  Do that first!</p>
-			</div>
-			<div>
-				<p>The URL below should have the path of a FOLDER, not an individual FILE.  The webDAV provider works by recursively scanning all files within the folder you specify.  Your keepass databases will be discovered by their file extension (.kdbx).</p>
-			</div>
-			<table v-if="serverList.length">
-				<tr>
-					<th>Server List:</th>
-				</tr>
-				<tr v-for="(server, index) in serverList">
-					<td>{{server.username}}</td>
-					<td>{{server.url}}</td>
-					<td>
-						<a v-show="!server.scanBusy" class="selectable" @click="scan(server.serverId)">
-						<i class="fa fa-search"></i> scan</a>
-						<a v-show="server.scanBusy"><i class="fa fa-spinner fa-pulse"></i> scanning</a>
-					</td>
-					<td>
-						<a class="selectable" @click="remove(server.serverId)">
-						<i class="fa fa-times-circle selectable"></i> remove</a>
-					</td>
-				</tr>
-			</table>
-			<div class="url-form shared-link-box" v-if="loggedIn">
-				<input id="webdav-server" type="text" v-model="webdav.url" placeholder="http://server:port/remote.php/webdav/">
-				<input id="webdav-username" type="text" v-model="webdav.username" placeholder="Username">
-				<input id="webdav-password" type="password" v-model="webdav.password" placeholder="Password">
-				<a class="waves-effect waves-light btn" @click="addServer">Add server</a>
-			</div>
-		</div>
-	</div>
-</template>
-
 <script>
 	const Base64 = require('base64-arraybuffer')
 	import {ChromePromiseApi} from '$lib/chrome-api-promise.js'
@@ -130,7 +85,7 @@
 					this.providerManager.logout().then(() => {
 						this.loggedIn = false
 					})
-				} else if (confirm("WebDAV is a beta feature. If you use it, the username and password to the webdav SERVER will be stored on disk.  \n\nTusk will never store you master database password.  \n\nSelect OK to continue.")) {
+				} else {
 					this.providerManager.login().then(() => {
 						this.loggedIn = true
 						this.onLogin()
@@ -154,15 +109,76 @@
 	}
 </script>
 
-<style lang="scss">
+<template>
+	<div class="box-bar roomy database-manager">
+		<generic-provider-ui 
+			:busy="busy" 
+			:databases="databases" 
+			:loggedIn="loggedIn" 
+			:error="messages.error"
+			:provider-manager="providerManager" 
+			:toggle-login="toggleLogin" 
+			:removeable="false"></generic-provider-ui>
+		<div v-if="loggedIn">
+			<div class="warn pill">
+				<p><b>Wait! </b>Did you read the <a href="https://github.com/subdavis/Tusk/wiki/WebDAV-Support">best practices guide</a>?  Do that first!</p>
+			</div>
+			<div>
+				<p>The URL below should have the path of a FOLDER, not an individual FILE.  The webDAV provider works by recursively scanning all files within the folder you specify.  Your keepass databases will be discovered by their file extension (.kdbx).</p>
+			</div>
+			<table v-if="serverList.length">
+				<tr>
+					<th>User</th>
+					<th>URL</th>
+					<th>Actions</th>
+				</tr>
+				<tr v-for="(server, index) in serverList">
+					<td>{{server.username}}</td>
+					<td>{{server.url}}</td>
+					<td>
+						<a v-show="!server.scanBusy" class="selectable" @click="scan(server.serverId)">
+						<i class="fa fa-search"></i> scan</a>
+						<a v-show="server.scanBusy"><i class="fa fa-spinner fa-pulse"></i> scanning</a>
+					</td>
+					<td>
+						<a class="selectable" @click="remove(server.serverId)">
+						<i class="fa fa-times-circle selectable"></i> remove</a>
+					</td>
+				</tr>
+			</table>
+			<div v-if="loggedIn">
+				<p><b>Add new server</b></p>
+				<div id="webdav-server-input-box">
+					<input id="webdav-server" type="text" v-model="webdav.url" placeholder="http://server:port/remote.php/webdav/">
+					<input id="webdav-username" type="text" v-model="webdav.username" placeholder="Username">
+					<input id="webdav-password" type="password" v-model="webdav.password" placeholder="Password">	
+				</div>
+				<a class="waves-effect waves-light btn" @click="addServer">Add server</a>
+			</div>	
+		</div>
+	</div>
+</template>
+
+<style lang="scss" scoped>
 	@import "../styles/settings.scss";
 
-	input#webdav-server {
-		width: 55%;
-	}
+	#webdav-server-input-box {
+		display: flex;
+		justify-content: space-between;
+		flex-wrap: wrap;
+		box-sizing: border-box;
+		
+		input {
+			padding: 4px;
+			margin: 0px 8px 8px 0px;
 
-	.top-padding {
-		padding: 20px 0px;
+			&#webdav-server {
+				width: 100%;
+			}
+			&#webdav-username, &#webdav-password {
+				flex: 1;
+			}
+		}
 	}
 
 	table {

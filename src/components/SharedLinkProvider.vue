@@ -207,7 +207,7 @@
 	}
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 	@import "../styles/settings.scss";
 	.url-form {
 		margin-top: 15px;

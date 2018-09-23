@@ -2,23 +2,6 @@
 	SharedLinkProvider:
 	Simple http provider that can also handle Dropbox Shared Links
 -->
-<template>
-	<div class="box-bar roomy database-manager">
-		<generic-provider-ui 
-			:busy="busy" 
-			:databases="databases" 
-			:loggedIn="loggedIn" 
-			:error="messages.error" 
-			:provider-manager="providerManager" 
-			:toggle-login="toggleLogin" 
-			:removeable="true" 
-			:remove-function="removePasswordFile"></generic-provider-ui>
-		<div class="url-form shared-link-box" v-if="loggedIn">
-			<input type="file" accept='.kdbx' style="display:none" id="file-selector" name='file' @change="handleAdd" multiple />
-			<a class="waves-effect waves-light btn" @click="selectFile">Select Local File</a>
-		</div>
-	</div>
-</template>
 
 <script>
 	const Base64 = require('base64-arraybuffer')
@@ -51,12 +34,11 @@
 					this.providerManager.logout().then(() => {
 						this.loggedIn = false
 					})
-				} else if (confirm("Do you understand that Tusk cannot keep your local database file up to date?  \n\nIf you change it, you'll have to re-upload the file again. \n\nSelect OK to continue.")) {
+				} else {
 					this.providerManager.login().then(() => {
 						this.loggedIn = true
 					})
-				} else {
-					e.preventDefault();
+					e.preventDefault()
 				}
 			},
 			selectFile(event) {
@@ -129,6 +111,32 @@
 	}
 </script>
 
-<style lang="scss">
+<template>
+	<div class="box-bar roomy database-manager">
+		<generic-provider-ui 
+			:busy="busy" 
+			:databases="databases" 
+			:loggedIn="loggedIn" 
+			:error="messages.error" 
+			:provider-manager="providerManager" 
+			:toggle-login="toggleLogin" 
+			:removeable="true" 
+			:remove-function="removePasswordFile"></generic-provider-ui>
+		<div v-if="loggedIn">
+			<div class="warn pill">
+				<p>
+					Tusk <b>cannot</b> keep your local database file up to date.
+					<b>If you change it, you'll have to import it into Tusk again.</b>
+				</p>
+			</div>
+			<div>
+				<input type="file" accept='.kdbx' style="display:none" id="file-selector" name='file' @change="handleAdd" multiple />
+				<a class="waves-effect waves-light btn" @click="selectFile">Select Local File</a>
+			</div>
+		</div>
+	</div>
+</template>
+
+<style lang="scss" scoped>
 	@import "../styles/settings.scss";
 </style>

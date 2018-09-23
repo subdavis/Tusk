@@ -512,7 +512,7 @@
 		}
 	}
 
-    .databaseChoose {
-        padding-left: 5px;
-    }
+	.databaseChoose {
+			padding-left: 5px;
+	}
 </style>
