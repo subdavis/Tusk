@@ -46,7 +46,7 @@ yarn build
 yarn bundle
 
 # static reload with file watch for tests
-yarn watch-tests
+yarn dev-tests
 ```
 
 For detailed explanation on how things work, consult the [docs for vue-loader](http://vuejs.github.io/vue-loader).
