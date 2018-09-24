@@ -1,8 +1,10 @@
-### This issue is a 
+---
+name: 🐛 Bug Report
+about: If something isn't working as expected 🤔.
 
-bug / feature / question 
+---
 
-<!-- Please leave only one -->
+## Bug report
 
 ### Steps to reproduce - current behaviour
 
@@ -33,13 +35,13 @@ bug / feature / question
 
 **Operating System:**
 
-**Browser:**
+**Browser vendor and version:**
 
-**Storage:**
+**Storage Provider:**
 
 <!-- 
   For example: 
   Operating System: macOS 10.XX.X / Windows 10 Pro
-  Browser: Chrome XX.XXX.XXX / Firefox XX.XXX
+  Browser: Chrome XX.XXX.XXX / Firefox XX.XXX (find at chrome://version or about:version)
   Storage: Nextcloud / Google Drive / Dropbox
 -->
