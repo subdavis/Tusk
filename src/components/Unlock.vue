@@ -255,7 +255,6 @@ export default {
 		if (!this.isUnlocked()) {
 
 			let try_autounlock = () => {
-				if (force) return;
 				this.busy = true
 				this.settings.getKeyFiles().then(keyFiles => {
 					this.keyFiles = keyFiles
