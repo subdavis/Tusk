@@ -367,8 +367,7 @@ export default {
 					<transition name="keyfile-picker">
 						<div>
 							<span class="selectable" v-for="(kf, kf_index) in keyFiles" :keyfile-index="kf_index" @click="chooseKeyFile(kf_index)">
-								<i class="fa fa-file fa-fw" aria-hidden="true"></i>
-												{{ kf.name }}
+								<i class="fa fa-file fa-fw" aria-hidden="true"></i> {{ kf.name }}
 							</span>
 							<span @click="links.openOptionsKeyfiles" class="selectable">
 								<i class="fa fa-wrench fa-fw" aria-hidden="true"></i> Manage Keyfiles</span>
