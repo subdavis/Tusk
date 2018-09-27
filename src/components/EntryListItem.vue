@@ -30,7 +30,7 @@
 `
 <script>
 	import { parseUrl } from '$lib/utils.js'
-    const OTP = require('keeweb/app/scripts/util/otp.js');
+	const OTP = require('keeweb/app/scripts/util/otp.js');
 
 	export default {
 		props: {
@@ -56,35 +56,35 @@
 		},
 		data() {
 		  return {
-              // OTP
-              otp: false,
-              otp_loop: undefined,
-              otp_value: "",
+			  // OTP
+			  otp: false,
+			  otp_loop: undefined,
+			  otp_value: "",
 			  keyHandler: e => {
-                  if ((e.ctrlKey || e.metaKey) && e.key == "/" && !e.altKey && !e.shiftKey)  {
-                      this.copyOtp(e);
-                  }
+				  if ((e.ctrlKey || e.metaKey) && e.key == "/" && !e.altKey && !e.shiftKey)  {
+					  this.copyOtp(e);
+				  }
 			  }
-          }
+		  }
 		},
-        beforeDestroy(){
-            clearInterval(this.otp_loop)
-        },
+		beforeDestroy(){
+			clearInterval(this.otp_loop)
+		},
 		methods: {
 			details(e) {
 				this.$router.route("/entry-details/" + this.entry.id)
 			},
-            setupOTP(url) {
-                let totp = OTP.parseUrl(url)
+			setupOTP(url) {
+				let totp = OTP.parseUrl(url)
 				this.otp = typeof totp.key !== "undefined"
-                let do_otp = () => {
-                    totp.next(code => {
-                        this.otp_value = code;
-                    })
-                }
-                this.otp_loop = setInterval(do_otp, 2000)
-                do_otp()
-            },
+				let do_otp = () => {
+					totp.next(code => {
+						this.otp_value = code;
+					})
+				}
+				this.otp_loop = setInterval(do_otp, 2000)
+				do_otp()
+			},
 			autofill(e) {
 				e.stopPropagation()
 				console.log("autofill")
@@ -94,24 +94,24 @@
 				e.stopPropagation()
 				console.log("copy")
 				this.unlockedState.copyPassword(this.entry);
-            },
-            copyOtp(e) {
-			    e.stopPropagation()
+			},
+			copyOtp(e) {
+				e.stopPropagation()
 				this.unlockedState.copyTotp(this.otp_value);
 			},
-            parseUrl(url) {
-                url = url.indexOf('http') < 0 ? 'http://' + url : url
-                let a = document.createElement('a')
-                a.href = url
-                return a
-            }
+			parseUrl(url) {
+				url = url.indexOf('http') < 0 ? 'http://' + url : url
+				let a = document.createElement('a')
+				a.href = url
+				return a
+			}
 		},
 		mounted() {
-		    const otpUrl = this.unlockedState.getDecryptedAttribute(this.entry, "otp");
-		    if (otpUrl.length) {
-                this.setupOTP(otpUrl)
-            }
-            window.addEventListener("keydown", this.keyHandler);
+			const otpUrl = this.unlockedState.getDecryptedAttribute(this.entry, "otp");
+			if (otpUrl.length) {
+				this.setupOTP(otpUrl)
+			}
+			window.addEventListener("keydown", this.keyHandler);
 		}
 	}
 </script>

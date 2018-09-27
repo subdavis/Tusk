@@ -152,14 +152,14 @@ function UnlockedState($router, keepassReference, protectedMemory, settings, not
 
 		let fieldName, textToPutOnClipboard;
 		if (copyPart === 'userName' || copyPart === 'password') {
-            textToPutOnClipboard = getAttribute(copyEntry, copyPart);
-            fieldName = copyPart.charAt(0).toUpperCase() + copyPart.slice(1); // https://stackoverflow.com/a/1026087
+			textToPutOnClipboard = getAttribute(copyEntry, copyPart);
+			fieldName = copyPart.charAt(0).toUpperCase() + copyPart.slice(1); // https://stackoverflow.com/a/1026087
 		} else {
 			fieldName = copyPart;
 			textToPutOnClipboard = copyEntry;
 		}
-        copyEntry = null;
-        copyPart = null;
+		copyEntry = null;
+		copyPart = null;
 		e.clipboardData.setData('text/plain', textToPutOnClipboard);
 		e.preventDefault();
 
