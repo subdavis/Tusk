@@ -249,6 +249,9 @@ export default {
 		}
 	},
 	async mounted() {
+		// modify unlockedState internal state
+		await this.unlockedState.getTabDetails();
+
 		if (!this.isUnlocked()) {
 
 			let try_autounlock = () => {
@@ -297,17 +300,16 @@ export default {
 				} else {
 					try_autounlock()
 				}
-			} catch (Exception) {
+			} catch (err) {
+				console.error(err);
 				//this is fine - it just means the cache expired.  Clear the cache to be sure.
 				this.secureCache.clear('secureCache.entries')
 				try_autounlock()
+
 			}
 			this.busy = false
 			focus()
 		}
-
-		// modify unlockedState internal state
-		await this.unlockedState.getTabDetails();
 		if (this.unlockedState.sitePermission) {
 			this.generalMessages.success = "You have previously granted Tusk permission to fill passwords on " + this.unlockedState.origin
 		} else {
@@ -327,7 +329,10 @@ export default {
 		</div>
 
 		<!-- Entry List -->
-		<entry-list v-if="!busy && isUnlocked()" :messages="unlockedMessages" :unlocked-state="unlockedState" :settings="settings"></entry-list>
+		<entry-list v-if="!busy && isUnlocked()"
+			:messages="unlockedMessages"
+			:unlocked-state="unlockedState"
+			:settings="settings"></entry-list>
 
 		<!-- General Messenger -->
 		<messenger :messages="generalMessages" v-show="!busy"></messenger>
@@ -343,8 +348,7 @@ export default {
 			<form v-on:submit="clickUnlock">
 
 				<div class="small selectable databaseChoose" @click="$router.route('/choose')">
-					<b>{{ databaseFileName }}</b>
-					<span class="muted-color">change...</span>
+					<b>{{ databaseFileName }}</b> <span class="muted-color">change...</span>
 				</div>
 
 				<div class="stack-item masterPasswordInput">
@@ -362,8 +366,7 @@ export default {
 					<transition name="keyfile-picker">
 						<div>
 							<span class="selectable" v-for="(kf, kf_index) in keyFiles" :keyfile-index="kf_index" @click="chooseKeyFile(kf_index)">
-								<i class="fa fa-file fa-fw" aria-hidden="true"></i>
-								{{ kf.name }}
+								<i class="fa fa-file fa-fw" aria-hidden="true"></i> {{ kf.name }}
 							</span>
 							<span @click="links.openOptionsKeyfiles" class="selectable">
 								<i class="fa fa-wrench fa-fw" aria-hidden="true"></i> Manage Keyfiles</span>
@@ -374,9 +377,8 @@ export default {
 				<div class="box-bar small plain remember-period-picker">
 					<span>
 						<label for="rememberPeriodLength">
-							<span>{{rememberPeriodText}} (slide to choose)</span>
-						</label>
-						<input id="rememberPeriodLength" type="range" min="0" :max="slider_options.length - 1" step="1" v-model="slider_int" v-on:input="setRememberPeriod(undefined)" />
+							<span>{{rememberPeriodText}} (slide to choose)</span></label>
+					<input id="rememberPeriodLength" type="range" min="0" :max="slider_options.length - 1" step="1" v-model="slider_int" v-on:input="setRememberPeriod(undefined)" />
 					</span>
 				</div>
 
