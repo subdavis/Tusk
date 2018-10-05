@@ -15,11 +15,19 @@
 		watch: {
 			// When the element becomes active, scroll it into view.
 			'entry.view_is_active': function(val) {
-				if (val)
+				if (val) {
 					this.$el.scrollIntoView({
 						block: "end",
 						inline: "nearest",
-						behavior: "smooth"});
+						behavior: "smooth"
+					});
+					const otpUrl = this.unlockedState.getDecryptedAttribute(this.entry, "otp");
+					if (otpUrl.length) {
+						this.setupOTP(otpUrl)
+					}
+				} else {
+					clearInterval(this.otp_loop)
+				}
 			}
 		},
 		data() {
@@ -35,9 +43,7 @@
 			  }
 		  }
 		},
-		beforeDestroy(){
-			clearInterval(this.otp_loop)
-		},methods: {
+		methods: {
 			details(e) {
 				this.$router.route("/entry-details/" + this.entry.id)},
 			setupOTP(url) {
@@ -73,10 +79,6 @@
 			}
 		},
 		mounted() {
-			const otpUrl = this.unlockedState.getDecryptedAttribute(this.entry, "otp");
-			if (otpUrl.length) {
-				this.setupOTP(otpUrl)
-			}
 			window.addEventListener("keydown", this.keyHandler);
 		}
 	}
