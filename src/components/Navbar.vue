@@ -3,6 +3,15 @@
   requires a lib/VirtualRouter, and the routes object used to initialize the virtualrouter.
   Active tab changes automatically based on visible route.
 -->
+<script>
+export default {
+	props: {
+		routes: Array,
+		initialTab: String
+	}
+}
+</script>
+
 <template>
 	<nav class="nav-extended">
 		<div class="nav-content">
@@ -16,27 +25,18 @@
 	</nav>
 </template>
 
-<script>
-	export default {
-		props: {
-			routes: Array,
-			initialTab: String
-		}
-	}
-</script>
-
 <style lang="scss">
-	@import "../styles/settings.scss";
-	nav {
-		position: fixed;
-		top: 0px;
-		z-index: 100;
-		.nav-content {
-			width: $options-width;
-			margin: 0px auto;
-			li.active {
-				border-bottom: 3px solid $background-color;
-			}
-		}
-	}
+@import "../styles/settings.scss";
+nav {
+  position: fixed;
+  top: 0px;
+  z-index: 100;
+  .nav-content {
+    width: $options-width;
+    margin: 0px auto;
+    li.active {
+      border-bottom: 3px solid $background-color;
+    }
+  }
+}
 </style>

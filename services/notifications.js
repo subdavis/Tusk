@@ -4,7 +4,7 @@ export class Notifications {
 	}
 	push(data) {
 		const { text, type, expire } = data;
-		return new Promise ((resolve, reject) => {
+		return new Promise((resolve, reject) => {
 			this.settings.getSetNotificationsEnabled().then(val => {
 				if (val.indexOf(type) > -1) {
 					chrome.runtime.sendMessage({

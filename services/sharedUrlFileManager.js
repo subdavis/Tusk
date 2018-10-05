@@ -71,7 +71,7 @@ function SharedUrlFileManager() {
 			url: dbInfo.direct_link,
 			responseType: 'arraybuffer',
 			cache: true
-		}).then(function(response) {
+		}).then(function (response) {
 			return response.data;
 		});
 	}

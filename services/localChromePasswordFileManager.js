@@ -17,8 +17,8 @@ function LocalChromePasswordFileManager() {
 		supportedFeatures: ['incognito', 'listDatabases', 'saveDatabase', 'deleteDatabase'],
 		title: 'Local Storage',
 		icon: 'icon-upload',
-		chooseTitle: 'File System',
-		chooseDescription: 'Upload files from your local or remote file-system.  A one-time copy of the file(s) will be saved in your browser\'s local storage.  If you update the database on your local system then you will have to re-upload it in order to see the changes.',
+		chooseTitle: 'File System (not recommended)',
+		chooseDescription: 'Upload files from your local or remote file-system.  A one-time copy of the file(s) will be saved in your browser\'s local storage.  If you update the database on your local system then you will have to re-import it in order to see the changes.',
 		login: enable,
 		logout: disable,
 		isLoggedIn: isEnabled
@@ -47,12 +47,12 @@ function LocalChromePasswordFileManager() {
 
 	var savingLocks = []; //prevent reading while an async save is ongoing
 	function listDatabases() {
-		return Promise.all(savingLocks).then(function() {
+		return Promise.all(savingLocks).then(function () {
 			return chromePromise.storage.local.get('passwordFiles')
-		}).then(function(result) {
+		}).then(function (result) {
 			var files = result.passwordFiles || [];
 
-			return files.filter(function(fi) {
+			return files.filter(function (fi) {
 				return (fi.storageVersion && fi.storageVersion >= backwardCompatibleVersion);
 			});
 		});
@@ -67,8 +67,8 @@ function LocalChromePasswordFileManager() {
 
 	//given minimal file information, retrieve the actual file
 	function getChosenDatabaseFile(dbInfo) {
-		return listDatabases().then(function(databases) {
-			var bytes = databases.reduce(function(prev, storedFile) {
+		return listDatabases().then(function (databases) {
+			var bytes = databases.reduce(function (prev, storedFile) {
 				if (storedFile.title == dbInfo.title) {
 					var data = Base64.decode(storedFile.data);
 					return data;
@@ -86,8 +86,8 @@ function LocalChromePasswordFileManager() {
 	//save the given database to persistent storage
 	function saveDatabase(db) {
 		db.storageVersion = currentVersion;
-		var p = listDatabases().then(function(existingFiles) {
-			var index = existingFiles.reduce(function(prev, curr, index) {
+		var p = listDatabases().then(function (existingFiles) {
+			var index = existingFiles.reduce(function (prev, curr, index) {
 				if (curr.title == db.title)
 					return index;
 				else
@@ -111,8 +111,8 @@ function LocalChromePasswordFileManager() {
 
 	//remove the database from storage
 	function deleteDatabase(db) {
-		return listDatabases().then(function(databases) {
-			databases = databases.filter(function(existing) {
+		return listDatabases().then(function (databases) {
+			databases = databases.filter(function (existing) {
 				return (existing.title != db.title);
 			});
 

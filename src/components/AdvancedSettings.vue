@@ -1,6 +1,153 @@
+<script>
+import JSONFormatter from 'json-formatter-js'
+import { isFirefox } from '$lib/utils'
+
+export default {
+	props: {
+		settings: Object,
+		secureCacheMemory: Object
+	},
+	data() {
+		return {
+			busy: false,
+			expireTime: 2,
+			hotkeyNavEnabled: false,
+			allOriginPermission: false,
+			allOriginPerms: {
+				origins: [
+					"https://*/*",
+					"http://*/*"
+				]
+			},
+			strictMatchEnabled: false,
+			notificationsEnabled: ['expiration'],
+			jsonState: [{
+				k: 'databaseUsages',                      // key
+				f: this.settings.getSetDatabaseUsages,    // getter
+				delete: {
+					f: this.settings.destroyLocalStorage, // remover
+					arg: 'databaseUsages',                // remover args
+					op: 'Delete'                          // remover button name
+				}
+			},
+			{
+				k: 'webdavServerList',
+				f: this.settings.getSetWebdavServerList,
+				delete: {
+					f: this.settings.destroyLocalStorage,
+					arg: 'webdavServerList',
+					op: 'Delete'
+				}
+			},
+			{
+				k: 'webdavDirectoryMap',
+				f: this.settings.getSetWebdavDirectoryMap,
+				delete: {
+					f: this.settings.destroyLocalStorage,
+					arg: 'webdavDirectoryMap',
+					op: 'Delete'
+				}
+			},
+			{
+				k: 'selectedDatabase',
+				f: this.settings.getCurrentDatabaseChoice,
+				delete: {
+					f: this.settings.destroyLocalStorage,
+					arg: 'selectedDatabase',
+					op: 'Delete'
+				}
+			},
+			{
+				k: 'keyFiles',
+				f: this.settings.getKeyFiles,
+				delete: {
+					f: this.settings.deleteAllKeyFiles,
+					arg: undefined,
+					op: 'Delete'
+				}
+			},
+			{
+				k: 'forgetTimes',
+				f: this.settings.getAllForgetTimes
+			},
+			{
+				k: 'sharedUrlList',
+				f: this.settings.getSharedUrlList,
+				delete: {
+					f: this.settings.destroyLocalStorage,
+					arg: 'sharedUrlList',
+					op: 'Delete'
+				}
+			},
+			]
+		}
+	},
+	watch: {
+		expireTime(newval, oldval) {
+			this.settings.getSetClipboardExpireInterval(parseInt(newval))
+		},
+		hotkeyNavEnabled(newval, oldval) {
+			this.settings.getSetHotkeyNavEnabled(newval)
+		},
+		strictMatchEnabled(newval, oldval) {
+			this.settings.getSetStrictModeEnabled(newval)
+		},
+		notificationsEnabled(newval) {
+			this.settings.getSetNotificationsEnabled(newval)
+		}
+	},
+	methods: {
+		isFirefox: isFirefox,
+		toggleOriginPermissions(evt) {
+			// Negated because this function will call before the vue model update.
+			if (!this.allOriginPermission) {
+				chrome.permissions.request(this.allOriginPerms);
+			} else {
+				chrome.permissions.remove(this.allOriginPerms);
+			}
+			this.settings.getSetOriginPermissionEnabled(!this.allOriginPermission);
+			this.allOriginPermission = !this.allOriginPermission;
+		},
+		init() {
+			this.settings.getSetClipboardExpireInterval().then(val => {
+				this.expireTime = val
+			})
+			this.settings.getSetHotkeyNavEnabled().then(val => {
+				this.hotkeyNavEnabled = val
+			})
+			this.settings.getSetNotificationsEnabled().then(val => {
+				this.notificationsEnabled = val
+			})
+			this.settings.getSetStrictModeEnabled().then(val => {
+				this.strictMatchEnabled = val;
+			})
+			if (!isFirefox()) {
+				chrome.permissions.contains(this.allOriginPerms, granted => {
+					this.allOriginPermission = !!granted;
+				});
+			}
+			this.jsonState.forEach(blob => {
+				blob.f().then(result => {
+					if (result && Object.keys(result).length) {
+						let formatter = new JSONFormatter(result)
+						let place = document.getElementById(blob.k)
+						while (place.firstChild) place.removeChild(place.firstChild);
+						place.appendChild(formatter.render())
+					} else {
+						document.getElementById(blob.k).parentNode.parentNode.remove();
+					}
+				});
+			});
+		}
+	},
+	mounted() {
+		this.init();
+	}
+}
+</script>
+
 <template>
 	<div>
-
 		<div class="box-bar roomy">
 			<h4>Clipboard Expiration Time</h4>
 			<p>When you copy a value to the clipboard, Tusk will set a timeout to automatically clear it again.  You can choose how long this timeout will last.</p>
@@ -22,9 +169,10 @@
 		<div class="box-bar roomy lighter">
 			<div>
 				<div class="switch">
-					<label>Enabled
+					<label>
 						<input type="checkbox" v-model="hotkeyNavEnabled">
 						<span class="lever"></span>
+						Hotkey Navigation
 					</label>
 				</div>
 			</div>
@@ -37,9 +185,10 @@
 		<div class="box-bar roomy lighter" v-if="!isFirefox()">
 			<div>
 				<div class="switch">
-					<label v-on:click="toggleOriginPermissions">Enabled
+					<label v-on:click="toggleOriginPermissions">
 						<input type="checkbox" v-model="allOriginPermission">
 						<span class="lever" @click.prevent></span>
+						Grant All Permissions
 					</label>
 				</div>
 			</div>
@@ -52,15 +201,17 @@
 		<div class="box-bar roomy lighter">
 			<div>
 				<div class="switch">
-					<label>Password expiration
+					<label>
 						<input type="checkbox" value="expiration" v-model="notificationsEnabled">
 						<span class="lever"></span>
+						Password expiration
 					</label>
 				</div>
 				<div class="switch">
-					<label>Clipboard events
+					<label>
 						<input type="checkbox" value="clipboard" v-model="notificationsEnabled">
 						<span class="lever"></span>
+						Clipboard events
 					</label>
 				</div>
 			</div>
@@ -73,10 +224,11 @@
 		<div class="box-bar roomy lighter">
 			<div>
 				<div class="switch">
-					<label>Enabled
-			      		<input type="checkbox" v-model="strictMatchEnabled">
-			      		<span class="lever"></span>
-			    	</label>
+					<label>
+							<input type="checkbox" v-model="strictMatchEnabled">
+							<span class="lever"></span>
+							Strict Matching
+					</label>
 				</div>
 			</div>
 		</div>
@@ -95,161 +247,13 @@
 	</div>
 </template>
 
-<script>
-	import JSONFormatter from 'json-formatter-js'
-	import { isFirefox } from '$lib/utils'
-
-	export default {
-		props: {
-			settings: Object,
-			secureCacheMemory: Object
-		},
-		data() {
-			return {
-				busy: false,
-				expireTime: 2,
-				hotkeyNavEnabled: false,
-				allOriginPermission: false,
-				allOriginPerms: {
-					origins: [
-						"https://*/*",
-						"http://*/*"
-					]
-				},
-				strictMatchEnabled: false,
-				notificationsEnabled: ['expiration'],
-				jsonState: [{
-						k: 'databaseUsages',                      // key
-						f: this.settings.getSetDatabaseUsages,    // getter
-						delete: {
-							f: this.settings.destroyLocalStorage, // remover
-							arg: 'databaseUsages',                // remover args
-							op: 'Delete'                          // remover button name
-						}
-					},
-					{
-						k: 'webdavServerList',
-						f: this.settings.getSetWebdavServerList,
-						delete: {
-							f: this.settings.destroyLocalStorage,
-							arg: 'webdavServerList',
-							op: 'Delete'
-						}
-					},
-					{
-						k: 'webdavDirectoryMap',
-						f: this.settings.getSetWebdavDirectoryMap,
-						delete: {
-							f: this.settings.destroyLocalStorage,
-							arg: 'webdavDirectoryMap',
-							op: 'Delete'
-						}
-					},
-					{
-						k: 'selectedDatabase',
-						f: this.settings.getCurrentDatabaseChoice,
-						delete: {
-							f: this.settings.destroyLocalStorage,
-							arg: 'selectedDatabase',
-							op: 'Delete'
-						}
-					},
-					{
-						k: 'keyFiles',
-						f: this.settings.getKeyFiles,
-						delete: {
-							f: this.settings.deleteAllKeyFiles,
-							arg: undefined,
-							op: 'Delete'
-						}
-					},
-					{
-						k: 'forgetTimes',
-						f: this.settings.getAllForgetTimes
-					},
-					{
-						k: 'sharedUrlList',
-						f: this.settings.getSharedUrlList,
-						delete: {
-							f: this.settings.destroyLocalStorage,
-							arg: 'sharedUrlList',
-							op: 'Delete'
-						}
-					},
-				]
-			}
-		},
-		watch: {
-			expireTime(newval, oldval) {
-				this.settings.getSetClipboardExpireInterval(parseInt(newval))
-			},
-			hotkeyNavEnabled(newval, oldval) {
-				this.settings.getSetHotkeyNavEnabled(newval)
-			},
-			strictMatchEnabled(newval, oldval) {
-				this.settings.getSetStrictModeEnabled(newval)
-			},
-			notificationsEnabled(newval) {
-				this.settings.getSetNotificationsEnabled(newval)
-			}
-		},
-		methods: {
-			isFirefox: isFirefox,
-			toggleOriginPermissions(evt) {
-				// Negated because this function will call before the vue model update.
-				if (!this.allOriginPermission) {
-					chrome.permissions.request(this.allOriginPerms);
-				} else {
-					chrome.permissions.remove(this.allOriginPerms);
-				}
-				this.settings.getSetOriginPermissionEnabled(!this.allOriginPermission);
-				this.allOriginPermission = !this.allOriginPermission;
-			},
-			init() {
-				this.settings.getSetClipboardExpireInterval().then(val => {
-					this.expireTime = val
-				})
-				this.settings.getSetHotkeyNavEnabled().then(val => {
-					this.hotkeyNavEnabled = val
-				})
-				this.settings.getSetNotificationsEnabled().then(val => {
-					this.notificationsEnabled = val
-				})
-				this.settings.getSetStrictModeEnabled().then(val => {
-					this.strictMatchEnabled = val;
-				})
-				if (!isFirefox()) {
-					chrome.permissions.contains(this.allOriginPerms, granted => {
-						this.allOriginPermission = !!granted;
-					});
-				}
-				this.jsonState.forEach(blob => {
-					blob.f().then(result => {
-						if (result && Object.keys(result).length) {
-							let formatter = new JSONFormatter(result)
-							let place = document.getElementById(blob.k)
-							while (place.firstChild) place.removeChild(place.firstChild);
-							place.appendChild(formatter.render())
-						} else {
-							document.getElementById(blob.k).parentNode.parentNode.remove();
-						}
-					});
-				});
-			}
-		},
-		mounted() {
-			this.init();
-		}
-	}
-</script>
-
 <style lang="scss">
-	@import "../styles/settings.scss";
-	.json {
-		font-size: 12px;
-	}
+@import "../styles/settings.scss";
+.json {
+  font-size: 12px;
+}
 
-	h4 {
-		font-size: 24px;
-	}
+h4 {
+  font-size: 24px;
+}
 </style>

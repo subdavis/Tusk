@@ -8,7 +8,7 @@ function KeepassHeader() {
 	};
 
 	var AES_CIPHER_UUID = new Uint8Array([0x31, 0xc1, 0xf2, 0xe6, 0xbf, 0x71, 0x43, 0x50, 0xbe, 0x58, 0x05, 0x21, 0x6a, 0xfc, 0x5a, 0xff]);
-	var littleEndian = (function() {
+	var littleEndian = (function () {
 		var buffer = new ArrayBuffer(2);
 		new DataView(buffer).setInt16(0, 256, true);
 		return new Int16Array(buffer)[0] === 256;

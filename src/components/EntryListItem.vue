@@ -1,38 +1,6 @@
-<template>
-	<div class="entry-list-item selectable between flair" v-bind:class="{ active: entry.view_is_active }" v-on:click="details">
-		<div class="text-info" v-bind:class="{ strike: entry.is_expired }">
-			<div class="header">
-				{{ header }}
-			</div>
-			<div class="user">
-				{{ entry.userName || '&#60;empty&#62;' }}
-			</div>
-		</div>
-		<div class="otp-block valign-wrapper" v-bind:class="{ hidden: !entry.view_is_active }">
-			{{ otp_value }}
-		</div>
-		<div class="buttons">
-			<span class="fa-stack otp" v-if="otp" v-on:click="copyOtp">
-				<i class="fa fa-circle fa-stack-2x"></i>
-				<i class="fa fa-clock-o fa-stack-1x fa-inverse"></i>
-			</span>
-			<span class="fa-stack copy" v-on:click="copy">
-				<i class="fa fa-circle fa-stack-2x"></i>
-				<i class="fa fa-clipboard fa-stack-1x fa-inverse"></i>
-			</span>
-			<span class="fa-stack autofill" v-on:click="autofill">
-				<i class="fa fa-circle fa-stack-2x"></i>
-				<i class="fa fa-magic fa-stack-1x fa-inverse"></i>
-			</span>
-		</div>
-	</div>
-</template>
-`
 <script>
 	import { parseUrl } from '$lib/utils.js'
-	const OTP = require('keeweb/app/scripts/util/otp.js');
-
-	export default {
+	const OTP = require('keeweb/app/scripts/util/otp.js');export default {
 		props: {
 			entry: Object,
 			unlockedState: Object
@@ -69,11 +37,9 @@
 		},
 		beforeDestroy(){
 			clearInterval(this.otp_loop)
-		},
-		methods: {
+		},methods: {
 			details(e) {
-				this.$router.route("/entry-details/" + this.entry.id)
-			},
+				this.$router.route("/entry-details/" + this.entry.id)},
 			setupOTP(url) {
 				let totp = OTP.parseUrl(url)
 				this.otp = typeof totp.key !== "undefined"
@@ -116,15 +82,44 @@
 	}
 </script>
 
+<template>
+	<div class="entry-list-item selectable between flair" v-bind:class="{ active: entry.view_is_active }" v-on:click="details">
+		<div class="text-info" v-bind:class="{ strike: entry.is_expired }">
+			<span class="header">{{ header }}</span>
+			<br>
+			<span class="user">
+				{{ entry.userName || '&#60;empty&#62;' }}
+			</span>
+		</div>
+        <div class="otp-block valign-wrapper" v-bind:class="{ hidden: !entry.view_is_active }">
+            {{ otp_value }}
+        </div>
+        <div class="buttons">
+			<span class="fa-stack otp" v-if="otp" v-on:click="copyOtp">
+				<i class="fa fa-circle fa-stack-2x"></i>
+				<i class="fa fa-clock-o fa-stack-1x fa-inverse"></i>
+			</span>
+			<span class="fa-stack copy" v-on:click="copy">
+				<i class="fa fa-circle fa-stack-2x"></i>
+				<i class="fa fa-clipboard fa-stack-1x fa-inverse"></i>
+			</span>
+			<span class="fa-stack autofill" v-on:click="autofill">
+				<i class="fa fa-circle fa-stack-2x"></i>
+				<i class="fa fa-magic fa-stack-1x fa-inverse"></i>
+			</span>
+		</div>
+	</div>
+</template>
+
 <style lang="scss">
 	@import "../styles/settings.scss";
 	.entry-list-item {
-		transition: all .3s ease;
+		transition: all 0.3s ease;
 		width: 100%;
 		padding: 10px $wall-padding;
 		box-sizing: border-box;
 		border-bottom: 1px solid $light-gray;
-		background-color: #FFF;
+		background-color: #fff;
 		display: flex;
 		.header {
 			font-size: 16px;
@@ -137,20 +132,19 @@
 			display: flex;
 			justify-content: space-between;
 			box-sizing: border-box;
-		}
+			}
 		.otp-block {
 			font: 16px monospace;
 		}
 		.copy,
 		.autofill,
 		.otp {
-			opacity: .2;
+			opacity: 0.2;
 		}
 		.copy:hover,
 		.autofill:hover,
 		.otp:hover {
-			opacity: .8;
-		}
+			opacity: 0.8;}
 		.hidden {
 			display: none;
 		}
@@ -160,7 +154,7 @@
 		}
 	}
 
-	.strike {
-		text-decoration: line-through;
-	}
+.strike {
+  text-decoration: line-through;
+}
 </style>

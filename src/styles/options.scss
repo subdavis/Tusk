@@ -1,10 +1,10 @@
 @import './shared.scss';
 
-@import "../../node_modules/materialize-css/sass/components/_tabs.scss";
-@import "../../node_modules/materialize-css/sass/components/forms/_forms.scss";
-@import "../../node_modules/materialize-css/sass/components/_navbar.scss";
-@import "../../node_modules/materialize-css/sass/components/_chips.scss";
-@import "../../node_modules/materialize-css/sass/components/_buttons.scss";
+@import "~materialize-css/sass/components/_tabs.scss";
+@import "~materialize-css/sass/components/forms/_switches.scss";
+@import "~materialize-css/sass/components/_navbar.scss";
+@import "~materialize-css/sass/components/_chips.scss";
+@import "~materialize-css/sass/components/_buttons.scss";
 
 nav {
   background-color: $blue;
@@ -57,9 +57,6 @@ h3 {
 	.description {
 		font-size: 12px;
 		font-color: $dark-background-color;
-	}
-	.switch {
-		min-width: 122px;
 	}
 	.between {
 		line-height: 36px;
