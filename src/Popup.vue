@@ -27,7 +27,7 @@
 <script>
 /* beautify preserve:start */
 // Singletons
-import { Settings } from '$services/settings.js'
+import { generateSettingsAdapter } from '@/store/helpers.js'
 import { ProtectedMemory } from '$services/protectedMemory.js'
 import { KeepassHeader } from '$services/keepassHeader.js'
 import { KeepassReference } from '$services/keepassReference.js'
@@ -54,33 +54,34 @@ import EntryDetails from '@/components/EntryDetails'
 import SvgDefs from '@/components/SvgDefs'
 
 const links = new Links()
-const protectedMemory = new ProtectedMemory()
-const secureCacheMemory = new SecureCacheMemory(protectedMemory)
-const settings = new Settings(secureCacheMemory)
-const keepassHeader = new KeepassHeader(settings)
+const settings = generateSettingsAdapter(this.$store) //
+const keepassHeader = new KeepassHeader()
 const keepassReference = new KeepassReference()
-const notifications = new Notifications(settings)
+const notifications = new Notifications(settings) //
 
 // File Managers
-const localChromePasswordFileManager = new LocalChromePasswordFileManager()
-const dropboxFileManager = new DropboxFileManager(settings)
-const googleDrivePasswordFileManager = new GoogleDrivePasswordFileManager(settings)
-const sharedUrlFileManager = new SharedUrlFileManager()
-const oneDriveFileManager = new OneDriveFileManager(settings)
-const pCloudFileManager = new PCloudFileManager(settings)
+// const localChromePasswordFileManager = new LocalChromePasswordFileManager()
+// const dropboxFileManager = new DropboxFileManager(settings) //
+// const googleDrivePasswordFileManager = new GoogleDrivePasswordFileManager(settings) //
+// const sharedUrlFileManager = new SharedUrlFileManager()
+// const oneDriveFileManager = new OneDriveFileManager(settings) //
+// const pCloudFileManager = new PCloudFileManager(settings) //
 const sampleDatabaseFileManager = new SampleDatabaseFileManager()
-const webdavFileManager = new WebdavFileManager(settings)
-
+// const webdavFileManager = new WebdavFileManager(settings) //
 const passwordFileStoreRegistry = new PasswordFileStoreRegistry(
-	localChromePasswordFileManager,
-	dropboxFileManager,
-	googleDrivePasswordFileManager,
-	sharedUrlFileManager,
+	// localChromePasswordFileManager,
+	// dropboxFileManager,
+	// googleDrivePasswordFileManager,
+	// sharedUrlFileManager,
 	sampleDatabaseFileManager,
-	oneDriveFileManager,
-	pCloudFileManager,
-	webdavFileManager)
-const keepassService = new KeepassService(keepassHeader, settings, passwordFileStoreRegistry, keepassReference)
+	// oneDriveFileManager,
+	// pCloudFileManager,
+	// webdavFileManager)
+)
+const keepassService = new KeepassService(
+	keepassHeader,
+	passwordFileStoreRegistry,
+	keepassReference)
 /* beautify preserve:end */
 
 export default {
@@ -97,11 +98,11 @@ export default {
 			services: {
 				/* The services exposed to UI components */
 				settings,
-				secureCache: secureCacheMemory,
+				// secureCache: secureCacheMemory,
 				passwordFileStoreRegistry,
 				keepassService,
 				links,
-				unlockedState: new UnlockedState(this.$router, keepassReference, protectedMemory, settings, notifications)
+				// unlockedState: new UnlockedState(this.$router, keepassReference, protectedMemory, settings, notifications)
 			},
 			show: {
 				unlock: {

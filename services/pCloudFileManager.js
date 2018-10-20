@@ -118,9 +118,8 @@ function PCloudFileManager(settings) {
 		if (authInfo === null) {
 			reject('Failed to extract authentication information from redirect url');
 		} else {
-			settings.getSetAccessToken(accessTokenType, authInfo.access_token).then(function () {
-				resolve(authInfo.access_token);
-			});
+			let token = settings.getSetAccessToken(accessTokenType, authInfo.access_token)
+			resolve(token)
 		}
 	}
 

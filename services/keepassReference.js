@@ -37,19 +37,10 @@ function KeepassReference() {
 		return result;
 	}
 
-	my.keewebGetDecryptedFieldValue = function (entry, fieldName) {
-		if (entry.protectedData === undefined || !(fieldName in entry['protectedData'])) {
-			return entry[fieldName] || ""; //not an encrypted field
-		}
-		return new kdbxweb.ProtectedValue(
-			entry['protectedData'][fieldName].value,
-			entry['protectedData'][fieldName].salt).getText();
-	}
-
 	my.getFieldValue = function (currentEntry, fieldName, allEntries) {
 		// entries are JSON serializable.
 		// Convert back to a keeweb.ProtectedValue for parsing.
-		let plainText = my.keewebGetDecryptedFieldValue(currentEntry, fieldName);
+		let plainText = keewebGetDecryptedFieldValue(currentEntry, fieldName);
 		return my.processAllReferences(my.majorVersion, plainText, currentEntry, allEntries);
 	}
 
@@ -72,10 +63,19 @@ function KeepassReference() {
 		}
 
 		// https://stackoverflow.com/questions/2970525/converting-any-string-into-camel-case
-		let camelize = (str) => {
+		const camelize = (str) => {
 			return str.replace(/(?:^\w|[A-Z]|\b\w)/g, function (letter, index) {
 				return index == 0 ? letter.toLowerCase() : letter.toUpperCase();
 			}).replace(/\s+/g, '');
+		}
+
+		const keewebGetDecryptedFieldValue = (entry, fieldName) => {
+			if (entry.protectedData === undefined || !(fieldName in entry['protectedData'])) {
+				return entry[fieldName] || ""; //not an encrypted field
+			}
+			return new kdbxweb.ProtectedValue(
+				entry['protectedData'][fieldName].value,
+				entry['protectedData'][fieldName].salt).getText();
 		}
 
 		var customLocalString = /^\{S:([a-zA-Z]+)\}$/.exec(referenceText)
@@ -104,7 +104,7 @@ function KeepassReference() {
 			});
 			if (matches.length) {
 				if (my.majorVersion >= 3) {
-					return my.keewebGetDecryptedFieldValue(matches[0], wantedField);
+					return keewebGetDecryptedFieldValue(matches[0], wantedField);
 				} else {
 					throw "Database Version Not Supported";
 				}
@@ -131,7 +131,6 @@ function KeepassReference() {
 			case 'O':
 				return '*';
 		}
-
 		return '';
 	}
 

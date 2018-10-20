@@ -100,21 +100,20 @@ function GoogleDrivePasswordFileManager(settings) {
 	}
 
 	oauth.revokeAuth = function () {
-		return settings.getSetAccessToken(accessTokenType).then(function (accessToken) {
-			if (accessToken) {
-				var url = 'https://accounts.google.com/o/oauth2/revoke?token=' + accessToken
-				return axios({
-					url: url,
-					responseType: 'jsonp'
-				}).catch(err => {
-					// Assume the request failed because the token was already bad...
-					console.error(err)
-					return Promise.resolve();
-				})
-			} else {
+		let accessToken = settings.getSetAccessToken(accessTokenType)
+		if (accessToken) {
+			var url = 'https://accounts.google.com/o/oauth2/revoke?token=' + accessToken
+			return axios({
+				url: url,
+				responseType: 'jsonp'
+			}).catch(err => {
+				// Assume the request failed because the token was already bad...
+				console.error(err)
 				return Promise.resolve();
-			}
-		})
+			})
+		} else {
+			return Promise.resolve();
+		}
 	}
 
 	oauth.handleAuthRedirectURI = function (redirect_url, randomState, resolve, reject) {
@@ -125,9 +124,8 @@ function GoogleDrivePasswordFileManager(settings) {
 			var access_token = tokenMatches[1];
 			var checkState = decodeURIComponent(stateMatches[1]);
 			if (checkState === randomState) {
-				settings.getSetAccessToken(accessTokenType, access_token).then(function () {
-					resolve(access_token);
-				});
+				settings.getSetAccessToken(accessTokenType, access_token)
+				resolve(access_token);
 			} else {
 				//some sort of error or parsing failure
 				reject(redirect_url);
@@ -149,11 +147,10 @@ function GoogleDrivePasswordFileManager(settings) {
 			chrome.identity.getAuthToken({
 				interactive: interactive
 			}, function (token) {
-				if (token)
-					settings.getSetAccessToken(accessTokenType, token).then(function () {
-						resolve(token);
-					});
-				else {
+				if (token) {
+					settings.getSetAccessToken(accessTokenType, token)
+					resolve(token);
+				} else {
 					let err = chrome.runtime.lastError;
 					if (!err) {
 						err = new Error("Failed to authenticate.");

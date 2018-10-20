@@ -116,6 +116,5 @@ describe('Unlock.vue', function(done) {
   		done()
   	}
   	unlock.$mount()
-  })
-
-})
+  });
+});

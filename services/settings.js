@@ -9,18 +9,7 @@ function Settings(secureCache) {
 
 	var exports = {}
 
-	// upgrade old settings.  Called on install.
-	exports.upgrade = function () {
-		// Patch https://subdavis.com/blog/jekyll/update/2017/01/02/ckp-security-flaw.html
-		exports.getSetDatabaseUsages().then(usages => {
-			let keys = Object.keys(usages)
-			keys.forEach(k => {
-				if (usages[k]['passwordKey'] !== undefined)
-					chrome.storage.local.clear()
-			})
-		})
-	}
-
+	/* factor to event bus */
 	exports.handleProviderError = function (err, provider) {
 		exports.getCurrentDatabaseChoice().then(info => {
 			let providerKey = provider === undefined ? info.providerKey : provider.key;
@@ -29,99 +18,6 @@ function Settings(secureCache) {
 				/* There was an error with reauthorizing google drive... */
 				links.openOptionsReauth(providerKey)
 			}
-		})
-	}
-
-	exports.getKeyFiles = function () {
-		return chromePromise.storage.local.get(['keyFiles']).then(function (items) {
-			return items.keyFiles || [];
-		});
-	}
-
-	exports.deleteKeyFile = function (name) {
-		return exports.getKeyFiles().then(function (keyFiles) {
-			keyFiles.forEach(function (keyFile, index) {
-				if (keyFile.name === name) {
-					keyFiles.splice(index, 1);
-				}
-			})
-
-			return chromePromise.storage.local.set({
-				'keyFiles': keyFiles
-			});
-		});
-	}
-
-	exports.deleteAllKeyFiles = function () {
-		return chromePromise.storage.local.remove('keyFiles')
-	}
-
-	exports.destroyLocalStorage = function (key) {
-		if (key.length) {
-			return chromePromise.storage.local.remove(key)
-		}
-	}
-
-	exports.addKeyFile = function (name, key) {
-		return exports.getKeyFiles().then(function (keyFiles) {
-			var matches = keyFiles.filter(function (keyFile) {
-				return keyFile.name === name;
-			})
-
-			var encodedKey = Base64.encode(key);
-			if (matches.length) {
-				//update
-				matches[0].encodedKey = encodedKey;
-			} else {
-				//insert
-				keyFiles.push({
-					name: name,
-					encodedKey: encodedKey
-				})
-			}
-
-			return chromePromise.storage.local.set({
-				'keyFiles': keyFiles
-			});
-		});
-	}
-
-	exports.saveCurrentDatabaseChoice = function (passwordFile, provider) {
-		let shallowCopy = function (obj) {
-			let clone = {}
-			clone.prototype = obj.prototype
-			Object.keys(obj).forEach(property => {
-				clone[property] = obj[property];
-			})
-			return clone
-		}
-		let passwordFileClone = shallowCopy(passwordFile)
-		passwordFileClone.data = undefined; //don't save the data with the choice
-
-		return chromePromise.storage.local.set({
-			'selectedDatabase': {
-				'passwordFile': passwordFileClone,
-				'providerKey': provider.key
-			}
-		});
-	}
-
-	exports.getCurrentDatabaseChoice = function () {
-		return chromePromise.storage.local.get(['selectedDatabase']).then(function (items) {
-			if (items.selectedDatabase) {
-				return items.selectedDatabase;
-			} else {
-				return null;
-			}
-		});
-	}
-
-	exports.disableDatabaseProvider = function (provider) {
-		return chromePromise.storage.local.get(['selectedDatabase']).then(items => {
-			if (items.selectedDatabase)
-				if (items.selectedDatabase.providerKey === provider.key)
-					return chromePromise.storage.local.remove('selectedDatabase')
-			return Promise.resolve(false)
 		})
 	}
 
@@ -140,68 +36,6 @@ function Settings(secureCache) {
 				return exports.setForgetTime(key, forgetTime)
 			})
 		})
-	}
-
-	/*
-	 * Sets a time to forget something
-	 */
-	exports.setForgetTime = function (key, time) {
-		var storageKey = 'forgetTimes';
-		return chromePromise.storage.local.get(storageKey).then(function (items) {
-			var forgetTimes = {}
-			if (items[storageKey]) {
-				forgetTimes = items[storageKey];
-			}
-			// only set if not exists...  This prevents us from resetting the clock every unlock...
-			if (!(key in forgetTimes))
-				forgetTimes[key] = time;
-
-			return chromePromise.storage.local.set({
-				'forgetTimes': forgetTimes
-			});
-		});
-	}
-
-	exports.getForgetTime = function (key) {
-		var storageKey = 'forgetTimes';
-		return chromePromise.storage.local.get(storageKey).then(function (items) {
-			var forgetTimes = {}
-			if (items[storageKey]) {
-				forgetTimes = items[storageKey];
-			}
-
-			return forgetTimes[key];
-		});
-	}
-
-	exports.getAllForgetTimes = function () {
-		var storageKey = 'forgetTimes';
-		return chromePromise.storage.local.get(storageKey).then(function (items) {
-			var forgetTimes = {}
-			if (items[storageKey]) {
-				forgetTimes = items[storageKey];
-			}
-
-			return forgetTimes;
-		})
-	}
-
-	exports.clearForgetTimes = function (keysArray) {
-		var storageKey = 'forgetTimes';
-		return chromePromise.storage.local.get(storageKey).then(function (items) {
-			var forgetTimes = {}
-			if (items[storageKey]) {
-				forgetTimes = items[storageKey];
-			}
-			keysArray.forEach(function (key) {
-				if (forgetTimes[key])
-					delete forgetTimes[key];
-			})
-
-			return chromePromise.storage.local.set({
-				'forgetTimes': forgetTimes
-			});
-		});
 	}
 
 	/**

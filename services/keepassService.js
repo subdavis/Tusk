@@ -10,7 +10,7 @@ let Case = require('case'),
 import { argon2 } from '$lib/argon2.js'
 import { parseUrl, getValidTokens } from '$lib/utils.js'
 
-function KeepassService(keepassHeader, settings, passwordFileStoreRegistry, keepassReference) {
+function KeepassService(keepassHeader, passwordFileStoreRegistry, keepassReference) {
 	var my = {};
 
 	var littleEndian = (function () {
@@ -22,8 +22,8 @@ function KeepassService(keepassHeader, settings, passwordFileStoreRegistry, keep
 	/** 
 	 * return Promise(arrayBufer)
 	 */
-	my.getChosenDatabaseFile = function () {
-		return passwordFileStoreRegistry.getChosenDatabaseFile(settings)
+	my.getChosenDatabaseFile = function (providerKey) {
+		return passwordFileStoreRegistry.getChosenDatabaseFile(providerKey)
 	}
 
 	my.getMasterKey = function (bufferPromise, masterPassword, keyFileInfo) {

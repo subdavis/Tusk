@@ -1,18 +1,15 @@
 var path = require('path')
 
 module.exports = {
-	entry: {
-		'bundle': './tests/test.js'
-	},
+	entry: 'mocha!./nodetests/index.js',
 	output: {
-      publicPath: '/tests/',
-      path: path.resolve(__dirname, './tests'),
-      filename: '[name].build.js'
+      path: path.resolve(__dirname, './nodetests'),
+      filename: 'bundle.js'
   },
 	module: {
     rules: [{
-	      test: /test\.js$/,
-	      use: 'mocha-loader',
+	      test: /\.spec\.js$/,
+	      use: 'babel-loader',
 	      exclude: /node_modules/,
     }, {
         test: /\.scss$/,
@@ -53,16 +50,6 @@ module.exports = {
         test: /\.js$/,
         loader: 'babel-loader',
         exclude: /node_modules/
-    }, {
-        test: /\.(png|jpg|gif|svg|kdbx)$/,
-        exclude: '/.*/',
-        loader: 'ignore-loader'
-    }, {
-        test: /\.html$/,
-        loader: 'file-loader',
-        options: {
-            name: '[name].[ext]'.replace('_page', '')
-        }
     }]
   },
   externals: {
@@ -75,7 +62,7 @@ module.exports = {
           '$services': path.resolve(__dirname, 'services/'),
           '$bwr': path.resolve(__dirname, 'bower_components/'),
           '$assets': path.resolve(__dirname, 'assets/'),
-          '@': path.resolve(__dirname, 'src/'),
+          '$src': path.resolve(__dirname, 'src/'),
       },
       extensions: ['*', '.js', '.vue', '.json']
   },

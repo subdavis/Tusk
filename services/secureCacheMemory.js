@@ -95,6 +95,4 @@ function SecureCacheMemory(protectedMemory) {
 	return exports;
 }
 
-export {
-	SecureCacheMemory
-}
+export default SecureCacheMemory;

@@ -27,26 +27,21 @@ Object DirMap {
 }
 
 */
-const Base64 = require('base64-arraybuffer');
-const createClient = require("webdav");
-const regeneratorRuntime = require('babel-regenerator-runtime')
-import { guid } from '$lib/utils.js'
-import { ChromePromiseApi } from '$lib/chrome-api-promise.js'
-import { create } from "domain";
 
-const chromePromise = ChromePromiseApi()
-const SEARCH_DEPTH = 5
+import createClient from 'webdav';
+import { guid } from '$lib/utils.js';
+import { WEBDAV_SERVER_LIST, WEBDAV_DIRECTORY_MAP } from '@/store/modules/settings.js';
 
-function WebdavFileManager(settings) {
+function WebdavFileManager(settings, search_depth = 5) {
 	var exports = {
 		key: 'webdav',
 		listDatabases: listDatabases,
 		getDatabaseChoiceData: getDatabaseChoiceData,
 		getChosenDatabaseFile: getChosenDatabaseFile,
 		supportedFeatures: ['incognito', 'listDatabases'],
-		title: 'WebDAV (beta)',
+		title: 'WebDAV',
 		icon: 'icon-folder',
-		chooseTitle: 'WebDAV (beta)',
+		chooseTitle: 'WebDAV',
 		chooseDescription: 'Choose a database from any WebDAV file server.  Tusk will always keep your database in sync with the server and automatically pull new versions.  WARNING: If you require username/password to use webdav, Tusk will store them unencrypted on disk.',
 		login: enable,
 		logout: disable,
@@ -82,18 +77,17 @@ function WebdavFileManager(settings) {
 		return isEnabled().then(enabled => {
 			if (!enabled)
 				return Promise.resolve([])
-			return settings.getSetWebdavDirectoryMap().then(dirMap => {
-				let promises = []
-				// For each server, for each directory in the server.
-				for (let serverId in dirMap)
-					dirMap[serverId].forEach(dirInfo => {
-						promises.push(searchDirectory(serverId, dirInfo.path))
-					})
-
-				return Promise.all(promises).then(results => {
-					// flatten results
-					return [].concat.apply([], results)
+			let dirMap = settings.getSet(WEBDAV_DIRECTORY_MAP)
+			let promises = []
+			// For each server, for each directory in the server.
+			for (let serverId in dirMap)
+				dirMap[serverId].forEach(dirInfo => {
+					promises.push(searchDirectory(serverId, dirInfo.path))
 				})
+
+			return Promise.all(promises).then(results => {
+				// flatten results
+				return [].concat.apply([], results)
 			})
 		})
 	}
@@ -109,7 +103,7 @@ function WebdavFileManager(settings) {
 		let serverInfo = await getServer(serverId)
 		if (serverInfo === null) {
 			console.error("serverInfo not found");
-			return
+			return;
 		}
 		let client = createClient(serverInfo.url, serverInfo.username, serverInfo.password)
 		createClient.setFetchMethod(window.fetch);
@@ -125,7 +119,7 @@ function WebdavFileManager(settings) {
 				let path = queue.shift()
 
 				// TODO: Implement depth better
-				if (path.split('/').length > SEARCH_DEPTH)
+				if (path.split('/').length > search_depth)
 					break; // We've exceeded search depth
 				let contents = await client.getDirectoryContents(path, { credentials: 'omit' });
 				let foundKDBXInDir = false;
@@ -146,12 +140,10 @@ function WebdavFileManager(settings) {
 		}
 
 		let bfsPromise = bfs()
-		let dirMapPromise = settings.getSetWebdavDirectoryMap()
-		return Promise.all([bfsPromise, dirMapPromise]).then(resolves => {
-			let foundDirectories = resolves[0]
-			let dirMap = resolves[1]
+		let dirMap = settings.getSet(WEBDAV_DIRECTORY_MAP)
+		return bfsPromise.then(foundDirectories => {
 			dirMap[serverInfo.serverId] = foundDirectories
-			return settings.getSetWebdavDirectoryMap(dirMap)
+			return settings.getSet(WEBDAV_DIRECTORY_MAP, dirMap)
 		})
 	}
 
@@ -220,24 +212,22 @@ function WebdavFileManager(settings) {
 				username: username,
 				password: password
 			}
-			return settings.getSetWebdavServerList().then(serverList => {
-				serverList = serverList.length ? serverList : []
-				let matches = serverList.filter((elem, i, a) => {
-					return (elem.url == serverInfo.url
-						&& elem.username == serverInfo.username
-						&& elem.password == serverInfo.password)
-				})
-				if (matches.length == 1) {
-					return matches[0].serverId
-				} else {
-					let newId = guid()
-					serverInfo['serverId'] = newId
-					serverList.push(serverInfo)
-					return settings.getSetWebdavServerList(serverList).then(() => {
-						return serverInfo
-					})
-				}
+			let serverList = listServers()
+			serverList = serverList.length ? serverList : []
+			let matches = serverList.filter((elem, i, a) => {
+				return (elem.url == serverInfo.url
+					&& elem.username == serverInfo.username
+					&& elem.password == serverInfo.password)
 			})
+			if (matches.length == 1) {
+				return matches[0].serverId
+			} else {
+				let newId = guid()
+				serverInfo['serverId'] = newId
+				serverList.push(serverInfo)
+				settings.getSet(WEBDAV_SERVER_LIST, serverList)
+				return serverInfo
+			}
 		})
 	}
 
@@ -245,7 +235,7 @@ function WebdavFileManager(settings) {
 	 * alias for settings.getSetWebdavServerList
 	 */
 	function listServers() {
-		return settings.getSetWebdavServerList()
+		return settings.getSet(WEBDAV_SERVER_LIST)
 	}
 
 	/**
@@ -269,18 +259,15 @@ function WebdavFileManager(settings) {
 	 * @param {string} serverId 
 	 */
 	function removeServer(serverId) {
-		return settings.getSetWebdavServerList().then(servers => {
-			for (var i = 0; i < servers.length; i++)
-				if (servers[i].serverId === serverId)
-					servers.splice(i, 1)
-			return settings.getSetWebdavServerList(servers)
-		}).then(() => {
-			// clean up DirMap
-			settings.getSetWebdavDirectoryMap().then(dirMap => {
-				delete dirMap[serverId]
-				return settings.getSetWebdavDirectoryMap(dirMap)
-			})
-		})
+		let servers = listServers()
+		for (var i = 0; i < servers.length; i++)
+			if (servers[i].serverId === serverId)
+				servers.splice(i, 1)
+		settings.getSet(WEBDAV_SERVER_LIST, servers)
+		// clean up DirMap
+		let dirMap = settings.getSet(WEBDAV_DIRECTORY_MAP)
+		delete dirMap[serverId]
+		return settings.getSet(WEBDAV_DIRECTORY_MAP, dirMap)
 	}
 
 	return exports;

@@ -20,12 +20,12 @@ function OauthManager(settings, oauth) {
 				authUrl               // state, redirect_uri, client_id will be added.
 
 				// FUNCTIONS
-				searchRequestFunction // function(token) > axios response promise
-				searchRequestHandler  // function(axios_response)  > dbInfo
-				fileRequestFunction   // function(dbinfo, token) > axios response with response.data = arraybuffer
-				getDatabaseChoiceData // function(dbInfo) > dbInfo
-				revokeAuth            // function takes no params > promise resolved with null
-				handleAuthRedirectURI // function (uri, randomState, resolve, reject) > promise resolved with token
+				searchRequestFunction // function(token) => axios response promise
+				searchRequestHandler  // function(axios_response) => dbInfo
+				fileRequestFunction   // function(dbinfo, token) => axios response with response.data = arraybuffer
+				getDatabaseChoiceData // function(dbInfo) => dbInfo
+				revokeAuth            // function() => promise resolved with null
+				handleAuthRedirectURI // function(uri, randomState, resolve, reject) => promise resolved with token
 			}
 		Returns:
 			- the exports object it creates.
