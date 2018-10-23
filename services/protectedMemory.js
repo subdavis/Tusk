@@ -8,6 +8,13 @@
 
 let Base64 = require('base64-arraybuffer')
 
+export const CACHED_ENTRIES = 'Secure Cache Entries';
+// export const CACHED_CREDENTIALS = 'Secure Cache Credentials';
+// export const PROTECTED_MEMORY_KEYS = [
+// 	CACHED_ENTRIES,
+// 	CACHED_CREDENTIALS,
+// ];
+
 function ProtectedMemory() {
 	var my = {
 		getData: getData,
@@ -50,6 +57,9 @@ function ProtectedMemory() {
 	}
 
 	function setData(key, data) {
+		// if (PROTECTED_MEMORY_KEYS.indexOf(key) < 0) {
+		// 	throw new Error(`${key} must be in approved secure cache keys`);
+		// }
 		var preppedData = prepData(data);
 		var encoder = new TextEncoder();
 		var dataBytes = encoder.encode(JSON.stringify(preppedData));

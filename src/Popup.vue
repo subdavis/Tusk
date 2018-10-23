@@ -11,13 +11,10 @@
 			:settings="services.settings"
 			:links="services.links"></file-picker>
 		<unlock id="/unlock/:provider/:title" v-if="show.unlock.visible"
-			:unlocked-state="services.unlockedState"
-			:secure-cache="services.secureCache"
 			:links="services.links"
 			:settings="services.settings"
 			:keepass-service="services.keepassService"></unlock>
 		<entry-details id="/entry-details/:entryId" v-if="show.entryDetails.visible"
-			:unlocked-state="services.unlockedState"
 			:links="services.links"
 			:settings="services.settings"></entry-details>
 		<!-- End Router View -->
@@ -27,14 +24,14 @@
 <script>
 /* beautify preserve:start */
 // Singletons
-import { generateSettingsAdapter } from '@/store/helpers.js'
+import { generateSettingsAdapter } from '@/store/modules/settings.js'
 import { ProtectedMemory } from '$services/protectedMemory.js'
 import { KeepassHeader } from '$services/keepassHeader.js'
 import { KeepassReference } from '$services/keepassReference.js'
 import { KeepassService } from '$services/keepassService.js'
 import { UnlockedState } from '$services/unlockedState.js'
-import { SecureCacheMemory } from '$services/secureCacheMemory.js'
-import { PasswordFileStoreRegistry } from '$services/passwordFileStore.js'
+// import { SecureCacheMemory } from '$services/secureCacheMemory.js'
+import PasswordFileStoreRegistry from '$services/passwordFileStore.js'
 import { Links } from '$services/links.js'
 import { Notifications } from '$services/notifications.js'
 // File Managers
@@ -54,10 +51,9 @@ import EntryDetails from '@/components/EntryDetails'
 import SvgDefs from '@/components/SvgDefs'
 
 const links = new Links()
-const settings = generateSettingsAdapter(this.$store) //
 const keepassHeader = new KeepassHeader()
 const keepassReference = new KeepassReference()
-const notifications = new Notifications(settings) //
+// const notifications = new Notifications(settings) //
 
 // File Managers
 // const localChromePasswordFileManager = new LocalChromePasswordFileManager()
@@ -97,7 +93,7 @@ export default {
 		return {
 			services: {
 				/* The services exposed to UI components */
-				settings,
+				settings: generateSettingsAdapter(this.$store),
 				// secureCache: secureCacheMemory,
 				passwordFileStoreRegistry,
 				keepassService,

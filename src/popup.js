@@ -4,11 +4,13 @@ require('font-awesome/css/font-awesome.css')
 
 // Vue Components
 import Vue from 'vue'
-import Popup from './Popup.vue'
-import VirtualRouter from '$lib/virtual-router.js'
+import Popup from './Popup'
+import VirtualRouter from '$lib/virtual-router'
 import store from './store';
+import { HYDRATE } from './store/modules/database'
 
-// Set up routes
+store.dispatch(HYDRATE)
+
 Vue.prototype.$router = new VirtualRouter()
 
 new Vue({

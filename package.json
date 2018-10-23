@@ -9,14 +9,15 @@
     "prebuild": "npm run clean",
     "build": "cross-env NODE_ENV=production webpack --progress --config webpack.config.js",
     "build-dll": "cross-env NODE_ENV=dll webpack --config webpack.dll.js --progress",
-		"dev": "webpack --progress --watch --config webpack.config.js",
-		"test:unit": "cross-env NODE_ENV=test jest nodetests/",
+    "dev": "webpack --progress --watch --config webpack.config.js",
+    "test:unit": "cross-env NODE_ENV=test jest nodetests/",
     "test:other": "cross-env NODE_ENV=test webpack --config webpack.test.config.js && mocha nodetests/bundle.js",
     "bundle": "./packer.sh chrome && ./packer.sh firefox",
     "clean": "rm -rf build/ *.zip manifest.json demo*"
   },
   "dependencies": {
     "axios": "^0.17.1",
+    "babel-plugin-transform-runtime": "^6.23.0",
     "babel-regenerator-runtime": "^6.5.0",
     "base64-arraybuffer": "^0.1.5",
     "case": "^1.5.4",
@@ -33,15 +34,15 @@
     "vuex-persistedstate": "^2.5.4",
     "webdav": "https://github.com/subdavis/webdav-client#fetchfix",
     "xmldom": "^0.1.27"
-	},
-	"jest": {
-		"moduleNameMapper": {
-			"^src/(.*)$": "<rootDir>/src/$1",
-			"^services/(.*)$": "<rootDir>/services/$1",
-			"^\\$lib/(.*)$": "<rootDir>/lib/$1",
-			"^@/(.*)$": "<rootDir>/src/$1"
-		}
-	},
+  },
+  "jest": {
+    "moduleNameMapper": {
+      "^src/(.*)$": "<rootDir>/src/$1",
+      "^services/(.*)$": "<rootDir>/services/$1",
+      "^\\$lib/(.*)$": "<rootDir>/lib/$1",
+      "^@/(.*)$": "<rootDir>/src/$1"
+    }
+  },
   "browserslist": [
     "> 1%",
     "last 2 versions",

@@ -8,7 +8,7 @@ export default {
 		GoBack
 	},
 	props: {
-		unlockedState: Object,
+		// unlockedState: Object,
 		settings: Object,
 		links: Object
 	},
@@ -26,7 +26,7 @@ export default {
 	},
 	methods: {
 		exposeAttribute(attr) {
-			attr.value = this.unlockedState.getDecryptedAttribute(this.entry, attr.key)
+			// attr.value = this.unlockedState.getDecryptedAttribute(this.entry, attr.key)
 			attr.isHidden = false
 		},
 		hideAttribute(attr) {
@@ -55,56 +55,56 @@ export default {
 		autofill(e) {
 			e.stopPropagation()
 			console.log("autofill")
-			this.unlockedState.autofill(this.entry);
+			// this.unlockedState.autofill(this.entry);
 		},
 		copy(e) {
 			e.stopPropagation()
 			console.log("copy")
-			this.unlockedState.copyPassword(this.entry);
+			// this.unlockedState.copyPassword(this.entry);
 		}
 	},
 	beforeDestroy() {
 		clearInterval(this.otp_loop)
 	},
-	mounted() {
-		let entryId = this.$router.getRoute().entryId
-		this.entry = this.unlockedState.cacheGet('allEntries').filter(entry => {
-			return entry.id == entryId
-		})[0]
-		this.attributes = this.entry.keys.map(key => {
-			// Should NOT be succeptible to XSS
-			let returnMap = {
-				key: key,
-				value: (this.entry[key] || "").replace(/\n/g, "<br>")
-			}
-			switch (key) {
-				case 'url':
-					let parsed = parseUrl(this.entry[key])
-					if (parsed !== null) {
-						returnMap['href'] = parsed.href
-					}
-					break;
-				case 'notes':
-					returnMap['value'] = this.entry[key]
-					break;
-			}
-			return returnMap;
-		})
-		for (var protectedKey in this.entry.protectedData) {
-			if (protectedKey === "otp") {
-				let url = this.unlockedState.getDecryptedAttribute(this.entry, protectedKey)
-				this.setupOTP(url)
-			} else {
-				this.attributes.push({
-					'key': protectedKey,
-					'value': this.hiddenValue,
-					'isHidden': true,
-					'protected': true,
-					'protectedAttr': this.entry.protectedData[protectedKey]
-				})
-			}
-		}
-	}
+	// mounted() {
+	// 	let entryId = this.$router.getRoute().entryId
+	// 	this.entry = this.unlockedState.cacheGet('allEntries').filter(entry => {
+	// 		return entry.id == entryId
+	// 	})[0]
+	// 	this.attributes = this.entry.keys.map(key => {
+	// 		// Should NOT be succeptible to XSS
+	// 		let returnMap = {
+	// 			key: key,
+	// 			value: (this.entry[key] || "").replace(/\n/g, "<br>")
+	// 		}
+	// 		switch (key) {
+	// 			case 'url':
+	// 				let parsed = parseUrl(this.entry[key])
+	// 				if (parsed !== null) {
+	// 					returnMap['href'] = parsed.href
+	// 				}
+	// 				break;
+	// 			case 'notes':
+	// 				returnMap['value'] = this.entry[key]
+	// 				break;
+	// 		}
+	// 		return returnMap;
+	// 	})
+	// 	for (var protectedKey in this.entry.protectedData) {
+	// 		if (protectedKey === "otp") {
+	// 			let url = this.unlockedState.getDecryptedAttribute(this.entry, protectedKey)
+	// 			this.setupOTP(url)
+	// 		} else {
+	// 			this.attributes.push({
+	// 				'key': protectedKey,
+	// 				'value': this.hiddenValue,
+	// 				'isHidden': true,
+	// 				'protected': true,
+	// 				'protectedAttr': this.entry.protectedData[protectedKey]
+	// 			})
+	// 		}
+	// 	}
+	// }
 }
 </script>
 
