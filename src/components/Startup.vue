@@ -5,10 +5,6 @@ import Spinner from 'vue-simple-spinner'
 import { Links } from '$services/links.js'
 /* beautify preserve:end */
 export default {
-	props: {
-		settings: Object,
-		passwordFileStoreRegistry: Object
-	},
 	data() {
 		return {
 			links: Links(),
@@ -20,7 +16,6 @@ export default {
 	},
 	computed: {
 		...mapState({
-			settings: 'settings',
 			database: 'database',
 		}),
 	},

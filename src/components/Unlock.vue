@@ -29,13 +29,14 @@ export default {
 		InfoCluster,
 		EntryList,
 		Spinner,
-		Messenger
+		Messenger,
 	},
 	data() {
 		return {
 			keyFilePicker: false,
 			appVersion: chrome.runtime.getManifest().version,
-			slider_int: 0
+			slider_int: 0,
+			rememberPeriodOptions,
 		}
 	},
 	computed: {
@@ -43,7 +44,7 @@ export default {
 			settings: 'settings',
 			database: 'database',
 			ui: 'ui',
-			isUnlocked: state => !state.database.locked,
+			isUnlocked: (state) => !state.database.locked,
 		}),
 		rememberPassword: function () {
 			return this.database.rememberPeriod.time;
@@ -67,6 +68,8 @@ export default {
 		...mapActions({
 			lock: LOCK,
 			unlock: UNLOCK,
+		}),
+		...mapMutations({
 			setKeyFileName: ACTIVE_KEY_FILE_NAME_SET,
 			setDatabaseFileName: DATABASE_FILE_NAME_SET,
 			setRememberPeriod: REMEMBER_PERIOD_SET,
@@ -218,10 +221,10 @@ export default {
 			:settings="settings"></entry-list> -->
 
 		<!-- General Messenger -->
-		<messenger :messages="generalMessages" v-show="!busy"></messenger>
+		<messenger :messages="ui.messages.general" v-show="!busy"></messenger>
 
 		<!-- Unlock input group -->
-		<div id="masterPasswordGroup" v-if="!busy && !isUnlocked()">
+		<div id="masterPasswordGroup" v-if="!busy && !isUnlocked">
 
 			<div class="unlockLogo stack-item">
 				<img src="assets/icons/exported/128x128.svg">
@@ -261,7 +264,7 @@ export default {
 					<span>
 						<label for="rememberPeriodLength">
 							<span>{{rememberPeriodText}} (slide to choose)</span></label>
-					<input id="rememberPeriodLength" type="range" min="0" :max="slider_options.length - 1" step="1" v-model="slider_int" v-on:input="setRememberPeriod(undefined)" />
+					<input id="rememberPeriodLength" type="range" min="0" :max="rememberPeriodOptions.length - 1" step="1" v-model="slider_int" v-on:input="setRememberPeriod(undefined)" />
 					</span>
 				</div>
 
@@ -276,7 +279,7 @@ export default {
 		<div class="box-bar medium between footer" v-show="!busy">
 			<span class="selectable" @click="links.openOptions">
 				<i class="fa fa-cog" aria-hidden="true"></i> Settings</span>
-			<span class="selectable" v-if="isUnlocked()" @click="forgetPassword()">
+			<span class="selectable" v-if="isUnlocked" @click="forgetPassword()">
 				<i class="fa fa-lock" aria-hidden="true"></i> Lock Database</span>
 			<span class="selectable" v-else @click="closeWindow">
 				<i class="fa fa-times-circle" aria-hidden="true"></i> Close Window</span>

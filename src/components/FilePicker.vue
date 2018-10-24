@@ -1,49 +1,60 @@
 <script>
+import { mapState, mapMutations, mapActions } from 'vuex'
+import { ACTIVE_SET, FAIL_GRACEFULLY } from '@/store/modules/database'
 import GoBack from '@/components/GoBack'
 
 export default {
 	props: {
-		passwordFileStoreRegistry: Object,
-		settings: Object,
-		links: Object
+		links: {
+			type: Object,
+			required: true,
+		},
 	},
 	components: {
-		GoBack
+		GoBack,
 	},
 	data() {
 		return {
-			databases: []
+			databases: [],
 		}
+	},
+	computed: {
+		...mapState({
+			database: 'database',
+		}),
 	},
 	methods: {
 		selectDatabase(i) {
 			if (i !== undefined) {
 				let database = this.databases[i]
-				let info = database.provider.getDatabaseChoiceData(database);
-				this.settings.saveCurrentDatabaseChoice(info, database.provider).then(nil => {
-					this.$router.route('/unlock/' + database.provider.key + '/' + encodeURIComponent(database.title))
+				let info = database.provider.getDatabaseChoiceData(database)
+				this.$store.commit(ACTIVE_SET, {
+					databaseFileName: info.tile,
+					providerKey: database.provider.key,
 				})
-			} else {
-				// TODO
+				this.$router.route(`/unlock/${database.provider.key}/${encodeURIComponent(info.title)}`)
 			}
-		}
+		},
 	},
-	mounted() {
-		this.passwordFileStoreRegistry.listFileManagers('listDatabases').forEach(provider => {
-			provider.listDatabases().then(databases => {
+	async mounted() {
+		const providers = this.database.passwordFileStoreRegistry.listFileManagers('listDatabases');
+		console.log(providers)
+		for (const i in providers) {
+			const provider = providers[i]
+			try {
+				const databases = await provider.listDatabases()
 				if (databases && databases.length) {
 					databases.forEach(database => {
 						database.provider = provider
 					})
 					this.databases = this.databases.concat(databases)
 				}
-			}).catch(err => {
-				this.settings.handleProviderError(err, provider);
+			} catch (err) {
 				console.error("Error when trying to listDatabases")
-				console.error(err)
-			})
-		})
-	}
+				this.$store.dispatch(FAIL_GRACEFULLY, err, provider.key)
+			}
+		}
+	},
 }
 </script>
 
@@ -64,7 +75,7 @@ export default {
 	</div>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 @import "../styles/settings.scss";
 .chooseFile {
   svg {

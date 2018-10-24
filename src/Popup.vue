@@ -4,10 +4,8 @@
 		<svg-defs></svg-defs>
 		<!-- Router View -->
 		<startup id="/" v-if="show.startup.visible"
-			:settings="services.settings"
-			:password-file-store-registry="services.passwordFileStoreRegistry"></startup>
+			:links="services.links"></startup>
 		<file-picker id="/choose" v-if="show.filePicker.visible"
-			:password-file-store-registry="services.passwordFileStoreRegistry"
 			:settings="services.settings"
 			:links="services.links"></file-picker>
 		<unlock id="/unlock/:provider/:title" v-if="show.unlock.visible"

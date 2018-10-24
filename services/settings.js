@@ -10,16 +10,16 @@ function Settings(secureCache) {
 	var exports = {}
 
 	/* factor to event bus */
-	exports.handleProviderError = function (err, provider) {
-		exports.getCurrentDatabaseChoice().then(info => {
-			let providerKey = provider === undefined ? info.providerKey : provider.key;
-			let errmsg = err.message || ""
-			if (errmsg.indexOf('interact') >= 0) {
-				/* There was an error with reauthorizing google drive... */
-				links.openOptionsReauth(providerKey)
-			}
-		})
-	}
+	// exports.handleProviderError = function (err, provider) {
+	// 	exports.getCurrentDatabaseChoice().then(info => {
+	// 		let providerKey = provider === undefined ? info.providerKey : provider.key;
+	// 		let errmsg = err.message || ""
+	// 		if (errmsg.indexOf('interact') >= 0) {
+	// 			/* There was an error with reauthorizing google drive... */
+	// 			links.openOptionsReauth(providerKey)
+	// 		}
+	// 	})
+	// }
 
 	exports.getCurrentMasterPasswordCacheKey = function () {
 		return exports.getCurrentDatabaseChoice().then(info => {
