@@ -24,7 +24,6 @@
 // Singletons
 import { generateSettingsAdapter } from '@/store/modules/settings.js'
 import { ProtectedMemory } from '$services/protectedMemory.js'
-import { KeepassHeader } from '$services/keepassHeader.js'
 import { KeepassReference } from '$services/keepassReference.js'
 import { KeepassService } from '$services/keepassService.js'
 import { UnlockedState } from '$services/unlockedState.js'
@@ -49,7 +48,6 @@ import EntryDetails from '@/components/EntryDetails'
 import SvgDefs from '@/components/SvgDefs'
 
 const links = new Links()
-const keepassHeader = new KeepassHeader()
 const keepassReference = new KeepassReference()
 // const notifications = new Notifications(settings) //
 
@@ -73,7 +71,6 @@ const passwordFileStoreRegistry = new PasswordFileStoreRegistry(
 	// webdavFileManager)
 )
 const keepassService = new KeepassService(
-	keepassHeader,
 	passwordFileStoreRegistry,
 	keepassReference)
 /* beautify preserve:end */

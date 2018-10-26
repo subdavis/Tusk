@@ -50,6 +50,14 @@ export default {
 			active: (state) => state.database.active,
 			keyFiles: (state) => state.settings.keyFiles,
 		}),
+		masterPassword: {
+			get () {
+				return this.database.masterPassword;
+			},
+			set (val) {
+				this.setMasterPassword({ masterPassword: val })
+			},
+		},
 		rememberPassword: function () {
 			return this.database.rememberPeriod.time;
 		},
@@ -77,6 +85,7 @@ export default {
 			setKeyFileName: ACTIVE_KEY_FILE_NAME_SET,
 			setDatabaseFileName: DATABASE_FILE_NAME_SET,
 			setRememberPeriod: REMEMBER_PERIOD_SET,
+			setMasterPassword: MASTER_PASSWORD_SET,
 		}),
 		closeWindow(event) {
 			window.close()
@@ -232,6 +241,71 @@ div
 			img(src="assets/icons/exported/128x128.svg")
 			span KeePass Tusk
 
+		form(@submit="clickUnlock")
+			.small.selectable.databaseChoose(@click="$router.route('/choose')")
+				b {{ active.databaseFileName }}
+				|  
+				span.muted-color change...
+
+			.stack-item.masterPasswordInput
+				input#masterPassword(
+						:type="isMasterPasswordInputVisible ? 'text' : 'password'",
+						v-model="masterPassword",
+						placeholder="🔒 master password",
+						ref="masterPassword",
+						autocomplete="off")
+				i(@click="isMasterPasswordInputVisible = !isMasterPasswordInputVisible",
+						:class="['fa', isMasterPasswordInputVisible ? 'fa-eye-slash' : 'fa-eye', 'fa-fw']",
+						aria-hidden="true")
+
+			.stack-item
+				#select-keyfile.selectable(@click="setKeyFileName({ keyFileName: null }); keyFilePicker = !keyFilePicker")
+					i.fa.fa-key(aria-hidden="true")
+					|  {{ active.keyFileName || 'No Key File Selected (choose)' }}
+
+			.stack-item.keyfile-picker(v-if="keyFilePicker")
+				transition(name="keyfile-picker")
+					div
+						span.selectable(
+								v-for="(keyFile, kf_index) in keyFiles",
+								:keyfile-index="kf_index",
+								:key="`${kf_index}-select`",
+								@click="chooseKeyFile(keyFile)")
+							i.fa.fa-file.fa-fw(aria-hidden="true") 
+							|  {{ keyFile.name }}
+
+						span.selectable(@click="links.openOptionsKeyfiles")
+							i.fa.fa-wrench.fa-fw(aria-hidden="true")
+							| Manage Keyfiles
+
+			.box-bar.small.plain.remember-period-picker
+				span
+					label(for="rememberPeriodLength")
+						span {{rememberPeriodText}} (slide to choose)
+				input#rememberPeriodLength(
+						type="range",
+						min="0",
+						:max="rememberPeriodOptions.length - 1",
+						step="1" v-model="slider_int",
+						@input="setRememberPeriod(undefined)")
+
+			.stack-item
+				button.action-button.selectable(@click="clickUnlock") Unlock Database
+
+	//- <!-- Footer -->
+	.box-bar.medium.between.footer(v-show="!busy")
+		span.selectable(@click="links.openOptions")
+			i.fa.fa-cog(aria-hidden="true")
+			|  Settings
+		span.selectable(v-if="isUnlocked", @click="forgetPassword()")
+			i.fa.fa-lock(aria-hidden="true")
+			|  Lock Database
+		span.selectable(v-else, @click="closeWindow")
+			i.fa.fa-times-circle(aria-hidden="true")
+			|  Close Window
+		span.selectable(@click="links.openHomepage")
+			i.fa.fa-info-circle(aria-hidden="true")
+			|  v{{ appVersion }}
 
 </template>
 

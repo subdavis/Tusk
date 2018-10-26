@@ -10,14 +10,8 @@ let Case = require('case'),
 import { argon2 } from '$lib/argon2.js'
 import { parseUrl, getValidTokens } from '$lib/utils.js'
 
-function KeepassService(keepassHeader, passwordFileStoreRegistry, keepassReference) {
+function KeepassService(passwordFileStoreRegistry, keepassReference) {
 	var my = {};
-
-	var littleEndian = (function () {
-		var buffer = new ArrayBuffer(2);
-		new DataView(buffer).setInt16(0, 256, true);
-		return new Int16Array(buffer)[0] === 256;
-	})();
 
 	/** 
 	 * return Promise(arrayBufer)
@@ -26,7 +20,8 @@ function KeepassService(keepassHeader, passwordFileStoreRegistry, keepassReferen
 		return passwordFileStoreRegistry.getChosenDatabaseFile(providerKey)
 	}
 
-	my.getMasterKey = function (bufferPromise, masterPassword, keyFileInfo) {
+	my.getMasterKey = function (masterPassword, keyFileInfo) {
+		console.log(masterPassword || "none", keyFileInfo)
 		/**
 		 * Validate that one of the following is true:
 		 * (password isn't empty OR keyfile isn't empty)
@@ -34,10 +29,10 @@ function KeepassService(keepassHeader, passwordFileStoreRegistry, keepassReferen
 		 * (assume password is the empty string)
 		 */
 		let protectedMasterPassword;
-		if (masterPassword === undefined && keyFileInfo === undefined) {
+		if (masterPassword === undefined && !keyFileInfo) {
 			// Neither keyfile nor password provided.  Assume empty string password.
 			protectedMasterPassword = kdbxweb.ProtectedValue.fromString("");
-		} else if (masterPassword === "" && keyFileInfo !== undefined) {
+		} else if (masterPassword === "" && keyFileInfo) {
 			// Keyfile but empty password provided.  Assume password is unused.
 			// This extension does not support the combo empty string + keyfile.
 			protectedMasterPassword = null;
@@ -45,30 +40,22 @@ function KeepassService(keepassHeader, passwordFileStoreRegistry, keepassReferen
 			protectedMasterPassword = kdbxweb.ProtectedValue.fromString(masterPassword)
 		}
 		var fileKey = keyFileInfo ? Base64.decode(keyFileInfo.encodedKey) : null;
-		return bufferPromise.then(function (buf) {
-			var h = keepassHeader.readHeader(buf);
-			return getKey(h.kdbx, protectedMasterPassword, fileKey);
-		});
+		return getKey(protectedMasterPassword, fileKey);
 	}
 
 	my.getDecryptedData = function (bufferPromise, masterKey) {
 		var majorVersion;
 		return bufferPromise.then(function (buf) {
-			var h = keepassHeader.readHeader(buf);
-			if (!h) throw new Error('Failed to read file header');
 
-			if (h.kdbx) { // KDBX - use kdbxweb library
-				kdbxweb.CryptoEngine.argon2 = argon2;
-				var kdbxCreds = jsonCredentialsToKdbx(masterKey);
-				return kdbxweb.Kdbx.load(buf, kdbxCreds).then(db => {
-					var psk = new Uint8Array(db.header.protectedStreamKey, 0, db.header.protectedStreamKey.length);
-					var entries = parseKdbxDb(db.groups);
-					majorVersion = db.header.versionMajor;
-					return processReferences(entries, majorVersion);
-				});
-			} else { // KDB - we don't support this anymore
-				throw "Unsupported Database Version";
-			}
+			kdbxweb.CryptoEngine.argon2 = argon2;
+			var kdbxCreds = jsonCredentialsToKdbx(masterKey);
+			return kdbxweb.Kdbx.load(buf, kdbxCreds).then(db => {
+				var psk = new Uint8Array(db.header.protectedStreamKey, 0, db.header.protectedStreamKey.length);
+				var entries = parseKdbxDb(db.groups);
+				majorVersion = db.header.versionMajor;
+				return processReferences(entries, majorVersion);
+			});
+
 		}).then(function (entries) {
 			return {
 				entries: entries,
@@ -118,7 +105,7 @@ function KeepassService(keepassHeader, passwordFileStoreRegistry, keepassReferen
 		})
 	}
 
-	function getKey(isKdbx, protectedMasterPassword, fileKey) {
+	function getKey(protectedMasterPassword, fileKey) {
 		var creds = new kdbxweb.Credentials(protectedMasterPassword, fileKey);
 		return creds.ready.then(() => {
 			return kdbxCredentialsToJson(creds);

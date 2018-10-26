@@ -31,8 +31,9 @@ export default {
 				this.$store.commit(ACTIVE_SET, {
 					databaseFileName: database.title,
 					providerKey: database.provider.key,
+					dbInfo: info,
 				})
-				this.$router.route(`/unlock/${database.provider.key}/${encodeURIComponent(info.title)}`)
+				this.$router.route(`/unlock/${database.provider.key}/${encodeURIComponent(database.title)}`)
 			}
 		},
 	},
