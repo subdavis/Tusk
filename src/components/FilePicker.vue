@@ -29,7 +29,7 @@ export default {
 				let database = this.databases[i]
 				let info = database.provider.getDatabaseChoiceData(database)
 				this.$store.commit(ACTIVE_SET, {
-					databaseFileName: info.tile,
+					databaseFileName: database.title,
 					providerKey: database.provider.key,
 				})
 				this.$router.route(`/unlock/${database.provider.key}/${encodeURIComponent(info.title)}`)
@@ -38,7 +38,6 @@ export default {
 	},
 	async mounted() {
 		const providers = this.database.passwordFileStoreRegistry.listFileManagers('listDatabases');
-		console.log(providers)
 		for (const i in providers) {
 			const provider = providers[i]
 			try {

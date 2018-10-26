@@ -74,9 +74,7 @@ function SampleDatabaseFileManager() {
 	}
 
 	function getActive() {
-		return chromePromise.storage.local.get('useSampleDatabase').then(function (results) {
-			return !!results.useSampleDatabase;
-		});
+		return Promise.resolve(true)
 	}
 
 	return exports;

@@ -6,13 +6,10 @@ export default {
 }
 </script>
 
-<template>
-	<div class="box-bar selectable" v-on:click="$router.goBack">
-		<span>
-			<i class="fa fa-long-arrow-left" aria-hidden="true"></i>
-			{{ message }}
-		</span>
-	</div>
+<template lang="pug">
+.box-bar.selectable(@click="$router.goBack")
+	span
+		i.fa.fa-long-arrow-left(aria-hidden="true") {{ message }}
 </template>
 
 <style lang="scss">

@@ -65,6 +65,8 @@
     "mocha-loader": "^1.1.2",
     "mocha-webpack": "^1.1.0",
     "node-sass": "^4.5.3",
+    "pug": "^2.0.3",
+    "pug-plain-loader": "^1.0.0",
     "sass-loader": "^6.0.6",
     "should": "^13.2.0",
     "sinon": "^4.1.4",

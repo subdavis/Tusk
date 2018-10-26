@@ -29,7 +29,7 @@ import { KeepassReference } from '$services/keepassReference.js'
 import { KeepassService } from '$services/keepassService.js'
 import { UnlockedState } from '$services/unlockedState.js'
 // import { SecureCacheMemory } from '$services/secureCacheMemory.js'
-import PasswordFileStoreRegistry from '$services/passwordFileStore.js'
+import { PasswordFileStoreRegistry } from '$services/passwordFileStore.js'
 import { Links } from '$services/links.js'
 import { Notifications } from '$services/notifications.js'
 // File Managers

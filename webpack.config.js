@@ -31,6 +31,9 @@ module.exports = {
                 'sass-loader?indentedSyntax'
             ],
         }, {
+						test: /\.pug$/,
+						loader: 'pug-plain-loader'
+				}, {
             test: /\.vue$/,
             loader: 'vue-loader',
             options: {

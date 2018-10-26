@@ -36,6 +36,7 @@ export default {
 			keyFilePicker: false,
 			appVersion: chrome.runtime.getManifest().version,
 			slider_int: 0,
+			isMasterPasswordInputVisible: false,
 			rememberPeriodOptions,
 		}
 	},
@@ -44,7 +45,10 @@ export default {
 			settings: 'settings',
 			database: 'database',
 			ui: 'ui',
+			busy: (state) => state.database.busy,
 			isUnlocked: (state) => !state.database.locked,
+			active: (state) => state.database.active,
+			keyFiles: (state) => state.settings.keyFiles,
 		}),
 		rememberPassword: function () {
 			return this.database.rememberPeriod.time;
@@ -202,92 +206,33 @@ export default {
 		// }
 		//set knowlege from the URL
 		// this.databaseFileName = decodeURIComponent(this.$router.getRoute().title)
-		this.setDatabaseFileName({ databaseFileName: this.$router.getRoute().title })
+		// this.setDatabaseFileName({ databaseFileName: this.$router.getRoute().title })
 	}
 }
 </script>
 
-<template>
-	<div>
-		<!-- Busy Spinner -->
-		<div v-if="busy" class="spinner">
-			<spinner size="medium" :message='"Unlocking " + databaseFileName'></spinner>
-		</div>
+<template lang="pug">
+div
+	//- <!-- Busy Spinner -->
+	.spinner(v-if="busy")
+		spinner(size="medium", :message='"Unlocking " + databaseFileName')
+	//- <!-- Entry List -->
+	//- <!-- <entry-list v-if="!busy && isUnlocked()"
+	//- :messages="unlockedMessages"
+	//- :unlocked-state="unlockedState"
+	//- :settings="settings"></entry-list> -->
 
-		<!-- Entry List -->
-		<!-- <entry-list v-if="!busy && isUnlocked()"
-			:messages="unlockedMessages"
-			:unlocked-state="unlockedState"
-			:settings="settings"></entry-list> -->
+	//- <!-- General Messenger -->
+	messenger(v-show="!busy", :messages="ui.messages.general" )
 
-		<!-- General Messenger -->
-		<messenger :messages="ui.messages.general" v-show="!busy"></messenger>
+	//- <!-- Unlock input group -->
+	#masterPasswordGroup(v-if="!busy && !isUnlocked")
+		
+		.stack-item.unlockLogo
+			img(src="assets/icons/exported/128x128.svg")
+			span KeePass Tusk
 
-		<!-- Unlock input group -->
-		<div id="masterPasswordGroup" v-if="!busy && !isUnlocked">
 
-			<div class="unlockLogo stack-item">
-				<img src="assets/icons/exported/128x128.svg">
-				<span>KeePass Tusk</span>
-			</div>
-
-			<form v-on:submit="clickUnlock">
-
-				<div class="small selectable databaseChoose" @click="$router.route('/choose')">
-					<b>{{ databaseFileName }}</b> <span class="muted-color">change...</span>
-				</div>
-
-				<div class="stack-item masterPasswordInput">
-					<input :type="isMasterPasswordInputVisible ? 'text' : 'password'" id="masterPassword" v-model="masterPassword" placeholder="🔒 master password" ref="masterPassword" autocomplete="off">
-					<i @click="isMasterPasswordInputVisible = !isMasterPasswordInputVisible" :class="['fa', isMasterPasswordInputVisible ? 'fa-eye-slash' : 'fa-eye', 'fa-fw']" aria-hidden="true"></i>
-				</div>
-
-				<div class="stack-item">
-					<div id="select-keyfile" class="selectable" @click="selectedKeyFile = undefined; keyFilePicker = !keyFilePicker">
-						<i class="fa fa-key" aria-hidden="true"></i> {{selectedKeyFileName}}
-					</div>
-				</div>
-
-				<div class="stack-item keyfile-picker" v-if="keyFilePicker">
-					<transition name="keyfile-picker">
-						<div>
-							<span class="selectable" v-for="(kf, kf_index) in keyFiles" :keyfile-index="kf_index" @click="chooseKeyFile(kf_index)">
-								<i class="fa fa-file fa-fw" aria-hidden="true"></i> {{ kf.name }}
-							</span>
-							<span @click="links.openOptionsKeyfiles" class="selectable">
-								<i class="fa fa-wrench fa-fw" aria-hidden="true"></i> Manage Keyfiles</span>
-						</div>
-					</transition>
-				</div>
-
-				<div class="box-bar small plain remember-period-picker">
-					<span>
-						<label for="rememberPeriodLength">
-							<span>{{rememberPeriodText}} (slide to choose)</span></label>
-					<input id="rememberPeriodLength" type="range" min="0" :max="rememberPeriodOptions.length - 1" step="1" v-model="slider_int" v-on:input="setRememberPeriod(undefined)" />
-					</span>
-				</div>
-
-				<div class="stack-item">
-					<button class="action-button selectable" v-on:click="clickUnlock">Unlock Database</button>
-				</div>
-			</form>
-
-		</div>
-
-		<!-- Footer -->
-		<div class="box-bar medium between footer" v-show="!busy">
-			<span class="selectable" @click="links.openOptions">
-				<i class="fa fa-cog" aria-hidden="true"></i> Settings</span>
-			<span class="selectable" v-if="isUnlocked" @click="forgetPassword()">
-				<i class="fa fa-lock" aria-hidden="true"></i> Lock Database</span>
-			<span class="selectable" v-else @click="closeWindow">
-				<i class="fa fa-times-circle" aria-hidden="true"></i> Close Window</span>
-			<span class="selectable" @click="links.openHomepage">
-				<i class="fa fa-info-circle" aria-hidden="true"></i> v{{ appVersion }}</span>
-		</div>
-
-	</div>
 </template>
 
 <style lang="scss">

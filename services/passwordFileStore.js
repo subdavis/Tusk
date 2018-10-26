@@ -46,4 +46,4 @@ function PasswordFileStoreRegistry(links) {
 	return my;
 }
 
-export default PasswordFileStoreRegistry;
+export { PasswordFileStoreRegistry };

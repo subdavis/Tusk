@@ -153,4 +153,4 @@ function ProtectedMemory() {
 	return my;
 }
 
-export default ProtectedMemory;
+export { ProtectedMemory };
