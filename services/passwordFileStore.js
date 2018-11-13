@@ -25,6 +25,10 @@ function PasswordFileStoreRegistry(links) {
 		);
 	}
 
+	my.getFileManager = (providerKey) => {
+		return fileManagers.filter( fm => fm.key == providerKey)[0]
+	}
+
 	my.getChosenDatabaseFile = (providerKey, dbInfo) => {
 		var matches = fileManagers.filter(fileManager =>
 			fileManager.key === providerKey

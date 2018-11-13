@@ -1,54 +1,50 @@
-<template>
-	<div id="popup-view">
-		<svg-defs></svg-defs>
-		<options-navbar :routes="routes" :initial-tab="initialTab"></options-navbar>
-		<!-- Router View -->
-		<div id="overflowbox">
-			<div id="contentbox">
-				<options-startup id="/" v-if="show.startup.visible"
-					:settings="services.settings"></options-startup>
-				<manage-databases id="/manage/databases" v-if="show.manageDatabases.visible" 
-					:dropbox-file-manager="services.dropboxFileManager" 
-					:google-drive-manager="services.googleDrivePasswordFileManager" 
-					:local-file-manager="services.localChromePasswordFileManager"
-					:onedrive-manager="services.oneDriveFileManager" 
-					:p-cloud-file-manager="services.pCloudFileManager"
-					:sample-manager="services.sampleDatabaseFileManager" 
-					:shared-url-manager="services.sharedUrlFileManager" 
-					:webdav-manager="services.webdavFileManager"
-					:settings="services.settings"></manage-databases>
-				<manage-keyfiles id="/manage/keyfiles" v-if="show.manageKeyfiles.visible" 
-					:settings="services.settings" 
-					:key-file-parser="services.keyFileParser"></manage-keyfiles>
-				<advanced-settings id="/advanced" v-if="show.advanced.visible" 
-					:settings="services.settings" 
-					:secure-cache-memory="services.secureCacheMemory"></advanced-settings>
-				<reauthorize id="/reauthorize" v-if="show.reauthorize.visible"
-					:settings="services.settings"
-					:providers="[services.dropboxFileManager,services.googleDrivePasswordFileManager,services.oneDriveFileManager,services.pCloudFileManager]"></reauthorize>
-			</div>
-		</div>
-	</div>
+<template lang="pug">
+#popup-view
+	svg-defs
+	options-navbar(
+			:routes='routes',
+			:initial-tab='initialTab')
+
+	#overflowbox
+		#contentbox
+			options-startup(
+					id='/',
+					v-if='show.startup.visible',
+					:settings='settings')
+			manage-databases(
+					id='/manage/databases',
+					v-if='show.manageDatabases.visible',
+					:dropbox-file-manager='services.dropboxFileManager',
+					:google-drive-manager='services.googleDrivePasswordFileManager',
+					:local-file-manager='services.localChromePasswordFileManager',
+					:onedrive-manager='services.oneDriveFileManager',
+					:p-cloud-file-manager='services.pCloudFileManager',
+					:sample-manager='services.sampleDatabaseFileManager',
+					:shared-url-manager='services.sharedUrlFileManager',
+					:webdav-manager='services.webdavFileManager',
+					:settings='settings')
+			manage-keyfiles(
+					id='/manage/keyfiles',
+					v-if='show.manageKeyfiles.visible',
+					:settings='settings',
+					:key-file-parser='services.keyFileParser')
+			advanced-settings(
+					id='/advanced',
+					v-if='show.advanced.visible',
+					:settings='settings')
+			reauthorize(
+					id='/reauthorize',
+					v-if='show.reauthorize.visible',
+					:settings='settings',
+					:providers='[services.dropboxFileManager,services.googleDrivePasswordFileManager,services.oneDriveFileManager,services.pCloudFileManager]')
 </template>
 
 <script>
-/* beautify preserve:start */
+import { mapState } from 'vuex'
 // Singletons
-import { ChromePromiseApi } from '$lib/chrome-api-promise.js'
-import { Settings } from '$services/settings.js'
-import { ProtectedMemory } from '$services/protectedMemory.js'
-import { SecureCacheMemory } from '$services/secureCacheMemory.js'
-import { PasswordFileStoreRegistry } from '$services/passwordFileStore.js'
+import { ChromePromiseApi } from '$lib/chrome-api-promise'
+import { generateSettingsAdapter } from '@/store/modules/settings'
 import { KeyFileParser } from '$services/keyFileParser.js'
-// File Managers
-import { LocalChromePasswordFileManager } from '$services/localChromePasswordFileManager.js'
-import { GoogleDrivePasswordFileManager } from '$services/googleDrivePasswordFileManager.js'
-import { DropboxFileManager } from '$services/dropboxFileManager.js'
-import { OneDriveFileManager } from '$services/oneDriveFileManager.js'
-import { SharedUrlFileManager } from '$services/sharedUrlFileManager.js'
-import { PCloudFileManager } from '$services/pCloudFileManager.js'
-import { SampleDatabaseFileManager } from '$services/sampleDatabaseFileManager.js'
-import { WebdavFileManager } from '$services/webdavFileManager.js'
 // Components
 import OptionsNavbar from '@/components/Navbar'
 import OptionsStartup from '@/components/OptionsStartup'
@@ -58,30 +54,8 @@ import AdvancedSettings from '@/components/AdvancedSettings'
 import SvgDefs from '@/components/SvgDefs'
 import Reauthorize from '@/components/Reauthorize'
 
-const protectedMemory = new ProtectedMemory()
-const secureCacheMemory = new SecureCacheMemory(protectedMemory)
-const settings = new Settings(secureCacheMemory)
 const keyFileParser = new KeyFileParser()
-
-// File Managers
-const localChromePasswordFileManager = new LocalChromePasswordFileManager()
-const dropboxFileManager = new DropboxFileManager(settings)
-const googleDrivePasswordFileManager = new GoogleDrivePasswordFileManager(settings)
-const sharedUrlFileManager = new SharedUrlFileManager()
-const oneDriveFileManager = new OneDriveFileManager(settings)
-const pCloudFileManager = new PCloudFileManager(settings)
-const sampleDatabaseFileManager = new SampleDatabaseFileManager()
-const webdavFileManager = new WebdavFileManager(settings)
-
-const passwordFileStoreRegistry = new PasswordFileStoreRegistry(
-	localChromePasswordFileManager,
-	dropboxFileManager,
-	googleDrivePasswordFileManager,
-	sharedUrlFileManager,
-	sampleDatabaseFileManager,
-	oneDriveFileManager,
-	pCloudFileManager)
-/* beautify preserve:end */
+const getFileManager = (key, store) => store.state.database.passwordFileStoreRegistry.getFileManager(key)
 
 export default {
 	name: 'app',
@@ -94,22 +68,28 @@ export default {
 		SvgDefs,
 		Reauthorize
 	},
+	computed: {
+		...mapState({
+
+			settings: 'settings',
+		}),
+	},
 	data() {
 		return {
 			routes: [],
 			initialTab: "/", // The tab to start on.
 			services: {
-				settings,
-				dropboxFileManager,
-				googleDrivePasswordFileManager,
-				localChromePasswordFileManager,
-				oneDriveFileManager,
-				pCloudFileManager,
-				sampleDatabaseFileManager,
-				sharedUrlFileManager,
+				settings: generateSettingsAdapter(this.$store),
 				keyFileParser,
-				secureCacheMemory,
-				webdavFileManager
+				// File Managers,
+				dropboxFileManager: getFileManager('dropbox', this.$store),
+				googleDrivePasswordFileManager: getFileManager('gdrive', this.$store),
+				localChromePasswordFileManager:  getFileManager('local', this.$store),
+				oneDriveFileManager: getFileManager('onedrive', this.$store),
+				pCloudFileManager: getFileManager('pcloud', this.$store),
+				sampleDatabaseFileManager: getFileManager('sample', this.$store),
+				sharedUrlFileManager: getFileManager('shared-url', this.$store),
+				webdavFileManager: getFileManager('webdav', this.$store),
 			},
 			show: {
 				startup: {

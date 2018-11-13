@@ -40,26 +40,21 @@ export default {
 }
 </script>
 
-<template>
-	<div class="entry-list-item selectable between flair" v-bind:class="{ active: entry.view_is_active }" v-on:click="details">
-		<div class="text-info" v-bind:class="{ strike: entry.is_expired }">
-			<span class="header">{{ header }}</span>
-			<br>
-			<span class="user">
-				{{ entry.userName || '&#60;empty&#62;' }}
-			</span>
-		</div>
-		<div class="buttons">
-			<span class="fa-stack copy" v-on:click="copy">
-				<i class="fa fa-circle fa-stack-2x"></i>
-				<i class="fa fa-clipboard fa-stack-1x fa-inverse"></i>
-			</span>
-			<span class="fa-stack autofill" v-on:click="autofill">
-				<i class="fa fa-circle fa-stack-2x"></i>
-				<i class="fa fa-magic fa-stack-1x fa-inverse"></i>
-			</span>
-		</div>
-	</div>
+<template lang="pug">
+.entry-list-item.selectable.between.flair(
+		:class='{ active: entry.view_is_active }',
+		v-on:click='details')
+  .text-info(:class='{ strike: entry.is_expired }')
+    span.header {{ header }}
+    br
+    span.user {{ entry.userName || 'empty' }}
+  .buttons
+    span.fa-stack.copy(v-on:click='copy')
+      i.fa.fa-circle.fa-stack-2x
+      i.fa.fa-clipboard.fa-stack-1x.fa-inverse
+    span.fa-stack.autofill(v-on:click='autofill')
+      i.fa.fa-circle.fa-stack-2x
+      i.fa.fa-magic.fa-stack-1x.fa-inverse
 </template>
 
 <style lang="scss">

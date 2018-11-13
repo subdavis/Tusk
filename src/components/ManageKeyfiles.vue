@@ -1,82 +1,94 @@
 <script>
+import {
+	KEY_FILE_GET,
+	KEY_FILE_ADD,
+	KEY_FILE_DELETE,
+	KEY_FILE_DELETE_ALL,
+} from '@/store/modules/settings'
+import { mapMutations, mapState } from 'vuex'
+import Messenger from './Messenger'
+
 export default {
 	props: {
 		settings: Object,
 		keyFileParser: Object
 	},
+	components: {
+		Messenger
+	},
 	data() {
 		return {
-			keyFiles: [],
-			errorMessage: ""
+			messages: {
+				error: ''
+			},
 		}
 	},
+	computed: {
+		...mapState({
+			keyFiles: (state) => state.settings.keyFiles,
+		}),
+	},
 	methods: {
-		loadKeyFiles() {
-			this.settings.getKeyFiles().then(keyFiles => {
-				this.keyFiles = keyFiles;
-			})
-		},
-		removeKeyFile(index) {
-			if (index >= 0 && index < this.keyFiles.length) {
-				let kf = this.keyFiles[index]
-				this.settings.deleteKeyFile(kf.name).then(nil => {
-					this.loadKeyFiles();
-				})
-			}
-		},
+		...mapMutations({
+			removeKeyFile: KEY_FILE_DELETE,
+			addKeyFile: KEY_FILE_ADD,
+			removeAllKeyFiles: KEY_FILE_DELETE_ALL,
+		}),
 		selectFileInput() {
 			document.getElementById('file').click();
 		},
+
 		handleAdd(event) {
-			let files = event.target.files;
-			this.errorMessage = ""
+			const files = event.target.files
+			this.messages.error = ''
 			for (var i = 0; i < files.length; i++) {
-				let reader = new FileReader()
-				let fp = files[i]
-				reader.onload = (e) => {
-					this.keyFileParser.getKeyFromFile(e.target.result).then(key => {
-						this.settings.addKeyFile(fp.name, key)
-							.then(this.loadKeyFiles)
-					}).catch(err => {
-						this.errorMessage = err.message;
-					})
+				const reader = new FileReader()
+				const fp = files[i]
+				reader.onload = async (e) => {
+					try {
+						const keyFile = await this.keyFileParser.getKeyFromFile(e.target.result);
+						this.addKeyFile({
+							name: fp.name,
+							encodedKey: keyFile,
+						})
+					} catch (err) {
+						this.messages.error = err.messages
+						throw err
+					}
 				};
 				reader.readAsArrayBuffer(fp)
 			}
 		}
 	},
-	mounted() {
-		this.loadKeyFiles()
-	}
 }
 </script>
 
-<template>
-	<div id="key-file-manager">
-		<div class="box-bar about roomy">
-			<p>
-				Key files are an
-				<b>optional authentication method</b>. More info on key files is available on the
-				<a href="http://keepass.info/help/base/keys.html#keyfiles" target="_blank">
-					KeePass site
-				</a>
-			</p>
-			<p>
-				Tusk can store your key files locally in your browser's storage, and apply them when opening your password database. Websites and other browser extensions do not have access to these files. However, they are
-				<b>stored unencrypted</b> in your local browser profile and someone with access to your device could read them.
-			</p>
-			<input multiple type="file" style="display:none;" id="file" name='file' @change="handleAdd" />
-			<a @click="selectFileInput" class="waves-effect waves-light btn">Add Key File</a>
-			<p class="box-bar error white-text" v-if="errorMessage">
-				{{ errorMessage }}
-			</p>
-		</div>
-		<div v-for="(file, file_index) in keyFiles" class="box-bar roomy small lighter">
-			<span>{{ file.name }}
-				<i @click="removeKeyFile(file_index)" class="fa fa-times-circle selectable" aria-hidden="true"></i>
-			</span>
-		</div>
-	</div>
+<template lang="pug">
+#key-file-manager
+  .box-bar.about.roomy
+    p
+      | Key files are an
+      b optional authentication method.
+      | More info on key files is available on the
+      a(href='http://keepass.info/help/base/keys.html#keyfiles', target='_blank') KeePass site
+    p
+      | Tusk can store your key files locally in your browser's storage, and apply them when opening your password database. Websites and other browser extensions do not have access to these files. However, they are
+      b stored unencrypted
+      |  in your local browser profile and someone with access to your device could read them.
+    input#file(multiple='',
+				type='file',
+				style='display:none;',
+				name='file',
+				@change='handleAdd')
+    a.waves-effect.waves-light.btn(@click='selectFileInput') Add Key File
+    messenger(:messages="messages")
+  .box-bar.roomy.small.lighter(
+			v-for='(file, file_index) in keyFiles',
+			:key='`${file_index}-list-item`')
+    span
+      | {{ file.name }}
+      i.fa.fa-times-circle.selectable(@click='removeKeyFile(file)', aria-hidden='true')
+
 </template>
 
 <style lang="scss">

@@ -87,7 +87,3 @@ export default {
 		<local-password-file-provider :provider-manager="localFileManager" :settings="settings"></local-password-file-provider>
 	</div>
 </template>
-
-<style lang="scss">
-@import "../styles/settings.scss";
-</style>

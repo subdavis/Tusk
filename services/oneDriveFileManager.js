@@ -19,7 +19,7 @@ function OneDriveFileManager(settings) {
 		accessTokenType: accessTokenType,
 		authUrl: 'https://login.live.com/oauth20_authorize.srf?response_type=token' +
 			'&scope=' + encodeURIComponent('onedrive.readonly'),
-		supportedFeatures: ['listDatabases'],
+		supportedFeatures: ['listDatabases', 'oauth'],
 		origins: ['https://login.live.com/'],
 		title: 'OneDrive',
 		icon: 'icon-onedrive',

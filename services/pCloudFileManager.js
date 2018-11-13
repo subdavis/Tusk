@@ -18,7 +18,7 @@ function PCloudFileManager(settings) {
 		accessTokenType: accessTokenType,
 		origins: ['https://*.pcloud.com/'],
 		authUrl: 'https://my.pcloud.com/oauth2/authorize?response_type=token&force_reapprove=true',
-		supportedFeatures: ['incognito', 'listDatabases'],
+		supportedFeatures: ['incognito', 'listDatabases', 'oauth'],
 		title: 'pCloud',
 		icon: 'icon-pcloud',
 		chooseTitle: 'pCloud',

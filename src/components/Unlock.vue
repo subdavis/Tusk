@@ -1,6 +1,5 @@
 <script>
 import { mapState, mapMutations, mapActions } from 'vuex'
-
 import { 
 	REMEMBER_PERIOD_SET,
 	MASTER_PASSWORD_SET,
@@ -19,10 +18,6 @@ import Messenger from '@/components/Messenger'
 export default {
 	props: {
 		/* Service dependeicies */
-		// unlockedState: Object,
-		// secureCache: Object,
-		settings: Object,
-		keepassService: Object,
 		links: Object
 	},
 	components: {
@@ -97,107 +92,12 @@ export default {
 				this.setKeyFileName({ keyFileName: null});
 			this.keyFilePicker = false
 		},
-		// showResults(entries) {
-		// 	let getMatchesForThreshold = (threshold, entries, requireEmptyURL = false) => {
-		// 		return entries.filter(e => (e.matchRank >= threshold) && (requireEmptyURL ? !e.URL : true));
-		// 	}
-		// 	this.settings.getSetStrictModeEnabled().then(strictMode => {
-		// 		let siteUrl = parseUrl(this.unlockedState.url)
-		// 		let title = this.unlockedState.title
-		// 		let siteTokens = getValidTokens(siteUrl.hostname + '.' + this.unlockedState.title)
-		// 		this.keepassService.rankEntries(entries, siteUrl, title, siteTokens) // in-place
-
-		// 		let allEntries = entries
-		// 		let priorityEntries = getMatchesForThreshold(100, entries)
-
-		// 		if (priorityEntries.length == 0) {
-		// 			priorityEntries = getMatchesForThreshold(10, entries)
-
-		// 			// in strict mode, good matches are considered partial matches.
-		// 			if (strictMode && priorityEntries.length) {
-		// 				this.unlockedMessages['warn'] = "No perfect origin matches, showing " + priorityEntries.length + " partial matches.";
-		// 			}
-		// 		}
-		// 		if (!strictMode && priorityEntries.length == 0) {
-		// 			priorityEntries = getMatchesForThreshold(0.8, entries, true)
-		// 		}
-		// 		if (!strictMode && priorityEntries.length == 0) {
-		// 			priorityEntries = getMatchesForThreshold(0.4, entries)
-
-		// 			if (priorityEntries.length) {
-		// 				this.unlockedMessages.warn = "No close matches, showing " + priorityEntries.length + " partial matches.";
-		// 			}
-		// 		}
-		// 		if (priorityEntries.length == 0) {
-		// 			this.unlockedMessages.warn = "No matches found for this site."
-		// 		}
-
-		// 		// Cache in memory
-		// 		this.unlockedState.cacheSet('allEntries', allEntries)
-		// 		this.unlockedState.cacheSet('priorityEntries', priorityEntries)
-		// 		this.$forceUpdate()
-		// 		//save longer term (in encrypted storage)
-		// 		this.secureCache.save('secureCache.entries', entries);
-		// 		this.busy = false
-		// 	})
-		// },
 		clickUnlock(event) {
 			event.preventDefault() // should be handled with vue directive
 			this.unlock()
 		},
 	},
 	async mounted() {
-		// modify unlockedState internal state
-		// await this.unlockedState.getTabDetails();
-
-		// if (!this.isUnlocked()) {
-
-			// let try_autounlock = () => {
-			// 	this.busy = true
-			// 	this.settings.getKeyFiles().then(keyFiles => {
-			// 		this.keyFiles = keyFiles
-			// 		return this.settings.getSetDefaultRememberPeriod()
-			// 	}).then(rememberPeriod => {
-			// 		this.setRememberPeriod(rememberPeriod)
-			// 		return this.settings.getCurrentDatabaseUsage()
-			// 	}).then(usage => {
-			// 		// tweak UI based on what we know about the db file
-			// 		this.hidePassword = (usage.requiresPassword === false)
-			// 		this.hideKeyFile = (usage.requiresKeyfile === false)
-			// 		this.rememberedPassword = (usage.passwordKey !== undefined)
-			// 		this.setRememberPeriod(usage.rememberPeriod)
-
-			// 		if (usage.passwordKey !== undefined && usage.requiresKeyfile === false) {
-			// 			this.unlock(usage.passwordKey) // Autologin if no keyfile
-			// 		} else if (usage.keyFileName !== undefined) {
-			// 			let matches = this.keyFiles.filter(kf => {
-			// 				return kf.name === usage.keyFileName
-			// 			})
-			// 			if (matches.length > 0) {
-			// 				this.selectedKeyFile = matches[0]
-			// 				if (this.hidePassword === true || usage.passwordKey !== undefined)
-			// 					this.unlock(usage.passwordKey)
-			// 			}
-			// 		}
-			// 	})
-			// }
-
-			// try {
-			// 	let entries = await this.secureCache.get('secureCache.entries');
-			// 	if (entries !== undefined && entries.length > 0) {
-			// 		this.showResults(entries)
-			// 	} else {
-			// 		try_autounlock()
-			// 	}
-			// } catch (err) {
-			// 	console.error(err);
-			// 	//this is fine - it just means the cache expired.  Clear the cache to be sure.
-			// 	this.secureCache.clear('secureCache.entries')
-			// 	try_autounlock()
-
-			// }
-			// this.busy = false
-		// }
 
 		let focus = () => {
 			this.$nextTick(() => {
@@ -230,6 +130,9 @@ div
 	//- :messages="unlockedMessages"
 	//- :unlocked-state="unlockedState"
 	//- :settings="settings"></entry-list> -->
+	entry-list(
+			v-if="!busy and isUnlocked",
+			:messages="ui.messages.unlocked")
 
 	//- <!-- General Messenger -->
 	messenger(v-show="!busy", :messages="ui.messages.general" )
@@ -243,6 +146,8 @@ div
 
 		form(@submit="clickUnlock")
 			.small.selectable.databaseChoose(@click="$router.route('/choose')")
+				i.fa.fa-database(aria-hidden="true")
+				|  
 				b {{ active.databaseFileName }}
 				|  
 				span.muted-color change...
@@ -261,7 +166,7 @@ div
 			.stack-item
 				#select-keyfile.selectable(@click="setKeyFileName({ keyFileName: null }); keyFilePicker = !keyFilePicker")
 					i.fa.fa-key(aria-hidden="true")
-					|  {{ active.keyFileName || 'No Key File Selected (choose)' }}
+					|  {{ active.keyFileName || (keyFilePicker ? 'Do Not Use Key File' : 'No Key File Selected (click to choose)') }}
 
 			.stack-item.keyfile-picker(v-if="keyFilePicker")
 				transition(name="keyfile-picker")

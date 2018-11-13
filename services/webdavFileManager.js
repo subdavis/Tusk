@@ -38,7 +38,7 @@ function WebdavFileManager(settings, search_depth = 5) {
 		listDatabases: listDatabases,
 		getDatabaseChoiceData: getDatabaseChoiceData,
 		getChosenDatabaseFile: getChosenDatabaseFile,
-		supportedFeatures: ['incognito', 'listDatabases'],
+		supportedFeatures: ['incognito', 'listDatabases', 'webdav'],
 		title: 'WebDAV',
 		icon: 'icon-folder',
 		chooseTitle: 'WebDAV',

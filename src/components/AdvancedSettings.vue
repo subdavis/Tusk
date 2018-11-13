@@ -5,7 +5,6 @@ import { isFirefox } from '$lib/utils'
 export default {
 	props: {
 		settings: Object,
-		secureCacheMemory: Object
 	},
 	data() {
 		return {

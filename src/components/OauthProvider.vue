@@ -86,7 +86,3 @@ export default {
 		<generic-provider-ui :busy="busy" :databases="databases" :loggedIn="loggedIn" :error="messages.error" :provider-manager="providerManager" :toggle-login="toggleLogin" :removeable="false" :remove-function="undefined"></generic-provider-ui>
 	</div>
 </template>
-
-<style lang="scss">
-@import "../styles/settings.scss";
-</style>

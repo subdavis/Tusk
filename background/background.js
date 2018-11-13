@@ -10,7 +10,7 @@
 
 import { ProtectedMemory } from '$services/protectedMemory.js'
 import { Notifications } from "$services/notifications";
-import { SettingsStore } from '@/store'
+import { BackgroundStore } from '@/store'
 import { UPGRADE } from '@/store/modules/database'
 import {
 	FORGET_TIMES_CLEAR,
@@ -203,7 +203,7 @@ function Background(store, protectedMemory, notifications) {
 
 }
 
-const adapter = generateSettingsAdapter(SettingsStore)
+const adapter = generateSettingsAdapter(BackgroundStore)
 const notifications = new Notifications(adapter)
 const protectedMemory = new ProtectedMemory()
-Background(SettingsStore, protectedMemory, notifications)
+Background(BackgroundStore, protectedMemory, notifications)

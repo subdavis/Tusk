@@ -34,6 +34,8 @@ export default {
 					dbInfo: info,
 				})
 				this.$router.route(`/unlock/${database.provider.key}/${encodeURIComponent(database.title)}`)
+				console.log('routed')
+				
 			}
 		},
 	},

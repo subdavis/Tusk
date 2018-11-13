@@ -18,10 +18,11 @@ function DropboxFileManager(settings) {
 	}
 
 	var oauth = {
+		key: accessTokenType,
 		accessTokenType: accessTokenType,
 		origins: ['https://*.dropbox.com/'],
 		authUrl: 'https://www.dropbox.com/oauth2/authorize?response_type=token&force_reapprove=false',
-		supportedFeatures: ['incognito', 'listDatabases'],
+		supportedFeatures: ['incognito', 'listDatabases', 'oauth'],
 		title: 'Dropbox',
 		icon: 'icon-dropbox',
 		chooseTitle: 'Dropbox',

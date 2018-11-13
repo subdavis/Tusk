@@ -140,30 +140,27 @@ export default {
 }
 </script>
 
-<template>
-	<div>
-		<div class="search">
-			<i class="fa fa-search"></i>
-			<input ref="searchbox" type='search' v-model="searchTerm" placeholder="search entire database..." />
-		</div>
-		<messenger :messages="allMessages"></messenger>
-		<div class="entries">
-			<div v-if="priorityEntries && searchTerm.length == 0">
-				<entry-list-item v-for="entry in priorityEntries"
-					:key="entry.id"
-					:entry="entry"
-					:unlocked-state="unlockedState">
-				</entry-list-item>
-			</div>
-			<div v-if="filteredEntries && searchTerm.length > 0">
-				<entry-list-item v-for="entry in filteredEntries"
-					:key="entry.id"
-					:entry="entry"
-					:unlocked-state="unlockedState">
-				</entry-list-item>
-			</div>
-		</div>
-	</div>
+<template lang="pug">
+div
+	.search
+		i.fa.fa-search
+		input(ref="searchbox",
+				type='search',
+				v-model="searchTerm",
+				placeholder="search entire database...")
+
+	messenger(:messages="allMessages")
+	.entries
+		div(v-if='priorityEntries && searchTerm.length == 0')
+			entry-list-item(
+					v-for='entry in priorityEntries',
+					:key='entry.id', :entry='entry',
+					:unlocked-state='unlockedState')
+		div(v-if='filteredEntries && searchTerm.length > 0')
+			entry-list-item(
+					v-for='entry in filteredEntries',
+					:key='entry.id', :entry='entry',
+					:unlocked-state='unlockedState')
 </template>
 
 <style lang="scss">
