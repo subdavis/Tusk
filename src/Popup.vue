@@ -26,6 +26,7 @@
 // Dependencies
 import { Links } from '$services/links.js'
 import { generateSettingsAdapter } from '@/store/modules/settings'
+import { HYDRATE } from '@/store/modules/database'
 // Components
 import Unlock from '@/components/Unlock'
 import Startup from '@/components/Startup'
@@ -67,25 +68,27 @@ export default {
 			}
 		}
 	},
-	mounted: function () {
+	async mounted() {
 		// Relies on the content of this.show
-		this.$router.registerRoutes([{
-			route: '/',
-			var: this.show.startup
-		},
-		{
-			route: '/choose',
-			var: this.show.filePicker
-		},
-		{
-			route: '/unlock/:provider/:title',
-			var: this.show.unlock
-		},
-		{
-			route: '/entry-details/:entryId',
-			var: this.show.entryDetails
-		}
+		this.$router.registerRoutes([
+			{
+				route: '/',
+				var: this.show.startup
+			},
+			{
+				route: '/choose',
+				var: this.show.filePicker
+			},
+			{
+				route: '/unlock/:provider/:title',
+				var: this.show.unlock
+			},
+			{
+				route: '/entry-details/:entryId',
+				var: this.show.entryDetails
+			},
 		])
+		await this.$store.dispatch(HYDRATE)
 		this.$router.route('/')
 	}
 }

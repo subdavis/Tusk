@@ -1,6 +1,12 @@
 <script>
+import { mapMutations, mapState } from 'vuex';
 import EntryListItem from '@/components/EntryListItem'
 import Messenger from '@/components/Messenger'
+import { SEARCH_FILTER_SET } from '@/store/modules/ui.js';
+import {
+	HOTKEY_NAV_ENABLED,
+	generateSettingsAdapter,
+} from '@/store/modules/settings'
 
 export default {
 	props: {
@@ -10,7 +16,7 @@ export default {
 	},
 	watch: {
 		searchTerm: function (val) {
-			this.unlockedState.cacheSet('searchFilter', val) // Causes cache refresh
+			this.setSearchFilter(val);
 			if (val.length) {
 				this.filteredEntries = this.allEntries.filter(entry => {
 					let result = entry.filterKey.indexOf(val.toLocaleLowerCase())
@@ -19,7 +25,7 @@ export default {
 			}
 			// Regardless of result, reset the active entry.
 			this.setActive(0)
-		}
+		},
 	},
 	components: {
 		EntryListItem,
@@ -27,12 +33,11 @@ export default {
 	},
 	data() {
 		return {
-			searchTerm: "",
-			filteredEntries: this.unlockedState.cacheGet('allEntries'),
-			priorityEntries: this.unlockedState.cacheGet('priorityEntries'),
-			allEntries: this.unlockedState.cacheGet('allEntries'),
+			searchTerm: this.$store.state.ui.searchFilter,
+			filteredEntries: this.$store.state.database.allEntries,
+			priorityEntries: this.$store.state.database.priorityEntries,
+			allEntries: this.$store.state.database.allEntries,
 			hotkeyNavEnabled: false,
-			allMessages: this.messages,
 			activeEntry: null,
 			activeEntryIndex: 0,
 			keyHandler: evt => {
@@ -69,6 +74,9 @@ export default {
 		}
 	},
 	methods: {
+		...mapMutations({
+			setSearchFilter: SEARCH_FILTER_SET,
+		}),
 		collectFilters(data, collector) {
 			if (data === null || data === undefined)
 				return data
@@ -87,7 +95,7 @@ export default {
 			entries.forEach(entry => {
 				var filters = new Array()
 				this.collectFilters(entry, filters)
-				entry.filterKey = filters.join(" ")
+				entry.filterKey = filters.join(' ')
 			})
 		},
 		setActive(index) {
@@ -117,26 +125,18 @@ export default {
 			this.$refs.searchbox.focus();
 		})
 		this.createEntryFilters(this.allEntries);
-		// Restore the search term if needed
-		let st = this.unlockedState.cache.searchFilter
-		if (st !== undefined)
-			this.searchTerm = st
-		let um = this.unlockedState.cacheGet('unlockedMessages')
-		if (um !== undefined)
-			this.allMessages = um
-		this.settings.getSetHotkeyNavEnabled().then(enabled => {
-			this.hotkeyNavEnabled = enabled
-			if (enabled) {
-				// Initialize the active entry
-				this.setActive(0)
-				// Listen for key events.
-				window.addEventListener("keydown", this.keyHandler)
-			}
-		})
+		const adapter = generateSettingsAdapter(this.$store)
+		this.hotkeyNavEnabled = adapter.getSet(HOTKEY_NAV_ENABLED)
+		if (this.hotkeyNavEnabled) {
+			// Initialize the active entry
+			this.setActive(0)
+			// Listen for key events.
+			window.addEventListener("keydown", this.keyHandler)
+		}
 	},
 	beforeDestroy() {
 		window.removeEventListener("keydown", this.keyHandler)
-	}
+	},
 }
 </script>
 
@@ -149,7 +149,7 @@ div
 				v-model="searchTerm",
 				placeholder="search entire database...")
 
-	messenger(:messages="allMessages")
+	messenger(:messages="messages")
 	.entries
 		div(v-if='priorityEntries && searchTerm.length == 0')
 			entry-list-item(

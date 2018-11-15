@@ -19,7 +19,7 @@ export default {
 				this.$el.scrollIntoView({
 					block: "end",
 					inline: "nearest",
-					behavior: "smooth"				});
+					behavior: "smooth"})
 		}
 	},
 	methods: {

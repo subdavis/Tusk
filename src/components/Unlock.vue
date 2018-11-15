@@ -17,8 +17,10 @@ import Messenger from '@/components/Messenger'
 
 export default {
 	props: {
-		/* Service dependeicies */
-		links: Object
+		links: {
+			type: Object,
+			required: true,
+		},
 	},
 	components: {
 		InfoCluster,
@@ -121,25 +123,18 @@ export default {
 </script>
 
 <template lang="pug">
-div
-	//- <!-- Busy Spinner -->
+#unlock-view
 	.spinner(v-if="busy")
 		spinner(size="medium", :message='"Unlocking " + databaseFileName')
-	//- <!-- Entry List -->
-	//- <!-- <entry-list v-if="!busy && isUnlocked()"
-	//- :messages="unlockedMessages"
-	//- :unlocked-state="unlockedState"
-	//- :settings="settings"></entry-list> -->
+
 	entry-list(
-			v-if="!busy and isUnlocked",
+			v-if="!busy && isUnlocked",
 			:messages="ui.messages.unlocked")
 
-	//- <!-- General Messenger -->
 	messenger(v-show="!busy", :messages="ui.messages.general" )
 
-	//- <!-- Unlock input group -->
 	#masterPasswordGroup(v-if="!busy && !isUnlocked")
-		
+
 		.stack-item.unlockLogo
 			img(src="assets/icons/exported/128x128.svg")
 			span KeePass Tusk
@@ -197,12 +192,11 @@ div
 			.stack-item
 				button.action-button.selectable(@click="clickUnlock") Unlock Database
 
-	//- <!-- Footer -->
-	.box-bar.medium.between.footer(v-show="!busy")
+	.footer.box-bar.medium.between(v-show="!busy")
 		span.selectable(@click="links.openOptions")
 			i.fa.fa-cog(aria-hidden="true")
 			|  Settings
-		span.selectable(v-if="isUnlocked", @click="forgetPassword()")
+		span.selectable(v-if="isUnlocked", @click="lock()")
 			i.fa.fa-lock(aria-hidden="true")
 			|  Lock Database
 		span.selectable(v-else, @click="closeWindow")
@@ -211,7 +205,6 @@ div
 		span.selectable(@click="links.openHomepage")
 			i.fa.fa-info-circle(aria-hidden="true")
 			|  v{{ appVersion }}
-
 </template>
 
 <style lang="scss">

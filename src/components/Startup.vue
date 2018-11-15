@@ -25,6 +25,7 @@ export default {
 
 		if (databaseFileName && providerKey) {
 			this.$router.route(`/unlock/${providerKey}/${encodeURIComponent(databaseFileName)}`)
+			return;
 		}
 
 		const readyPromises = [];

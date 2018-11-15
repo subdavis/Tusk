@@ -9,8 +9,6 @@ import VirtualRouter from '$lib/virtual-router'
 import store from './store';
 import { HYDRATE } from './store/modules/database'
 
-store.dispatch(HYDRATE)
-
 Vue.prototype.$router = new VirtualRouter()
 
 new Vue({
