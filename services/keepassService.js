@@ -21,7 +21,6 @@ function KeepassService(passwordFileStoreRegistry, keepassReference) {
 	}
 
 	my.getMasterKey = function (masterPassword, keyFileInfo) {
-		console.log(masterPassword || "none", keyFileInfo)
 		/**
 		 * Validate that one of the following is true:
 		 * (password isn't empty OR keyfile isn't empty)

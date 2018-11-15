@@ -181,13 +181,12 @@ export default {
 			.box-bar.small.plain.remember-period-picker
 				span
 					label(for="rememberPeriodLength")
-						span {{rememberPeriodText}} (slide to choose)
+						span {{ database.rememberPeriod.text }} (slide)
 				input#rememberPeriodLength(
 						type="range",
 						min="0",
 						:max="rememberPeriodOptions.length - 1",
-						step="1" v-model="slider_int",
-						@input="setRememberPeriod(undefined)")
+						step="1" v-model="slider_int")
 
 			.stack-item
 				button.action-button.selectable(@click="clickUnlock") Unlock Database

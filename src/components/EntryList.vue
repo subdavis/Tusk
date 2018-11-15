@@ -1,5 +1,5 @@
 <script>
-import { mapMutations, mapState } from 'vuex';
+import { mapMutations } from 'vuex';
 import EntryListItem from '@/components/EntryListItem'
 import Messenger from '@/components/Messenger'
 import { SEARCH_FILTER_SET } from '@/store/modules/ui.js';
@@ -10,9 +10,7 @@ import {
 
 export default {
 	props: {
-		settings: Object,
 		messages: Object,
-		unlockedState: Object
 	},
 	watch: {
 		searchTerm: function (val) {
@@ -154,13 +152,13 @@ div
 		div(v-if='priorityEntries && searchTerm.length == 0')
 			entry-list-item(
 					v-for='entry in priorityEntries',
-					:key='entry.id', :entry='entry',
-					:unlocked-state='unlockedState')
+					:key='entry.id',
+					:entry='entry')
 		div(v-if='filteredEntries && searchTerm.length > 0')
 			entry-list-item(
 					v-for='entry in filteredEntries',
-					:key='entry.id', :entry='entry',
-					:unlocked-state='unlockedState')
+					:key='entry.id',
+					:entry='entry')
 </template>
 
 <style lang="scss">

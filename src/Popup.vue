@@ -18,8 +18,7 @@
 	entry-details(
 			id="/entry-details/:entryId",
 			v-if="show.entryDetails.visible",
-			:links="services.links",
-			:settings="services.settings")
+			:links="services.links")
 </template>
 
 <script>

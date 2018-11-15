@@ -3,6 +3,15 @@ const kdbxweb = require('kdbxweb')
 function KeepassReference() {
 	"use strict";
 
+	const keewebGetDecryptedFieldValue = (entry, fieldName) => {
+		if (entry.protectedData === undefined || !(fieldName in entry['protectedData'])) {
+			return entry[fieldName] || ""; //not an encrypted field
+		}
+		return new kdbxweb.ProtectedValue(
+			entry['protectedData'][fieldName].value,
+			entry['protectedData'][fieldName].salt).getText();
+	}
+
 	var my = {
 		majorVersion: 3 // Defaults to 3, unless told otherwise
 	};
@@ -67,15 +76,6 @@ function KeepassReference() {
 			return str.replace(/(?:^\w|[A-Z]|\b\w)/g, function (letter, index) {
 				return index == 0 ? letter.toLowerCase() : letter.toUpperCase();
 			}).replace(/\s+/g, '');
-		}
-
-		const keewebGetDecryptedFieldValue = (entry, fieldName) => {
-			if (entry.protectedData === undefined || !(fieldName in entry['protectedData'])) {
-				return entry[fieldName] || ""; //not an encrypted field
-			}
-			return new kdbxweb.ProtectedValue(
-				entry['protectedData'][fieldName].value,
-				entry['protectedData'][fieldName].salt).getText();
 		}
 
 		var customLocalString = /^\{S:([a-zA-Z]+)\}$/.exec(referenceText)

@@ -22,9 +22,8 @@ function Links() {
 	function openOptionsPath(path) {
 		// A hack to figure out what the browser uses to point to us.
 		// For example, chrome says we will always be chrome-extension://fmhmiaejopepamlcjkncpgpdjichnecm/...
-		let loc = window.location.origin;
 		chrome.tabs.create({
-			url: loc + path
+			url: window.location.origin + path
 		})
 	}
 
@@ -37,7 +36,7 @@ function Links() {
 	}
 
 	function openOptionsDatabases() {
-		openOptionsPath("/options.html#/manage/databases");
+		openOptionsPath("/options.html#/manage/databases")
 	}
 
 	function openOptionsKeyfiles() {
@@ -62,6 +61,7 @@ function Links() {
 
 	return my;
 }
+
 export {
 	Links
 }

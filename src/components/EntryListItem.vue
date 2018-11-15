@@ -2,8 +2,10 @@
 import { parseUrl } from '$lib/utils.js'
 export default {
 	props: {
-		entry: Object,
-		unlockedState: Object
+		entry: {
+			type: Object,
+			required: true,
+		},
 	},
 	computed: {
 		header: function () {
@@ -29,12 +31,12 @@ export default {
 		autofill(e) {
 			e.stopPropagation()
 			console.log("autofill")
-			this.unlockedState.autofill(this.entry);
+			this.$emit('autofill')
 		},
 		copy(e) {
 			e.stopPropagation()
 			console.log("copy")
-			this.unlockedState.copyPassword(this.entry);
+			this.$emit('copy')
 		}
 	}
 }
