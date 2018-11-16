@@ -154,11 +154,13 @@ export default {
 			span.fa-stack.copy
 				i.fa.fa-circle.fa-stack-2x
 				i.fa.fa-clipboard.fa-stack-1x.fa-inverse
+			=" "
 			| Copy to clipboard
 		.button-inner.selectable(v-on:click.stop="$emit('autofill')")
 			span.fa-stack.copy
 				i.fa.fa-circle.fa-stack-2x
 				i.fa.fa-magic.fa-stack-1x.fa-inverse
+			=" "
 			| Autofill
 </template>
 

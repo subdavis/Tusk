@@ -1,5 +1,5 @@
 <script>
-import { mapMutations } from 'vuex';
+import { mapMutations, mapState } from 'vuex';
 import EntryListItem from '@/components/EntryListItem'
 import Messenger from '@/components/Messenger'
 import { SEARCH_FILTER_SET } from '@/store/modules/ui.js';
@@ -12,29 +12,25 @@ export default {
 	props: {
 		messages: Object,
 	},
-	watch: {
-		searchTerm: function (val) {
-			this.setSearchFilter(val);
-			if (val.length) {
-				this.filteredEntries = this.allEntries.filter(entry => {
-					let result = entry.filterKey.indexOf(val.toLocaleLowerCase())
-					return (result > -1)
-				})
-			}
-			// Regardless of result, reset the active entry.
-			this.setActive(0)
-		},
-	},
 	components: {
 		EntryListItem,
 		Messenger
 	},
+	computed: {
+		...mapState({
+			database: 'database',
+			ui: 'ui',
+			searchFilter: (state) => state.ui.searchFilter,
+		}),
+		filteredEntries() {
+			return this.database.allEntries.filter(entry => {
+				let result = entry.filterKey.indexOf(this.searchFilter.toLocaleLowerCase())
+				return (result > -1)
+			})
+		},
+	},
 	data() {
 		return {
-			searchTerm: this.$store.state.ui.searchFilter,
-			filteredEntries: this.$store.state.database.allEntries,
-			priorityEntries: this.$store.state.database.priorityEntries,
-			allEntries: this.$store.state.database.allEntries,
 			hotkeyNavEnabled: false,
 			activeEntry: null,
 			activeEntryIndex: 0,
@@ -75,27 +71,6 @@ export default {
 		...mapMutations({
 			setSearchFilter: SEARCH_FILTER_SET,
 		}),
-		collectFilters(data, collector) {
-			if (data === null || data === undefined)
-				return data
-			if (data.constructor == ArrayBuffer || data.constructor == Uint8Array)
-				return null
-			else if (typeof (data) === 'string')
-				collector.push(data.toLocaleLowerCase())
-			else if (data.constructor == Array)
-				for (var i = 0; i < data.length; i++)
-					this.collectFilters(data[i], collector)
-			else
-				for (var prop in data)
-					this.collectFilters(data[prop], collector)
-		},
-		createEntryFilters(entries) {
-			entries.forEach(entry => {
-				var filters = new Array()
-				this.collectFilters(entry, filters)
-				entry.filterKey = filters.join(' ')
-			})
-		},
 		setActive(index) {
 			if (!this.hotkeyNavEnabled) return;
 			// Unset the current active entry
@@ -103,10 +78,10 @@ export default {
 				this.$set(this.activeEntry, 'view_is_active', false)
 			}
 			let activeList;
-			if (this.filteredEntries.length > 0 && this.searchTerm.length > 0)
+			if (this.filteredEntries.length > 0 && this.searchFilter.length > 0)
 				activeList = this.filteredEntries
-			else if (this.priorityEntries.length > 0)
-				activeList = this.priorityEntries
+			else if (this.database.priorityEntries.length > 0)
+				activeList = this.database.priorityEntries
 			else // Neither list has entries
 				return
 			if (index < 0)
@@ -122,7 +97,6 @@ export default {
 		this.$nextTick(function () {
 			this.$refs.searchbox.focus();
 		})
-		this.createEntryFilters(this.allEntries);
 		const adapter = generateSettingsAdapter(this.$store)
 		this.hotkeyNavEnabled = adapter.getSet(HOTKEY_NAV_ENABLED)
 		if (this.hotkeyNavEnabled) {
@@ -144,17 +118,18 @@ div
 		i.fa.fa-search
 		input(ref="searchbox",
 				type='search',
-				v-model="searchTerm",
+				:value="searchFilter",
+				@input="setSearchFilter($event.target.value); setActive(0);"
 				placeholder="search entire database...")
 
 	messenger(:messages="messages")
 	.entries
-		div(v-if='priorityEntries && searchTerm.length == 0')
+		div(v-if='database.priorityEntries && searchFilter.length == 0')
 			entry-list-item(
-					v-for='entry in priorityEntries',
+					v-for='entry in database.priorityEntries',
 					:key='entry.id',
 					:entry='entry')
-		div(v-if='filteredEntries && searchTerm.length > 0')
+		div(v-if='filteredEntries && searchFilter.length > 0')
 			entry-list-item(
 					v-for='entry in filteredEntries',
 					:key='entry.id',

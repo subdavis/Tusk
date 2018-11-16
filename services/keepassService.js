@@ -8,7 +8,7 @@ let Case = require('case'),
 	kdbxweb = require('kdbxweb')
 
 import { argon2 } from '$lib/argon2.js'
-import { parseUrl, getValidTokens } from '$lib/utils.js'
+import { parseUrl, getValidTokens, collectFilters } from '$lib/utils.js'
 
 function KeepassService(passwordFileStoreRegistry, keepassReference) {
 	var my = {};
@@ -55,12 +55,15 @@ function KeepassService(passwordFileStoreRegistry, keepassReference) {
 				return processReferences(entries, majorVersion);
 			});
 
-		}).then(function (entries) {
-			return {
-				entries: entries,
-				version: majorVersion
-			};
-		});
+		}).then(entries => entries.map(entry => {
+			var filters = new Array()
+			collectFilters(entry, filters)
+			entry.filterKey = filters.join(' ')
+			return entry
+		})).then(entries => ({
+			entries: entries,
+			version: majorVersion,
+		}));
 	}
 
 	my.rankEntries = (entries, siteUrl, title, siteTokens) => {
