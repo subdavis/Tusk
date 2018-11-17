@@ -7,20 +7,20 @@ import {
 } from '@/store/modules/settings'
 import { mapMutations, mapState } from 'vuex'
 import Messenger from './Messenger'
+import { KeyFileParser } from '$services/keyFileParser.js'
+import { generateSettingsAdapter } from '@/store/modules/settings'
 
 export default {
-	props: {
-		settings: Object,
-		keyFileParser: Object
-	},
 	components: {
 		Messenger
 	},
 	data() {
 		return {
+			keyFileParser: new KeyFileParser(),
 			messages: {
 				error: ''
 			},
+			settings: generateSettingsAdapter(this.$store),
 		}
 	},
 	computed: {
@@ -37,7 +37,6 @@ export default {
 		selectFileInput() {
 			document.getElementById('file').click();
 		},
-
 		handleAdd(event) {
 			const files = event.target.files
 			this.messages.error = ''
@@ -88,7 +87,6 @@ export default {
     span
       | {{ file.name }}
       i.fa.fa-times-circle.selectable(@click='removeKeyFile(file)', aria-hidden='true')
-
 </template>
 
 <style lang="scss">

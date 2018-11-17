@@ -1,22 +1,14 @@
 <script>
+import { generateSettingsAdapter } from '@/store/modules/settings'
 import OauthProvider from '@/components/OauthProvider'
 import SharedLinkProvider from '@/components/SharedLinkProvider'
 import LocalPasswordFileProvider from '@/components/LocalPasswordFileProvider'
 import WebdavProvider from '@/components/WebdavProvider'
 import VirtualRouter from '$lib/virtual-router.js'
 
+const getFileManager = (key, store) => store.state.database.passwordFileStoreRegistry.getFileManager(key)
+
 export default {
-	props: {
-		dropboxFileManager: Object,
-		googleDriveManager: Object,
-		localFileManager: Object,
-		onedriveManager: Object,
-		pCloudFileManager: Object,
-		sampleManager: Object,
-		webdavManager: Object,
-		sharedUrlManager: Object,
-		settings: Object,
-	},
 	components: {
 		OauthProvider,
 		SharedLinkProvider,
@@ -25,6 +17,16 @@ export default {
 	},
 	data() {
 		return {
+			// File Managers
+			dropboxFileManager: getFileManager('dropbox', this.$store),
+			googleDrivePasswordFileManager: getFileManager('gdrive', this.$store),
+			localChromePasswordFileManager:  getFileManager('local', this.$store),
+			oneDriveFileManager: getFileManager('onedrive', this.$store),
+			pCloudFileManager: getFileManager('pcloud', this.$store),
+			sampleDatabaseFileManager: getFileManager('sample', this.$store),
+			sharedUrlFileManager: getFileManager('shared-url', this.$store),
+			webdavFileManager: getFileManager('webdav', this.$store),
+			settings: generateSettingsAdapter(this.$store),
 			show: {
 				help: {
 					visible: false
