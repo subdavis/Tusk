@@ -25,9 +25,6 @@ export default {
 		}
 	},
 	methods: {
-		details(e) {
-			this.$router.route("/entry-details/" + this.entry.id)
-		},
 		autofill(e) {
 			e.stopPropagation()
 			console.log("autofill")
@@ -44,8 +41,8 @@ export default {
 
 <template lang="pug">
 .entry-list-item.selectable.between.flair(
-		:class='{ active: entry.view_is_active }',
-		v-on:click='details')
+		:class="{ active: entry.view_is_active }",
+		v-on:click="$router.push({ path: `/details/${entry.id}` })")
   .text-info(:class='{ strike: entry.is_expired }')
     span.header {{ header }}
     br

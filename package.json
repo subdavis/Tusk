@@ -28,6 +28,7 @@
     "materialize-css": "^0.100.2",
     "pako": "^1.0.6",
     "vue": "^2.4.4",
+    "vue-async-computed": "^3.5.0",
     "vue-router": "^3.0.1",
     "vue-simple-spinner": "^1.2.8",
     "vuex": "^3.0.1",

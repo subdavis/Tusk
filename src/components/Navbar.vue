@@ -1,36 +1,27 @@
-<!-- 
-  Navbar:
-  requires a lib/VirtualRouter, and the routes object used to initialize the virtualrouter.
-  Active tab changes automatically based on visible route.
--->
 <script>
+import { options_routes } from '@/routes'
 export default {
-	props: {
-		routes: Array,
-		initialTab: String
-	}
+	computed: {
+		routes: () => options_routes,
+	},
 }
 </script>
 
-<template>
-	<nav class="nav-extended">
-		<div class="nav-content">
-			<ul class="tabs tabs-transparent">
-				<!-- set class like /advanced-active-listener so the router can set -->
-				<li v-for="route in routes" v-if="!route.hidden_from_navbar" class="tab" :class="{ active: (route.var.visible) }">
-					<a @click="$router.route(route.route)">{{ route.name }}</a>
-				</li>
-			</ul>
-		</div>
-	</nav>
+<template lang="pug">
+nav
+	.nav-content
+		ul.left
+			li(v-for="link in routes", :key="link.path", v-if="!link.hidden")
+				router-link(:to="link.path") {{ link.name }}
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 @import "../styles/settings.scss";
 nav {
   position: fixed;
   top: 0px;
-  z-index: 100;
+  z-index: 1;
+	
   .nav-content {
     width: $options-width;
     margin: 0px auto;

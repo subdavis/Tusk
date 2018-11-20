@@ -122,11 +122,3 @@ c0-3.323-2.694-6.016-6.017-6.016" />
 		</symbol>
 	</svg>
 </template>
-
-<script>
-export default {}
-</script>
-
-<style lang="scss">
-@import "../styles/settings.scss";
-</style>

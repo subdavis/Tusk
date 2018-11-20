@@ -76,7 +76,7 @@ export default {
 			ui: 'ui',
 		}),
 		entry() {
-			const entry_id = this.$router.getRoute().entryId
+			const entry_id = this.$router.params.entry_id
 			return this.getEntry(entry_id)
 		},
 		attributes() {

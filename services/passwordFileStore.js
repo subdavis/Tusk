@@ -2,9 +2,9 @@
  * Provides a container for various storage mechanisms (aka FileManagers) that can be injected,
  * so that the rest of the code can be independent of specifics.
  */
-function PasswordFileStoreRegistry(links) {
+function PasswordFileStoreRegistry() {
 
-	var my = { links };
+	var my = {};
 
 	/* 
 	 * each argument is a filemanager.  

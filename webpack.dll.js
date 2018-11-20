@@ -19,7 +19,8 @@ module.exports = {
             "materialize-css",
             "pako",
             "vue/dist/vue.runtime.esm.js",
-            "vue-simple-spinner",
+						"vue-simple-spinner",
+						"vue-router",
             "webdav",
             "xmldom",
         ]

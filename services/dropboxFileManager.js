@@ -1,12 +1,8 @@
 "use strict";
 const Base64 = require('base64-arraybuffer')
 const axios = require('axios')
-import {
-	ChromePromiseApi
-} from '$lib/chrome-api-promise.js'
-import {
-	OauthManager
-} from '$services/oauthManager.js'
+import { ChromePromiseApi } from '$lib/chrome-api-promise.js'
+import { OauthManager } from '$services/oauthManager.js'
 
 const chromePromise = ChromePromiseApi()
 

@@ -140,7 +140,7 @@ export default {
 			span KeePass Tusk
 
 		form(@submit="clickUnlock")
-			.small.selectable.databaseChoose(@click="$router.route('/choose')")
+			.small.selectable.databaseChoose(@click="$router.push({ path: '/choose' })")
 				i.fa.fa-database(aria-hidden="true")
 				|  
 				b {{ active.databaseFileName }}

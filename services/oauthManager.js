@@ -58,30 +58,24 @@ function OauthManager(settings, oauth) {
 	function getToken() {
 		return ensureOriginPermissions().then(ensured => {
 			if (ensured) {
-				return settings.getSetAccessToken(accessTokenType).then(function (stored_token) {
-					if (stored_token) {
-						state.loggedIn = true;
-						return stored_token;
-					}
-					return auth(false) // try passive auth if there's no token...
-				})
+				const stored_token = settings.getSetAccessToken(accessTokenType)
+				if (stored_token) {
+					state.loggedIn = true;
+					return stored_token;
+				}
+				return auth(false) // try passive auth if there's no token...
 			}
 		})
 	}
 
-	function removeToken() {
-		return settings.getSetAccessToken(accessTokenType, null);
-	}
-
 	//lists databases if a token is already stored
 	function listDatabasesSafe() {
-		return settings.getSetAccessToken(accessTokenType).then(function (stored_token) {
-			if (stored_token) {
-				return listDatabases();
-			} else {
-				return [];
-			}
-		});
+		const stored_token = settings.getSetAccessToken(accessTokenType)
+		if (stored_token) {
+			return listDatabases();
+		} else {
+			return [];
+		}
 	}
 
 	function getDatabases() {
@@ -132,9 +126,8 @@ function OauthManager(settings, oauth) {
 
 	function logout() {
 		return oauth.revokeAuth().then(function () {
-			return removeToken().then(function () {
-				state.loggedIn = false
-			})
+			settings.getSetAccessToken(accessTokenType, null);
+			state.loggedIn = false
 		})
 	}
 

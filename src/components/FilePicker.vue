@@ -33,7 +33,7 @@ export default {
 					providerKey: database.provider.key,
 					dbInfo: info,
 				})
-				this.$router.route(`/unlock/${database.provider.key}/${encodeURIComponent(database.title)}`)
+				this.$router.push({ path: `/unlock/${database.provider.key}/${encodeURIComponent(database.title)}` })
 			}
 		},
 	},
@@ -50,7 +50,7 @@ export default {
 					this.databases = this.databases.concat(databases)
 				}
 			} catch (err) {
-				console.error("Error when trying to listDatabases")
+				console.error('Error when trying to listDatabases')
 				this.$store.dispatch(FAIL_GRACEFULLY, err, provider.key)
 			}
 		}
@@ -58,21 +58,19 @@ export default {
 }
 </script>
 
-<template>
-	<div>
-		<div v-for="(db, index) in databases" class="box-bar small selectable flair chooseFile" @click="selectDatabase(index)">
-			<span>
-				<svg class="icon" viewBox="0 0 1 1">
-					<use v-bind="{'xlink:href':'#'+db.provider.icon}" />
-				</svg> {{ db.title }}
-			</span>
-		</div>
-		<div class="box-bar small selectable flair chooseFile" @click="links.openOptionsDatabases">
-			<span>
-				<b>Manage Database Files</b>
-			</span>
-		</div>
-	</div>
+<template lang="pug">
+#file-picker
+	.box-bar.small.selectable.flair.chooseFile(
+			v-for="(db, index) in databases",
+			:key="`${index}`"
+			@click="selectDatabase(index)")
+		span
+			svg.icon(viewBox="0 0 1 1")
+				use(v-bind="{'xlink:href':'#'+db.provider.icon}")
+			|  {{ db.title }}
+	.box-bar.small.selectable.flair.chooseFile(@click="links.openOptionsDatabases")
+		span
+			b Manage Database Files
 </template>
 
 <style lang="scss" scoped>

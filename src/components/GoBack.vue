@@ -7,7 +7,7 @@ export default {
 </script>
 
 <template lang="pug">
-.box-bar.selectable(@click="$router.goBack")
+.box-bar.selectable(@click="$router.go(-1)")
 	span
 		i.fa.fa-long-arrow-left(aria-hidden="true")
 		=" "

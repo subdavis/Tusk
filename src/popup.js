@@ -4,14 +4,17 @@ require('font-awesome/css/font-awesome.css')
 
 // Vue Components
 import Vue from 'vue'
+import VueRouter from 'vue-router'
 import Popup from './Popup'
-import VirtualRouter from '$lib/virtual-router'
 import store from './store';
+import { popup_routes } from './routes'
 import { HYDRATE } from './store/modules/database'
 
-Vue.prototype.$router = new VirtualRouter()
+Vue.use(VueRouter)
+const router = new VueRouter({ routes: popup_routes })
 
-new Vue({
+store.dispatch(HYDRATE).then(() => new Vue({
 	store,
+	router,
 	render: h => h(Popup)
-}).$mount('#app')
+}).$mount('#app'))

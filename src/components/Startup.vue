@@ -24,7 +24,7 @@ export default {
 		const providerKey = this.database.active.providerKey
 
 		if (databaseFileName && providerKey) {
-			this.$router.route(`/unlock/${providerKey}/${encodeURIComponent(databaseFileName)}`)
+			this.$router.push({ path: `/unlock/${providerKey}/${encodeURIComponent(databaseFileName)}` })
 			return;
 		}
 
@@ -37,7 +37,7 @@ export default {
 			return prev.concat(curr);
 		})
 		if (availableFiles.length) {
-			this.$router.route('/choose')
+			this.$router.push({ path: '/choose' })
 		} else {
 			this.busy = false
 		}

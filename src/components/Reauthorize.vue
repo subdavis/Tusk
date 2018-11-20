@@ -21,7 +21,7 @@ export default {
 		}
 	},
 	mounted() {
-		let provider_key = this.$router.getRoute().provider;
+		let provider_key = this.$router.params.provider;
 		this.providers.forEach(p => {
 			if (p.key === provider_key)
 				this.provider = p
