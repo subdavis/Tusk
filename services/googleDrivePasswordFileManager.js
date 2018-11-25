@@ -1,4 +1,3 @@
-const Base64 = require('base64-arraybuffer')
 const axios = require('axios')
 import {
 	ChromePromiseApi
@@ -10,14 +9,8 @@ import {
 	OauthManager
 } from '$services/oauthManager.js'
 
-const chromePromise = ChromePromiseApi()
-
 function GoogleDrivePasswordFileManager(settings) {
 	var accessTokenType = 'gdrive';
-
-	var state = {
-		loggedIn: false
-	}
 
 	var oauth = {
 		key: accessTokenType,

@@ -1,17 +1,9 @@
 "use strict";
-const Base64 = require('base64-arraybuffer')
 const axios = require('axios')
-import { ChromePromiseApi } from '$lib/chrome-api-promise.js'
 import { OauthManager } from '$services/oauthManager.js'
-
-const chromePromise = ChromePromiseApi()
 
 function DropboxFileManager(settings) {
 	var accessTokenType = 'dropbox';
-
-	var state = {
-		loggedIn: false
-	}
 
 	var oauth = {
 		key: accessTokenType,
@@ -96,7 +88,6 @@ function DropboxFileManager(settings) {
 			var checkState = decodeURIComponent(decodeURIComponent(stateMatches[1])); //I have no idea why it is double-encoded
 			var uid = uidMatches[1];
 			if (checkState === randomState) {
-				state.loggedIn = true;
 				settings.getSetAccessToken(accessTokenType, access_token)
 				resolve(access_token);
 			} else {

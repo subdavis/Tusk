@@ -6,11 +6,13 @@
 		 * login()
 		 * logout()
 		 * listDatabases()
+     * 
+		 * It also has the following properties:
+		 * title
 		 */
 	If new providers are added, prefer that they are oauth providers.
 -->
 <script>
-import { generateSettingsAdapter } from '@/store/modules/settings'
 import GenericProviderUi from '@/components/GenericProviderUi'
 
 export default {
@@ -27,8 +29,6 @@ export default {
 		return {
 			busy: false,
 			databases: [],
-			loggedIn: false,
-			settings: generateSettingsAdapter(this.$store),
 			messages: {
 				error: '',
 			},
@@ -52,30 +52,24 @@ export default {
 					throw new Error(err)
 				}
 			},
-			watch() {
-				this.loggedIn
-			},
 		},
 		loggedIn: {
 			default: false,
-			get() { return this.providerManager.isLoggedIn(); },
+			async get() { 
+				const is = await this.providerManager.isLoggedIn();
+				return is;
+			},
 		},
 	},
 	methods: {
 		toggleLogin(event) {
-			//v-bind:id="'toggleButton'+providerManager.key"j
 			if (!this.busy) {
 				if (this.loggedIn) {
-					this.providerManager.logout().then(nil => {
-						// if logout works, attempt to unset the currentDatabaseChoice.
-						this.settings.disableDatabaseProvider(this.providerManager)
-					}).catch(err => {
-						this.settings.disableDatabaseProvider(this.providerManager)
+					this.providerManager.logout().catch(err => {
 						this.messages.error = err.toString()
 					})
 				} else {
 					this.providerManager.login().catch(err => {
-						this.loggedIn = false
 						this.messages.error = err.toString()
 					})
 				}
@@ -93,7 +87,7 @@ export default {
   generic-provider-ui(
 			:busy='busy',
 			:databases='databases',
-			:loggedin='loggedIn',
+			:logged-in='loggedIn',
 			:error='messages.error',
 			:provider-manager='providerManager',
 			:toggle-login='toggleLogin',

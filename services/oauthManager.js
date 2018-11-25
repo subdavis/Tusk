@@ -32,10 +32,6 @@ function OauthManager(settings, oauth) {
 	*/
 	var accessTokenType = oauth.accessTokenType
 
-	var state = {
-		loggedIn: false
-	}
-
 	var exports = {
 		key: accessTokenType,
 		listDatabases: listDatabasesSafe,
@@ -49,7 +45,6 @@ function OauthManager(settings, oauth) {
 		chooseDescription: oauth.chooseDescription,
 		interactiveLogin: login,
 		ensureOriginPermissions: ensureOriginPermissions,
-		state: state,
 		login: login,
 		isLoggedIn: isLoggedIn,
 		logout: logout
@@ -60,7 +55,6 @@ function OauthManager(settings, oauth) {
 			if (ensured) {
 				const stored_token = settings.getSetAccessToken(accessTokenType)
 				if (stored_token) {
-					state.loggedIn = true;
 					return stored_token;
 				}
 				return auth(false) // try passive auth if there's no token...
@@ -120,14 +114,15 @@ function OauthManager(settings, oauth) {
 
 	function isLoggedIn() {
 		return new Promise((resolve, reject) => {
-			resolve(state.loggedIn)
+			const loggedIn = settings.getProviderEnabled(oauth.accessTokenType)
+			resolve(loggedIn)
 		})
 	}
 
 	function logout() {
 		return oauth.revokeAuth().then(function () {
-			settings.getSetAccessToken(accessTokenType, null);
-			state.loggedIn = false
+			settings.getSetAccessToken(accessTokenType, null)
+			settings.setProviderEnabled(accessTokenType, false)
 		})
 	}
 
@@ -201,7 +196,7 @@ function OauthManager(settings, oauth) {
 			return authfunction(interactive).then(token => {
 				if (token) {
 					console.info("Successfully logged into", oauth.accessTokenType);
-					state.loggedIn = true;
+					settings.setProviderEnabled(oauth.accessTokenType, true)
 				}
 				return token;
 			});

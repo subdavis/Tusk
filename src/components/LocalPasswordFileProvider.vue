@@ -30,7 +30,6 @@ export default {
 	methods: {
 		toggleLogin(e) {
 			if (this.loggedIn) {
-				this.settings.disableDatabaseProvider(this.providerManager)
 				this.providerManager.logout().then(() => {
 					this.loggedIn = false
 				})

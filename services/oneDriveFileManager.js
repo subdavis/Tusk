@@ -11,9 +11,6 @@ const chromePromise = ChromePromiseApi()
 
 function OneDriveFileManager(settings) {
 	var accessTokenType = 'onedrive';
-	var state = {
-		loggedIn: false
-	}
 	var oauth = {
 		key: accessTokenType,
 		accessTokenType: accessTokenType,

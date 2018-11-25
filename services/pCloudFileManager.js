@@ -8,11 +8,6 @@ const chromePromise = ChromePromiseApi()
 
 function PCloudFileManager(settings) {
 	var accessTokenType = 'pcloud';
-
-	var state = {
-		loggedIn: false
-	}
-
 	var oauth = {
 		key: accessTokenType,
 		accessTokenType: accessTokenType,

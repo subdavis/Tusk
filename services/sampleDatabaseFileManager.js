@@ -1,13 +1,8 @@
 "use strict";
 
 const axios = require('axios')
-import {
-	ChromePromiseApi
-} from '$lib/chrome-api-promise.js'
 
-const chromePromise = ChromePromiseApi()
-
-function SampleDatabaseFileManager() {
+function SampleDatabaseFileManager(settings) {
 	var exports = {
 		key: 'sample',
 		listDatabases: listDatabases,
@@ -66,15 +61,13 @@ function SampleDatabaseFileManager() {
 
 	function setActive(flag) {
 		if (flag)
-			return chromePromise.storage.local.set({
-				'useSampleDatabase': true
-			});
+			return Promise.resolve(settings.setProviderEnabled(exports.key, true))
 		else
-			return chromePromise.storage.local.remove('useSampleDatabase');
+			return Promise.resolve(settings.setProviderEnabled(exports.key, false))
 	}
 
 	function getActive() {
-		return Promise.resolve(true)
+		return Promise.resolve(settings.getProviderEnabled(exports.key))
 	}
 
 	return exports;

@@ -21,6 +21,7 @@ div
 				svg.icon(viewBox='0 0 1 1')
 					use(v-bind="{'xlink:href':'#'+providerManager.icon}")
 				|  {{ providerManager.chooseTitle }}
+			=" "
 			span.error.pill(v-show='error.length') {{error}}
 			span.chip(v-for='(db, index) in databases')
 				| {{ db.title }}

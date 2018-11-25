@@ -74,6 +74,7 @@ export default {
       | Tusk can store your key files locally in your browser's storage, and apply them when opening your password database. Websites and other browser extensions do not have access to these files. However, they are
       b stored unencrypted
       |  in your local browser profile and someone with access to your device could read them.
+
     input#file(multiple='',
 				type='file',
 				style='display:none;',
@@ -89,7 +90,7 @@ export default {
       i.fa.fa-times-circle.selectable(@click='removeKeyFile(file)', aria-hidden='true')
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 @import "../styles/settings.scss";
 #key-file-manager {
   span {

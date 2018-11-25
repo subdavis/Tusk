@@ -22,7 +22,7 @@ export default {
 			localChromePasswordFileManager:	getFileManager('local', this.$store),
 			oneDriveFileManager: getFileManager('onedrive', this.$store),
 			pCloudFileManager: getFileManager('pcloud', this.$store),
-			sampleDatabaseFileManager: getFileManager('sample', this.$store),
+			sampleManager: getFileManager('sample', this.$store),
 			sharedUrlFileManager: getFileManager('shared-url', this.$store),
 			webdavFileManager: getFileManager('webdav', this.$store),
 			settings: generateSettingsAdapter(this.$store),
@@ -42,13 +42,14 @@ export default {
 			b  requires
 			|	 that you enable at least one of these cloud storage providers to sync your keepass database with. Once the files appear below, they will be available to unlock within the popup window.
 		router-link.waves-effect.waves-light.btn(:to="`/manage/databases/help`") Help me choose
+		=" "
 		router-link.waves-effect.waves-light.btn(:to="`/manage/databases/new`") I haven't made a keepass database yet.
 		router-view
 	oauth-provider(:provider-manager='dropboxFileManager')
 	//- oauth-provider(:provider-manager='googleDriveManager')
 	//- oauth-provider(:provider-manager='onedriveManager')
 	//- oauth-provider(:provider-manager='pCloudFileManager')
-	//- oauth-provider(:provider-manager='sampleManager')
+	oauth-provider(:provider-manager='sampleManager')
 	//- shared-link-provider(:provider-manager='sharedUrlManager')
 	//- webdav-provider(:provider-manager='webdavManager')
 	//- local-password-file-provider(:provider-manager='localFileManager')
