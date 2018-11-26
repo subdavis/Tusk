@@ -2,7 +2,7 @@
 import { mapMutations, mapState } from 'vuex';
 import EntryListItem from '@/components/EntryListItem'
 import Messenger from '@/components/Messenger'
-import { SEARCH_FILTER_SET } from '@/store/modules/ui.js';
+import { SEARCH_FILTER_SET } from '@/store/modules/ui.js'
 import {
 	HOTKEY_NAV_ENABLED,
 	generateSettingsAdapter,
@@ -10,7 +10,10 @@ import {
 
 export default {
 	props: {
-		messages: Object,
+		autofill: {
+			type: Object,
+			required: true,
+		},
 	},
 	components: {
 		EntryListItem,
@@ -40,9 +43,9 @@ export default {
 					case 66: // B
 						if (evt.ctrlKey || evt.metaKey) {
 							if (evt.keyCode === 67) {
-								this.unlockedState.copyPassword(this.activeEntry)
+								this.autofill.copyPassword(this.activeEntry)
 							} else if (evt.keyCode === 66) {
-								this.unlockedState.copyUsername(this.activeEntry)
+								this.autofill.copyUsername(this.activeEntry)
 							}
 						}
 						break
@@ -61,7 +64,7 @@ export default {
 						break
 					case 13: // ENTER
 						if (this.activeEntry !== null)
-							this.unlockedState.autofill(this.activeEntry)
+							this.autofill.autofill(this.activeEntry)
 						break
 				}
 			}
@@ -122,7 +125,7 @@ div
 				@input="setSearchFilter($event.target.value); setActive(0);"
 				placeholder="search entire database...")
 
-	messenger(:messages="messages")
+	messenger(:messages="ui.messages.unlocked")
 	.entries
 		div(v-if='database.priorityEntries && searchFilter.length == 0')
 			entry-list-item(

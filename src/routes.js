@@ -1,19 +1,25 @@
+import { Autofill } from '$services/autofill'
+import store from './store';
+import { generateSettingsAdapter } from './store/modules/settings'
 // Options
-import OptionsStartup from '@/components/OptionsStartup'
-import ManageDatabases from '@/components/ManageDatabases/ManageDatabases'
-import HelpMeChoose from '@/components/ManageDatabases/HelpMeChoose'
-import CreateNewDatabase from '@/components/ManageDatabases/CreateNewDatabase'
-import ManageKeyfiles from '@/components/ManageKeyfiles'
-import AdvancedSettings from '@/components/AdvancedSettings'
-import Reauthorize from '@/components/Reauthorize'
+import OptionsStartup from './components/OptionsStartup'
+import ManageDatabases from './components/ManageDatabases/ManageDatabases'
+import HelpMeChoose from './components/ManageDatabases/HelpMeChoose'
+import CreateNewDatabase from './components/ManageDatabases/CreateNewDatabase'
+import ManageKeyfiles from './components/ManageKeyfiles'
+import AdvancedSettings from './components/AdvancedSettings'
+import Reauthorize from './components/Reauthorize'
 // Popups
-import Startup from '@/components/Startup.vue'
-import FilePicker from '@/components/FilePicker.vue'
-import Unlock from '@/components/Unlock.vue'
-import EntryDetails from '@/components/EntryDetails.vue'
+import Startup from './components/Startup.vue'
+import FilePicker from './components/FilePicker.vue'
+import Unlock from './components/Unlock.vue'
+import EntryDetails from './components/EntryDetails.vue'
+import EntryList from './components/EntryList.vue'
 import { Links } from '$services/links'
 
 const links = new Links()
+const adapter = generateSettingsAdapter(store)
+const autofill = new Autofill(adapter)
 
 const options_routes = [
 	{
@@ -71,6 +77,11 @@ const popup_routes = [
 		props: { links },
 	},
 	{
+		path: '/entry-list',
+		component: EntryList,
+		props: { autofill },
+	},
+	{
 		path: '/unlock/:provider/:title',
 		component: Unlock,
 		props: { links },
@@ -78,7 +89,7 @@ const popup_routes = [
 	{
 		path: '/details/:entry_id',
 		component: EntryDetails,
-		props: { links },
+		props: { links, autofill },
 	},
 	{
 		path: '*',

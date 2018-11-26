@@ -1,30 +1,30 @@
 const kdbxweb = require('kdbxweb')
 
-function KeepassReference() {
-	"use strict";
+class KeepassReference {
 
-	const keewebGetDecryptedFieldValue = (entry, fieldName) => {
+	constructor() {
+		this.majorVersion = 3
+	}
+
+	getFieldValue(entry, fieldName) {
 		if (entry.protectedData === undefined || !(fieldName in entry['protectedData'])) {
 			return entry[fieldName] || ""; //not an encrypted field
 		}
+		// Rehydrate protectedValue from Json-Serializable arrays.
 		return new kdbxweb.ProtectedValue(
 			entry['protectedData'][fieldName].value,
 			entry['protectedData'][fieldName].salt).getText();
 	}
 
-	var my = {
-		majorVersion: 3 // Defaults to 3, unless told otherwise
-	};
-
-	my.hasReferences = function (fieldValue) {
+	hasReferences(fieldValue) {
 		return !!/\{.+\}/.test(fieldValue || '');
 	}
 
 	/*
 	 * Process all references found in fieldValue to their final values
 	 */
-	my.processAllReferences = function (majorVersion, fieldValue, currentEntry, allEntries) {
-		my.majorVersion = majorVersion; //update the major version if it changed.
+	processAllReferences(majorVersion = 3, fieldValue, currentEntry, allEntries) {
+		this.majorVersion = majorVersion; // update the major version if it changed.
 		var re = /(\{[^\{\}]+\})/g;
 		var expressions = re.exec(fieldValue || '');
 		if (!expressions) return fieldValue; //no references
@@ -35,7 +35,7 @@ function KeepassReference() {
 			if (expressions.index >= lastIndex) {
 				result += fieldValue.substring(lastIndex, expressions.index);
 			}
-			result += my.resolveReference(expressions[1], currentEntry, allEntries);
+			result += this.resolveReference(expressions[1], currentEntry, allEntries);
 			lastIndex = expressions.index + expressions[1].length;
 			expressions = re.exec(fieldValue || '');
 		}
@@ -46,14 +46,7 @@ function KeepassReference() {
 		return result;
 	}
 
-	my.getFieldValue = function (currentEntry, fieldName, allEntries) {
-		// entries are JSON serializable.
-		// Convert back to a keeweb.ProtectedValue for parsing.
-		let plainText = keewebGetDecryptedFieldValue(currentEntry, fieldName);
-		return my.processAllReferences(my.majorVersion, plainText, currentEntry, allEntries);
-	}
-
-	my.resolveReference = function (referenceText, currentEntry, allEntries) {
+	resolveReference(referenceText, currentEntry, allEntries) {
 		var localParts = /^\{([a-zA-Z]+)\}$/.exec(referenceText)
 		if (localParts) {
 			// local field
@@ -103,7 +96,7 @@ function KeepassReference() {
 				}
 			});
 			if (matches.length) {
-				if (my.majorVersion >= 3) {
+				if (this.majorVersion >= 3) {
 					return keewebGetDecryptedFieldValue(matches[0], wantedField);
 				} else {
 					throw "Database Version Not Supported";
@@ -114,7 +107,7 @@ function KeepassReference() {
 		return referenceText;
 	}
 
-	function getPropertyNameFromCode(code) {
+	getPropertyNameFromCode(code) {
 		switch (code) {
 			case 'T':
 				return 'title';
@@ -133,8 +126,6 @@ function KeepassReference() {
 		}
 		return '';
 	}
-
-	return my;
 }
 
 export {

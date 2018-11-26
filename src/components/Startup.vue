@@ -22,8 +22,11 @@ export default {
 	async mounted() {
 		const databaseFileName = this.database.active.databaseFileName
 		const providerKey = this.database.active.providerKey
+		const locked = this.database.locked
 
-		if (databaseFileName && providerKey) {
+		if (!locked) {
+			this.$router.push({ path: 'entry-list' })
+		} else if (databaseFileName && providerKey) {
 			this.$router.push({ path: `/unlock/${providerKey}/${encodeURIComponent(databaseFileName)}` })
 			return;
 		}

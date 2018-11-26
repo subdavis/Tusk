@@ -9,6 +9,7 @@ import {
 	UNLOCK,
 	rememberPeriodOptions,
 } from '@/store/modules/database'
+import { MESSAGES_GENERAL_SET } from '@/store/modules/ui'
 import { parseUrl, getValidTokens } from '$lib/utils.js'
 import InfoCluster from '@/components/InfoCluster'
 import EntryList from '@/components/EntryList'
@@ -83,6 +84,7 @@ export default {
 			setDatabaseFileName: DATABASE_FILE_NAME_SET,
 			setRememberPeriod: REMEMBER_PERIOD_SET,
 			setMasterPassword: MASTER_PASSWORD_SET,
+			setGeneralMessages: MESSAGES_GENERAL_SET,
 		}),
 		closeWindow(event) {
 			window.close()
@@ -94,9 +96,14 @@ export default {
 				this.setKeyFileName({ keyFileName: null});
 			this.keyFilePicker = false
 		},
-		clickUnlock(event) {
-			event.preventDefault() // should be handled with vue directive
-			this.unlock()
+		async clickUnlock(event) {
+			try {
+				await this.unlock()
+				this.$router.push('entry-list')
+			} catch (err) {
+				this.setGeneralMessages({ error: err.message })
+				throw err;
+			}
 		},
 	},
 	async mounted() {
@@ -127,11 +134,7 @@ export default {
 	.spinner(v-if="busy")
 		spinner(size="medium", :message='"Unlocking " + databaseFileName')
 
-	entry-list(
-			v-if="!busy && isUnlocked",
-			:messages="ui.messages.unlocked")
-
-	messenger(v-show="!busy", :messages="ui.messages.general" )
+	messenger(v-show="!busy", :messages="ui.messages.general")
 
 	#masterPasswordGroup(v-if="!busy && !isUnlocked")
 
@@ -139,7 +142,7 @@ export default {
 			img(src="assets/icons/exported/128x128.svg")
 			span KeePass Tusk
 
-		form(@submit="clickUnlock")
+		form
 			.small.selectable.databaseChoose(@click="$router.push({ path: '/choose' })")
 				i.fa.fa-database(aria-hidden="true")
 				|  
@@ -189,7 +192,7 @@ export default {
 						step="1" v-model="slider_int")
 
 			.stack-item
-				button.action-button.selectable(@click="clickUnlock") Unlock Database
+				button.action-button.selectable(@click.prevent="clickUnlock") Unlock Database
 
 	.footer.box-bar.medium.between(v-show="!busy")
 		span.selectable(@click="links.openOptions")

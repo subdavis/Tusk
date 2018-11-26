@@ -49,7 +49,6 @@ function KeepassService(passwordFileStoreRegistry, keepassReference) {
 			kdbxweb.CryptoEngine.argon2 = argon2;
 			var kdbxCreds = jsonCredentialsToKdbx(masterKey);
 			return kdbxweb.Kdbx.load(buf, kdbxCreds).then(db => {
-				var psk = new Uint8Array(db.header.protectedStreamKey, 0, db.header.protectedStreamKey.length);
 				var entries = parseKdbxDb(db.groups);
 				majorVersion = db.header.versionMajor;
 				return processReferences(entries, majorVersion);

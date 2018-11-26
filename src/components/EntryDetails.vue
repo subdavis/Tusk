@@ -23,6 +23,10 @@ export default {
 			type: Object,
 			required: true,
 		},
+		autofill: {
+			type: Object,
+			required: true,
+		},
 	},
 	data() {
 		return {
@@ -150,13 +154,13 @@ export default {
 					i.fa.fa-eye(v-else-if='attr.protected && !attr.isHidden', aria-hidden='true')
 					| {{ attr.value }}
 	.attribute-box.button-box
-		.button-inner.selectable(v-on:click.stop="$emit('copy')")
+		.button-inner.selectable(v-on:click.stop="autofill.copyPassword(entry)")
 			span.fa-stack.copy
 				i.fa.fa-circle.fa-stack-2x
 				i.fa.fa-clipboard.fa-stack-1x.fa-inverse
 			=" "
 			| Copy to clipboard
-		.button-inner.selectable(v-on:click.stop="$emit('autofill')")
+		.button-inner.selectable(v-on:click.stop="autofill.autofill(entry)")
 			span.fa-stack.copy
 				i.fa.fa-circle.fa-stack-2x
 				i.fa.fa-magic.fa-stack-1x.fa-inverse
