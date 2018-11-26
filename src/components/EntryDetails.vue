@@ -11,7 +11,6 @@ import {
 	DECRYPTED_ATTRIBUTE_GET
 } from '@/store/modules/database'
 import GoBack from '@/components/GoBack'
-
 const HIDDEN_VAL = '••••••••••••'
 
 export default {
@@ -80,7 +79,7 @@ export default {
 			ui: 'ui',
 		}),
 		entry() {
-			const entry_id = this.$router.params.entry_id
+			const entry_id = this.$router.currentRoute.params.entry_id
 			return this.getEntry(entry_id)
 		},
 		attributes() {

@@ -1,7 +1,8 @@
 <script>
-import { mapMutations, mapState } from 'vuex';
+import { mapMutations, mapState } from 'vuex'
 import EntryListItem from '@/components/EntryListItem'
 import Messenger from '@/components/Messenger'
+import TuskFooter from '@/components/Footer'
 import { SEARCH_FILTER_SET } from '@/store/modules/ui.js'
 import {
 	HOTKEY_NAV_ENABLED,
@@ -17,7 +18,8 @@ export default {
 	},
 	components: {
 		EntryListItem,
-		Messenger
+		Messenger,
+		TuskFooter,
 	},
 	computed: {
 		...mapState({
@@ -137,6 +139,7 @@ div
 					v-for='entry in filteredEntries',
 					:key='entry.id',
 					:entry='entry')
+	tusk-footer
 </template>
 
 <style lang="scss">

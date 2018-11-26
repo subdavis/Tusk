@@ -15,7 +15,7 @@ import InfoCluster from '@/components/InfoCluster'
 import EntryList from '@/components/EntryList'
 import Spinner from 'vue-simple-spinner'
 import Messenger from '@/components/Messenger'
-
+import TuskFooter from '@/components/Footer'
 export default {
 	props: {
 		links: {
@@ -28,11 +28,11 @@ export default {
 		EntryList,
 		Spinner,
 		Messenger,
+		TuskFooter,
 	},
 	data() {
 		return {
 			keyFilePicker: false,
-			appVersion: chrome.runtime.getManifest().version,
 			slider_int: 0,
 			isMasterPasswordInputVisible: false,
 			rememberPeriodOptions,
@@ -44,7 +44,6 @@ export default {
 			database: 'database',
 			ui: 'ui',
 			busy: (state) => state.database.busy,
-			isUnlocked: (state) => !state.database.locked,
 			active: (state) => state.database.active,
 			keyFiles: (state) => state.settings.keyFiles,
 		}),
@@ -76,7 +75,6 @@ export default {
 	},
 	methods: {
 		...mapActions({
-			lock: LOCK,
 			unlock: UNLOCK,
 		}),
 		...mapMutations({
@@ -86,9 +84,6 @@ export default {
 			setMasterPassword: MASTER_PASSWORD_SET,
 			setGeneralMessages: MESSAGES_GENERAL_SET,
 		}),
-		closeWindow(event) {
-			window.close()
-		},
 		chooseKeyFile(index) {
 			if (index >= 0)
 				this.setKeyFileName({ keyFileName: this.settings.keyFiles[index].name });
@@ -99,7 +94,7 @@ export default {
 		async clickUnlock(event) {
 			try {
 				await this.unlock()
-				this.$router.push('entry-list')
+				this.$router.push({ path: '/entry-list' })
 			} catch (err) {
 				this.setGeneralMessages({ error: err.message })
 				throw err;
@@ -131,12 +126,13 @@ export default {
 
 <template lang="pug">
 #unlock-view
+	
 	.spinner(v-if="busy")
 		spinner(size="medium", :message='"Unlocking " + databaseFileName')
 
 	messenger(v-show="!busy", :messages="ui.messages.general")
 
-	#masterPasswordGroup(v-if="!busy && !isUnlocked")
+	#masterPasswordGroup(v-if="!busy")
 
 		.stack-item.unlockLogo
 			img(src="assets/icons/exported/128x128.svg")
@@ -192,24 +188,11 @@ export default {
 						step="1" v-model="slider_int")
 
 			.stack-item
-				button.action-button.selectable(@click.prevent="clickUnlock") Unlock Database
-
-	.footer.box-bar.medium.between(v-show="!busy")
-		span.selectable(@click="links.openOptions")
-			i.fa.fa-cog(aria-hidden="true")
-			|  Settings
-		span.selectable(v-if="isUnlocked", @click="lock()")
-			i.fa.fa-lock(aria-hidden="true")
-			|  Lock Database
-		span.selectable(v-else, @click="closeWindow")
-			i.fa.fa-times-circle(aria-hidden="true")
-			|  Close Window
-		span.selectable(@click="links.openHomepage")
-			i.fa.fa-info-circle(aria-hidden="true")
-			|  v{{ appVersion }}
+				button.action-button.selectable(@click.prevent="clickUnlock") Unlock Database	
+	tusk-footer
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 @import "../styles/settings.scss";
 #masterPasswordGroup {
   .keyfile-picker {
@@ -307,14 +290,6 @@ export default {
 
 .spinner {
   padding: $wall-padding;
-}
-
-.footer span {
-  padding: 2px 4px;
-  border-radius: 3px;
-  &:hover {
-    background-color: $dark-background-color;
-  }
 }
 
 .databaseChoose {

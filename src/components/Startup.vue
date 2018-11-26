@@ -25,7 +25,7 @@ export default {
 		const locked = this.database.locked
 
 		if (!locked) {
-			this.$router.push({ path: 'entry-list' })
+			this.$router.push({ path: '/entry-list' })
 		} else if (databaseFileName && providerKey) {
 			this.$router.push({ path: `/unlock/${providerKey}/${encodeURIComponent(databaseFileName)}` })
 			return;
