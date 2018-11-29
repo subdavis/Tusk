@@ -56,12 +56,6 @@ module.exports = {
             loader: 'babel-loader',
             include: [ path.join(__dirname, './src'), path.join(__dirname, './lib'), path.join(__dirname, './services'), path.join(__dirname, './background') ],
         }, {
-            test: /\.wasm$/,
-            loader: 'file-loader',
-            options: {
-                name: '[name].[ext]'
-            }
-        }, {
             test: /\.css$/,
             use: ExtractTextPlugin.extract({
                 fallback: "style-loader",
@@ -101,8 +95,9 @@ module.exports = {
             context: __dirname,
             manifest: require('./dll/library-manifest.json')
         }),
-    ],
-    devtool: undefined
+		],
+    devtool: undefined,
+    node: { fs: 'empty' },
 }
 
 if (process.env.NODE_ENV === 'production') {
