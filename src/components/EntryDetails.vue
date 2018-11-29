@@ -29,6 +29,7 @@ export default {
 	},
 	data() {
 		return {
+			attributes: [],
 			// OTP
 			otp: false,
 			otp_timeleft: 0,
@@ -69,6 +70,44 @@ export default {
 	beforeDestroy() {
 		clearInterval(this.otp_loop)
 	},
+	mounted() {
+		let entry = this.entry
+		let attributes = entry.keys.map(key => {
+			const val = entry[key]
+			// Should NOT be succeptible to XSS
+			const returnMap = {
+				key: key,
+				value: (val || '').replace(/\n/g, "<br>")
+			}
+			switch (key) {
+				case 'url':
+					let parsed = parseUrl(val)
+					if (parsed !== null) {
+						returnMap['href'] = parsed.href
+					}
+					break;
+				case 'notes':
+					returnMap['value'] = val
+					break;
+			}
+			return returnMap;
+		})
+		for (const protectedKey in entry.protectedData) {
+			if (protectedKey === "otp") {
+				const url = this.getDecryptedAttribute(entry, protectedKey)
+				this.setupOTP(url)
+			} else {
+				attributes.push({
+					'key': protectedKey,
+					'value': HIDDEN_VAL,
+					'isHidden': true,
+					'protected': true,
+					'protectedAttr': entry.protectedData[protectedKey],
+				})
+			}
+		}
+		this.attributes = attributes;
+	},
 	computed: {
 		...mapGetters({
 			getEntry: ENTRY_GET,
@@ -81,44 +120,6 @@ export default {
 		entry() {
 			const entry_id = this.$router.currentRoute.params.entry_id
 			return this.getEntry(entry_id)
-		},
-		attributes() {
-			let entry = this.entry
-			let attributes = entry.keys.map(key => {
-				const val = entry[key]
-				// Should NOT be succeptible to XSS
-				const returnMap = {
-					key: key,
-					value: (val || '').replace(/\n/g, "<br>")
-				}
-				switch (key) {
-					case 'url':
-						let parsed = parseUrl(val)
-						if (parsed !== null) {
-							returnMap['href'] = parsed.href
-						}
-						break;
-					case 'notes':
-						returnMap['value'] = val
-						break;
-				}
-				return returnMap;
-			})
-			for (const protectedKey in entry.protectedData) {
-				if (protectedKey === "otp") {
-					const url = this.getDecryptedAttribute(entry, protectedKey)
-					this.setupOTP(url)
-				} else {
-					attributes.push({
-						'key': protectedKey,
-						'value': HIDDEN_VAL,
-						'isHidden': true,
-						'protected': true,
-						'protectedAttr': entry.protectedData[protectedKey],
-					})
-				}
-			}
-			return attributes
 		},
 	},
 }
@@ -151,7 +152,7 @@ export default {
 				span.attribute-value.protected(v-if="attr.key !== 'notes'", @click='toggleAttribute(attr)')
 					i.fa.fa-eye-slash(v-if='attr.protected && attr.isHidden', aria-hidden='true')
 					i.fa.fa-eye(v-else-if='attr.protected && !attr.isHidden', aria-hidden='true')
-					| {{ attr.value }}
+					|  {{ attr.value }}
 	.attribute-box.button-box
 		.button-inner.selectable(v-on:click.stop="autofill.copyPassword(entry)")
 			span.fa-stack.copy

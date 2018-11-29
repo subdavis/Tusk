@@ -97,7 +97,7 @@ class KeepassReference {
 			});
 			if (matches.length) {
 				if (this.majorVersion >= 3) {
-					return keewebGetDecryptedFieldValue(matches[0], wantedField);
+					return this.getFieldValue(matches[0], wantedField);
 				} else {
 					throw "Database Version Not Supported";
 				}
