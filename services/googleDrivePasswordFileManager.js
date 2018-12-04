@@ -1,20 +1,13 @@
 const axios = require('axios')
-import {
-	ChromePromiseApi
-} from '$lib/chrome-api-promise.js'
-import {
-	urlencode
-} from '$lib/utils.js'
-import {
-	OauthManager
-} from '$services/oauthManager.js'
+import { urlencode } from '$lib/utils.js'
+import { OauthManager } from '$services/oauthManager.js'
 
 function GoogleDrivePasswordFileManager(settings) {
 	var accessTokenType = 'gdrive';
 
 	var oauth = {
 		key: accessTokenType,
-		accessTokenType: accessTokenType,
+		accessTokenType,
 		supportedFeatures: ['listDatabases', 'oauth'],
 		authUrl: `https://accounts.google.com/o/oauth2/v2/auth?response_type=token&scope=${encodeURIComponent('https://www.googleapis.com/auth/drive.readonly')}`,
 		origins: [
@@ -117,7 +110,6 @@ function GoogleDrivePasswordFileManager(settings) {
 			var access_token = tokenMatches[1];
 			var checkState = decodeURIComponent(stateMatches[1]);
 			if (checkState === randomState) {
-				settings.getSetAccessToken(accessTokenType, access_token)
 				resolve(access_token);
 			} else {
 				//some sort of error or parsing failure

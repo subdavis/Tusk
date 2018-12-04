@@ -1,11 +1,7 @@
 "use strict";
 const axios = require('axios')
-import {
-	ChromePromiseApi
-} from '$lib/chrome-api-promise.js'
-import {
-	OauthManager
-} from '$services/oauthManager.js'
+import { ChromePromiseApi } from '$lib/chrome-api-promise.js'
+import { OauthManager } from '$services/oauthManager.js'
 
 const chromePromise = ChromePromiseApi()
 
@@ -123,8 +119,7 @@ function OneDriveFileManager(settings) {
 		if (authInfo === null) {
 			reject('Failed to extract authentication information from redirect url');
 		} else {
-			settings.getSetAccessToken(accessTokenType, authInfo.access_token);
-			resolve();
+			resolve(authInfo.access_token);
 		}
 	}
 

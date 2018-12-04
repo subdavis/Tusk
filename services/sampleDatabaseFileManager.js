@@ -1,6 +1,12 @@
 "use strict";
 
 const axios = require('axios')
+import store from '@/store'
+import {
+	PROVIDER_ENABLE,
+	PROVIDER_DISABLE,
+	PROVIDER_ENABLED_GET,
+} from '@/store/modules/settings'
 
 function SampleDatabaseFileManager(settings) {
 	var exports = {
@@ -30,15 +36,12 @@ function SampleDatabaseFileManager(settings) {
 	}
 
 	function listDatabases() {
-		return getActive().then(function (flag) {
-			if (flag) {
-				return [{
-					title: 'Sample.kdbx - password is 123'
-				}];
-			} else {
-				return [];
-			}
-		});
+		const enabled = this.getActive();
+		if (enabled) {
+			return [{ title: 'Sample.kdbx - password is 123' }];
+		} else {
+			return [];
+		}
 	}
 
 	//get the minimum information needed to identify this file for future retrieval
@@ -61,13 +64,13 @@ function SampleDatabaseFileManager(settings) {
 
 	function setActive(flag) {
 		if (flag)
-			return Promise.resolve(settings.setProviderEnabled(exports.key, true))
+			return Promise.resolve(store.commit(PROVIDER_ENABLE, { providerKey: exports.key }))
 		else
-			return Promise.resolve(settings.setProviderEnabled(exports.key, false))
+			return Promise.resolve(store.commit(PROVIDER_DISABLE, { providerKey: exports.key }))
 	}
 
 	function getActive() {
-		return Promise.resolve(settings.getProviderEnabled(exports.key))
+		return store.getters[PROVIDER_ENABLED_GET](exports.key);
 	}
 
 	return exports;

@@ -4,6 +4,8 @@
 -->
 <script>
 const Base64 = require('base64-arraybuffer')
+import { mapState } from 'vuex'
+import { PROVIDER_ENABLED_GET } from '@/store/modules/settings'
 import { ChromePromiseApi } from '$lib/chrome-api-promise.js'
 import GenericProviderUi from '@/components/GenericProviderUi'
 const chromePromise = ChromePromiseApi()
@@ -13,7 +15,6 @@ export default {
 		return {
 			busy: false,
 			databases: [],
-			loggedIn: false,
 			messages: {
 				error: ""
 			},
@@ -22,8 +23,7 @@ export default {
 				url: "",
 				password: ""
 			},
-			serverList: [],
-			serverListMeta: {}
+			busyServers: {},
 		}
 	},
 	components: {
@@ -33,53 +33,40 @@ export default {
 		providerManager: Object,
 		settings: Object
 	},
+	computed: {
+		...mapState({
+			serverList: (state) => state.auxillary.webdavServerList,
+			directoryMap: (state) => state.auxillary.webdavDirectoryMap,
+		}),
+		loggedIn() {
+			return this.$store.getters[PROVIDER_ENABLED_GET](this.providerManager.key)
+		},
+	},
+	asyncComputed: {
+		databases: {
+			default: [],
+			async get() {
+				return await this.providerManager.listDatabases();
+			},
+			watch() {
+				this.loggedIn
+				this.serverList
+				this.directoryMap
+			},
+		},
+	},
 	methods: {
-		addServer() {
-			chromePromise.permissions.request({
-				origins: [this.webdav.url] //FLAGHERE TODO
-			}).then(() => {
-				this.providerManager.addServer(this.webdav.url, this.webdav.username, this.webdav.password).then(serverInfo => {
-					// do somethings
-					return this.updateServerList().then(() => {
-						this.scan(serverInfo.serverId)
-					})
-				}).catch(err => {
-					console.error(err)
-					this.messages.error = err.toString()
-				})
-			}).catch(err => {
-				console.error(err)
-				this.messages.error = err.toString()
-			})
-		},
-		setBusy(serverId, busy) {
-			let serverListItem = this.serverList.filter(elem => {
-				return elem.serverId === serverId
-			})[0]
-			serverListItem.scanBusy = busy
-		},
-		scan(serverId) {
-			this.setBusy(serverId, true)
-			return this.providerManager.searchServer(serverId).then(dirMap => {
-				this.providerManager.listDatabases().then(databases => {
-					this.databases = databases
-				})
-			}).catch(err => {
-				this.messages.error = err.toString()
-			}).then(() => {
-				// READ: finally.
-				this.setBusy(serverId, false)
-			})
-		},
-		remove(serverId) {
-			return this.providerManager.removeServer(serverId).then(this.updateServerList)
-		},
-		updateServerList() {
-			return this.providerManager.listServers().then(servers => {
-				this.serverList = servers
-			})
+		async addServer() {
+			try {
+				await chromePromise.permissions.request({ origins: [this.webdav.url] });
+				const serverInfo = await this.providerManager.addServer(this.webdav.url, this.webdav.username, this.webdav.password);
+			} catch (err) {
+				console.error(err);
+				this.messages.error = err.toString();
+			}
 		},
 		toggleLogin() {
+			console.log('toggle')
 			if (this.loggedIn) {
 				this.providerManager.logout().then(() => {
 					this.loggedIn = false
@@ -96,7 +83,6 @@ export default {
 			this.providerManager.listDatabases().then(databases => {
 				this.databases = databases
 			})
-			this.updateServerList()
 		}
 	},
 	mounted() {
@@ -116,7 +102,7 @@ export default {
 			:loggedIn="loggedIn" 
 			:error="messages.error"
 			:provider-manager="providerManager" 
-			:toggle-login="toggleLogin" 
+			@login="toggleLogin" 
 			:removeable="false"></generic-provider-ui>
 		<div v-if="loggedIn">
 			<div class="warn pill">
@@ -133,16 +119,16 @@ export default {
 					<th>URL</th>
 					<th>Actions</th>
 				</tr>
-				<tr v-for="(server, index) in serverList">
+				<tr v-for="(server, index) in serverList" :key="index">
 					<td>{{server.username}}</td>
 					<td>{{server.url}}</td>
 					<td>
-						<a v-show="!server.scanBusy" class="selectable" @click="scan(server.serverId)">
+						<a v-show="true" class="selectable" @click="providerManager.searchServer(server.serverId)">
 						<i class="fa fa-search"></i> scan</a>
-						<a v-show="server.scanBusy"><i class="fa fa-spinner fa-pulse"></i> scanning</a>
+						<a v-show="false"><i class="fa fa-spinner fa-pulse"></i> scanning</a>
 					</td>
 					<td>
-						<a class="selectable" @click="remove(server.serverId)">
+						<a class="selectable" @click="providerManager.removeServer(server.serverId)">
 						<i class="fa fa-times-circle selectable"></i> remove</a>
 					</td>
 				</tr>

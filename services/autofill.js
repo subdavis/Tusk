@@ -4,7 +4,7 @@ import { KeepassReference } from './keepassReference'
 import { Notifications } from './notifications'
 import { FORGET_TIME_SET, CLIPBOARD_EXPIRE_INTERVAL } from '@/store/modules/settings'
 // TODO: hack to allow access to `setForgetTime`.
-// Services should not have direct access to the store.s
+// Services should not have direct access to the store.
 import store from '@/store'
 
 /**

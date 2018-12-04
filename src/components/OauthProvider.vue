@@ -1,18 +1,17 @@
 <!-- 
 	OauthProvider:
 	Database Provider for database managers that implement the oauth interface:
-		/* The providerManager implements the following methods that return promises:
-		 * isLoggedIn()
-		 * login()
-		 * logout()
-		 * listDatabases()
-     * 
-		 * It also has the following properties:
-		 * title
-		 */
-	If new providers are added, prefer that they are oauth providers.
+	The providerManager implements the following:
+		* login() -> promise
+		* logout() -> promise
+		* listDatabases() -> promise(Array)
+		* isLoggedIn() -> boolean
+	It also has properties:
+		* title
+		* key
 -->
 <script>
+import { PROVIDER_ENABLED_GET } from '@/store/modules/settings'
 import GenericProviderUi from '@/components/GenericProviderUi'
 
 export default {
@@ -27,37 +26,36 @@ export default {
 	},
 	data() {
 		return {
-			busy: false,
-			databases: [],
 			messages: {
 				error: '',
 			},
 		}
 	},
 	computed: {
-		failed: () => this.messages.error.length > 0,
-		busy: () => (this.databases === null && !this.failed),
+		failed() {
+			return this.messages.error.length > 0
+		},
+		busy() {
+			return this.databases === null && !this.failed
+		},
+		loggedIn() {
+			return this.$store.getters[PROVIDER_ENABLED_GET](this.providerManager.key)
+		}
 	},
 	asyncComputed: {
 		databases: {
 			default: null,
 			async get(){
 				try {
-					const databases = await this.providerManager.listDatabases()
-					console.log(databases)
-					return databases
+					return await this.providerManager.listDatabases()
 				} catch (err) {
 					console.error("Error while connecting to database backend for", this.providerManager.title)
 					this.messages.error = err.message
 					throw new Error(err)
 				}
 			},
-		},
-		loggedIn: {
-			default: false,
-			async get() { 
-				const is = await this.providerManager.isLoggedIn();
-				return is;
+			watch() {
+				this.loggedIn
 			},
 		},
 	},
@@ -85,12 +83,11 @@ export default {
 <template lang="pug">
 .box-bar.roomy.database-manager
   generic-provider-ui(
-			:busy='busy',
+			:busy="busy",
 			:databases='databases',
 			:logged-in='loggedIn',
 			:error='messages.error',
 			:provider-manager='providerManager',
-			:toggle-login='toggleLogin',
-			:removeable='false',
-			:remove-function='undefined')
+			@login='toggleLogin',
+			:removeable='false')
 </template>

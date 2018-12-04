@@ -1,10 +1,6 @@
 "use strict";
-const Base64 = require('base64-arraybuffer')
 import axios from 'axios/dist/axios.min.js'
-import { ChromePromiseApi } from '$lib/chrome-api-promise.js'
 import { OauthManager } from '$services/oauthManager.js'
-
-const chromePromise = ChromePromiseApi()
 
 function PCloudFileManager(settings) {
 	var accessTokenType = 'pcloud';
@@ -113,8 +109,7 @@ function PCloudFileManager(settings) {
 		if (authInfo === null) {
 			reject('Failed to extract authentication information from redirect url');
 		} else {
-			let token = settings.getSetAccessToken(accessTokenType, authInfo.access_token)
-			resolve(token)
+			resolve(authInfo.access_token)
 		}
 	}
 

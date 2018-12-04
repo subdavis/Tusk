@@ -6,9 +6,7 @@ export default {
 		databases: Array,
 		error: String,
 		loggedIn: Boolean,
-		toggleLogin: Function,
 		removeable: Boolean,
-		removeFunction: Function
 	}
 };
 </script>
@@ -18,18 +16,18 @@ div
 	.between
 		.title
 			span
-				svg.icon(viewBox='0 0 1 1')
+				svg.icon(viewBox="0 0 1 1")
 					use(v-bind="{'xlink:href':'#'+providerManager.icon}")
 				|  {{ providerManager.chooseTitle }}
-			=" "
-			span.error.pill(v-show='error.length') {{error}}
-			span.chip(v-for='(db, index) in databases')
+			= " "
+			span.error.pill(v-show="error.length") {{error}}
+			span.chip(v-for="(db, index) in databases")
 				| {{ db.title }}
-				i.fa.fa-times-circle.selectable(v-if='removeable', aria-hidden='true', @click='removeFunction(index)')
-
+				i.fa.fa-times-circle.selectable(v-if="removeable", aria-hidden="true", @click="$emit('remove', index)")
 		.switch
 			label
-				input(:disabled='busy', type='checkbox', :checked='loggedIn', @click='toggleLogin')
+				i.fa.fa-spinner.fa-pulse(v-if="busy")
+				input(:disabled="busy", type="checkbox", :checked="loggedIn", @click="$emit('login')")
 				span.lever
 	.description {{ providerManager.chooseDescription }}
 </template>

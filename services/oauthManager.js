@@ -1,8 +1,13 @@
 "use strict";
 const Base64 = require('base64-arraybuffer')
+import store from '@/store'
 import {
-	ChromePromiseApi
-} from '$lib/chrome-api-promise.js'
+	PROVIDER_ENABLE,
+	PROVIDER_DISABLE,
+	PROVIDER_ENABLED_GET,
+} from '@/store/modules/settings'
+import { ChromePromiseApi } from '$lib/chrome-api-promise.js'
+
 const chromePromise = ChromePromiseApi()
 
 function OauthManager(settings, oauth) {
@@ -113,16 +118,13 @@ function OauthManager(settings, oauth) {
 	}
 
 	function isLoggedIn() {
-		return new Promise((resolve, reject) => {
-			const loggedIn = settings.getProviderEnabled(oauth.accessTokenType)
-			resolve(loggedIn)
-		})
+		return store.getters[PROVIDER_ENABLED_GET](oauth.accessTokenType)
 	}
 
 	function logout() {
 		return oauth.revokeAuth().then(function () {
 			settings.getSetAccessToken(accessTokenType, null)
-			settings.setProviderEnabled(accessTokenType, false)
+			store.commit(PROVIDER_DISABLE, { providerKey: accessTokenType })
 		})
 	}
 
@@ -194,9 +196,11 @@ function OauthManager(settings, oauth) {
 
 		return ensureOriginPermissions().then(ensured => {
 			return authfunction(interactive).then(token => {
+				console.log(token)
 				if (token) {
-					console.info("Successfully logged into", oauth.accessTokenType);
-					settings.setProviderEnabled(oauth.accessTokenType, true)
+					console.info("Successfully logged into", oauth.accessTokenType)
+					settings.getSetAccessToken(accessTokenType, token)
+					store.commit(PROVIDER_ENABLE, { providerKey: oauth.accessTokenType })
 				}
 				return token;
 			});

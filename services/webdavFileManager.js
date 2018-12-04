@@ -28,11 +28,20 @@ Object DirMap {
 
 */
 
-import createClient from 'webdav';
-import { guid } from '$lib/utils.js';
-import { WEBDAV_SERVER_LIST, WEBDAV_DIRECTORY_MAP } from '@/store/modules/settings.js';
+import createClient from 'webdav'
+import { guid } from '$lib/utils.js'
+import store from '@/store'
+import {
+	PROVIDER_ENABLE,
+	PROVIDER_DISABLE,
+	PROVIDER_ENABLED_GET,
+} from '@/store/modules/settings'
+import {
+	WEBDAV_SERVER_LIST_SET,
+	WEBDAV_DIRECTORY_MAP_SET,
+} from '@/store/modules/auxillary'
 
-function WebdavFileManager(settings, search_depth = 5) {
+function WebdavFileManager(search_depth = 5) {
 	var exports = {
 		key: 'webdav',
 		listDatabases: listDatabases,
@@ -52,22 +61,16 @@ function WebdavFileManager(settings, search_depth = 5) {
 		listServers: listServers
 	};
 
+	function isEnabled() {
+		return Promise.resolve(store.getters[PROVIDER_ENABLED_GET](exports.key))
+	}
+
 	function enable() {
-		return chromePromise.storage.local.set({
-			'webdavEnabled': true
-		})
+		return Promise.resolve(store.commit(PROVIDER_ENABLE, { providerKey: exports.key }))
 	}
 
 	function disable() {
-		return chromePromise.storage.local.set({
-			'webdavEnabled': false
-		})
-	}
-
-	function isEnabled() {
-		return chromePromise.storage.local.get('webdavEnabled').then(result => {
-			return result.webdavEnabled || false
-		})
+		return Promise.resolve(store.commit(PROVIDER_DISABLE, { providerKey: exports.key }))
 	}
 
 	/** 
@@ -77,7 +80,7 @@ function WebdavFileManager(settings, search_depth = 5) {
 		return isEnabled().then(enabled => {
 			if (!enabled)
 				return Promise.resolve([])
-			let dirMap = settings.getSet(WEBDAV_DIRECTORY_MAP)
+			let dirMap = store.state.auxillary.webdavDirectoryMap
 			let promises = []
 			// For each server, for each directory in the server.
 			for (let serverId in dirMap)
@@ -110,7 +113,7 @@ function WebdavFileManager(settings, search_depth = 5) {
 
 		/** 
 		 * returns Object:[]DirInfo
-		*/
+		 */
 		let bfs = async function () {
 			let queue = ['/']
 			let foundDirectories = []
@@ -140,10 +143,10 @@ function WebdavFileManager(settings, search_depth = 5) {
 		}
 
 		let bfsPromise = bfs()
-		let dirMap = settings.getSet(WEBDAV_DIRECTORY_MAP)
+		let dirMap = store.state.auxillary.webdavDirectoryMap
 		return bfsPromise.then(foundDirectories => {
 			dirMap[serverInfo.serverId] = foundDirectories
-			return settings.getSet(WEBDAV_DIRECTORY_MAP, dirMap)
+			store.commit(WEBDAV_DIRECTORY_MAP_SET, { map: dirMap })
 		})
 	}
 
@@ -225,7 +228,8 @@ function WebdavFileManager(settings, search_depth = 5) {
 				let newId = guid()
 				serverInfo['serverId'] = newId
 				serverList.push(serverInfo)
-				settings.getSet(WEBDAV_SERVER_LIST, serverList)
+				store.commit(WEBDAV_SERVER_LIST_SET, { list: serverList })
+				searchServer(newId)
 				return serverInfo
 			}
 		})
@@ -235,39 +239,35 @@ function WebdavFileManager(settings, search_depth = 5) {
 	 * alias for settings.getSetWebdavServerList
 	 */
 	function listServers() {
-		return settings.getSet(WEBDAV_SERVER_LIST)
+		return store.state.auxillary.webdavServerList
 	}
 
 	/**
-	 * return Promise --> Object:ServerInfo
+	 * return Object:ServerInfo
 	 * @param {string} serverId 
 	 */
 	function getServer(serverId) {
-		return listServers().then(serverList => {
-			return serverList.filter((e, i, a) => {
-				return e.serverId === serverId
-			})
-		}).then(matches => {
-			if (matches.length === 1)
-				return matches[0]
-			return null
-		})
+		const serverList = listServers()
+		const matches = serverList.filter(e => e.serverId === serverId)
+		return matches.length ? matches[0] : null
 	}
 
 	/**
-	 * Returns a promise --> Object:ServerInfo
+	 * Returns Object:ServerInfo
 	 * @param {string} serverId 
 	 */
 	function removeServer(serverId) {
 		let servers = listServers()
+		let removed = []
 		for (var i = 0; i < servers.length; i++)
 			if (servers[i].serverId === serverId)
-				servers.splice(i, 1)
-		settings.getSet(WEBDAV_SERVER_LIST, servers)
+				removed = servers.splice(i, 1)
+		store.commit(WEBDAV_SERVER_LIST_SET, { list: servers })
 		// clean up DirMap
-		let dirMap = settings.getSet(WEBDAV_DIRECTORY_MAP)
+		let dirMap = store.state.auxillary.webdavDirectoryMap
 		delete dirMap[serverId]
-		return settings.getSet(WEBDAV_DIRECTORY_MAP, dirMap)
+		store.commit(WEBDAV_DIRECTORY_MAP_SET, { map: dirMap })
+		return removed.length ? removed[0] : null
 	}
 
 	return exports;

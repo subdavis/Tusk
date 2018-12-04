@@ -88,7 +88,6 @@ function DropboxFileManager(settings) {
 			var checkState = decodeURIComponent(decodeURIComponent(stateMatches[1])); //I have no idea why it is double-encoded
 			var uid = uidMatches[1];
 			if (checkState === randomState) {
-				settings.getSetAccessToken(accessTokenType, access_token)
 				resolve(access_token);
 			} else {
 				//some sort of error or parsing failure
