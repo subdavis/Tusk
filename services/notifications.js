@@ -1,13 +1,10 @@
-import { NOTIFICATIONS_ENABLED } from '@/store/modules/settings.js'
+import store from '@/store'
 
 export class Notifications {
-	constructor(settings) {
-		this.settings = settings;
-	}
 	push(data) {
 		const { text, type, expire } = data;
-		return new Promise((resolve, reject) => {
-			let val = this.settings.getSet(NOTIFICATIONS_ENABLED)
+		return new Promise((resolve) => {
+			let val = store.state.settings.notificationsEnabledList
 			if (val.indexOf(type) > -1) {
 				chrome.runtime.sendMessage({
 					m: "showMessage",

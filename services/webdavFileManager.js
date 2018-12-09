@@ -28,7 +28,7 @@ Object DirMap {
 
 */
 
-import createClient from 'webdav'
+const createClient = require("webdav");
 import { guid } from '$lib/utils.js'
 import store from '@/store'
 import {
@@ -40,6 +40,8 @@ import {
 	WEBDAV_SERVER_LIST_SET,
 	WEBDAV_DIRECTORY_MAP_SET,
 } from '@/store/modules/auxillary'
+
+createClient.setFetchMethod(window.fetch);
 
 function WebdavFileManager(search_depth = 5) {
 	var exports = {
@@ -73,8 +75,33 @@ function WebdavFileManager(search_depth = 5) {
 		return Promise.resolve(store.commit(PROVIDER_DISABLE, { providerKey: exports.key }))
 	}
 
+	/**
+	 * return Object:ServerInfo
+	 * @param {string} serverId 
+	 */
+	function getServer(serverId) {
+		const serverList = listServers()
+		const matches = serverList.filter(e => e.serverId === serverId)
+		return matches.length ? matches[0] : null
+	}
+
+	/**
+	 * @param {string} serverId 
+	 * @return {object} webdavClient
+	 */
+	function getClient(serverId) {
+		const serverInfo = getServer(serverId)
+		if (serverInfo === null)
+			throw new Error('Database no longer exists')
+		const { url, username, password } = serverInfo
+		return {
+			client: createClient(url, username, password),
+			serverInfo,
+		}
+	}
+
 	/** 
-	 * returns promise -> Object:[]DBInfo
+	 * @return {Promise}
 	*/
 	function listDatabases() {
 		return isEnabled().then(enabled => {
@@ -103,14 +130,7 @@ function WebdavFileManager(search_depth = 5) {
 	 * @param {string} serverId 
 	 */
 	async function searchServer(serverId) {
-		let serverInfo = await getServer(serverId)
-		if (serverInfo === null) {
-			console.error("serverInfo not found");
-			return;
-		}
-		let client = createClient(serverInfo.url, serverInfo.username, serverInfo.password)
-		createClient.setFetchMethod(window.fetch);
-
+		const { client, serverInfo } = getClient(serverId)
 		/** 
 		 * returns Object:[]DirInfo
 		 */
@@ -164,13 +184,8 @@ function WebdavFileManager(search_depth = 5) {
 	 * @param {object:DBInfo} dbInfo 
 	 */
 	function getChosenDatabaseFile(dbInfo) {
-		return getServer(dbInfo.serverId).then(serverInfo => {
-			if (serverInfo === null)
-				throw 'Database no longer exists'
-			let client = createClient(serverInfo.url, serverInfo.username, serverInfo.password)
-			createClient.setFetchMethod(window.fetch)
-			return client.getFileContents(dbInfo.path, { credentials: 'omit' })
-		})
+		const { client } = getClient(dbInfo.serverId)
+		return client.getFileContents(dbInfo.path, { credentials: 'omit' })
 	}
 
 	/**
@@ -178,25 +193,17 @@ function WebdavFileManager(search_depth = 5) {
 	 * @param {string} serverId 
 	 * @param {string} directory 
 	 */
-	function searchDirectory(serverId, directory) {
-		return getServer(serverId).then(serverInfo => {
-			if (serverInfo === null)
-				return []
-			let client = createClient(serverInfo.url, serverInfo.username, serverInfo.password)
-			createClient.setFetchMethod(window.fetch);
-			return client.getDirectoryContents(directory, { credentials: 'omit' }).then(contents => {
-				// map from directory contents to DBInfo type.
-				return contents.filter(element => {
-					return element.filename.indexOf('.kdbx') >= 1
-				}).map(element => {
-					return {
-						title: element.basename,
-						path: element.filename,
-						serverId: serverId
-					}
-				})
-			})
-		})
+	async function searchDirectory(serverId, directory) {
+		const { client } = getClient(serverId)
+		const contents = await client.getDirectoryContents(directory, { credentials: 'omit' })
+		// map from directory contents to DBInfo type.
+		return contents
+			.filter(e => e.filename.indexOf('.kdbx') >= 1)
+			.map(e => ({
+				title: e.basename,
+				path: e.filename,
+				serverId,
+			}))
 	}
 
 	/**
@@ -205,9 +212,6 @@ function WebdavFileManager(search_depth = 5) {
 	 */
 	function addServer(url, username, password) {
 		let client = createClient(url, username, password)
-		createClient.setFetchMethod((a, b) => {
-			return window.fetch(a, b);
-		})
 		return client.getDirectoryContents('/', { credentials: 'omit' }).then(contents => {
 			// success!
 			let serverInfo = {
@@ -240,16 +244,6 @@ function WebdavFileManager(search_depth = 5) {
 	 */
 	function listServers() {
 		return store.state.auxillary.webdavServerList
-	}
-
-	/**
-	 * return Object:ServerInfo
-	 * @param {string} serverId 
-	 */
-	function getServer(serverId) {
-		const serverList = listServers()
-		const matches = serverList.filter(e => e.serverId === serverId)
-		return matches.length ? matches[0] : null
 	}
 
 	/**

@@ -28,9 +28,6 @@ $RECYCLE.BIN/
 # Icon must ends with two \r.
 Icon
 
-# chrome web-store assets
-store/
-
 # Thumbnails
 ._*
 

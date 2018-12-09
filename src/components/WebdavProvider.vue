@@ -66,7 +66,6 @@ export default {
 			}
 		},
 		toggleLogin() {
-			console.log('toggle')
 			if (this.loggedIn) {
 				this.providerManager.logout().then(() => {
 					this.loggedIn = false
@@ -81,6 +80,7 @@ export default {
 		onLogin() {
 			/* Other things to do when a successful login happens... */
 			this.providerManager.listDatabases().then(databases => {
+				console.log(databases)
 				this.databases = databases
 			})
 		}
