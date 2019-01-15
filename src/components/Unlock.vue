@@ -447,6 +447,7 @@ export default {
     float: left;
   }
   .masterPasswordInput {
+    border-top: 1px solid $light-gray;
     position: relative;
     i {
       position: absolute;
@@ -458,12 +459,11 @@ export default {
   }
   input[type="text"],
   input[type="password"] {
-    width: 100%;
+    width: calc(100% - 1em);
     box-sizing: border-box;
     font-size: 18px;
     border-width: 0px 0px;
     padding: 5px $wall-padding;
-    border-top: 1px solid $light-gray;
     &:focus {
       outline: none;
     }
