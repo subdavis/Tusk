@@ -169,9 +169,10 @@ function GoogleDrivePasswordFileManager(settings) {
 		});
 	}
 
-	// If this browser has the getAuthToken function.  Hack for #64
+	// If this browser has the getAuthToken function...  Hack for #64
+	// There is the getAuthToken function in Opera, but it isn't supported. Detect Opera by the chrome.search function.
 	try {
-		if (chrome.identity.getAuthToken !== undefined) {
+		if (chrome.identity.getAuthToken !== undefined && chrome.search === undefined) {
 			oauth['auth'] = chrome_auth;
 		}
 	}
