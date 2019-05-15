@@ -102,6 +102,16 @@ export default {
 					'protected': true,
 					'protectedAttr': this.entry.protectedData[protectedKey]
 				})
+				// some keepass programs (e.g. keepassxc) store TOTP params in
+				// "TOTP Seed" & "TOTP Settings" (tOTPSeed & tOTPSettings) instead of the otp URL
+				// in this case, we also want to display the computed TOTP value
+				if (protectedKey === "tOTPSeed" && "tOTPSettings" in this.entry) {
+					let otpSettings = this.entry["tOTPSettings"].split(';')
+					let otpSeed = this.unlockedState.getDecryptedAttribute(this.entry, protectedKey)
+					if (otpSettings.length >= 2) {
+						this.setupOTP(OTP.makeUrl(otpSeed , otpSettings[0], otpSettings[1]))
+					}
+				}
 			}
 		}
 	}
