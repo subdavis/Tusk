@@ -3,9 +3,8 @@
 	Simple http provider that can also handle Dropbox Shared Links
 -->
 <script>
-import {
-	ChromePromiseApi
-} from '$lib/chrome-api-promise.js'
+import { ChromePromiseApi } from '$lib/chrome-api-promise.js'
+import { parseUrl } from '$lib/utils.js'
 import GenericProviderUi from '@/components/GenericProviderUi'
 const chromePromise = ChromePromiseApi()
 
@@ -42,123 +41,72 @@ export default {
 				})
 			}
 		},
+		updateLinks() {
+			return this.providerManager.getUrls().then(links => {
+				this.links = links
+			})
+		},
 		removeLink(index) {
-			if (index !== undefined)
-				if (index >= 0)
-					this.links.splice(index, 1)
-			this.providerManager.setUrls(this.links)
+			if (index !== undefined && index >= 0) {
+				this.providerManager.removeUrl(this.links[index])
+					.then(() => this.updateLinks())
+			}
 		},
 		addLink() {
-
-			/* 
-			 * SharedURL Object:
-			 * This code is pretty low quality and LoC could probably be reduced.
-			 * However, it works for now.
-			 * TODO: Make this better...
-			 */
-			var that = this;
-			var SharedUrl = function (url, title) {
-				this.url = url;
-				this.direct_link = url;
-				this.title = title;
-				let a = document.createElement("a");
-				a.href = url;
-				this.origin = a.hostname;
-				this.processSpecialSources();
+			if (!this.currentUrl || !this.currentUrlTitle) {
+				this.messages.error = "Link or Title Missing";
+				return;
 			}
-			SharedUrl.prototype.isValid = function () {
-				if (this.direct_link && this.title) {
-					let parsed = this.parseUrl(this.direct_link);
-					if (parsed) {
-						let lastchar = this.direct_link.charAt(this.direct_link.length - 1);
-						if (lastchar != "/" && parsed.pathname.length == 1) {
-							that.messages.error = "URL must include file path. (eg. http://example.com is invalid, but http://example.com/file.ckp is valid.)"
-							return false;
-						}
-						return parsed.pathname.length;
-					}
-					that.messages.error = "Link URL is not valid."
+
+			let parsed = parseUrl(this.currentUrl);
+			if (!parsed.host || parsed.host === window.location.host) {
+				this.messages.error = "Link URL is not valid."
+				return;
+			}
+			if (parsed.pathname.charAt(parsed.pathname.length - 1) === "/") {
+				this.messages.error = "URL must include file path. (eg. http://example.com is invalid, but http://example.com/file.ckp is valid.)"
+				return;
+			}
+
+			let direct_link;
+			if (parsed.host === "drive.google.com") {
+				let id = getParameterByName("id", parsed.href);
+				if (!id) {
+					this.messages.error = "Invalid Google Drive Shared Link";
+					return;
 				}
-				that.messages.error = "Link or Title Missing";
-				return false;
-			}
-			// Support Dropbox, and any other cloud host where 
-			// direct download links _can_ be made but are not the same as their
-			// respective shared urls.
-			SharedUrl.prototype.processSpecialSources = function () {
-				let googleGenerator = function (url) {
-					let id = getParameterByName("id", url);
-					if (id)
-						return "https://docs.google.com/uc?export=download&id=" + id;
-					throw "Invalid Google Drive Shared Link";
-				};
-				let dropboxGenerator = function (url) {
-					let path = url.split('/s/');
-					if (path.length != 2)
-						throw "Invalid Dropbox Shared Link";
-					return "https://dl.dropboxusercontent.com/s/" + path[1];
-				};
-				let ownNextCloudGenerator = function (url) {
-					let exclude = /\/[A-Za-z0-9]{15}\/download/
-					let matches = url.match(exclude) || []
-					if (matches.length === 1)
-						return url;
-					else
-						return url + "/download"
-				};
-				let generatorMap = {
-					"drive.google.com": googleGenerator,
-					"www.dropbox.com": dropboxGenerator,
-					"\/[A-Za-z0-9]{15}\/?": ownNextCloudGenerator
-				};
-				for (var regx in generatorMap) {
-					let matches = this.url.match(regx) || []
-					if (matches.length) {
-						this.direct_link = generatorMap[regx](this.url);
-						break;
-					}
+				direct_link = "https://docs.google.com/uc?export=download&id=" + id;
+			} else if (parsed.host === "www.dropbox.com") {
+				if (!parsed.pathname.startsWith("/s/")) {
+					this.messages.error = "Invalid Dropbox Shared Link";
+					return;
 				}
+				direct_link = "https://dl.dropboxusercontent.com/s/" + parsed.pathname.substring(3);
+			} else {
+				direct_link = parsed.href;
 			}
-			SharedUrl.prototype.parseUrl = function () {
-				var a = document.createElement('a');
-				a.href = this.direct_link;
-				if (a.host && a.host != window.location.host)
-					return {
-						host: a.host,
-						hostname: a.hostname,
-						pathname: a.pathname,
-						port: a.port,
-						protocol: a.protocol,
-						search: a.search,
-						hash: a.hash
-					};
-				return false;
-			}
-			// END TODO
 
-			/* 
-			 * MAIN addLink
-			 */
-
-			// try to parse the url..
-			let lnk = new SharedUrl(this.currentUrl, this.currentUrlTitle);
-			if (lnk.isValid()) {
-				this.messages.error = "";
-				// go ahead and request permissions.  There isn't a good way to ask from the popup screen...
-				this.busy = true;
-				chromePromise.permissions.request({
-					origins: [lnk.direct_link] //FLAGHERE TODO
-				}).then(nil => {
+			// go ahead and request permissions.  There isn't a good way to ask from the popup screen...
+			this.messages.error = "";
+			this.busy = true;
+			chromePromise.permissions
+				.request({
+					origins: [direct_link] //FLAGHERE TODO
+				})
+				.then(() => this.providerManager.addUrl({
+					direct_link: direct_link,
+					title: this.currentUrlTitle
+				}))
+				.then(() => this.updateLinks())
+				.then(() => {
 					// on accepted
 					this.busy = false;
-					this.links.push(lnk);
-					this.providerManager.setUrls(this.links);
-				}, reason => {
+				})
+				.catch(reason => {
 					// on rejected
 					this.busy = false;
 					this.messages.error = reason.message;
 				});
-			}
 		},
 
 		/*
@@ -174,16 +122,15 @@ export default {
 			if (!results) return null;
 			if (!results[2]) return '';
 			return decodeURIComponent(results[2].replace(/\+/g, " "));
-		}
+		},
+
+
 	},
 	mounted() {
 		this.providerManager.isLoggedIn().then(loggedIn => {
 			this.loggedIn = loggedIn
 		})
-		this.providerManager.getUrls().then(links => {
-			if (links !== false)
-				this.links = links
-		})
+		this.updateLinks();
 	}
 }
 </script>
@@ -204,20 +151,20 @@ export default {
 .url-form {
   margin-top: 15px;
   &.shared-link-box {
-    display: flex;
-    justify-content: space-between;
-    align-content: stretch;
-    input {
-      width: 25%;
-      margin-right: 8px;
-      margin-bottom: 5px;
-    }
-    input#shared-link {
-      width: 48%;
-    }
-    .btn {
-      margin-top: 6px;
-    }
+	display: flex;
+	justify-content: space-between;
+	align-content: stretch;
+	input {
+	  width: 25%;
+	  margin-right: 8px;
+	  margin-bottom: 5px;
+	}
+	input#shared-link {
+	  width: 48%;
+	}
+	.btn {
+	  margin-top: 6px;
+	}
   }
 }
 </style>
