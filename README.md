@@ -1,3 +1,12 @@
+# Tusk is no longer actively maintained.
+
+* **Is it still safe?**  Yes. As far as the community is aware, Tusk's security model is still the same.  You may continue using Tusk, and I will keep the third party integrations (Dropbox, Google Drive, etc.) active.  Please contact me through [my website](https://subdavis.com) to report security concerns.
+* **Why is it unsuppored?** Because I no longer prefer the keepass ecosystem.  I believe version control and data sync should be a core feature of any password manager.
+* **Any good alternatives?** I've switched entirely to [Password Store](https://www.passwordstore.org/) + [BrowserPass](https://github.com/browserpass/browserpass-extension) and I'm happier now.  If you want something more user friendly, I highly recommend [Bitwarden](https://bitwarden.com/).  To remain with Keepass, try [Kee](https://kee.pm) or [KeepassXC-Browser](https://chrome.google.com/webstore/detail/keepassxc-browser/oboonakemofpalcgghocfoadofidjkkk).
+* **Could someone else take over?** If you have a lot of time and are interested in taking over leadership of Tusk, please contact me through [my website](https://subdavis.com) and tell me about yourself and what you'd like to do with Tuisk.  It has over 25 thousand active users, and I'm sure they would all love to see the project live on.
+
+----
+
 # Tusk
 > A modern, clean keepass browser extension built with Vue.js and kdbxweb.  Rebooted from perfectapi/CKP
 
