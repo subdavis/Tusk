@@ -50,6 +50,7 @@ function SecureCacheMemory(protectedMemory) {
 	//wake up the background page and get a pipe to send/receive messages:
 	exports.get = function (key) {
 		ready.then(function (port) {
+			console.log(port)
 			port.postMessage({
 				action: 'get',
 				key: key

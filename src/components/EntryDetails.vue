@@ -1,7 +1,7 @@
 <script>
-const OTP = require('keeweb/app/scripts/util/otp.js')
-import { parseUrl } from '$lib/utils.js'
-import GoBack from '@/components/GoBack'
+import * as OTP from '@/lib/otp.js'
+import { parseUrl } from '@/lib/utils.js'
+import GoBack from '@/components/GoBack.vue'
 
 export default {
 	components: {

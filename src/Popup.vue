@@ -47,11 +47,11 @@ import { SharedUrlFileManager } from '$services/sharedUrlFileManager.js'
 import { SampleDatabaseFileManager } from '$services/sampleDatabaseFileManager.js'
 import { WebdavFileManager } from '$services/webdavFileManager.js'
 // Components
-import Unlock from '@/components/Unlock'
-import Startup from '@/components/Startup'
-import FilePicker from '@/components/FilePicker'
-import EntryDetails from '@/components/EntryDetails'
-import SvgDefs from '@/components/SvgDefs'
+import Unlock from '@/components/Unlock.vue'
+import Startup from '@/components/Startup.vue'
+import FilePicker from '@/components/FilePicker.vue'
+import EntryDetails from '@/components/EntryDetails.vue'
+import SvgDefs from '@/components/SvgDefs.vue'
 
 const links = new Links()
 const protectedMemory = new ProtectedMemory()

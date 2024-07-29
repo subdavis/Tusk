@@ -1,5 +1,5 @@
-const Base64 = require('base64-arraybuffer')
-import { ChromePromiseApi } from '$lib/chrome-api-promise.js'
+import * as Base64 from 'base64-arraybuffer'
+import { ChromePromiseApi } from '@/lib/chrome-api-promise.js'
 import { Links } from '$services/links.js'
 const chromePromise = ChromePromiseApi()
 const links = new Links()

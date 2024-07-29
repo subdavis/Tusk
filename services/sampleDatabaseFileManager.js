@@ -1,9 +1,9 @@
 "use strict";
 
-const axios = require('axios')
+import axios from 'axios'
 import {
 	ChromePromiseApi
-} from '$lib/chrome-api-promise.js'
+} from '@/lib/chrome-api-promise.js'
 
 const chromePromise = ChromePromiseApi()
 
@@ -18,7 +18,7 @@ function SampleDatabaseFileManager() {
 		permissions: [],
 		icon: 'icon-flask',
 		chooseTitle: 'Sample Database',
-		chooseDescription: 'Sample database that you can use to try out the functionality.  The master password is 123.',
+		chooseDescription: 'Sample database that you can use to try out the functionality. The master password is 123.',
 		getActive: getActive,
 		setActive: setActive,
 		login: login, // Implement the "oauth" interface
@@ -57,7 +57,7 @@ function SampleDatabaseFileManager() {
 	function getChosenDatabaseFile(dbInfo) {
 		return axios({
 			method: 'GET',
-			url: chrome.extension.getURL('/assets/other/Sample123.kdbx'),
+			url: '/assets/other/Sample123.kdbx',
 			responseType: 'arraybuffer'
 		}).then(function (response) {
 			return response.data;

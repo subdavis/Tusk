@@ -1,5 +1,5 @@
 <script>
-import GoBack from '@/components/GoBack'
+import GoBack from '@/components/GoBack.vue'
 
 export default {
 	props: {

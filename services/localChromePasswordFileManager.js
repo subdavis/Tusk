@@ -1,8 +1,8 @@
 "use strict";
-const Base64 = require('base64-arraybuffer')
+import * as Base64 from 'base64-arraybuffer'
 import {
 	ChromePromiseApi
-} from '$lib/chrome-api-promise.js'
+} from '@/lib/chrome-api-promise.js'
 
 const chromePromise = ChromePromiseApi()
 

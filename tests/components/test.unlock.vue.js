@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import Unlock from '@/components/Unlock'
+import Unlock from '@/components/Unlock.vue'
 import { SecureCacheMemory } from '$services/secureCacheMemory.js'
 
 /*

@@ -12,6 +12,7 @@ import { Settings } from '$services/settings.js'
 import { Notifications } from "$services/notifications";
 
 function Background(protectedMemory, settings, notifications) {
+	console.log('Background worker registered');
 	chrome.runtime.onInstalled.addListener(settings.upgrade);
 	chrome.runtime.onStartup.addListener(forgetStuff);
 
@@ -52,11 +53,11 @@ function Background(protectedMemory, settings, notifications) {
 
 		if (message.m == "showMessage") {
 			const expire = typeof message.expire !== 'undefined' ? message.expire * 1000 : 60000;
-			chrome.notifications.create({
+			chrome.notifications.create(null, {
 				'type': 'basic',
-				'iconUrl': '/assets/icons/exported/48x48.png',
+				'iconUrl': '/assets/48x48.png',
 				'title': 'Tusk',
-				'message': message.text
+				'message': message.text,
 			}, function(notificationId) {
 				setTimeout(() => chrome.notifications.clear(notificationId), expire)
 			})
@@ -90,10 +91,9 @@ function Background(protectedMemory, settings, notifications) {
 					});
 					return;
 				}
-				chrome.tabs.executeScript(message.tabId, {
-					file: "build/inject.build.js",
-					allFrames: true,
-					runAt: "document_start"
+				chrome.scripting.executeScript({
+					target: { tabId: message.tabId, allFrames: true },
+					files: ["/dist/contentScripts/index.global.js"],
 				}, function(result) {
 					//script injected
 					console.log("injected")
@@ -138,7 +138,7 @@ function Background(protectedMemory, settings, notifications) {
 	});
 
 	function forgetStuff() {
-		console.log("ForgetStuff", new Date())
+		console.log("Alarm Handler -- Check if we should clear Cache --", new Date())
 		protectedMemory.clearData('secureCache.entries'); // ALWAYS clear entries.
 		settings.getAllForgetTimes().then(function(allTimes) {
 			var now = Date.now();

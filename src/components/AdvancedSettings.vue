@@ -1,6 +1,6 @@
 <script>
 import JSONFormatter from 'json-formatter-js'
-import { isFirefox } from '$lib/utils'
+import { isFirefox } from '@/lib/utils'
 
 export default {
 	props: {

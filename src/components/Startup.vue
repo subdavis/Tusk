@@ -1,7 +1,7 @@
 <script>
 /* beautify preserve:start */
 import { Links } from '$services/links.js'
-import Spinner from 'vue-simple-spinner'
+// import Spinner from 'vue-simple-spinner'
 /* beautify preserve:end */
 export default {
 	props: {
@@ -15,7 +15,7 @@ export default {
 		}
 	},
 	components: {
-		Spinner
+		// Spinner
 	},
 	mounted: function () {
 		this.settings.getCurrentDatabaseChoice().then(info => {
@@ -52,12 +52,12 @@ export default {
 	<div>
 		<!-- Busy Spinner -->
 		<div v-if="busy" class="box-bar plain spinner">
-			<spinner size="medium" :message="'Starting up...'"></spinner>
+			<div>Spinner</div>
 		</div>
 		<div v-else>
 			<div class="box-bar plain">
 				<div class="unlockLogo stack-item">
-					<img src="assets/icons/exported/128x128.svg">
+					<img src="@/assets/icons/exported/128x128.svg">
 					<span>KeePass Tusk</span>
 				</div>
 				<p>Tusk is an extension that uses your existing KeePass database files to autofill passwords on websites. In order to continue, you must add your KeePass database file(s).</p>

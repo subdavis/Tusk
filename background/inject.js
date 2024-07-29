@@ -1,4 +1,4 @@
-import { isVisible, parseUrl } from '$lib/utils.js'
+import { isVisible, parseUrl } from '@/lib/utils.js'
 /* 
 Inject script
 

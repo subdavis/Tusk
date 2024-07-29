@@ -1,11 +1,11 @@
-const Base64 = require('base64-arraybuffer')
-const axios = require('axios')
+import axios from 'axios'
+
 import {
 	ChromePromiseApi
-} from '$lib/chrome-api-promise.js'
+} from '@/lib/chrome-api-promise.js'
 import {
 	urlencode
-} from '$lib/utils.js'
+} from '@/lib/utils.js'
 import {
 	OauthManager
 } from '$services/oauthManager.js'

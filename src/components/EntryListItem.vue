@@ -1,5 +1,5 @@
 <script>
-import { parseUrl } from '$lib/utils.js'
+import { parseUrl } from '@/lib/utils.js'
 export default {
 	props: {
 		entry: Object,
@@ -7,6 +7,7 @@ export default {
 	},
 	computed: {
 		header: function () {
+			console.log(this.entry)
 			if (this.entry.title.length > 0)
 				return this.entry.title
 			return this.entry.url

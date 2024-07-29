@@ -2,13 +2,13 @@
 /**
  * Service for opening keepass files
  */
-let Case = require('case'),
-	Base64 = require('base64-arraybuffer'),
-	pako = require('pako'),
-	kdbxweb = require('kdbxweb')
+import * as Base64 from 'base64-arraybuffer'
+import * as Case from 'case'
+// import pako from 'pako'
+import * as kdbxweb from 'kdbxweb'
 
-import { argon2 } from '$lib/argon2.js'
-import { parseUrl, getValidTokens } from '$lib/utils.js'
+import { argon2 } from '@/lib/argon2.js'
+import { parseUrl, getValidTokens } from '@/lib/utils.js'
 
 function KeepassService(keepassHeader, settings, passwordFileStoreRegistry, keepassReference) {
 	var my = {};
@@ -232,6 +232,7 @@ function KeepassService(keepassHeader, settings, passwordFileStoreRegistry, keep
 	 */
 
 	function protectedValueToJSON(pv) {
+		console.log(pv)
 		return {
 			salt: Array.from(pv._salt),
 			value: Array.from(pv._value)

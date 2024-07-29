@@ -1,5 +1,5 @@
 'use strict';
-import A2Module from '$lib/argon2.wasm.js';
+import A2Module from '@/lib/argon2.wasm.js';
 
 function argon2(password, salt, memory, iterations, length, parallelism, type, version) {
 	var Module = A2Module;

@@ -1,8 +1,8 @@
 "use strict";
-const Base64 = require('base64-arraybuffer')
+import * as Base64 from 'base64-arraybuffer'
 import {
 	ChromePromiseApi
-} from '$lib/chrome-api-promise.js'
+} from '@/lib/chrome-api-promise.js'
 const chromePromise = ChromePromiseApi()
 
 function OauthManager(settings, oauth) {
@@ -131,6 +131,7 @@ function OauthManager(settings, oauth) {
 	}
 
 	function logout() {
+		console.log('logout')
 		return oauth.revokeAuth().then(function () {
 			return removeToken().then(function () {
 				state.loggedIn = false
@@ -182,7 +183,7 @@ function OauthManager(settings, oauth) {
 			return new Promise(function (resolve, reject) {
 				chromePromise.runtime.getManifest().then(manifest => {
 					//random state, protects against CSRF
-					var randomState = Base64.encode(window.crypto.getRandomValues(new Uint8Array(16)));
+					var randomState = Base64.encode(crypto.getRandomValues(new Uint8Array(16)));
 					var authUrl = oauth.authUrl +
 						'&client_id=' + manifest.static_data[oauth.accessTokenType].client_id +
 						'&state=' + encodeURIComponent(randomState) +

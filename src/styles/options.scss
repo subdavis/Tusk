@@ -1,10 +1,10 @@
 @import './shared.scss';
 
-@import "~materialize-css/sass/components/_tabs.scss";
-@import "~materialize-css/sass/components/forms/_switches.scss";
-@import "~materialize-css/sass/components/_navbar.scss";
-@import "~materialize-css/sass/components/_chips.scss";
-@import "~materialize-css/sass/components/_buttons.scss";
+@import "materialize-css/sass/components/_tabs.scss";
+@import "materialize-css/sass/components/forms/_switches.scss";
+@import "materialize-css/sass/components/_navbar.scss";
+@import "materialize-css/sass/components/_chips.scss";
+@import "materialize-css/sass/components/_buttons.scss";
 
 nav {
   background-color: $blue;
