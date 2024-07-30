@@ -15,7 +15,7 @@
     "clean": "rm -rf build/ *.zip manifest.json demo*"
   },
   "dependencies": {
-    "axios": "^0.17.1",
+    "axios": "^0.28.0",
     "babel-regenerator-runtime": "^6.5.0",
     "base64-arraybuffer": "^0.1.5",
     "case": "^1.5.4",
