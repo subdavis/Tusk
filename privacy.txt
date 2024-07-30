@@ -1,0 +1,22 @@
+Privacy Policy
+--------------
+
+Tusk may transmit and receive user data between the user's own storage at one of the cloud storage providers (e.g. Google Drive, Dropbox) and the Tusk extension.  When doing so, data is always encrypted using the mechanism supported by the cloud provider.
+
+Tusk does not transmit data to anywhere not mentioned above. Tusk is designed with your privacy in mind. We do not collect, store, or process any personal data or usage information from our users.
+
+Tusk only scans webpages when the user has opted-in to fill passwords on that particular website.
+
+When Tusk scans a webpage, it is for the sole purpose of identifying username and password fields, so that they may be automatically filled at the user's request.
+
+
+Changes to This Privacy Policy
+------------------------------
+
+We may update our Privacy Policy from time to time.
+
+
+Open source software
+--------------------
+
+Tusk is open source software. The full source code is available at https://github.com/subdavis/Tusk
