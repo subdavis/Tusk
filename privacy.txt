@@ -1,14 +1,23 @@
 Privacy Policy
 --------------
 
-Tusk may transmit and receive user data between the user's own storage at one of the cloud storage providers (e.g. Google Drive, Dropbox) and the Tusk extension.  When doing so, data is always encrypted using the mechanism supported by the cloud provider.
+* Tusk may transmit and receive user data between the user's own storage at one of the cloud storage providers (e.g. Google Drive, Dropbox) and the Tusk extension.  When doing so, data is always encrypted using the mechanism supported by the cloud provider.
+* Tusk does not transmit data to anywhere not mentioned above. Tusk is designed with your privacy in mind. We do not collect, store, or process any personal data or usage information from our users.
+* Tusk only scans webpages when the user has opted-in to fill passwords on that particular website.
+* When Tusk scans a webpage, it is for the sole purpose of identifying username and password fields, so that they may be automatically filled at the user's request.
+* You may delete your own data by uninstalling Tusk.
 
-Tusk does not transmit data to anywhere not mentioned above. Tusk is designed with your privacy in mind. We do not collect, store, or process any personal data or usage information from our users.
+Google Data usage
+-----------------
 
-Tusk only scans webpages when the user has opted-in to fill passwords on that particular website.
+This section discusses how Keepass Tusk accesses, uses, stores, or shares Google user data.
 
-When Tusk scans a webpage, it is for the sole purpose of identifying username and password fields, so that they may be automatically filled at the user's request.
+* Tusk uses the browser.identity API to get an OAuth2 access token and nothing else.
+* NONE of your google user account details (email, name, etc.) are used or collected AT ALL by Tusk.
+* Only the access token is retained by Tusk, and it is only kept on the user's browser.
+* Tusk DOES NOT share, transfer, or disclose Google user data with third-parties.
 
+Google Drive file data is transmitted exclusively between Google servers and your browser. Tusk uses your authentication token to 1. search for files with the .kdbx extension and 2. download the file you choose for the purpose of presenting the user with their keepass data.
 
 Changes to This Privacy Policy
 ------------------------------
