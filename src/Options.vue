@@ -34,7 +34,7 @@
 <script>
 /* beautify preserve:start */
 // Singletons
-import { ChromePromiseApi } from '$lib/chrome-api-promise.js'
+import { ChromePromiseApi } from '@/lib/chrome-api-promise.js'
 import { Settings } from '$services/settings.js'
 import { ProtectedMemory } from '$services/protectedMemory.js'
 import { SecureCacheMemory } from '$services/secureCacheMemory.js'
@@ -50,13 +50,13 @@ import { PCloudFileManager } from '$services/pCloudFileManager.js'
 import { SampleDatabaseFileManager } from '$services/sampleDatabaseFileManager.js'
 import { WebdavFileManager } from '$services/webdavFileManager.js'
 // Components
-import OptionsNavbar from '@/components/Navbar'
-import OptionsStartup from '@/components/OptionsStartup'
-import ManageDatabases from '@/components/ManageDatabases'
-import ManageKeyfiles from '@/components/ManageKeyfiles'
-import AdvancedSettings from '@/components/AdvancedSettings'
-import SvgDefs from '@/components/SvgDefs'
-import Reauthorize from '@/components/Reauthorize'
+import OptionsNavbar from '@/components/Navbar.vue'
+import OptionsStartup from '@/components/OptionsStartup.vue'
+import ManageDatabases from '@/components/ManageDatabases.vue'
+import ManageKeyfiles from '@/components/ManageKeyfiles.vue'
+import AdvancedSettings from '@/components/AdvancedSettings.vue'
+import SvgDefs from '@/components/SvgDefs.vue'
+import Reauthorize from '@/components/Reauthorize.vue'
 
 const protectedMemory = new ProtectedMemory()
 const secureCacheMemory = new SecureCacheMemory(protectedMemory)

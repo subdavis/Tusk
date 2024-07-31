@@ -37,15 +37,15 @@ function Links() {
 	}
 
 	function openOptionsDatabases() {
-		openOptionsPath("/options.html#/manage/databases");
+		openOptionsPath("/dist/options.html#/manage/databases");
 	}
 
 	function openOptionsKeyfiles() {
-		openOptionsPath("/options.html#/manage/keyfiles")
+		openOptionsPath("/dist/options.html#/manage/keyfiles")
 	}
 
 	function openOptionsReauth(reauth_id) {
-		openOptionsPath("/options.html#/reauthorize/" + reauth_id)
+		openOptionsPath("/dist/options.html#/reauthorize/" + reauth_id)
 	}
 
 	function openWebstore() {

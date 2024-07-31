@@ -1,7 +1,7 @@
 "use strict";
 
-import { ChromePromiseApi } from '$lib/chrome-api-promise.js'
-import { parseUrl } from '$lib/utils.js'
+import { ChromePromiseApi } from '@/lib/chrome-api-promise.js'
+import { parseUrl } from '@/lib/utils.js'
 
 const chromePromise = ChromePromiseApi()
 
@@ -31,6 +31,10 @@ function UnlockedState($router, keepassReference, protectedMemory, settings, not
 			}, function (tabs) {
 				if (tabs && tabs.length) {
 					my.tabId = tabs[0].id;
+					// if (!tabs[0].url) {
+					// 	resolve();
+					// 	return;
+					// }
 					var url = tabs[0].url.split('?');
 					my.url = url[0];
 					my.title = tabs[0].title;

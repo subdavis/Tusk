@@ -1,6 +1,6 @@
 <script>
-import EntryListItem from '@/components/EntryListItem'
-import Messenger from '@/components/Messenger'
+import EntryListItem from '@/components/EntryListItem.vue'
+import Messenger from '@/components/Messenger.vue'
 
 export default {
 	props: {
@@ -9,7 +9,8 @@ export default {
 		unlockedState: Object
 	},
 	watch: {
-		searchTerm: function (val) {
+		searchTerm(val) {
+			console.log(val)
 			this.unlockedState.cacheSet('searchFilter', val) // Causes cache refresh
 			if (val.length) {
 				this.filteredEntries = this.allEntries.filter(entry => {
@@ -112,6 +113,7 @@ export default {
 		}
 	},
 	mounted() {
+		console.log("EntryList mounted", this.priorityEntries, this.searchTerm)
 		// Autofocus searchbox
 		this.$nextTick(function () {
 			this.$refs.searchbox.focus();

@@ -27,12 +27,10 @@ Object DirMap {
 }
 
 */
-const Base64 = require('base64-arraybuffer');
-const createClient = require("webdav");
-const regeneratorRuntime = require('babel-regenerator-runtime')
-import { guid } from '$lib/utils.js'
-import { ChromePromiseApi } from '$lib/chrome-api-promise.js'
-import { create } from "domain";
+import * as Base64 from 'base64-arraybuffer';
+import { createClient } from 'webdav';
+import { guid } from '@/lib/utils.js'
+import { ChromePromiseApi } from '@/lib/chrome-api-promise.js'
 
 const chromePromise = ChromePromiseApi()
 const SEARCH_DEPTH = 5
@@ -111,8 +109,10 @@ function WebdavFileManager(settings) {
 			console.error("serverInfo not found");
 			return
 		}
-		let client = createClient(serverInfo.url, serverInfo.username, serverInfo.password)
-		createClient.setFetchMethod(window.fetch);
+		let client = createClient(serverInfo.url, {
+			username: serverInfo.username,
+			password: serverInfo.password,
+		})
 
 		/** 
 		 * returns Object:[]DirInfo
@@ -172,8 +172,10 @@ function WebdavFileManager(settings) {
 		return getServer(dbInfo.serverId).then(serverInfo => {
 			if (serverInfo === null)
 				throw 'Database no longer exists'
-			let client = createClient(serverInfo.url, serverInfo.username, serverInfo.password)
-			createClient.setFetchMethod(window.fetch)
+			let client = createClient(serverInfo.url, {
+				username: serverInfo.username,
+				password: serverInfo.password,
+			})
 			return client.getFileContents(dbInfo.path, { credentials: 'omit' })
 		})
 	}
@@ -187,8 +189,10 @@ function WebdavFileManager(settings) {
 		return getServer(serverId).then(serverInfo => {
 			if (serverInfo === null)
 				return []
-			let client = createClient(serverInfo.url, serverInfo.username, serverInfo.password)
-			createClient.setFetchMethod(window.fetch);
+			let client = createClient(serverInfo.url, {
+				username: serverInfo.username,
+				password: serverInfo.password,
+			})
 			return client.getDirectoryContents(directory, { credentials: 'omit' }).then(contents => {
 				// map from directory contents to DBInfo type.
 				return contents.filter(element => {
@@ -209,9 +213,8 @@ function WebdavFileManager(settings) {
 	 * @param {Object:ServerInfo} serverInfo 
 	 */
 	function addServer(url, username, password) {
-		let client = createClient(url, username, password)
-		createClient.setFetchMethod((a, b) => {
-			return window.fetch(a, b);
+		let client = createClient(url, {
+			username, password
 		})
 		return client.getDirectoryContents('/', { credentials: 'omit' }).then(contents => {
 			// success!

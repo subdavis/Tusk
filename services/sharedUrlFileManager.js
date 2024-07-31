@@ -1,9 +1,9 @@
 "use strict";
 
-const axios = require('axios')
+import axios from 'axios'
 import {
 	ChromePromiseApi
-} from '$lib/chrome-api-promise.js'
+} from '@/lib/chrome-api-promise.js'
 
 const chromePromise = ChromePromiseApi()
 

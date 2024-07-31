@@ -1,10 +1,10 @@
 <script>
-import { parseUrl, getValidTokens } from '$lib/utils.js'
+import { parseUrl, getValidTokens } from '@/lib/utils.js'
 
-import InfoCluster from '@/components/InfoCluster'
-import EntryList from '@/components/EntryList'
+import InfoCluster from '@/components/InfoCluster.vue'
+import EntryList from '@/components/EntryList.vue'
 import Spinner from 'vue-simple-spinner'
-import Messenger from '@/components/Messenger'
+import Messenger from '@/components/Messenger.vue'
 
 export default {
 	props: {
@@ -146,6 +146,7 @@ export default {
 			this.unlockedState.clearCache() // new
 		},
 		showResults(entries) {
+			console.log('showResults', entries)
 			let getMatchesForThreshold = (threshold, entries, requireEmptyURL = false) => {
 				return entries.filter(e => (e.matchRank >= threshold) && (requireEmptyURL ? !e.URL : true));
 			}
@@ -194,6 +195,7 @@ export default {
 			this.unlock()
 		},
 		unlock(passwordKey) {
+			console.log('unlock')
 			this.busy = true
 			this.generalMessages.error = ""
 			let passwordKeyPromise;
@@ -239,22 +241,18 @@ export default {
 					this.generalMessages['error'] = errmsg
 					this.busy = false
 				})
-			}).catch(err => {
-				this.settings.handleProviderError(err)
-				let errmsg = err.message || "Incorrect password or keyfile"
-				console.error(errmsg)
-				this.generalMessages['error'] = errmsg
-				this.busy = false
 			})
 		}
 	},
 	async mounted() {
+		
 		// modify unlockedState internal state
 		await this.unlockedState.getTabDetails();
-
+		
 		if (!this.isUnlocked()) {
-
+			
 			let try_autounlock = () => {
+				console.log('try')
 				this.busy = true
 				this.settings.getKeyFiles().then(keyFiles => {
 					this.keyFiles = keyFiles
@@ -291,10 +289,13 @@ export default {
 						mp.focus()
 				});
 			}
-
+			
 			this.busy = true
 			try {
+				console.log('mounted2')
+				// console.log('mounted2', entries)
 				let entries = await this.secureCache.get('secureCache.entries');
+				console.log('mounted2', entries)
 				if (entries !== undefined && entries.length > 0) {
 					this.showResults(entries)
 				} else {
@@ -329,10 +330,10 @@ export default {
 		</div>
 
 		<!-- Entry List -->
-		<entry-list v-if="!busy && isUnlocked()"
+		<EntryList v-if="!busy && isUnlocked()"
 			:messages="unlockedMessages"
 			:unlocked-state="unlockedState"
-			:settings="settings"></entry-list>
+			:settings="settings"></EntryList>
 
 		<!-- General Messenger -->
 		<messenger :messages="generalMessages" v-show="!busy"></messenger>
@@ -341,7 +342,7 @@ export default {
 		<div id="masterPasswordGroup" v-if="!busy && !isUnlocked()">
 
 			<div class="unlockLogo stack-item">
-				<img src="assets/icons/exported/128x128.svg">
+				<img src="/assets/icons/exported/128x128.svg" width="256px" height="256px">
 				<span>KeePass Tusk</span>
 			</div>
 

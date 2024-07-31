@@ -9,7 +9,7 @@ export default {
 		<div class="box-bar roomy">
 
 			<div class="unlockLogo stack-item optionsheader">
-				<img src="assets/icons/exported/128x128.svg">
+				<img src="@/assets/icons/exported/128x128.svg" width="256px" height="256px">
 				<span>Getting Started with Tusk</span>
 			</div>
 

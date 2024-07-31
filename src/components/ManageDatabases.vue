@@ -1,9 +1,9 @@
 <script>
-import OauthProvider from '@/components/OauthProvider'
-import SharedLinkProvider from '@/components/SharedLinkProvider'
-import LocalPasswordFileProvider from '@/components/LocalPasswordFileProvider'
-import WebdavProvider from '@/components/WebdavProvider'
-import VirtualRouter from '$lib/virtual-router.js'
+import OauthProvider from '@/components/OauthProvider.vue'
+import SharedLinkProvider from '@/components/SharedLinkProvider.vue'
+import LocalPasswordFileProvider from '@/components/LocalPasswordFileProvider.vue'
+import WebdavProvider from '@/components/WebdavProvider.vue'
+import VirtualRouter from '@/lib/virtual-router.js'
 
 export default {
 	props: {
@@ -77,11 +77,11 @@ export default {
 				<a href="https://dropbox.com">Dropbox</a> or
 				<a href="http://drive.google.com">Google Drive</a> and come back here when you're done.</p>
 		</div>
+		<oauth-provider :provider-manager="sampleManager" :settings="settings"></oauth-provider>
 		<oauth-provider :provider-manager="dropboxFileManager" :settings="settings"></oauth-provider>
 		<oauth-provider :provider-manager="googleDriveManager" :settings="settings"></oauth-provider>
 		<oauth-provider :provider-manager="onedriveManager" :settings="settings"></oauth-provider>
-		<oauth-provider :provider-manager="pCloudFileManager" :settings="settings"></oauth-provider>
-		<oauth-provider :provider-manager="sampleManager" :settings="settings"></oauth-provider>
+		<!-- <oauth-provider :provider-manager="pCloudFileManager" :settings="settings"></oauth-provider> -->
 		<shared-link-provider :provider-manager="sharedUrlManager" :settings="settings"></shared-link-provider>
 		<webdav-provider :provider-manager="webdavManager" :settings="settings"></webdav-provider>
 		<local-password-file-provider :provider-manager="localFileManager" :settings="settings"></local-password-file-provider>

@@ -1,11 +1,11 @@
-const Base64 = require('base64-arraybuffer')
-const axios = require('axios')
+import axios from 'axios'
+
 import {
 	ChromePromiseApi
-} from '$lib/chrome-api-promise.js'
+} from '@/lib/chrome-api-promise.js'
 import {
 	urlencode
-} from '$lib/utils.js'
+} from '@/lib/utils.js'
 import {
 	OauthManager
 } from '$services/oauthManager.js'
@@ -102,6 +102,7 @@ function GoogleDrivePasswordFileManager(settings) {
 	oauth.revokeAuth = function () {
 		return settings.getSetAccessToken(accessTokenType).then(function (accessToken) {
 			if (accessToken) {
+				chrome.identity.clearAllCachedAuthTokens()
 				var url = 'https://accounts.google.com/o/oauth2/revoke?token=' + accessToken
 				return axios({
 					url: url,
@@ -147,7 +148,7 @@ function GoogleDrivePasswordFileManager(settings) {
 		interactive = !!interactive;
 		return new Promise(function (resolve, reject) {
 			chrome.identity.getAuthToken({
-				interactive: interactive
+				interactive
 			}, function (token) {
 				if (token)
 					settings.getSetAccessToken(accessTokenType, token).then(function () {

@@ -3,9 +3,9 @@
 	Simple http provider that can also handle Dropbox Shared Links
 -->
 <script>
-import { ChromePromiseApi } from '$lib/chrome-api-promise.js'
-import { parseUrl } from '$lib/utils.js'
-import GenericProviderUi from '@/components/GenericProviderUi'
+import { ChromePromiseApi } from '@/lib/chrome-api-promise.js'
+import { parseUrl } from '@/lib/utils.js'
+import GenericProviderUi from '@/components/GenericProviderUi.vue'
 const chromePromise = ChromePromiseApi()
 
 export default {
@@ -76,12 +76,6 @@ export default {
 					return;
 				}
 				direct_link = "https://docs.google.com/uc?export=download&id=" + id;
-			} else if (parsed.host === "www.dropbox.com") {
-				if (!parsed.pathname.startsWith("/s/")) {
-					this.messages.error = "Invalid Dropbox Shared Link";
-					return;
-				}
-				direct_link = "https://dl.dropboxusercontent.com/s/" + parsed.pathname.substring(3);
 			} else {
 				direct_link = parsed.href;
 			}

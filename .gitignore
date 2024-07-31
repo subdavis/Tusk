@@ -84,3 +84,6 @@ bower_components/
 *.travis.yml
 manifest.json
 demo*
+
+extension/dist
+extension/manifest.json

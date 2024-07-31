@@ -1,4 +1,4 @@
-const kdbxweb = require('kdbxweb')
+import kdbxweb from 'kdbxweb';
 
 function KeepassReference() {
 	"use strict";

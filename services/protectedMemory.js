@@ -6,7 +6,7 @@
  * access to the code from reading the contents.
  */
 
-let Base64 = require('base64-arraybuffer')
+import * as Base64 from 'base64-arraybuffer'
 
 function ProtectedMemory() {
 	var my = {
@@ -21,13 +21,13 @@ function ProtectedMemory() {
 	var dataMap = {};
 	var AES = {
 		name: "AES-CBC",
-		iv: window.crypto.getRandomValues(new Uint8Array(16))
+		iv: crypto.getRandomValues(new Uint8Array(16))
 	};
 
 	var keyPromise = initNewKey();
 
 	function initNewKey() {
-		return window.crypto.subtle.generateKey({
+		return crypto.subtle.generateKey({
 			name: "AES-CBC",
 			length: 256
 		}, false, ["encrypt", "decrypt"]);
@@ -40,7 +40,7 @@ function ProtectedMemory() {
 
 		return keyPromise.then(key => {
 			var encBytes = Base64.decode(encData);
-			return window.crypto.subtle.decrypt(AES, key, encBytes);
+			return crypto.subtle.decrypt(AES, key, encBytes);
 		}).then(function (data) {
 			var decoder = new TextDecoder();
 			var decoded = decoder.decode(new Uint8Array(data));
@@ -54,7 +54,7 @@ function ProtectedMemory() {
 		var encoder = new TextEncoder();
 		var dataBytes = encoder.encode(JSON.stringify(preppedData));
 		return keyPromise.then(key => {
-			return window.crypto.subtle.encrypt(AES, key, dataBytes);
+			return crypto.subtle.encrypt(AES, key, dataBytes);
 		}).then(function (encData) {
 			var dataString = Base64.encode(encData);
 			dataMap[key] = dataString;
@@ -94,7 +94,7 @@ function ProtectedMemory() {
 	 * Prep data for serializing by converting ArrayBuffer properties to base64 properties
 	 * Also makes a deep copy, so what is returned is not the original.
 	 */
-	var randomString = "Ựៅ" // Base64.encode(window.crypto.getRandomValues(new Uint8Array(4)));
+	var randomString = "Ựៅ" // Base64.encode(crypto.getRandomValues(new Uint8Array(4)));
 	function prepData(data) {
 		if (data === null || data === undefined || typeof (data) !== 'object')
 			return data;

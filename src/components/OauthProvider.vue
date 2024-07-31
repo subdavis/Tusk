@@ -10,7 +10,7 @@
 	If new providers are added, prefer that they are oauth providers.
 -->
 <script>
-import GenericProviderUi from '@/components/GenericProviderUi'
+import GenericProviderUi from '@/components/GenericProviderUi.vue'
 
 export default {
 	data() {
@@ -51,6 +51,8 @@ export default {
 		},
 		toggleLogin(event) {
 			//v-bind:id="'toggleButton'+providerManager.key"j
+			// this.providerManager.logout()
+			// this.settings.disableDatabaseProvider(this.providerManager)
 			if (!this.busy) {
 				if (this.loggedIn) {
 					this.providerManager.logout().then(nil => {

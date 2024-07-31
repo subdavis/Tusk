@@ -1,5 +1,5 @@
-const Base64 = require('base64-arraybuffer')
-import { ChromePromiseApi } from '$lib/chrome-api-promise.js'
+import * as Base64 from 'base64-arraybuffer'
+import { ChromePromiseApi } from '@/lib/chrome-api-promise.js'
 import { Links } from '$services/links.js'
 const chromePromise = ChromePromiseApi()
 const links = new Links()
@@ -60,6 +60,10 @@ function Settings(secureCache) {
 		if (key.length) {
 			return chromePromise.storage.local.remove(key)
 		}
+	}
+
+	exports.hardReset = function() {
+		chromePromise.storage.clear()
 	}
 
 	exports.addKeyFile = function (name, key) {

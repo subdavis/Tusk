@@ -3,9 +3,9 @@
 	Simple http provider that can also handle Dropbox Shared Links
 -->
 <script>
-const Base64 = require('base64-arraybuffer')
-import { ChromePromiseApi } from '$lib/chrome-api-promise.js'
-import GenericProviderUi from '@/components/GenericProviderUi'
+import * as Base64 from 'base64-arraybuffer'
+import { ChromePromiseApi } from '@/lib/chrome-api-promise.js'
+import GenericProviderUi from '@/components/GenericProviderUi.vue'
 const chromePromise = ChromePromiseApi()
 
 export default {

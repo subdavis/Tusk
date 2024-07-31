@@ -4,8 +4,8 @@
 -->
 
 <script>
-const Base64 = require('base64-arraybuffer')
-import GenericProviderUi from '@/components/GenericProviderUi'
+import * as Base64 from 'base64-arraybuffer'
+import GenericProviderUi from '@/components/GenericProviderUi.vue'
 
 export default {
 	data() {
