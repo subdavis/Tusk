@@ -102,6 +102,7 @@ function GoogleDrivePasswordFileManager(settings) {
 	oauth.revokeAuth = function () {
 		return settings.getSetAccessToken(accessTokenType).then(function (accessToken) {
 			if (accessToken) {
+				chrome.identity.clearAllCachedAuthTokens()
 				var url = 'https://accounts.google.com/o/oauth2/revoke?token=' + accessToken
 				return axios({
 					url: url,
@@ -147,7 +148,7 @@ function GoogleDrivePasswordFileManager(settings) {
 		interactive = !!interactive;
 		return new Promise(function (resolve, reject) {
 			chrome.identity.getAuthToken({
-				interactive: interactive
+				interactive
 			}, function (token) {
 				if (token)
 					settings.getSetAccessToken(accessTokenType, token).then(function () {

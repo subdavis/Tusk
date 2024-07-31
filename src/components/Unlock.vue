@@ -3,7 +3,7 @@ import { parseUrl, getValidTokens } from '@/lib/utils.js'
 
 import InfoCluster from '@/components/InfoCluster.vue'
 import EntryList from '@/components/EntryList.vue'
-// import Spinner from 'vue-simple-spinner'
+import Spinner from 'vue-simple-spinner'
 import Messenger from '@/components/Messenger.vue'
 
 export default {
@@ -18,7 +18,7 @@ export default {
 	components: {
 		InfoCluster,
 		EntryList,
-		// Spinner,
+		Spinner,
 		Messenger
 	},
 	data() {
@@ -326,8 +326,7 @@ export default {
 	<div>
 		<!-- Busy Spinner -->
 		<div v-if="busy" class="spinner">
-			<!-- <spinner size="medium" :message='"Unlocking " + databaseFileName'></spinner> -->
-			<div>Spinner {{ isUnlocked() }}</div>
+			<spinner size="medium" :message='"Unlocking " + databaseFileName'></spinner>
 		</div>
 
 		<!-- Entry List -->

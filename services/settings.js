@@ -62,6 +62,10 @@ function Settings(secureCache) {
 		}
 	}
 
+	exports.hardReset = function() {
+		chromePromise.storage.clear()
+	}
+
 	exports.addKeyFile = function (name, key) {
 		return exports.getKeyFiles().then(function (keyFiles) {
 			var matches = keyFiles.filter(function (keyFile) {

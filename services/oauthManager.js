@@ -96,8 +96,13 @@ function OauthManager(settings, oauth) {
 			let status = error.response.status
 			attempt = attempt || 0
 
-			if (attempt > 0)
+			if (attempt > 0) {
+				if (oauth.key === 'gdrive') {
+					// If the gdrive token is bad, clear all cached auth tokens
+					chrome.identity.clearAllCachedAuthTokens()
+				}
 				throw new Error(error)
+			}
 
 			if (status >= 400 && status <= 599) {
 				console.error("listDatabases failed with status code", status)
@@ -131,7 +136,6 @@ function OauthManager(settings, oauth) {
 	}
 
 	function logout() {
-		console.log('logout')
 		return oauth.revokeAuth().then(function () {
 			return removeToken().then(function () {
 				state.loggedIn = false

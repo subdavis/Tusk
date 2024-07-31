@@ -1,7 +1,7 @@
 <script>
 /* beautify preserve:start */
 import { Links } from '$services/links.js'
-// import Spinner from 'vue-simple-spinner'
+import Spinner from 'vue-simple-spinner'
 /* beautify preserve:end */
 export default {
 	props: {
@@ -15,7 +15,7 @@ export default {
 		}
 	},
 	components: {
-		// Spinner
+		Spinner
 	},
 	mounted: function () {
 		this.settings.getCurrentDatabaseChoice().then(info => {
@@ -52,7 +52,7 @@ export default {
 	<div>
 		<!-- Busy Spinner -->
 		<div v-if="busy" class="box-bar plain spinner">
-			<div>Spinner</div>
+			<spinner size="large" />
 		</div>
 		<div v-else>
 			<div class="box-bar plain">

@@ -177,14 +177,17 @@ function Background(protectedMemory, settings, notifications) {
 	}
 
 	function clearClipboard() {
-		var clearClipboard = function(e) {
-			e.clipboardData.setData('text/plain', "");
-			e.preventDefault();
-			document.removeEventListener('copy', clearClipboard); //don't listen anymore
-		}
+		// No longer have access to document in this context.
+		// https://github.com/GoogleChrome/chrome-extensions-samples/tree/main/functional-samples/cookbook.offscreen-clipboard-write
+		console.log('Clearing clipboard');
+		// var clearClipboard = function(e) {
+		// 	e.clipboardData.setData('text/plain', "");
+		// 	e.preventDefault();
+		// 	document.removeEventListener('copy', clearClipboard); //don't listen anymore
+		// }
 
-		document.addEventListener('copy', clearClipboard);
-		document.execCommand('copy');
+		// document.addEventListener('copy', clearClipboard);
+		// document.execCommand('copy');
 	}
 
 	function forgetPassword() {
