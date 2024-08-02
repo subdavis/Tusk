@@ -4,7 +4,7 @@ import SharedLinkProvider from '@/components/SharedLinkProvider.vue'
 import LocalPasswordFileProvider from '@/components/LocalPasswordFileProvider.vue'
 import WebdavProvider from '@/components/WebdavProvider.vue'
 import VirtualRouter from '@/lib/virtual-router.js'
-
+import GooglePicker from '@/components/GooglePicker.vue'
 export default {
 	props: {
 		dropboxFileManager: Object,
@@ -19,6 +19,7 @@ export default {
 	},
 	components: {
 		OauthProvider,
+		GooglePicker,
 		SharedLinkProvider,
 		LocalPasswordFileProvider,
 		WebdavProvider
@@ -63,10 +64,10 @@ export default {
 			<p>Tusk
 				<b>requires</b> that you enable at least one of these cloud storage providers to sync your keepass database with. Once the files appear below, they will be available to unlock within the popup window.</p>
 
-			<a class="waves-effect waves-light btn" @click="tabRouter.route('/help/me/choose')">Help me choose</a>
-			<a class="waves-effect waves-light btn" @click="tabRouter.route('/new/user')">I haven't made a keepass database yet.</a>
+			<a class="waves-effect waves-light btn mr-10" @click="tabRouter.route('/help/me/choose')">Help me choose</a>
+			<a class="waves-effect waves-light btn" @click="tabRouter.route('/new/user')">I don't have a KeePass Database</a>
 
-			<p id="/help/me/choose" v-show="show.help.visible">If you're unsure which to pick, the developers recommend
+			<p id="/help/me/choose" v-show="show.help.visible">If you're unsure which to pick, I recommend
 				<b>Dropbox</b>. It is easy to use and widely supported by other Keepass apps, such as
 				<a href="https://play.google.com/store/apps/details?id=keepass2android.keepass2android&hl=en">Keepass2Android</a> for iOS or
 				<a href="https://itunes.apple.com/us/app/keepass-touch/id966759076?mt=8">KeepassTouch</a>. Simply create a Dropbox account, upload your keepass database, and enable the dropbox provider below.</p>
@@ -79,7 +80,9 @@ export default {
 		</div>
 		<oauth-provider :provider-manager="sampleManager" :settings="settings"></oauth-provider>
 		<oauth-provider :provider-manager="dropboxFileManager" :settings="settings"></oauth-provider>
-		<oauth-provider :provider-manager="googleDriveManager" :settings="settings"></oauth-provider>
+		<oauth-provider :provider-manager="googleDriveManager" :settings="settings">
+			<google-picker v-bind="{ googleDriveManager, settings }" />
+		</oauth-provider>
 		<oauth-provider :provider-manager="onedriveManager" :settings="settings"></oauth-provider>
 		<!-- <oauth-provider :provider-manager="pCloudFileManager" :settings="settings"></oauth-provider> -->
 		<shared-link-provider :provider-manager="sharedUrlManager" :settings="settings"></shared-link-provider>

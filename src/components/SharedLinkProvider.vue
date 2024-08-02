@@ -70,13 +70,18 @@ export default {
 
 			let direct_link;
 			if (parsed.host === "drive.google.com") {
-				let id = getParameterByName("id", parsed.href);
-				if (!id) {
-					this.messages.error = "Invalid Google Drive Shared Link";
+				// Expected URL Structure is https://drive.google.com/file/d/FILE_ID/view?usp=sharing
+				let id = parsed.pathname.split("/")[3];
+				if (!id || !parsed.pathname.startsWith("/file/d/")) {
+					this.messages.error = "Invalid Google Drive Shared Link. Expected format: https://drive.google.com/file/d/FILE_ID";
 					return;
 				}
-				direct_link = "https://docs.google.com/uc?export=download&id=" + id;
-			} else {
+				// direct_link = "https://drive.google.com/uc?export=download&id=" + id;
+				this.messages.error = "Google Drive Shared Links are no longer supported. Please use the Google Drive provider."
+				return;
+			} else if (parsed.host.endsWith(".dropbox.com")) {
+				direct_link = parsed.href.replace("dl=0", "dl=1");
+			}	else {
 				direct_link = parsed.href;
 			}
 
@@ -102,23 +107,6 @@ export default {
 					this.messages.error = reason.message;
 				});
 		},
-
-		/*
-		 * Helper Methods...
-		 */
-
-		// https://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
-		getParameterByName(name, url) {
-			if (!url) url = window.location.href;
-			name = name.replace(/[\[\]]/g, "\\$&");
-			var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
-				results = regex.exec(url);
-			if (!results) return null;
-			if (!results[2]) return '';
-			return decodeURIComponent(results[2].replace(/\+/g, " "));
-		},
-
-
 	},
 	mounted() {
 		this.providerManager.isLoggedIn().then(loggedIn => {
@@ -132,6 +120,11 @@ export default {
 <template>
 	<div class="box-bar roomy database-manager">
 		<generic-provider-ui :busy="busy" :databases="links" :loggedIn="loggedIn" :error="messages.error" :provider-manager="providerManager" :toggle-login="toggleLogin" :removeable="true" :remove-function="removeLink"></generic-provider-ui>
+		<ul class="examples">
+			<li><b>Dropbox URL Example</b> https://www.dropbox.com/scl/fi/FILE_ID/filename.kdbx?rlkey=&st=&dl=1</li>
+			<li><b>Google Drive and OneDrive</b> shared links no longer work</li>
+			<li>Other clould provider shared links will likely not work, but direct HTTP file links will.</li>
+		</ul>
 		<div class="url-form shared-link-box" v-if="loggedIn">
 			<input id="shared-link" type="text" v-model="currentUrl" placeholder="Shared Link URL">
 			<input id="shared-link-name" type="text" v-model="currentUrlTitle" placeholder="Database Name">
@@ -142,23 +135,23 @@ export default {
 
 <style lang="scss" scoped>
 @import "../styles/settings.scss";
+.examples {
+	font-size: 13px;
+}
 .url-form {
   margin-top: 15px;
   &.shared-link-box {
-	display: flex;
-	justify-content: space-between;
-	align-content: stretch;
-	input {
-	  width: 25%;
-	  margin-right: 8px;
-	  margin-bottom: 5px;
-	}
-	input#shared-link {
-	  width: 48%;
-	}
-	.btn {
-	  margin-top: 6px;
-	}
+		display: flex;
+		justify-content: space-between;
+		align-content: stretch;
+		input {
+			width: 25%;
+			margin-right: 8px;
+			margin-bottom: 5px;
+		}
+		input#shared-link {
+			width: 48%;
+		}
   }
 }
 </style>

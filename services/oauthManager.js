@@ -52,7 +52,8 @@ function OauthManager(settings, oauth) {
 		state: state,
 		login: login,
 		isLoggedIn: isLoggedIn,
-		logout: logout
+		logout: logout,
+		getToken,
 	};
 
 	function getToken() {

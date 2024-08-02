@@ -209,7 +209,7 @@ export default {
 				this.selectedKeyFile.name :
 				undefined
 			passwordKeyPromise.then(passwordKey => {
-				this.keepassService.getDecryptedData(bufferPromise, passwordKey).then(decryptedData => {
+				return this.keepassService.getDecryptedData(bufferPromise, passwordKey).then(decryptedData => {
 					let entries = decryptedData.entries
 					let version = decryptedData.version
 					let dbUsage = {
@@ -235,12 +235,11 @@ export default {
 					this.showResults(entries)
 					this.busy = false
 					this.masterPassword = ""
-				}).catch(err => {
-					let errmsg = err.message || "Incorrect password or keyfile"
-					console.error(errmsg)
-					this.generalMessages['error'] = errmsg
-					this.busy = false
 				})
+			}).catch((err) => {
+				console.error(err)
+				this.generalMessages['error'] = err.message || "invalid keyfile or KDBX file"
+				this.busy = false
 			})
 		}
 	},
