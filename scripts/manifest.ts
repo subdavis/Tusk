@@ -5,7 +5,7 @@ import { isDev, log, port, r } from './utils'
 const manifest: Manifest.WebExtensionManifest = {
   "name": "KeePass Tusk - Password Access and Autofill",
   "short_name": "KeePass Tusk",
-  "version": "2024.7.30",
+  "version": "2024.8.2",
   "manifest_version": 3,
   "minimum_chrome_version": "88",
   "description": "Readonly KeePass password database integration for Chrome and Firefox",
@@ -14,7 +14,7 @@ const manifest: Manifest.WebExtensionManifest = {
     "48": "/assets/48x48.png"
   },
   "oauth2": {
-    "client_id": "714523444550-a34d1sjum49defn68apeqqfttbh6tfgo.apps.googleusercontent.com",
+    "client_id": "876467817034-al13p9m2bphgregs0rij76n1tumakcqr.apps.googleusercontent.com",
     "scopes": [
       "https://www.googleapis.com/auth/drive.file"
     ]
@@ -31,17 +31,11 @@ const manifest: Manifest.WebExtensionManifest = {
     "default_title": "KeePass Tusk"
   },
 	content_security_policy: {
-		// sandbox: `sandbox allow-scripts allow-forms allow-popups allow-modals; script-src \'self\' \'unsafe-inline\' https://apis.google.com; object-src \'self\'; frame-ancestors 'self' https://docs.google.com;`,
 		extension_pages: isDev
 			// this is required on dev for Vite script to load
 			? `script-src \'self\' http://localhost:${port}; object-src \'self\'`
 			: 'script-src \'self\'; object-src \'self\''
 	},
-	// "sandbox": {
-  //   "pages": [
-  //     "dist/sandbox-picker.html",
-  //   ]
-  // },
 	"options_ui": {
 		"page": "./dist/options.html",
     "open_in_tab": true
@@ -79,7 +73,7 @@ const manifest: Manifest.WebExtensionManifest = {
       "client_id": "f4c55645-3f43-4f8e-a7d2-ec167b416f1d"
     },
     "gdrive": {
-      "client_id": "714523444550-a34d1sjum49defn68apeqqfttbh6tfgo.apps.googleusercontent.com"
+      "client_id": "876467817034-rlas0hnb5jc9dt1qmp11l6g4724ktoqn.apps.googleusercontent.com"
     },
     "pcloud": {
       "client_id": "1NklWhTApYR"
