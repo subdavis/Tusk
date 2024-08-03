@@ -5,7 +5,7 @@ import { isDev, log, port, r } from './utils'
 const manifest: Manifest.WebExtensionManifest = {
   "name": "KeePass Tusk - Password Access and Autofill",
   "short_name": "KeePass Tusk",
-  "version": "2024.7.30",
+  "version": "2024.8.2",
   "manifest_version": 3,
   "minimum_chrome_version": "88",
   "description": "Readonly KeePass password database integration for Chrome and Firefox",
@@ -16,7 +16,7 @@ const manifest: Manifest.WebExtensionManifest = {
   "oauth2": {
     "client_id": "876467817034-al13p9m2bphgregs0rij76n1tumakcqr.apps.googleusercontent.com",
     "scopes": [
-      "https://www.googleapis.com/auth/drive.readonly"
+      "https://www.googleapis.com/auth/drive.file"
     ]
   },
   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAhoF/A6nYIxSHW2AekTQRJga9QodwEJBTeAA5r0tW9djrTHY3Ei0FdnUE1FrH2Hx03tsj4RjXMWDHtsqMg4REJdFNzndsRKWvliGomXtxE8XByawJf/NGx0/imAtVBrHc846D/Bn4q1dRaRauqkPMKgpcHoPeg+uLTBIfAn5qPgLlvLLqNSKRg6zGYkm0iBYFiyLd1cqWjsDrVhant90W5rE7qmGQPXZudkc2ejtijuMJL4CF9BeQXOVv/9a0XzAwNbArSr+zHnNOicZPyeEnT7mujFDvLRzXvi7OPW+8mdEsm3AeagKZ6bGUuqyzwxs8XlysWqJsXBoX6tjZCGGVpQIDAQAB",
@@ -34,7 +34,7 @@ const manifest: Manifest.WebExtensionManifest = {
 		extension_pages: isDev
 			// this is required on dev for Vite script to load
 			? `script-src \'self\' http://localhost:${port}; object-src \'self\'`
-			: 'script-src \'self\'; object-src \'self\'',
+			: 'script-src \'self\'; object-src \'self\''
 	},
 	"options_ui": {
 		"page": "./dist/options.html",

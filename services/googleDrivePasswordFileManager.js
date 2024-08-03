@@ -23,7 +23,7 @@ function GoogleDrivePasswordFileManager(settings) {
 		key: accessTokenType,
 		accessTokenType: accessTokenType,
 		supportedFeatures: ['listDatabases'],
-		authUrl: `https://accounts.google.com/o/oauth2/v2/auth?response_type=token&scope=${encodeURIComponent('https://www.googleapis.com/auth/drive.readonly')}`,
+		authUrl: `https://accounts.google.com/o/oauth2/v2/auth?response_type=token&scope=${encodeURIComponent('https://www.googleapis.com/auth/drive.file')}`,
 		origins: [
 			"https://www.googleapis.com/*",
 			"https://accounts.google.com/*",
