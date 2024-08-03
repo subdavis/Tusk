@@ -3,9 +3,9 @@
 
 ![Tusk](https://user-images.githubusercontent.com/25948390/45255427-a466f300-b386-11e8-9321-931934faafb4.png "Tusk Logo")
 
-## Back in business
+## 🧟 Back from the dead 🧟
 
-[Read the blog post](https://medium.com/@brandon.a.davis/keepass-tusk-is-back-from-the-dead-a367697212fd) and stay tuned for more updates.
+[Read the release notes](https://github.com/subdavis/Tusk/releases/tag/v2024.8.2) and stay tuned for more updates!
 
 ## Installation
 
@@ -32,28 +32,19 @@ This section provides in-depth information about how tusk works under the hood. 
 
 Tusk requires:
 * `node`
-* `npm`
 * `yarn`
 
 ```bash
 # install dependencies
 yarn install
 
-# build static DLL resources (optional)
-yarn build-dll
-
 # build for production with minification
 yarn build
+yarn pack:zip
 
-# run the packer script targeted for 'chrome' and 'firefox' after build.
-# this step generates the zip archives submitted to Chrome/Firefox addon marketplaces.
-yarn bundle
-
-# static reload with file watch for tests
-yarn dev-tests
+# Hot reload
+yarn dev
 ```
-
-For detailed explanation on how things work, consult the [docs for vue-loader](http://vuejs.github.io/vue-loader).
 
 ## Running tests
 
@@ -77,11 +68,7 @@ I originally wanted to call it *Elephant*, as in *An elephant never forgets.*  I
 
 This is it! CKPX has been rebranded as Tusk to mark its Firefox release.  The C in CKPX stood for 'Chrome'.
 
-> Can I donate money?
-
-I don't want your money.  Take whatever you would have given me and find a local charity -- a food bank, a women's shelter or an animal shelter, for example.  Enjoy your free software.
-
-> So how can I support Tusk?
+> How can I support Tusk?
 
 If you ❤️ Tusk, please consider leaving a positive review on [the Firefox Add-on store](https://addons.mozilla.org/en-GB/firefox/addon/keepass-tusk/) or [the Chrome webstore](https://chrome.google.com/webstore/detail/fmhmiaejopepamlcjkncpgpdjichnecm) - I'll be eternally grateful.
 
