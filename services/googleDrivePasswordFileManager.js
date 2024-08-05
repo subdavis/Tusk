@@ -102,7 +102,9 @@ function GoogleDrivePasswordFileManager(settings) {
 	oauth.revokeAuth = function () {
 		return settings.getSetAccessToken(accessTokenType).then(function (accessToken) {
 			if (accessToken) {
-				chrome.identity.clearAllCachedAuthTokens()
+				if (chrome.identity.clearAllCachedAuthTokens) {
+					chrome.identity.clearAllCachedAuthTokens()
+				}
 				var url = 'https://accounts.google.com/o/oauth2/revoke?token=' + accessToken
 				return axios({
 					url: url,
@@ -163,17 +165,22 @@ function GoogleDrivePasswordFileManager(settings) {
 						//too confusing
 						reject(new Error("You must Authorize google drive access to continue."))
 					} else {
-						reject(err);
+						reject(new Error("Failed to authenticate:" + err.message));
 					}
 				}
 			});
 		});
 	}
 
-	// If this browser has the getAuthToken function...  Hack for #64
-	// There is the getAuthToken function in Opera, but it isn't supported. Detect Opera by the chrome.search function.
 	try {
-	    if (chrome.identity.getAuthToken !== undefined && chrome.search === undefined && !window.navigator.userAgent.match("Vivaldi")) {
+		// These browsers do not properly support chrome.identity.getAuthToken
+		const isEdge = !!window.navigator.userAgent.match("Edg/");
+		const isVivaldi = !!window.navigator.userAgent.match("Vivaldi");
+		const isOpera = !!window.navigator.userAgent.match("OPR");
+		const isArc = !!getComputedStyle(document.documentElement).getPropertyValue('--arc-palette-title')
+		const isBrave = !!window.navigator.brave
+
+	  if (chrome.identity.getAuthToken && !isVivaldi && !isEdge && !isOpera && !isArc && !isBrave) {
 			oauth['auth'] = chrome_auth;
 		}
 	}
