@@ -91,13 +91,11 @@ function firefoxManifest() {
 	return Object.assign({}, _manifest, {
 		"browser_specific_settings": {
 			"gecko": {
-				"id": "brandon@subdavis.com",
-				"strict_min_version": "57.0"
+				"id": "brandon@subdavis.com"
 			}
 		},
 		"background": {
-			"scripts": ["./dist/background/index.mjs"],
-			"persistent": false
+			"scripts": ["./dist/background/index.mjs"]
 		},
 		// Firefox is incapable of detecting user input through promise chains.
 		"host_permissions": [
