@@ -100,7 +100,9 @@ function OauthManager(settings, oauth) {
 			if (attempt > 0) {
 				if (oauth.key === 'gdrive') {
 					// If the gdrive token is bad, clear all cached auth tokens
-					chrome.identity.clearAllCachedAuthTokens()
+					if (chrome.identity.clearAllCachedAuthTokens) {
+						chrome.identity.clearAllCachedAuthTokens()
+					}
 				}
 				throw new Error(error)
 			}
