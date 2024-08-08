@@ -80,7 +80,7 @@ function chromeManifestV3(): Manifest.WebExtensionManifest {
 			// The Chrome identity client ID for Chrome ONLY
 			"client_id": "876467817034-al13p9m2bphgregs0rij76n1tumakcqr.apps.googleusercontent.com",
 			"scopes": [
-				"https://www.googleapis.com/auth/drive.readonly"
+				"https://www.googleapis.com/auth/drive.file"
 			]
 		},
 		permissions,

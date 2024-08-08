@@ -62,7 +62,9 @@ export default {
 	<div>
 		<div class="box-bar about roomy">
 			<p>Tusk
-				<b>requires</b> that you enable at least one of these cloud storage providers to sync your keepass database with. Once the files appear below, they will be available to unlock within the popup window.</p>
+				<b>requires</b> that you enable at least one of these cloud storage providers to sync your keepass database with. Once the files appear below, they will be available to unlock within the popup window.
+				If you have problems, please read <a href="https://github.com/subdavis/Tusk/wiki/Troubleshooting#google-drive-issues">the troubleshooting guide</a> or <a href="https://github.com/subdavis/Tusk/issues">open an issue</a>.
+			</p>
 
 			<a class="waves-effect waves-light btn mr-10" @click="tabRouter.route('/help/me/choose')">Help me choose</a>
 			<a class="waves-effect waves-light btn" @click="tabRouter.route('/new/user')">I don't have a KeePass Database</a>
