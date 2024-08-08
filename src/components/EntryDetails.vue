@@ -1,5 +1,5 @@
 <script>
-import * as OTP from '@/lib/otp.js'
+import { Otp as OTP } from '@/lib/otp.js'
 import { parseUrl } from '@/lib/utils.js'
 import GoBack from '@/components/GoBack.vue'
 
@@ -43,23 +43,23 @@ export default {
 			let otpobj = OTP.parseUrl(url)
 			this.otp = true
 			let do_otp = () => {
-				otpobj.next((code, timeleft) => {
+				otpobj.next((_, code, timeleft) => {
 					this.otp_value = code;
 					this.otp_timeleft = (timeleft / 1000) | 0;
 					this.otp_width = Math.floor(timeleft / 300) + "%"
 				})
 			}
-			this.otp_loop = setInterval(do_otp, 2000)
+			this.otp_loop = setInterval(do_otp, 1000)
 			do_otp()
 		},
 		autofill(e) {
 			e.stopPropagation()
-			console.log("autofill")
+			console.debug("autofill")
 			this.unlockedState.autofill(this.entry);
 		},
 		copy(e) {
 			e.stopPropagation()
-			console.log("copy")
+			console.debug("copy")
 			this.unlockedState.copyPassword(this.entry);
 		}
 	},
@@ -128,7 +128,7 @@ export default {
 				<br>
 				<span class="attribute-value">{{otp_value}}</span>
 				<div class="progress">
-					<div class="determinate" v-bind:style="{ width: otp_width }"></div>
+					<div :key="otp_value" class="determinate" style="transition: width 1s linear;" v-bind:style="{ width: otp_width }"></div>
 				</div>
 			</div>
 

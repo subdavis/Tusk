@@ -29,7 +29,7 @@ function KeepassHeader() {
 		var VERSION_KDBX = 3;
 		if (h.sigKeePass != DBSIG_KEEPASS || (h.sigKeePassType != DBSIG_KDBX && h.sigKeePassType != DBSIG_KDBX_ALPHA && h.sigKeePassType != DBSIG_KDB && h.sigKeePassType != DBSIG_KDB_NEW)) {
 			//fail
-			console.log("Signature fail.  sig 1:" + h.sigKeePass.toString(16) + ", sig2:" + h.sigKeePassType.toString(16));
+			console.error("Signature fail.  sig 1:" + h.sigKeePass.toString(16) + ", sig2:" + h.sigKeePassType.toString(16));
 			throw new Error('This is not a valid KeePass file - file signature is not correct.')
 		}
 
@@ -39,8 +39,6 @@ function KeepassHeader() {
 			readKdbHeader(buf, 8, h);
 		}
 
-		//console.log(h);
-		//console.log("version: " + h.version.toString(16) + ", keyRounds: " + h.keyRounds);
 		return h;
 	}
 
@@ -96,7 +94,7 @@ function KeepassHeader() {
 				var len = descriptor.getUint16(1, littleEndian);
 
 				var dv = new DataView(buf, position + 3, len);
-				//console.log("fieldid " + fieldId + " found at " + position);
+
 				position += 3;
 				switch (fieldId) {
 					case 0: //end of header

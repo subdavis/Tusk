@@ -6,18 +6,29 @@ import * as Base64 from 'base64-arraybuffer'
 import * as Case from 'case'
 // import pako from 'pako'
 import * as kdbxweb from 'kdbxweb'
+import argon2 from 'argon2-browser/dist/argon2-bundled.min.js';
 
-import { argon2 } from '@/lib/argon2.js'
+kdbxweb.CryptoEngine.setArgon2Impl((
+	password, salt,
+	memory, iterations, length, parallelism, type, version
+) => {
+	console.log('Using argon2 implementation', password, salt, memory, iterations, length, parallelism, type, version);
+	return argon2.hash({
+		pass: new Uint8Array(password),
+		salt: new Uint8Array(salt),
+		time: iterations,
+		mem: memory,
+		hashLen: length,
+		parallelism,
+		type,
+		version,
+	}).then((v) => v.hash)
+});
+
 import { parseUrl, getValidTokens } from '@/lib/utils.js'
 
 function KeepassService(keepassHeader, settings, passwordFileStoreRegistry, keepassReference) {
 	var my = {};
-
-	var littleEndian = (function () {
-		var buffer = new ArrayBuffer(2);
-		new DataView(buffer).setInt16(0, 256, true);
-		return new Int16Array(buffer)[0] === 256;
-	})();
 
 	/** 
 	 * return Promise(arrayBufer)
@@ -40,7 +51,7 @@ function KeepassService(keepassHeader, settings, passwordFileStoreRegistry, keep
 		} else if (masterPassword === "" && keyFileInfo !== undefined) {
 			// Keyfile but empty password provided.  Assume password is unused.
 			// This extension does not support the combo empty string + keyfile.
-			protectedMasterPassword = null;
+			protectedMasterPassword = null
 		} else {
 			protectedMasterPassword = kdbxweb.ProtectedValue.fromString(masterPassword)
 		}
@@ -58,10 +69,8 @@ function KeepassService(keepassHeader, settings, passwordFileStoreRegistry, keep
 			if (!h) throw new Error('Failed to read file header');
 
 			if (h.kdbx) { // KDBX - use kdbxweb library
-				kdbxweb.CryptoEngine.argon2 = argon2;
 				var kdbxCreds = jsonCredentialsToKdbx(masterKey);
 				return kdbxweb.Kdbx.load(buf, kdbxCreds).then(db => {
-					var psk = new Uint8Array(db.header.protectedStreamKey, 0, db.header.protectedStreamKey.length);
 					var entries = parseKdbxDb(db.groups);
 					majorVersion = db.header.versionMajor;
 					return processReferences(entries, majorVersion);
@@ -190,15 +199,14 @@ function KeepassService(keepassHeader, settings, passwordFileStoreRegistry, keep
 					entry.keys.push('tags');
 				}
 				if (db_entry.fields) {
-					var field_keys = Object.keys(db_entry.fields);
-					for (let k = 0; k < field_keys.length; k++) {
-						var field = field_keys[k];
-						if (typeof db_entry.fields[field] === 'object') {
+					for (const [key, field] of db_entry.fields) {
+						const camelKey = Case.camel(key);
+						if (typeof field === 'object') {
 							// type = object ? protected value
-							entry.protectedData[Case.camel(field)] = protectedValueToJSON(db_entry.fields[field]);
+							entry.protectedData[camelKey] = protectedValueToJSON(field);
 						} else {
-							entry.keys.push(Case.camel(field));
-							entry[Case.camel(field)] = db_entry.fields[field];
+							entry.keys.push(camelKey);
+							entry[camelKey] = field;
 						}
 					}
 				}
@@ -232,10 +240,9 @@ function KeepassService(keepassHeader, settings, passwordFileStoreRegistry, keep
 	 */
 
 	function protectedValueToJSON(pv) {
-		console.log(pv)
 		return {
-			salt: Array.from(pv._salt),
-			value: Array.from(pv._value)
+			salt: Array.from(pv.salt),
+			value: Array.from(pv.value)
 		}
 	}
 
