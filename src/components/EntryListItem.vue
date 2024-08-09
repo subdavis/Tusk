@@ -7,7 +7,6 @@ export default {
 	},
 	computed: {
 		header: function () {
-			console.log(this.entry)
 			if (this.entry.title.length > 0)
 				return this.entry.title
 			return this.entry.url
@@ -29,12 +28,12 @@ export default {
 		},
 		autofill(e) {
 			e.stopPropagation()
-			console.log("autofill")
+			console.debug("autofill")
 			this.unlockedState.autofill(this.entry);
 		},
 		copy(e) {
 			e.stopPropagation()
-			console.log("copy")
+			console.debug("copy")
 			this.unlockedState.copyPassword(this.entry);
 		}
 	}

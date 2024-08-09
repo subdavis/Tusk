@@ -12,7 +12,7 @@ import { Settings } from '$services/settings.js'
 import { Notifications } from "$services/notifications";
 
 function Background(protectedMemory, settings, notifications) {
-	console.log('Background worker registered');
+	console.log('Background worker registered.');
 	chrome.runtime.onInstalled.addListener(settings.upgrade);
 	chrome.runtime.onStartup.addListener(forgetStuff);
 
@@ -96,7 +96,7 @@ function Background(protectedMemory, settings, notifications) {
 					files: ["/dist/contentScripts/index.global.js"],
 				}, function(result) {
 					//script injected
-					console.log("injected")
+					console.log("Autofill script injected.")
 					chrome.tabs.sendMessage(message.tabId, {
 						m: "fillPassword",
 						u: message.u,
@@ -179,7 +179,7 @@ function Background(protectedMemory, settings, notifications) {
 	function clearClipboard() {
 		// No longer have access to document in this context.
 		// https://github.com/GoogleChrome/chrome-extensions-samples/tree/main/functional-samples/cookbook.offscreen-clipboard-write
-		console.log('Clearing clipboard');
+		console.info('Clearing clipboard');
 		// var clearClipboard = function(e) {
 		// 	e.clipboardData.setData('text/plain', "");
 		// 	e.preventDefault();

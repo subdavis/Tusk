@@ -146,7 +146,6 @@ export default {
 			this.unlockedState.clearCache() // new
 		},
 		showResults(entries) {
-			console.log('showResults', entries)
 			let getMatchesForThreshold = (threshold, entries, requireEmptyURL = false) => {
 				return entries.filter(e => (e.matchRank >= threshold) && (requireEmptyURL ? !e.URL : true));
 			}
@@ -195,7 +194,6 @@ export default {
 			this.unlock()
 		},
 		unlock(passwordKey) {
-			console.log('unlock')
 			this.busy = true
 			this.generalMessages.error = ""
 			let passwordKeyPromise;
@@ -240,6 +238,7 @@ export default {
 				console.error(err)
 				this.generalMessages['error'] = err.message || "invalid keyfile or KDBX file"
 				this.busy = false
+				throw err
 			})
 		}
 	},
@@ -251,7 +250,6 @@ export default {
 		if (!this.isUnlocked()) {
 			
 			let try_autounlock = () => {
-				console.log('try')
 				this.busy = true
 				this.settings.getKeyFiles().then(keyFiles => {
 					this.keyFiles = keyFiles
@@ -291,10 +289,7 @@ export default {
 			
 			this.busy = true
 			try {
-				console.log('mounted2')
-				// console.log('mounted2', entries)
 				let entries = await this.secureCache.get('secureCache.entries');
-				console.log('mounted2', entries)
 				if (entries !== undefined && entries.length > 0) {
 					this.showResults(entries)
 				} else {

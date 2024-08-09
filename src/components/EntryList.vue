@@ -10,7 +10,6 @@ export default {
 	},
 	watch: {
 		searchTerm(val) {
-			console.log(val)
 			this.unlockedState.cacheSet('searchFilter', val) // Causes cache refresh
 			if (val.length) {
 				this.filteredEntries = this.allEntries.filter(entry => {
@@ -113,7 +112,6 @@ export default {
 		}
 	},
 	mounted() {
-		console.log("EntryList mounted", this.priorityEntries, this.searchTerm)
 		// Autofocus searchbox
 		this.$nextTick(function () {
 			this.$refs.searchbox.focus();
