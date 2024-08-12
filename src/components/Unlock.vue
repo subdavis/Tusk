@@ -145,7 +145,7 @@ export default {
 			this.unlockedState.clearClipboardState()
 			this.unlockedState.clearCache() // new
 		},
-		showResults(entries) {
+		showResults(entries, fromCache) {
 			let getMatchesForThreshold = (threshold, entries, requireEmptyURL = false) => {
 				return entries.filter(e => (e.matchRank >= threshold) && (requireEmptyURL ? !e.URL : true));
 			}
@@ -185,7 +185,10 @@ export default {
 				this.unlockedState.cacheSet('priorityEntries', priorityEntries)
 				this.$forceUpdate()
 				//save longer term (in encrypted storage)
-				this.secureCache.save('secureCache.entries', entries);
+				if (!fromCache) {
+					// Don't bother saving if we're just reading from the cache.
+					this.secureCache.save('secureCache.entries', entries);
+				}
 				this.busy = false
 			})
 		},
@@ -291,7 +294,7 @@ export default {
 			try {
 				let entries = await this.secureCache.get('secureCache.entries');
 				if (entries !== undefined && entries.length > 0) {
-					this.showResults(entries)
+					this.showResults(entries, true)
 				} else {
 					try_autounlock()
 				}

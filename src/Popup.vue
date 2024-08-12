@@ -28,7 +28,7 @@
 /* beautify preserve:start */
 // Singletons
 import { Settings } from '$services/settings.js'
-import { ProtectedMemory } from '$services/protectedMemory.js'
+import { ProtectedMemory } from '$services/protectedMemory'
 import { KeepassHeader } from '$services/keepassHeader.js'
 import { KeepassReference } from '$services/keepassReference.js'
 import { KeepassService } from '$services/keepassService.js'

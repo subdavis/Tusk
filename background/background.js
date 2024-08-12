@@ -7,7 +7,7 @@
   Settings can call secureCacheMemory, which in turn can open new ports to this script.
 */
 
-import { ProtectedMemory } from '$services/protectedMemory.js'
+import { ProtectedMemory } from '$services/protectedMemory'
 import { Settings } from '$services/settings.js'
 import { Notifications } from "$services/notifications";
 
