@@ -39,7 +39,7 @@ const permissions = [
 const baseManifest: Manifest.WebExtensionManifest = {
   "name": "KeePass Tusk - Password Access and Autofill",
   "short_name": "KeePass Tusk",
-  "version": "2024.8.6",
+  "version": "2024.8.12",
   "description": "Readonly KeePass password database integration for Chrome and Firefox",
   "icons": {
     "16": "/assets/16x16.png",
@@ -75,12 +75,12 @@ const baseManifest: Manifest.WebExtensionManifest = {
 function chromeManifestV3(): Manifest.WebExtensionManifest {
 	return Object.assign({}, baseManifest, {
 		"manifest_version": 3,
-		"minimum_chrome_version": "88",
+		"minimum_chrome_version": "102",
 		"oauth2": {
 			// The Chrome identity client ID for Chrome ONLY
 			"client_id": "876467817034-al13p9m2bphgregs0rij76n1tumakcqr.apps.googleusercontent.com",
 			"scopes": [
-				"https://www.googleapis.com/auth/drive.readonly"
+				"https://www.googleapis.com/auth/drive.file"
 			]
 		},
 		permissions,
