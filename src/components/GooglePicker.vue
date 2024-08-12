@@ -50,7 +50,8 @@ export default {
 <template>
 	<div>
 		<div class="warn pill">
-			<p><b>Google Drive support has updated!</b> You can now grant Tusk access to each keepass file.</p>
+			<p><b>Google Drive support has updated!</b> You can now grant Tusk access to each keepass file.
+				<br>Having problems? <b><a href="https://github.com/subdavis/Tusk/wiki/Troubleshooting#google-drive-issues">Read the troubleshooting guide.</a></b></p>
 		</div>
 		<div
 			v-show="!pickerOpen"
