@@ -1,6 +1,6 @@
 const should = require('should')
 
-import { ProtectedMemory } from '$services/protectedMemory.js'
+import { ProtectedMemory } from '$services/protectedMemory'
 import { SecureCacheMemory } from '$services/secureCacheMemory.js'
 
 var memory = {};

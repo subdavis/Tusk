@@ -36,7 +36,7 @@
 // Singletons
 import { ChromePromiseApi } from '@/lib/chrome-api-promise.js'
 import { Settings } from '$services/settings.js'
-import { ProtectedMemory } from '$services/protectedMemory.js'
+import { ProtectedMemory } from '$services/protectedMemory'
 import { SecureCacheMemory } from '$services/secureCacheMemory.js'
 import { PasswordFileStoreRegistry } from '$services/passwordFileStore.js'
 import { KeyFileParser } from '$services/keyFileParser.js'
