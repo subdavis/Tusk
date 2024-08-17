@@ -1,10 +1,11 @@
+import { isFirefox } from './utils.js'
+
 function ChromePromiseApi() {
 	var my = {
 		permissions: {
 			"contains": permissionContains,
 			"request": permissionRequest,
 			"remove": permissionRemove,
-			"getAll": permissionsGetAll
 		},
 		identity: {
 			"launchWebAuthFlow": launchWebAuthFlow,
@@ -76,19 +77,9 @@ function ChromePromiseApi() {
 		});
 	}
 
-	function permissionsGetAll() {
-		return new Promise(function(resolve, reject) {
-			chrome.permissions.getAll(function(perms) {
-				if (chrome.runtime.lastError) {
-					reject(new Error(chrome.runtime.lastError.message));
-				} else {
-					resolve(perms);
-				}
-			});
-		});
-	}
-
 	function permissionRemove(perms) {
+		// Firefox does not support permissions API
+		if (isFirefox()) return Promise.resolve()
 		return new Promise(function(resolve, reject) {
 			chrome.permissions.remove(perms, function(removed) {
 				if (removed) {
@@ -108,6 +99,8 @@ function ChromePromiseApi() {
 	}
 
 	function permissionContains(perms) {
+		// Firefox does not support permissions API
+		if (isFirefox()) return Promise.resolve()
 		return new Promise(function(resolve, reject) {
 			chrome.permissions.contains(perms, function(hasPermission) {
 				if (hasPermission) {
@@ -124,6 +117,8 @@ function ChromePromiseApi() {
 	}
 
 	function permissionRequest(perms) {
+		// Firefox does not support permissions API
+		if (isFirefox()) return Promise.resolve()
 		return new Promise(function(resolve, reject) {
 			chrome.permissions.request(perms, function(granted) {
 				if (granted) {
