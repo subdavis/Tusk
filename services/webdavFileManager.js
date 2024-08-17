@@ -28,7 +28,7 @@ Object DirMap {
 
 */
 import * as Base64 from 'base64-arraybuffer';
-import { createClient } from 'webdav';
+import { AuthType, createClient } from 'webdav';
 import { guid } from '@/lib/utils.js'
 import { ChromePromiseApi } from '@/lib/chrome-api-promise.js'
 
@@ -112,6 +112,7 @@ function WebdavFileManager(settings) {
 		let client = createClient(serverInfo.url, {
 			username: serverInfo.username,
 			password: serverInfo.password,
+			authType: AuthType.Auto,
 		})
 
 		/** 
@@ -175,6 +176,7 @@ function WebdavFileManager(settings) {
 			let client = createClient(serverInfo.url, {
 				username: serverInfo.username,
 				password: serverInfo.password,
+				authType: AuthType.Auto,
 			})
 			return client.getFileContents(dbInfo.path, { credentials: 'omit' })
 		})
@@ -192,6 +194,7 @@ function WebdavFileManager(settings) {
 			let client = createClient(serverInfo.url, {
 				username: serverInfo.username,
 				password: serverInfo.password,
+				authType: AuthType.Auto,
 			})
 			return client.getDirectoryContents(directory, { credentials: 'omit' }).then(contents => {
 				// map from directory contents to DBInfo type.
@@ -214,7 +217,8 @@ function WebdavFileManager(settings) {
 	 */
 	function addServer(url, username, password) {
 		let client = createClient(url, {
-			username, password
+			username, password,
+			authType: AuthType.Auto,
 		})
 		return client.getDirectoryContents('/', { credentials: 'omit' }).then(contents => {
 			// success!
