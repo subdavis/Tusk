@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "argon2-browser": "^1.18.0",
-    "axios": "^1.7.2",
+    "axios": "^1.7.4",
     "base64-arraybuffer": "^1.0.2",
     "case": "^1.5.4",
     "font-awesome": "^4.7.0",
