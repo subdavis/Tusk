@@ -5,8 +5,9 @@ import InfoCluster from '@/components/InfoCluster.vue'
 import EntryList from '@/components/EntryList.vue'
 import Spinner from 'vue-simple-spinner'
 import Messenger from '@/components/Messenger.vue'
+import { defineComponent } from 'vue'
 
-export default {
+export default defineComponent({
 	props: {
 		/* Service dependeicies */
 		unlockedState: Object,
@@ -34,6 +35,7 @@ export default {
 				success: ""
 			},
 			busy: false,
+			isUnlocked: false,
 			masterPassword: "",
 			isMasterPasswordInputVisible: false,
 			keyFiles: [], // list of all available
@@ -83,9 +85,6 @@ export default {
 			if (this.selectedKeyFile !== undefined)
 				return this.selectedKeyFile.name
 			return "No keyfile selected.  (click to change)"
-		},
-		isUnlocked() {
-			return this.unlockedState.unlocked.value
 		}
 	},
 	watch: {
@@ -140,10 +139,11 @@ export default {
 			this.settings.getCurrentMasterPasswordCacheKey().then(key => {
 				if (key !== null)
 					this.secureCache.clear(key)
+				this.secureCache.clear('secureCache.entries')
+				this.unlockedState.clearClipboardState()
+				this.unlockedState.clearCache() // new
+				this.isUnlocked = false
 			})
-			this.secureCache.clear('secureCache.entries')
-			this.unlockedState.clearClipboardState()
-			this.unlockedState.clearCache() // new
 		},
 		showResults(entries, fromCache) {
 			let getMatchesForThreshold = (threshold, entries, requireEmptyURL = false) => {
@@ -190,6 +190,7 @@ export default {
 					this.secureCache.save('secureCache.entries', entries);
 				}
 				this.busy = false
+				this.isUnlocked = true
 			})
 		},
 		clickUnlock(event) {
@@ -316,7 +317,7 @@ export default {
 		//set knowlege from the URL
 		this.databaseFileName = decodeURIComponent(this.$router.getRoute().title)
 	}
-}
+})
 </script>
 
 <template>
@@ -396,7 +397,7 @@ export default {
 		<div class="box-bar medium between footer" v-show="!busy">
 			<span class="selectable" @click="links.openOptions">
 				<i class="fa fa-cog" aria-hidden="true"></i> Settings</span>
-			<span class="selectable" v-if="isUnlocked" @click="forgetPassword()">
+			<span class="selectable" v-if="isUnlocked" @click="forgetPassword">
 				<i class="fa fa-lock" aria-hidden="true"></i> Lock Database</span>
 			<span class="selectable" v-else @click="closeWindow">
 				<i class="fa fa-times-circle" aria-hidden="true"></i> Close Window</span>

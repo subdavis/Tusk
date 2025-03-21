@@ -79,6 +79,7 @@ function UnlockedState(keepassReference, settings, notifications) {
 		destroy(my.cache)
 		my.unlocked.value = false;
 		my.cache = {}
+		console.log('locked', my.unlocked.value);
 	}
 
 	my.cacheSet = function (key, val) {
@@ -88,6 +89,7 @@ function UnlockedState(keepassReference, settings, notifications) {
 			my.clearCache()
 			window.close()
 		}, 120000);
+		console.log("Setting cache for " + key);
 		my.cache[key] = val;
 		my.unlocked.value = true;
 	}

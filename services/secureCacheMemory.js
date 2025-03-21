@@ -64,6 +64,7 @@ function SecureCacheMemory(protectedMemory) {
 	}
 
 	exports.clear = function (key) {
+		console.log('clearing key: ' + key);
 		return ready.then(function (port) {
 			port.postMessage({
 				action: 'clear',
