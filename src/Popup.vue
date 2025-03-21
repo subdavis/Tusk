@@ -3,28 +3,19 @@
 		<!-- SVG Defs -->
 		<svg-defs></svg-defs>
 		<!-- Router View -->
-		<startup id="/" v-if="show.startup.visible"
-			:settings="services.settings"
-			:password-file-store-registry="services.passwordFileStoreRegistry"></startup>
-		<file-picker id="/choose" v-if="show.filePicker.visible"
-			:password-file-store-registry="services.passwordFileStoreRegistry"
-			:settings="services.settings"
-			:links="services.links"></file-picker>
-		<unlock id="/unlock/:provider/:title" v-if="show.unlock.visible"
-			:unlocked-state="services.unlockedState"
-			:secure-cache="services.secureCache"
-			:links="services.links"
-			:settings="services.settings"
-			:keepass-service="services.keepassService"></unlock>
-		<entry-details id="/entry-details/:entryId" v-if="show.entryDetails.visible"
-			:unlocked-state="services.unlockedState"
-			:links="services.links"
-			:settings="services.settings"></entry-details>
+		<startup id="/" v-if="show.startup.visible" :settings="settings"
+			:password-file-store-registry="passwordFileStoreRegistry"></startup>
+		<file-picker id="/choose" v-if="show.filePicker.visible" :password-file-store-registry="passwordFileStoreRegistry"
+			:settings="settings" :links="links"></file-picker>
+		<unlock id="/unlock/:provider/:title" v-if="show.unlock.visible" :unlocked-state="unlockedState"
+			:secure-cache="secureCache" :links="links" :settings="settings" :keepass-service="keepassService"></unlock>
+		<entry-details id="/entry-details/:entryId" v-if="show.entryDetails.visible" :unlocked-state="unlockedState"
+			:links="links" :settings="settings"></entry-details>
 		<!-- End Router View -->
 	</div>
 </template>
 
-<script>
+<script setup>
 /* beautify preserve:start */
 // Singletons
 import { Settings } from '$services/settings.js'
@@ -52,11 +43,13 @@ import Startup from '@/components/Startup.vue'
 import FilePicker from '@/components/FilePicker.vue'
 import EntryDetails from '@/components/EntryDetails.vue'
 import SvgDefs from '@/components/SvgDefs.vue'
+import { reactive } from 'vue'
+import { useRouter } from '@/lib/useRouter.js'
 
 const links = new Links()
 const protectedMemory = new ProtectedMemory()
-const secureCacheMemory = new SecureCacheMemory(protectedMemory)
-const settings = new Settings(secureCacheMemory)
+const secureCache = new SecureCacheMemory(protectedMemory)
+const settings = new Settings(secureCache)
 const keepassHeader = new KeepassHeader(settings)
 const keepassReference = new KeepassReference()
 const notifications = new Notifications(settings)
@@ -81,79 +74,59 @@ const passwordFileStoreRegistry = new PasswordFileStoreRegistry(
 	pCloudFileManager,
 	webdavFileManager)
 const keepassService = new KeepassService(keepassHeader, settings, passwordFileStoreRegistry, keepassReference)
+const unlockedState = new UnlockedState(keepassReference, settings, notifications)
 /* beautify preserve:end */
 
-export default {
-	name: 'app',
-	components: {
-		Unlock,
-		Startup,
-		FilePicker,
-		EntryDetails,
-		SvgDefs
+const show = reactive({
+	unlock: {
+		visible: false
 	},
-	data() {
-		return {
-			services: {
-				/* The services exposed to UI components */
-				settings,
-				secureCache: secureCacheMemory,
-				passwordFileStoreRegistry,
-				keepassService,
-				links,
-				unlockedState: new UnlockedState(this.$router, keepassReference, protectedMemory, settings, notifications)
-			},
-			show: {
-				unlock: {
-					visible: false
-				},
-				startup: {
-					visible: false
-				},
-				filePicker: {
-					visible: false
-				},
-				entryDetails: {
-					visble: false
-				}
-			}
-		}
+	startup: {
+		visible: false
 	},
-	mounted: function () {
-		// Relies on the content of this.show
-		this.$router.registerRoutes([{
-			route: '/',
-			var: this.show.startup
-		},
-		{
-			route: '/choose',
-			var: this.show.filePicker
-		},
-		{
-			route: '/unlock/:provider/:title',
-			var: this.show.unlock
-		},
-		{
-			route: '/entry-details/:entryId',
-			var: this.show.entryDetails
-		}
-		])
-		this.$router.route('/')
+	filePicker: {
+		visible: false
+	},
+	entryDetails: {
+		visble: false
 	}
+})
+
+const $router = useRouter();
+$router.registerRoutes([{
+	route: '/',
+	var: show.startup
+},
+{
+	route: '/choose',
+	var: show.filePicker
+},
+{
+	route: '/unlock/:provider/:title',
+	var: show.unlock
+},
+{
+	route: '/entry-details/:entryId',
+	var: show.entryDetails
 }
+])
+$router.route('/')
+
+
 </script>
 
 <style lang="scss">
 @import "./styles/shared.scss";
+
 #router-view {
-  width: 400px;
-  margin: 0px auto;
-  color: $text-color;
-  background-color: $background-color;
+	width: 400px;
+	margin: 0px auto;
+	color: $text-color;
+	background-color: $background-color;
 }
 
 body {
-  margin: 0px;
-  width: 100%;
+	margin: 0px;
+	width: 100%;
 }
 </style>

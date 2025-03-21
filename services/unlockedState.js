@@ -2,13 +2,14 @@
 
 import { ChromePromiseApi } from '@/lib/chrome-api-promise.js'
 import { parseUrl } from '@/lib/utils.js'
+import { ref } from 'vue';
 
 const chromePromise = ChromePromiseApi()
 
 /**
  * Shared state and methods for an unlocked password file.
  */
-function UnlockedState($router, keepassReference, protectedMemory, settings, notifications) {
+function UnlockedState(keepassReference, settings, notifications) {
 	var my = {
 		tabId: "", //tab id of current tab
 		url: "", //url of current tab
@@ -16,7 +17,8 @@ function UnlockedState($router, keepassReference, protectedMemory, settings, not
 		origin: "", //url of current tab without path or querystring
 		sitePermission: false, //true if the extension already has rights to autofill the password
 		cache: {}, // a secure cache that refreshes when values are set or fetched
-		clipboardStatus: "" //status message about clipboard, used when copying password to the clipboard
+		clipboardStatus: "", //status message about clipboard, used when copying password to the clipboard
+		unlocked: ref(false),
 	};
 	var copyEntry;
 	var copyPart;
@@ -62,6 +64,7 @@ function UnlockedState($router, keepassReference, protectedMemory, settings, not
 	};
 
 	my.clearCache = function () {
+		console.log("Clearing cache");
 		// Destroys an object in memory.
 		function destroy(obj) {
 			for (var prop in obj) {
@@ -74,6 +77,7 @@ function UnlockedState($router, keepassReference, protectedMemory, settings, not
 			}
 		}
 		destroy(my.cache)
+		my.unlocked.value = false;
 		my.cache = {}
 	}
 
@@ -85,6 +89,7 @@ function UnlockedState($router, keepassReference, protectedMemory, settings, not
 			window.close()
 		}, 120000);
 		my.cache[key] = val;
+		my.unlocked.value = true;
 	}
 
 	my.cacheGet = function (key) {
@@ -135,9 +140,9 @@ function UnlockedState($router, keepassReference, protectedMemory, settings, not
 		copyEntry = entry;
 		document.execCommand('copy');
 	}
-	my.gotoDetails = function (entry) {
-		$router.route('/entry-details/' + entry.id);
-	}
+	// my.gotoDetails = function (entry) {
+	// 	$router.route('/entry-details/' + entry.id);
+	// }
 
 	my.getDecryptedAttribute = function (entry, attributeName) {
 		return keepassReference.getFieldValue(entry, attributeName, my.cache.allEntries);

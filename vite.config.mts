@@ -1,7 +1,7 @@
 import { dirname, relative } from 'node:path'
 import type { UserConfig } from 'vite'
 import { defineConfig } from 'vite'
-import Vue from '@vitejs/plugin-vue2'
+import Vue from '@vitejs/plugin-vue'
 import wasm from 'vite-plugin-wasm'
 
 import { isDev, isLocal, port, r } from './scripts/utils'
@@ -11,6 +11,7 @@ export const sharedConfig: UserConfig = {
   root: r('src'),
   resolve: {
     alias: {
+			vue: '@vue/compat',
       '@': `${r('src')}/`,
 			'$services': `${r('services')}/`
     },
@@ -21,7 +22,15 @@ export const sharedConfig: UserConfig = {
     __NAME__: JSON.stringify(packageJson.name),
   },
   plugins: [
-    Vue(),
+		Vue({
+			template: {
+				compilerOptions: {
+					compatConfig: {
+						MODE: 2
+					}
+				}
+			}
+		}),
 		wasm(),
     // rewrite assets to use relative path
     {

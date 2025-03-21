@@ -1,6 +1,7 @@
 import * as Base64 from 'base64-arraybuffer'
 import { ChromePromiseApi } from '@/lib/chrome-api-promise.js'
 import { Links } from '$services/links.js'
+import { toRaw } from 'vue'
 const chromePromise = ChromePromiseApi()
 const links = new Links()
 
@@ -62,7 +63,7 @@ function Settings(secureCache) {
 		}
 	}
 
-	exports.hardReset = function() {
+	exports.hardReset = function () {
 		chromePromise.storage.clear()
 	}
 
@@ -249,10 +250,11 @@ function Settings(secureCache) {
 
 	let keyGetSetter = function (key, val, defaultval, value_type) {
 		let update_obj = {}
-		update_obj[key] = val
-		if (val !== undefined && (typeof (val) === value_type || val === null))
+		update_obj[key] = toRaw(val)
+		if (val !== undefined && (typeof (val) === value_type || val === null)) {
+			console.info('Setting ' + key + ' to ', val);
 			return chromePromise.storage.local.set(update_obj).then(() => val)
-		else
+		} else
 			return chromePromise.storage.local.get(key).then(oldval => {
 				if (oldval[key] !== undefined)
 					if (typeof (oldval[key]) === value_type)

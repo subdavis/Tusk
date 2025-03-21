@@ -109,7 +109,7 @@ export default {
 					let otpSettings = this.entry["tOTPSettings"].split(';')
 					let otpSeed = this.unlockedState.getDecryptedAttribute(this.entry, protectedKey)
 					if (otpSettings.length >= 2) {
-						this.setupOTP(OTP.makeUrl(otpSeed , otpSettings[0], otpSettings[1]))
+						this.setupOTP(OTP.makeUrl(otpSeed, otpSettings[0], otpSettings[1]))
 					}
 				}
 			}
@@ -126,33 +126,35 @@ export default {
 			<div v-if="otp" class="attribute-box">
 				<span class="attribute-title">One Time Password</span>
 				<br>
-				<span class="attribute-value">{{otp_value}}</span>
+				<span class="attribute-value">{{ otp_value }}</span>
 				<div class="progress">
-					<div :key="otp_value" class="determinate" style="transition: width 1s linear;" v-bind:style="{ width: otp_width }"></div>
+					<div :key="otp_value" class="determinate" style="transition: width 1s linear;"
+						v-bind:style="{ width: otp_width }"></div>
 				</div>
 			</div>
 
-			<div class="attribute-box" v-for="attr in attributes" v-if="attr.protected || attr.value">
-				<span class="attribute-title">{{ attr.key }}</span>
-				<br>
-				<!-- notes -->
-				<pre v-if="attr.key === 'notes'" class="attribute-value">{{ attr.value }}</pre>
-				<!-- URL -->
-				<span v-else-if="attr.key === 'url'" class="attribute-value">
-					<a @click="links.open(attr.href)" href="javascript:void(0)">{{ attr.value }}</a>
-				</span>
-				<!-- other -->
-				<span v-else-if="!attr.protected" class="attribute-value">{{ attr.value }}</span>
-				<!-- protected -->
-				<div v-else>
-					<span v-if="attr.key !== 'notes'" class="attribute-value protected" @click="toggleAttribute(attr)">
-						<i v-if="attr.protected && attr.isHidden" class="fa fa-eye-slash" aria-hidden="true"></i>
-						<i v-else-if="attr.protected && !attr.isHidden" class="fa fa-eye" aria-hidden="true"></i>
-						{{ attr.value }}
+			<div class="attribute-box" v-for="attr in attributes" :key="attr.key">
+				<template v-if="attr.protected || attr.value">
+					<span class="attribute-title">{{ attr.key }}</span>
+					<br>
+					<!-- notes -->
+					<pre v-if="attr.key === 'notes'" class="attribute-value">{{ attr.value }}</pre>
+					<!-- URL -->
+					<span v-else-if="attr.key === 'url'" class="attribute-value">
+						<a @click="links.open(attr.href)" href="javascript:void(0)">{{ attr.value }}</a>
 					</span>
-				</div>
+					<!-- other -->
+					<span v-else-if="!attr.protected" class="attribute-value">{{ attr.value }}</span>
+					<!-- protected -->
+					<div v-else>
+						<span v-if="attr.key !== 'notes'" class="attribute-value protected" @click="toggleAttribute(attr)">
+							<i v-if="attr.protected && attr.isHidden" class="fa fa-eye-slash" aria-hidden="true"></i>
+							<i v-else-if="attr.protected && !attr.isHidden" class="fa fa-eye" aria-hidden="true"></i>
+							{{ attr.value }}
+						</span>
+					</div>
+				</template>
 			</div>
-
 		</div>
 		<div class="attribute-box button-box">
 			<div class="button-inner selectable" v-on:click="copy">
@@ -173,46 +175,51 @@ export default {
 
 <style lang="scss">
 @import "../styles/settings.scss";
+
 .all-attributes {
-  max-height: 400px;
-  overflow-y: auto;
+	max-height: 400px;
+	overflow-y: auto;
 }
 
 .attribute-box {
-  box-sizing: border-box;
-  padding: 8px $wall-padding;
-  font-size: 16px;
-  background-color: $light-background-color;
+	box-sizing: border-box;
+	padding: 8px $wall-padding;
+	font-size: 16px;
+	background-color: $light-background-color;
 }
 
 .attribute-title {
-  padding-bottom: 10px;
-  font-weight: 700;
-  font-size: 12px;
+	padding-bottom: 10px;
+	font-weight: 700;
+	font-size: 12px;
 }
 
 .attribute-value {
-  font-family: "DejaVu Sans", Arial, sans-serif;
-  &.protected:hover {
-    outline: $light-gray solid 2px;
-    outline-offset: 1px;
-  }
+	font-family: "DejaVu Sans", Arial, sans-serif;
+
+	&.protected:hover {
+		outline: $light-gray solid 2px;
+		outline-offset: 1px;
+	}
 }
 
 .button-box {
-  font-size: 14px;
-  display: flex;
-  // justify-content: space-between;
-  box-sizing: border-box;
-  // min-width: 80px;
-  .button-inner {
-    flex: 0 0 50%;
-    &:hover span {
-      opacity: 0.8;
-    }
-  }
-  span {
-    opacity: 0.2;
-  }
+	font-size: 14px;
+	display: flex;
+	// justify-content: space-between;
+	box-sizing: border-box;
+
+	// min-width: 80px;
+	.button-inner {
+		flex: 0 0 50%;
+
+		&:hover span {
+			opacity: 0.8;
+		}
+	}
+
+	span {
+		opacity: 0.2;
+	}
 }
 </style>

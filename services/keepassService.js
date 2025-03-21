@@ -12,7 +12,7 @@ kdbxweb.CryptoEngine.setArgon2Impl((
 	password, salt,
 	memory, iterations, length, parallelism, type, version
 ) => {
-	console.log('Using argon2 implementation', password, salt, memory, iterations, length, parallelism, type, version);
+	console.log('Using argon2 implementation', version);
 	return argon2.hash({
 		pass: new Uint8Array(password),
 		salt: new Uint8Array(salt),

@@ -1,4 +1,4 @@
-@import './shared.scss';
+@import "./shared.scss";
 
 @import "materialize-css/sass/components/_tabs.scss";
 @import "materialize-css/sass/components/forms/_switches.scss";
@@ -7,7 +7,7 @@
 @import "materialize-css/sass/components/_buttons.scss";
 
 nav {
-  background-color: $blue;
+	background-color: $blue;
 }
 
 .content-body {
@@ -23,19 +23,20 @@ a.btn {
 
 	&:hover {
 		background-color: $blue;
-		opacity: .7;
+		opacity: 0.7;
 	}
 }
 
 h3 {
-	margin: 1.6rem 0 .8rem 0
+	margin: 1.6rem 0 0.8rem 0;
 }
 
-.switch label input[type=checkbox]:checked + .lever {
+.switch label input[type="checkbox"]:checked + .lever {
 	background-color: $green;
+
 	&:after {
 		background-color: $light-green;
-	}	
+	}
 }
 
 .database-manager {
@@ -46,18 +47,20 @@ h3 {
 	}
 
 	svg {
-    width: 18px;
-    vertical-align: middle;
-  }
-  .chip {
+		width: 18px;
+		vertical-align: middle;
+	}
+
+	.chip {
 		height: 24px;
 		line-height: 24px;
 		font-size: 11px;
 	}
+
 	.description {
 		font-size: 12px;
-		font-color: $dark-background-color;
 	}
+
 	.between {
 		line-height: 36px;
 	}

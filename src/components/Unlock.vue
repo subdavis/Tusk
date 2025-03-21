@@ -83,6 +83,9 @@ export default {
 			if (this.selectedKeyFile !== undefined)
 				return this.selectedKeyFile.name
 			return "No keyfile selected.  (click to change)"
+		},
+		isUnlocked() {
+			return this.unlockedState.unlocked.value
 		}
 	},
 	watch: {
@@ -133,9 +136,6 @@ export default {
 			this.secureCache.clear('secureCache.entries')
 			this.$router.route('/choose')
 		},
-		isUnlocked: function () {
-			return this.unlockedState.cache.allEntries !== undefined
-		},
 		forgetPassword() {
 			this.settings.getCurrentMasterPasswordCacheKey().then(key => {
 				if (key !== null)
@@ -183,7 +183,7 @@ export default {
 				// Cache in memory
 				this.unlockedState.cacheSet('allEntries', allEntries)
 				this.unlockedState.cacheSet('priorityEntries', priorityEntries)
-				this.$forceUpdate()
+
 				//save longer term (in encrypted storage)
 				if (!fromCache) {
 					// Don't bother saving if we're just reading from the cache.
@@ -246,12 +246,12 @@ export default {
 		}
 	},
 	async mounted() {
-		
+
 		// modify unlockedState internal state
 		await this.unlockedState.getTabDetails();
-		
-		if (!this.isUnlocked()) {
-			
+
+		if (!this.isUnlocked) {
+
 			let try_autounlock = () => {
 				this.busy = true
 				this.settings.getKeyFiles().then(keyFiles => {
@@ -289,7 +289,7 @@ export default {
 						mp.focus()
 				});
 			}
-			
+
 			this.busy = true
 			try {
 				let entries = await this.secureCache.get('secureCache.entries');
@@ -325,18 +325,17 @@ export default {
 		<div v-if="busy" class="spinner">
 			<spinner size="medium" :message='"Unlocking " + databaseFileName'></spinner>
 		</div>
-
+		{{ isUnlocked ? 'true' : 'false' }}
+		{{ busy ? 'true' : 'false' }}
 		<!-- Entry List -->
-		<EntryList v-if="!busy && isUnlocked()"
-			:messages="unlockedMessages"
-			:unlocked-state="unlockedState"
+		<EntryList v-if="!busy && isUnlocked" :messages="unlockedMessages" :unlocked-state="unlockedState"
 			:settings="settings"></EntryList>
 
 		<!-- General Messenger -->
 		<messenger :messages="generalMessages" v-show="!busy"></messenger>
 
 		<!-- Unlock input group -->
-		<div id="masterPasswordGroup" v-if="!busy && !isUnlocked()">
+		<div id="masterPasswordGroup" v-if="!busy && !isUnlocked">
 
 			<div class="unlockLogo stack-item">
 				<img src="/assets/icons/exported/128x128.svg" width="256px" height="256px">
@@ -350,20 +349,24 @@ export default {
 				</div>
 
 				<div class="stack-item masterPasswordInput">
-					<input :type="isMasterPasswordInputVisible ? 'text' : 'password'" id="masterPassword" v-model="masterPassword" placeholder="🔒 master password" ref="masterPassword" autocomplete="off">
-					<i @click="isMasterPasswordInputVisible = !isMasterPasswordInputVisible" :class="['fa', isMasterPasswordInputVisible ? 'fa-eye-slash' : 'fa-eye', 'fa-fw']" aria-hidden="true"></i>
+					<input :type="isMasterPasswordInputVisible ? 'text' : 'password'" id="masterPassword" v-model="masterPassword"
+						placeholder="🔒 master password" ref="masterPassword" autocomplete="off">
+					<i @click="isMasterPasswordInputVisible = !isMasterPasswordInputVisible"
+						:class="['fa', isMasterPasswordInputVisible ? 'fa-eye-slash' : 'fa-eye', 'fa-fw']" aria-hidden="true"></i>
 				</div>
 
 				<div class="stack-item">
-					<div id="select-keyfile" class="selectable" @click="selectedKeyFile = undefined; keyFilePicker = !keyFilePicker">
-						<i class="fa fa-key" aria-hidden="true"></i> {{selectedKeyFileName}}
+					<div id="select-keyfile" class="selectable"
+						@click="selectedKeyFile = undefined; keyFilePicker = !keyFilePicker">
+						<i class="fa fa-key" aria-hidden="true"></i> {{ selectedKeyFileName }}
 					</div>
 				</div>
 
 				<div class="stack-item keyfile-picker" v-if="keyFilePicker">
 					<transition name="keyfile-picker">
 						<div>
-							<span class="selectable" v-for="(kf, kf_index) in keyFiles" :keyfile-index="kf_index" @click="chooseKeyFile(kf_index)">
+							<span class="selectable" v-for="(kf, kf_index) in keyFiles" :keyfile-index="kf_index"
+								@click="chooseKeyFile(kf_index)">
 								<i class="fa fa-file fa-fw" aria-hidden="true"></i> {{ kf.name }}
 							</span>
 							<span @click="links.openOptionsKeyfiles" class="selectable">
@@ -375,8 +378,10 @@ export default {
 				<div class="box-bar small plain remember-period-picker">
 					<span>
 						<label for="rememberPeriodLength">
-							<span>{{rememberPeriodText}} (slide to choose)</span></label>
-					<input id="rememberPeriodLength" type="range" min="0" :max="slider_options.length - 1" step="1" v-model="slider_int" v-on:input="setRememberPeriod(undefined)" />
+							<span>{{ rememberPeriodText }} (slide to choose)</span>
+						</label>
+						<input id="rememberPeriodLength" type="range" min="0" :max="slider_options.length - 1" step="1"
+							v-model="slider_int" v-on:input="setRememberPeriod(undefined)" />
 					</span>
 				</div>
 
@@ -391,7 +396,7 @@ export default {
 		<div class="box-bar medium between footer" v-show="!busy">
 			<span class="selectable" @click="links.openOptions">
 				<i class="fa fa-cog" aria-hidden="true"></i> Settings</span>
-			<span class="selectable" v-if="isUnlocked()" @click="forgetPassword()">
+			<span class="selectable" v-if="isUnlocked" @click="forgetPassword()">
 				<i class="fa fa-lock" aria-hidden="true"></i> Lock Database</span>
 			<span class="selectable" v-else @click="closeWindow">
 				<i class="fa fa-times-circle" aria-hidden="true"></i> Close Window</span>
@@ -404,113 +409,131 @@ export default {
 
 <style lang="scss">
 @import "../styles/settings.scss";
+
 #masterPasswordGroup {
-  .keyfile-picker {
-    background-color: $light-background-color;
-    box-sizing: border-box;
-    transition: all 0.2s linear;
-    max-height: 200px;
-    overflow-y: auto;
-    opacity: 1;
-    border-top: 1px solid $light-gray;
-    border-bottom: 1px solid $light-gray;
-    padding: 5px $wall-padding;
-    margin: 5px 0px;
-    &.keyfile-picker-enter,
-    &.keyfile-picker-leave-to {
-      max-height: 0px;
-      opacity: 0;
-    }
-    span {
-      display: block;
-      padding: 2px 0px;
-      &:hover {
-        padding-left: 3px;
-      }
-    }
-  }
-  #select-keyfile {
-    padding: 8px $wall-padding;
-    background-color: $light-background-color;
-    border-bottom: 1px solid $light-gray;
-    i {
-      font-size: 14px;
-    }
-    &:hover {
-      opacity: 0.7;
-    }
-  }
-  #rememberPeriodLength {
-    width: 80px;
-    float: left;
-  }
-  .masterPasswordInput {
-    border-top: 1px solid $light-gray;
-    position: relative;
-    i {
-      position: absolute;
-      font-size: 14px;
-      top: calc(50% - 0.5em);
-      right: 10px;
-      cursor: pointer;
-    }
-  }
-  input[type="text"],
-  input[type="password"] {
-    width: calc(100% - 1em);
-    box-sizing: border-box;
-    font-size: 18px;
-    border-width: 0px 0px;
-    padding: 5px $wall-padding;
-    &:focus {
-      outline: none;
-    }
-  }
-  .remember-period-picker {
-    margin: 6px 0px;
-    input[type="range"] {
-      -webkit-appearance: none;
-      margin: 6px;
-      margin-left: 0px;
-    }
-  }
-  input[type="range"]:focus {
-    outline: none;
-  }
-  input[type="range"]::-webkit-slider-runnable-track {
-    height: 6px;
-    cursor: pointer;
-    animate: 0.2s;
-    background: $blue;
-    border-radius: 1.3px;
-    border: 0.2px solid #010101;
-    margin-top: -2px;
-  }
-  input[type="range"]::-webkit-slider-thumb {
-    border: 1px solid black;
-    height: 18px;
-    width: 10px;
-    border-radius: 2px;
-    background: white;
-    cursor: pointer;
-    -webkit-appearance: none;
-    margin-top: -7px;
-  }
+	.keyfile-picker {
+		background-color: $light-background-color;
+		box-sizing: border-box;
+		transition: all 0.2s linear;
+		max-height: 200px;
+		overflow-y: auto;
+		opacity: 1;
+		border-top: 1px solid $light-gray;
+		border-bottom: 1px solid $light-gray;
+		padding: 5px $wall-padding;
+		margin: 5px 0px;
+
+		&.keyfile-picker-enter,
+		&.keyfile-picker-leave-to {
+			max-height: 0px;
+			opacity: 0;
+		}
+
+		span {
+			display: block;
+			padding: 2px 0px;
+
+			&:hover {
+				padding-left: 3px;
+			}
+		}
+	}
+
+	#select-keyfile {
+		padding: 8px $wall-padding;
+		background-color: $light-background-color;
+		border-bottom: 1px solid $light-gray;
+
+		i {
+			font-size: 14px;
+		}
+
+		&:hover {
+			opacity: 0.7;
+		}
+	}
+
+	#rememberPeriodLength {
+		width: 80px;
+		float: left;
+	}
+
+	.masterPasswordInput {
+		border-top: 1px solid $light-gray;
+		position: relative;
+
+		i {
+			position: absolute;
+			font-size: 14px;
+			top: calc(50% - 0.5em);
+			right: 10px;
+			cursor: pointer;
+		}
+	}
+
+	input[type="text"],
+	input[type="password"] {
+		width: calc(100% - 1em);
+		box-sizing: border-box;
+		font-size: 18px;
+		border-width: 0px 0px;
+		padding: 5px $wall-padding;
+
+		&:focus {
+			outline: none;
+		}
+	}
+
+	.remember-period-picker {
+		margin: 6px 0px;
+
+		input[type="range"] {
+			-webkit-appearance: none;
+			margin: 6px;
+			margin-left: 0px;
+		}
+	}
+
+	input[type="range"]:focus {
+		outline: none;
+	}
+
+	input[type="range"]::-webkit-slider-runnable-track {
+		height: 6px;
+		cursor: pointer;
+		animate: 0.2s;
+		background: $blue;
+		border-radius: 1.3px;
+		border: 0.2px solid #010101;
+		margin-top: -2px;
+	}
+
+	input[type="range"]::-webkit-slider-thumb {
+		border: 1px solid black;
+		height: 18px;
+		width: 10px;
+		border-radius: 2px;
+		background: white;
+		cursor: pointer;
+		-webkit-appearance: none;
+		margin-top: -7px;
+	}
 }
 
 .spinner {
-  padding: $wall-padding;
+	padding: $wall-padding;
 }
 
 .footer span {
-  padding: 2px 4px;
-  border-radius: 3px;
-  &:hover {
-    background-color: $dark-background-color;
-  }
+	padding: 2px 4px;
+	border-radius: 3px;
+
+	&:hover {
+		background-color: $dark-background-color;
+	}
 }
 
 .databaseChoose {
-  padding-left: 5px;
+	padding-left: 5px;
 }
 </style>

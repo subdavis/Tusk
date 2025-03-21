@@ -3,13 +3,12 @@
 import 'font-awesome/css/font-awesome.css'
 
 // Vue Components
-import Vue from 'vue'
+import { createApp } from 'vue'
 import Popup from './Popup.vue'
-import VirtualRouter from '@/lib/virtual-router.js'
+import { router } from '@/lib/useRouter.js'
 import './styles/shared.scss'
-// Set up routes
-Vue.prototype.$router = new VirtualRouter()
 
-new Vue({
-	render: h => h(Popup)
-}).$mount('#app')
+
+const app = createApp(Popup)
+app.config.globalProperties.$router = router
+app.mount('#app')
