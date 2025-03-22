@@ -32,7 +32,6 @@
     "font-awesome": "^4.7.0",
     "json-formatter-js": "^2.2.0",
     "kdbxweb": "^2.1.1",
-    "materialize-css": "^1.0.0",
     "pako": "^1.0.6",
     "vue": "3",
     "vue-simple-spinner": "^1.2.10",
