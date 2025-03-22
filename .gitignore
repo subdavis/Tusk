@@ -87,3 +87,11 @@ demo*
 
 extension/dist
 extension/manifest.json
+
+.yarn/*
+!.yarn/cache
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
