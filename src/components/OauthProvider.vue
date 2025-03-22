@@ -97,9 +97,16 @@ export default {
 
 <template>
   <div class="box-bar roomy database-manager">
-    <generic-provider-ui :busy="busy" :databases="databases" :logged-in="loggedIn" :error="messages.error"
-      :provider-manager="providerManager" :toggle-login="toggleLogin" :removeable="false"
-      :remove-function="undefined" />
+    <generic-provider-ui
+      :busy="busy"
+      :databases="databases"
+      :logged-in="loggedIn"
+      :error="messages.error"
+      :provider-manager="providerManager"
+      :toggle-login="toggleLogin"
+      :removeable="false"
+      :remove-function="undefined"
+    />
     <template v-if="loggedIn">
       <slot />
     </template>

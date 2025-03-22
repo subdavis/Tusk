@@ -333,8 +333,12 @@ export default defineComponent({
     </div>
 
     <!-- Entry List -->
-    <EntryList v-if="!busy && isUnlocked" :messages="unlockedMessages" :unlocked-state="unlockedState"
-      :settings="settings" />
+    <EntryList
+      v-if="!busy && isUnlocked"
+      :messages="unlockedMessages"
+      :unlocked-state="unlockedState"
+      :settings="settings"
+    />
 
     <!-- General Messenger -->
     <messenger v-show="!busy" :messages="generalMessages" />
@@ -352,18 +356,30 @@ export default defineComponent({
         </div>
 
         <div class="stack-item masterPasswordInput">
-          <input id="masterPassword" ref="masterPassword" v-model="masterPassword"
-            :type="isMasterPasswordInputVisible ? 'text' : 'password'" placeholder="🔒 master password"
-            autocomplete="off" />
-          <i :class="['fa', isMasterPasswordInputVisible ? 'fa-eye-slash' : 'fa-eye', 'fa-fw']" aria-hidden="true"
-            @click="isMasterPasswordInputVisible = !isMasterPasswordInputVisible" />
+          <input
+            id="masterPassword"
+            ref="masterPassword"
+            v-model="masterPassword"
+            :type="isMasterPasswordInputVisible ? 'text' : 'password'"
+            placeholder="🔒 master password"
+            autocomplete="off"
+          />
+          <i
+            :class="['fa', isMasterPasswordInputVisible ? 'fa-eye-slash' : 'fa-eye', 'fa-fw']"
+            aria-hidden="true"
+            @click="isMasterPasswordInputVisible = !isMasterPasswordInputVisible"
+          />
         </div>
 
         <div class="stack-item">
-          <div id="select-keyfile" class="selectable" @click="
-            selectedKeyFile = undefined;
-          keyFilePicker = !keyFilePicker;
-          ">
+          <div
+            id="select-keyfile"
+            class="selectable"
+            @click="
+              selectedKeyFile = undefined;
+              keyFilePicker = !keyFilePicker;
+            "
+          >
             <i class="fa fa-key" aria-hidden="true" /> {{ selectedKeyFileName }}
           </div>
         </div>
@@ -371,12 +387,17 @@ export default defineComponent({
         <div v-if="keyFilePicker" class="stack-item keyfile-picker">
           <transition name="keyfile-picker">
             <div>
-              <span v-for="(kf, kf_index) in keyFiles" class="selectable" :keyfile-index="kf_index"
-                @click="chooseKeyFile(kf_index)">
+              <span
+                v-for="(kf, kf_index) in keyFiles"
+                class="selectable"
+                :keyfile-index="kf_index"
+                @click="chooseKeyFile(kf_index)"
+              >
                 <i class="fa fa-file fa-fw" aria-hidden="true" /> {{ kf.name }}
               </span>
               <span class="selectable" @click="links.openOptionsKeyfiles">
-                <i class="fa fa-wrench fa-fw" aria-hidden="true" /> Manage Keyfiles</span>
+                <i class="fa fa-wrench fa-fw" aria-hidden="true" /> Manage Keyfiles</span
+              >
             </div>
           </transition>
         </div>
@@ -386,8 +407,15 @@ export default defineComponent({
             <label for="rememberPeriodLength">
               <span>{{ rememberPeriodText }} (slide to choose)</span>
             </label>
-            <input id="rememberPeriodLength" v-model="slider_int" type="range" min="0" :max="slider_options.length - 1"
-              step="1" @input="setRememberPeriod(undefined)" />
+            <input
+              id="rememberPeriodLength"
+              v-model="slider_int"
+              type="range"
+              min="0"
+              :max="slider_options.length - 1"
+              step="1"
+              @input="setRememberPeriod(undefined)"
+            />
           </span>
         </div>
 
@@ -400,13 +428,17 @@ export default defineComponent({
     <!-- Footer -->
     <div v-show="!busy" class="box-bar medium between footer">
       <span class="selectable" @click="links.openOptions">
-        <i class="fa fa-cog" aria-hidden="true" /> Settings</span>
+        <i class="fa fa-cog" aria-hidden="true" /> Settings</span
+      >
       <span v-if="isUnlocked" class="selectable" @click="forgetPassword">
-        <i class="fa fa-lock" aria-hidden="true" /> Lock Database</span>
+        <i class="fa fa-lock" aria-hidden="true" /> Lock Database</span
+      >
       <span v-else class="selectable" @click="closeWindow">
-        <i class="fa fa-times-circle" aria-hidden="true" /> Close Window</span>
+        <i class="fa fa-times-circle" aria-hidden="true" /> Close Window</span
+      >
       <span class="selectable" @click="links.openHomepage">
-        <i class="fa fa-info-circle" aria-hidden="true" /> v{{ appVersion }}</span>
+        <i class="fa fa-info-circle" aria-hidden="true" /> v{{ appVersion }}</span
+      >
     </div>
   </div>
 </template>
