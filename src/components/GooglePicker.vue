@@ -51,23 +51,16 @@ export default {
 	<div>
 		<div class="warn pill">
 			<p><b>Google Drive support has updated!</b> You can now grant Tusk access to each keepass file.
-				<br>Having problems? <b><a href="https://github.com/subdavis/Tusk/wiki/Troubleshooting#google-drive-issues">Read the troubleshooting guide.</a></b></p>
+				<br>Having problems? <b><a href="https://github.com/subdavis/Tusk/wiki/Troubleshooting#google-drive-issues">Read
+						the troubleshooting guide.</a></b>
+			</p>
 		</div>
-		<div
-			v-show="!pickerOpen"
-			style="margin-top: 10px;"
-		>
-			<a
-				class="btn"
-				@click="showPicker"
-			>
+		<div v-show="!pickerOpen" style="margin-top: 10px;">
+			<a class="btn" @click="showPicker">
 				Choose database file
 			</a>
 		</div>
-		<iframe
-			id="pickerFrame"
-			v-show="pickerOpen"
-			style="width: 100%; height: 480px; border: 4px solid gray;"
+		<iframe id="pickerFrame" v-show="pickerOpen" style="width: 100%; height: 480px; border: 4px solid gray;"
 			src="https://subdavis.com/Tusk/sandbox-picker.html">
 		</iframe>
 	</div>

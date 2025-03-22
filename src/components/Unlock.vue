@@ -326,8 +326,7 @@ export default defineComponent({
 		<div v-if="busy" class="spinner">
 			<spinner size="medium" :message='"Unlocking " + databaseFileName'></spinner>
 		</div>
-		{{ isUnlocked ? 'true' : 'false' }}
-		{{ busy ? 'true' : 'false' }}
+
 		<!-- Entry List -->
 		<EntryList v-if="!busy && isUnlocked" :messages="unlockedMessages" :unlocked-state="unlockedState"
 			:settings="settings"></EntryList>

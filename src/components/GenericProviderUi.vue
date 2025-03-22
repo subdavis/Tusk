@@ -19,15 +19,11 @@ export default {
 			<div class="title" style="display: flex; align-items: center;">
 				<span>
 					<svg class="icon" viewBox="0 0 1 1">
-						<use v-bind="{'xlink:href':'#'+providerManager.icon}"></use>
+						<use v-bind="{ 'xlink:href': '#' + providerManager.icon }"></use>
 					</svg>
 					{{ providerManager.chooseTitle }}
 				</span>
-				<span class="error pill" v-show="error.length">{{error}}</span>
-				<span v-for="(db, index) in databases" class="chip">
-					{{ db.title }}
-					<i v-if="removeable" class="fa fa-times-circle selectable" aria-hidden="true" @click="removeFunction(index)"></i>
-				</span>
+				<span class="error pill" v-show="error.length">{{ error }}</span>
 			</div>
 			<div>
 				<div class="switch">
@@ -37,6 +33,13 @@ export default {
 					</label>
 				</div>
 			</div>
+		</div>
+		<div style="display: flex; flex-wrap: wrap;">
+			<span v-for="(db, index) in databases" class="chip" style="margin-bottom: 5px;">
+				{{ db.title }}
+				<i v-if="removeable" class="fa fa-times-circle selectable" aria-hidden="true"
+					@click="removeFunction(index)"></i>
+			</span>
 		</div>
 		<div class="description">{{ providerManager.chooseDescription }}</div>
 	</div>
