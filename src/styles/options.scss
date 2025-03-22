@@ -1,10 +1,10 @@
 @import "./shared.scss";
 
-@import "materialize-css/sass/components/_tabs.scss";
-@import "materialize-css/sass/components/forms/_switches.scss";
-@import "materialize-css/sass/components/_navbar.scss";
-@import "materialize-css/sass/components/_chips.scss";
-@import "materialize-css/sass/components/_buttons.scss";
+@import "@materialize/components/_tabs.scss";
+@import "@materialize/components/forms/_switches.scss";
+@import "@materialize/components/_navbar.scss";
+@import "@materialize/components/_chips.scss";
+@import "@materialize/components/_buttons.scss";
 
 nav {
 	background-color: $blue;
@@ -20,6 +20,7 @@ p {
 
 a.btn {
 	background-color: $blue;
+	color: $background-color;
 
 	&:hover {
 		background-color: $blue;
@@ -55,6 +56,7 @@ h3 {
 		height: 24px;
 		line-height: 24px;
 		font-size: 11px;
+		margin: 0px 4px;
 	}
 
 	.description {

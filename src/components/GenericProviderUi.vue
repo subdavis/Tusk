@@ -16,7 +16,7 @@ export default {
 <template>
 	<div>
 		<div class="between">
-			<div class="title">
+			<div class="title" style="display: flex; align-items: center;">
 				<span>
 					<svg class="icon" viewBox="0 0 1 1">
 						<use v-bind="{'xlink:href':'#'+providerManager.icon}"></use>

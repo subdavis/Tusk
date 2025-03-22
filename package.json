@@ -6,14 +6,14 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "clear": "rimraf --glob extension/dist extension/manifest.json 'extension.*'",
-    "dev": "run-s clear && cross-env NODE_ENV=development run-p 'dev:*'",
+    "clear": "rm -rf extension/dist extension/manifest.json 'extension.*'",
+    "dev": "run-s clear && NODE_ENV=development run-p 'dev:*'",
     "dev:prepare": "esno scripts/prepare.ts",
     "dev:web": "vite",
     "dev:background": "run-s build:background -- --mode development",
     "dev:js": "run-s build:js -- --mode development",
-    "build": "cross-env NODE_ENV=production run-s clear build:web build:prepare build:background build:js",
-    "build:ff": "cross-env NODE_ENV=production TARGET=firefox run-s clear build:web build:prepare build:background build:js",
+    "build": "NODE_ENV=production run-s clear build:web build:prepare build:background build:js",
+    "build:ff": "NODE_ENV=production TARGET=firefox run-s clear build:web build:prepare build:background build:js",
     "build:prepare": "esno scripts/prepare.ts",
     "build:background": "vite build --config vite.config.background.mts",
     "build:js": "vite build --config vite.config.content.mts",
@@ -21,6 +21,7 @@
     "pack:zip": "rimraf extension.zip && zip -r extension.zip extension/*"
   },
   "dependencies": {
+    "@materializecss/materialize": "^2.2.1",
     "@vue/compat": "^3.5.13",
     "argon2-browser": "^1.18.0",
     "axios": "^1.8.4",
@@ -47,13 +48,11 @@
     "@types/webextension-polyfill": "^0.10.7",
     "@vitejs/plugin-vue": "^5.2.3",
     "bestzip": "^2.2.1",
-    "cross-env": "^7.0.3",
-    "esno": "^4.7.0",
+    "esno": "^4.8.0",
     "fs-extra": "^11.2.0",
-    "npm-run-all": "^4.1.5",
-    "rimraf": "^6.0.1",
+    "npm-run-all2": "^7.0.2",
     "sass": "^1.77.8",
-    "vite": "^5.3.6",
+    "vite": "^5.4.14",
     "vite-plugin-wasm": "^3.3.0"
   }
 }
