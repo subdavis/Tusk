@@ -1,17 +1,17 @@
-"use strict";
-import * as Base64 from 'base64-arraybuffer'
-import axios from 'axios'
-import { ChromePromiseApi } from '@/lib/chrome-api-promise.js'
-import { OauthManager } from '$services/oauthManager.js'
+'use strict';
+import * as Base64 from 'base64-arraybuffer';
+import axios from 'axios';
+import { ChromePromiseApi } from '@/lib/chrome-api-promise.js';
+import { OauthManager } from '$services/oauthManager.js';
 
-const chromePromise = ChromePromiseApi()
+const chromePromise = ChromePromiseApi();
 
 function PCloudFileManager(settings) {
 	var accessTokenType = 'pcloud';
 
 	var state = {
-		loggedIn: false
-	}
+		loggedIn: false,
+	};
 
 	var oauth = {
 		key: accessTokenType,
@@ -22,7 +22,8 @@ function PCloudFileManager(settings) {
 		title: 'pCloud',
 		icon: 'icon-pcloud',
 		chooseTitle: 'pCloud',
-		chooseDescription: 'Access password files stored on pCloud. Files will be retrieved from pCould each time they are used.',
+		chooseDescription:
+			'Access password files stored on pCloud. Files will be retrieved from pCould each time they are used.',
 	};
 
 	oauth.searchRequestFunction = function (token) {
@@ -35,47 +36,47 @@ function PCloudFileManager(settings) {
 				showdeleted: 0,
 				nofiles: 0,
 				noshares: 1,
-				filtermeta: "isfolder,name,id,folderid,fileid,path"
+				filtermeta: 'isfolder,name,id,folderid,fileid,path',
 			},
 			headers: {
-				'Authorization': 'Bearer ' + token
-			}
-		})
-	}
+				Authorization: 'Bearer ' + token,
+			},
+		});
+	};
 
 	oauth.searchRequestHandler = function (response) {
-
 		var walk = function (files, contents, path) {
 			contents.forEach((file) => {
 				if (file.isfolder) {
-					walk(files, file.contents, path + file.name + "/")
+					walk(files, file.contents, path + file.name + '/');
+				} else {
+					file.path = path + file.name;
+					files.push(file);
 				}
-				else {
-					file.path = path + file.name
-					files.push(file)
-				}
-			})
-			return files
-		}
+			});
+			return files;
+		};
 
-		var files = walk([], response.data.metadata.contents, "/")
-		return files.filter(function (fileInfo) {
-			return fileInfo.name && /\.kdbx?$/.exec(fileInfo.name)
-		}).map(function (fileInfo) {
-			return {
-				title: fileInfo.path,
-				id: fileInfo.fileid
-			};
-		});
-	}
+		var files = walk([], response.data.metadata.contents, '/');
+		return files
+			.filter(function (fileInfo) {
+				return fileInfo.name && /\.kdbx?$/.exec(fileInfo.name);
+			})
+			.map(function (fileInfo) {
+				return {
+					title: fileInfo.path,
+					id: fileInfo.fileid,
+				};
+			});
+	};
 
 	//get the minimum information needed to identify this file for future retrieval
 	oauth.getDatabaseChoiceData = function (dbInfo) {
 		return {
 			title: dbInfo.title,
-			id: dbInfo.id
-		}
-	}
+			id: dbInfo.id,
+		};
+	};
 
 	//given minimal file information, retrieve the actual file
 	oauth.fileRequestFunction = function (dbInfo, token) {
@@ -86,21 +87,21 @@ function PCloudFileManager(settings) {
 				path: dbInfo.title,
 			},
 			headers: {
-				'Authorization': 'Bearer ' + token,
+				Authorization: 'Bearer ' + token,
 			},
 		}).then(function (response) {
-			var url = `https://${response.data.hosts[0]}${response.data.path}`
+			var url = `https://${response.data.hosts[0]}${response.data.path}`;
 			return axios({
 				method: 'GET',
 				url: url,
 				responseType: 'arraybuffer',
-			})
-		})
-	}
+			});
+		});
+	};
 
 	oauth.revokeAuth = function () {
-		return Promise.resolve()
-	}
+		return Promise.resolve();
+	};
 
 	oauth.handleAuthRedirectURI = function (redirect_url, randomState, resolve, reject) {
 		function parseAuthInfoFromUrl(url) {
@@ -109,9 +110,12 @@ function PCloudFileManager(settings) {
 				return null;
 			}
 			hash = hash[1];
-			return JSON.parse('{"' + hash.replace(/&/g, '","').replace(/=/g, '":"') + '"}', function (key, value) {
-				return key === "" ? value : decodeURIComponent(value);
-			});
+			return JSON.parse(
+				'{"' + hash.replace(/&/g, '","').replace(/=/g, '":"') + '"}',
+				function (key, value) {
+					return key === '' ? value : decodeURIComponent(value);
+				}
+			);
 		}
 
 		var authInfo = parseAuthInfoFromUrl(redirect_url);
@@ -122,11 +126,9 @@ function PCloudFileManager(settings) {
 				resolve(authInfo.access_token);
 			});
 		}
-	}
+	};
 
-	return OauthManager(settings, oauth)
+	return OauthManager(settings, oauth);
 }
 
-export {
-	PCloudFileManager
-}
+export { PCloudFileManager };

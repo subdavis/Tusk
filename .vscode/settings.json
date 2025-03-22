@@ -1,5 +1,5 @@
 {
-	"editor.insertSpaces": false,
+	"editor.insertSpaces": true,
 	"editor.tabSize": 2,
 	"editor.detectIndentation": false,
 	"vetur.format.defaultFormatter.js": "vscode-typescript",

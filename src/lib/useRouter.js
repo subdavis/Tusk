@@ -1,8 +1,8 @@
 import VirtualRouter from './virtual-router';
 
-const router = new VirtualRouter()
+const router = new VirtualRouter();
 const useRouter = () => {
-	return router;
+  return router;
 };
 
 export { useRouter, router };
