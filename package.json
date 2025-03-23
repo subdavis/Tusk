@@ -20,7 +20,7 @@
     "build:js": "vite build --config vite.config.content.mts",
     "build:web": "vite build",
     "format": "eslint --fix --ext .ts,.js,.vue,.html src/ scripts/ services/ background/",
-    "pack:zip": "rimraf extension.zip && zip -r extension.zip extension/*"
+    "pack:zip": "rm -f extension.zip && zip -r extension.zip extension/*"
   },
   "dependencies": {
     "@materializecss/materialize": "^2.2.1",
