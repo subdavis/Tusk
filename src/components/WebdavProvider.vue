@@ -233,9 +233,9 @@ table {
 }
 
 .warning-box {
+  border: 3px solid red;
   p {
     margin: 4px;
   }
-  border: 3px solid red;
 }
 </style>

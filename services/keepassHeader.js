@@ -83,7 +83,7 @@ function KeepassHeader() {
       //constants for KDB:
       h.keyRounds2 = 0;
       h.compressionFlags = 0;
-      h.protectedStreamKey = crypto.getRandomValues(new Uint8Array(16)); //KDB does not have this, but we will create in order to protect the passwords
+      h.protectedStreamKey = window.crypto.getRandomValues(new Uint8Array(16)); //KDB does not have this, but we will create in order to protect the passwords
       h.innerRandomStreamId = 0;
       h.streamStartBytes = null;
       h.kdb = true;

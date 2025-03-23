@@ -68,7 +68,7 @@ Otp.prototype.next = function (callback) {
 };
 
 Otp.prototype.hmac = function (data, callback) {
-  const subtle = crypto.subtle || crypto.webkitSubtle;
+  const subtle = window.crypto.subtle || window.crypto.webkitSubtle;
   const algo = { name: 'HMAC', hash: { name: this.algorithm.replace('SHA', 'SHA-') } };
   subtle
     .importKey('raw', this.key, algo, false, ['sign'])

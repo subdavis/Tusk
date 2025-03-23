@@ -1,139 +1,139 @@
-@import "@materialize/components/theme.module.scss";
-@import "@materialize/components/tokens.module.scss";
-@import "@materialize/components/colors.module.scss";
-@import "@materialize/components/typography.module.scss";
-@import "@materialize/components/_color-variables.scss";
-@import "@materialize/components/_color-classes.scss";
-@import "@materialize/components/_variables.scss";
-@import "@materialize/components/_normalize.scss";
-@import "@materialize/components/_global.scss";
-@import "@materialize/components/_typography.scss";
-@import "@materialize/components/_preloader.scss";
+@import '@materialize/components/theme.module.scss';
+@import '@materialize/components/tokens.module.scss';
+@import '@materialize/components/colors.module.scss';
+@import '@materialize/components/typography.module.scss';
+@import '@materialize/components/_color-variables.scss';
+@import '@materialize/components/_color-classes.scss';
+@import '@materialize/components/_variables.scss';
+@import '@materialize/components/_normalize.scss';
+@import '@materialize/components/_global.scss';
+@import '@materialize/components/_typography.scss';
+@import '@materialize/components/_preloader.scss';
 
-@import "./settings.scss";
+@import './settings.scss';
 
 .selectable {
-	transition: all 0.3s ease;
+  transition: all 0.3s ease;
 
-	&:hover {
-		cursor: pointer;
-	}
+  &:hover {
+    cursor: pointer;
+  }
 
-	&.flair:hover {
-		padding-left: 20px;
-	}
+  &.flair:hover {
+    padding-left: 20px;
+  }
 }
 
 .between {
-	width: 100%;
-	justify-content: space-between;
-	display: flex;
+  width: 100%;
+  justify-content: space-between;
+  display: flex;
 }
 
 .stack-item {
-	box-sizing: border-box;
-	width: 100%;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .error {
-	border-left: 4px solid $light-red;
+  border-left: 4px solid $light-red;
 
-	&.pill {
-		border-left: 0px;
-		background-color: $light-red;
-		border-radius: 4px;
-		padding: 0px 4px;
-	}
+  &.pill {
+    border-left: 0px;
+    background-color: $light-red;
+    border-radius: 4px;
+    padding: 0px 4px;
+  }
 }
 
 .warn {
-	border-left: 4px solid $warn-yellow;
+  border-left: 4px solid $warn-yellow;
 
-	&.pill {
-		border-left: 0px;
-		background-color: $warn-yellow;
-		border-radius: 4px;
-		padding: 0 4px;
-	}
+  &.pill {
+    border-left: 0px;
+    background-color: $warn-yellow;
+    border-radius: 4px;
+    padding: 0 4px;
+  }
 }
 
 .success {
-	border-left: 4px solid $green;
+  border-left: 4px solid $green;
 }
 
 button.action-button {
-	background-color: $blue;
-	color: $background-color;
-	font-size: 18px;
-	border-width: 1px 0px;
-	width: 100%;
-	border-top: 1px solid $light-gray;
-	border-bottom: 1px solid $light-gray;
-	margin: 0px;
-	padding: 4px;
-	box-sizing: border-box;
+  background-color: $blue;
+  color: $background-color;
+  font-size: 18px;
+  border-width: 1px 0px;
+  width: 100%;
+  border-top: 1px solid $light-gray;
+  border-bottom: 1px solid $light-gray;
+  margin: 0px;
+  padding: 4px;
+  box-sizing: border-box;
 
-	&:hover {
-		opacity: 0.7;
-	}
+  &:hover {
+    opacity: 0.7;
+  }
 }
 
 .box-bar {
-	width: 100%;
-	box-sizing: border-box;
-	padding: 8px $wall-padding;
-	border-bottom: 2px solid $light-gray;
-	font-size: 18px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px $wall-padding;
+  border-bottom: 2px solid $light-gray;
+  font-size: 18px;
 
-	&.button {
-		background-color: $background-color;
-	}
+  &.button {
+    background-color: $background-color;
+  }
 
-	&.roomy {
-		padding: $wall-padding $options-wall-padding;
+  &.roomy {
+    padding: $wall-padding $options-wall-padding;
 
-		&.small {
-			padding: 6px $options-wall-padding;
-			font-size: 14px;
-		}
-	}
+    &.small {
+      padding: 6px $options-wall-padding;
+      font-size: 14px;
+    }
+  }
 
-	&.small {
-		padding: 6px $wall-padding;
-		font-size: 12px;
-	}
+  &.small {
+    padding: 6px $wall-padding;
+    font-size: 12px;
+  }
 
-	&.medium {
-		padding: 8px $wall-padding;
-		font-size: 14px;
-	}
+  &.medium {
+    padding: 8px $wall-padding;
+    font-size: 14px;
+  }
 
-	&.lighter {
-		background-color: $light-background-color;
-	}
+  &.lighter {
+    background-color: $light-background-color;
+  }
 
-	&.plain {
-		border-bottom: 0px;
-	}
+  &.plain {
+    border-bottom: 0px;
+  }
 
-	&.nopad {
-		padding: 0px;
-	}
+  &.nopad {
+    padding: 0px;
+  }
 }
 
 .unlockLogo {
-	font-weight: 700;
-	font-size: 20px;
-	text-align: center;
-	padding: 20px 0px;
+  font-weight: 700;
+  font-size: 20px;
+  text-align: center;
+  padding: 20px 0px;
 
-	img {
-		width: 48px;
-		height: 48px;
-		vertical-align: middle;
-	}
+  img {
+    width: 48px;
+    height: 48px;
+    vertical-align: middle;
+  }
 }
 
 .mr-10 {
-	margin-right: 10px;
+  margin-right: 10px;
 }

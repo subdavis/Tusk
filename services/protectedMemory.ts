@@ -28,7 +28,7 @@ function ProtectedMemory() {
   async function getCryptoKey() {
     const key = (await browser.storage.session.get('__key__'))['__key__'];
     if (key === undefined) {
-      const newKey = await crypto.subtle.generateKey(
+      const newKey = await window.crypto.subtle.generateKey(
         {
           name: AES.name,
           length: 256,
@@ -36,14 +36,14 @@ function ProtectedMemory() {
         true,
         ['encrypt', 'decrypt']
       );
-      const exported = await crypto.subtle.exportKey('raw', newKey);
+      const exported = await window.crypto.subtle.exportKey('raw', newKey);
       const serialized = serialize(exported);
       await browser.storage.session.set({ __key__: serialized });
       console.log('Generated protected memory key');
       return newKey;
     }
     const deSerialized = deserialize(key);
-    const cryptoKey = await crypto.subtle.importKey('raw', deSerialized, AES.name, false, [
+    const cryptoKey = await window.crypto.subtle.importKey('raw', deSerialized, AES.name, false, [
       'encrypt',
       'decrypt',
     ]);
@@ -60,7 +60,7 @@ function ProtectedMemory() {
     return getCryptoKey()
       .then((cryptoKey) => {
         var encBytes = Base64.decode(encData);
-        return crypto.subtle.decrypt(AES, cryptoKey, encBytes);
+        return window.crypto.subtle.decrypt(AES, cryptoKey, encBytes);
       })
       .then(function (data) {
         var decoder = new TextDecoder();
@@ -77,7 +77,7 @@ function ProtectedMemory() {
     var dataBytes = encoder.encode(JSON.stringify(preppedData));
     return getCryptoKey()
       .then((cryptoKey) => {
-        return crypto.subtle.encrypt(AES, cryptoKey, dataBytes);
+        return window.crypto.subtle.encrypt(AES, cryptoKey, dataBytes);
       })
       .then(function (encData) {
         var dataString = Base64.encode(encData);

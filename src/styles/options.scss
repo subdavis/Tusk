@@ -1,69 +1,69 @@
-@import "./shared.scss";
+@import './shared.scss';
 
-@import "@materialize/components/_tabs.scss";
-@import "@materialize/components/forms/_switches.scss";
-@import "@materialize/components/_navbar.scss";
-@import "@materialize/components/_chips.scss";
-@import "@materialize/components/_buttons.scss";
+@import '@materialize/components/_tabs.scss';
+@import '@materialize/components/forms/_switches.scss';
+@import '@materialize/components/_navbar.scss';
+@import '@materialize/components/_chips.scss';
+@import '@materialize/components/_buttons.scss';
 
 nav {
-	background-color: $blue;
+  background-color: $blue;
 }
 
 .content-body {
-	padding: 0px $options-wall-padding;
+  padding: 0px $options-wall-padding;
 }
 
 p {
-	font-size: 14px;
+  font-size: 14px;
 }
 
 a.btn {
-	background-color: $blue;
-	color: $background-color;
+  background-color: $blue;
+  color: $background-color;
 
-	&:hover {
-		background-color: $blue;
-		opacity: 0.7;
-	}
+  &:hover {
+    background-color: $blue;
+    opacity: 0.7;
+  }
 }
 
 h3 {
-	margin: 1.6rem 0 0.8rem 0;
+  margin: 1.6rem 0 0.8rem 0;
 }
 
-.switch label input[type="checkbox"]:checked + .lever {
-	background-color: $green;
+.switch label input[type='checkbox']:checked + .lever {
+  background-color: $green;
 
-	&:after {
-		background-color: $light-green;
-	}
+  &:after {
+    background-color: $light-green;
+  }
 }
 
 .database-manager {
-	background-color: $light-background-color;
+  background-color: $light-background-color;
 
-	.error {
-		font-size: 12px;
-	}
+  .error {
+    font-size: 12px;
+  }
 
-	svg {
-		width: 18px;
-		vertical-align: middle;
-	}
+  svg {
+    width: 18px;
+    vertical-align: middle;
+  }
 
-	.chip {
-		height: 24px;
-		line-height: 24px;
-		font-size: 11px;
-		margin-right: 4px;
-	}
+  .chip {
+    height: 24px;
+    line-height: 24px;
+    font-size: 11px;
+    margin-right: 4px;
+  }
 
-	.description {
-		font-size: 12px;
-	}
+  .description {
+    font-size: 12px;
+  }
 
-	.between {
-		line-height: 36px;
-	}
+  .between {
+    line-height: 36px;
+  }
 }
