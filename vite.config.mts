@@ -1,18 +1,20 @@
-import { dirname, relative } from 'node:path'
-import type { UserConfig } from 'vite'
-import { defineConfig } from 'vite'
-import Vue from '@vitejs/plugin-vue2'
-import wasm from 'vite-plugin-wasm'
+import path, { dirname, relative } from 'node:path';
+import type { UserConfig } from 'vite';
+import { defineConfig } from 'vite';
+import Vue from '@vitejs/plugin-vue';
+import wasm from 'vite-plugin-wasm';
 
-import { isDev, isLocal, port, r } from './scripts/utils'
-import packageJson from './package.json'
+import { isDev, isLocal, port, r } from './scripts/utils';
+import packageJson from './package.json';
 
 export const sharedConfig: UserConfig = {
   root: r('src'),
   resolve: {
     alias: {
+      vue: '@vue/compat',
       '@': `${r('src')}/`,
-			'$services': `${r('services')}/`
+      $services: `${r('services')}/`,
+      '@materialize': path.resolve(__dirname, 'node_modules/@materializecss/materialize/sass'),
     },
   },
   define: {
@@ -21,15 +23,23 @@ export const sharedConfig: UserConfig = {
     __NAME__: JSON.stringify(packageJson.name),
   },
   plugins: [
-    Vue(),
-		wasm(),
+    Vue({
+      template: {
+        compilerOptions: {
+          compatConfig: {
+            MODE: 2,
+          },
+        },
+      },
+    }),
+    wasm(),
     // rewrite assets to use relative path
     {
       name: 'assets-rewrite',
       enforce: 'post',
       apply: 'build',
       transformIndexHtml(html, { path }) {
-        return html.replace(/"\/assets\//g, `"${relative(dirname(path), '/assets')}/`)
+        return html.replace(/"\/assets\//g, `"${relative(dirname(path), '/assets')}/`);
       },
     },
   ],
@@ -42,7 +52,15 @@ export const sharedConfig: UserConfig = {
       // 'vue-demi',
     ],
   },
-}
+  css: {
+    preprocessorOptions: {
+      scss: {
+        quietDeps: true,
+        silenceDeprecations: ['legacy-js-api', 'import'],
+      },
+    },
+  },
+};
 
 export default defineConfig(({ command }) => ({
   ...sharedConfig,
@@ -56,9 +74,7 @@ export default defineConfig(({ command }) => ({
     origin: `http://localhost:${port}`,
   },
   build: {
-    watch: isDev
-      ? {}
-      : undefined,
+    watch: isDev ? {} : undefined,
     outDir: r('extension/dist'),
     emptyOutDir: false,
     minify: false,
@@ -74,4 +90,4 @@ export default defineConfig(({ command }) => ({
     globals: true,
     environment: 'jsdom',
   },
-}))
+}));

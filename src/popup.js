@@ -1,15 +1,15 @@
-"use strict";
+'use strict';
 
-import 'font-awesome/css/font-awesome.css'
+import 'font-awesome/css/font-awesome.css';
 
 // Vue Components
-import Vue from 'vue'
-import Popup from './Popup.vue'
-import VirtualRouter from '@/lib/virtual-router.js'
-import './styles/shared.scss'
-// Set up routes
-Vue.prototype.$router = new VirtualRouter()
+import { createApp } from 'vue';
+import Popup from './Popup.vue';
+import { router } from '@/lib/useRouter.js';
+import './styles/shared.scss';
 
-new Vue({
-	render: h => h(Popup)
-}).$mount('#app')
+document.documentElement.setAttribute('theme', 'light');
+
+const app = createApp(Popup);
+app.config.globalProperties.$router = router;
+app.mount('#app');

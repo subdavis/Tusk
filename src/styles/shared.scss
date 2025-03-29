@@ -1,15 +1,20 @@
-@import "materialize-css/sass/components/_color-variables.scss";
-@import "materialize-css/sass/components/_color-classes.scss";
-@import "materialize-css/sass/components/_variables.scss";
-@import "materialize-css/sass/components/_normalize.scss";
-@import "materialize-css/sass/components/_global.scss";
-@import "materialize-css/sass/components/_typography.scss";
-@import "materialize-css/sass/components/_preloader.scss";
+@import '@materialize/components/theme.module.scss';
+@import '@materialize/components/tokens.module.scss';
+@import '@materialize/components/colors.module.scss';
+@import '@materialize/components/typography.module.scss';
+@import '@materialize/components/_color-variables.scss';
+@import '@materialize/components/_color-classes.scss';
+@import '@materialize/components/_variables.scss';
+@import '@materialize/components/_normalize.scss';
+@import '@materialize/components/_global.scss';
+@import '@materialize/components/_typography.scss';
+@import '@materialize/components/_preloader.scss';
 
-@import "./settings.scss";
+@import './settings.scss';
 
 .selectable {
-  transition: all .3s ease;
+  transition: all 0.3s ease;
+
   &:hover {
     cursor: pointer;
   }
@@ -32,13 +37,13 @@
 
 .error {
   border-left: 4px solid $light-red;
-  
+
   &.pill {
     border-left: 0px;
     background-color: $light-red;
     border-radius: 4px;
     padding: 0px 4px;
-  };
+  }
 }
 
 .warn {
@@ -48,8 +53,8 @@
     border-left: 0px;
     background-color: $warn-yellow;
     border-radius: 4px;
-    padding: 0px 4px;
-  };
+    padding: 0 4px;
+  }
 }
 
 .success {
@@ -67,20 +72,19 @@ button.action-button {
   margin: 0px;
   padding: 4px;
   box-sizing: border-box;
-  
+
   &:hover {
-    opacity: .7;
+    opacity: 0.7;
   }
 }
 
 .box-bar {
-  
   width: 100%;
   box-sizing: border-box;
   padding: 8px $wall-padding;
   border-bottom: 2px solid $light-gray;
   font-size: 18px;
-  
+
   &.button {
     background-color: $background-color;
   }
@@ -131,5 +135,5 @@ button.action-button {
 }
 
 .mr-10 {
-	margin-right: 10px;
+  margin-right: 10px;
 }

@@ -1,7 +1,7 @@
 {
-	"editor.insertSpaces": false,
-	"editor.tabSize": 2,
-	"editor.detectIndentation": false,
-	"vetur.format.defaultFormatter.js": "vscode-typescript",
-	"vetur.format.defaultFormatter.html": "none",
+  "editor.insertSpaces": true,
+  "editor.tabSize": 2,
+  "editor.detectIndentation": false,
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode"
 }
