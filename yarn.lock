@@ -1069,7 +1069,7 @@ __metadata:
     pako: "npm:^1.0.6"
     prettier: "npm:^3.5.3"
     sass: "npm:^1.86.0"
-    vite: "npm:^5.4.15"
+    vite: "npm:^5.4.20"
     vite-plugin-wasm: "npm:^3.3.0"
     vue: "npm:3"
     vue-eslint-parser: "npm:^10.1.1"
@@ -3741,9 +3741,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vite@npm:^5.4.15":
-  version: 5.4.15
-  resolution: "vite@npm:5.4.15"
+"vite@npm:^5.4.20":
+  version: 5.4.20
+  resolution: "vite@npm:5.4.20"
   dependencies:
     esbuild: "npm:^0.21.3"
     fsevents: "npm:~2.3.3"
@@ -3780,7 +3780,7 @@ __metadata:
       optional: true
   bin:
     vite: bin/vite.js
-  checksum: 10c0/f8a4893bf9d57fe3ded6dc0a2278e8ded707fc9cf38d5a3255fe3caaeea41c52f29bf4deb5e85c9e8dbc8848e9046a7306727ca3fb7b67847d75ee2f2afda5e5
+  checksum: 10c0/391a1fdd7e05445d60aa3b15d6c1cffcdd92c5d154da375bf06b9cd5633c2387ebee0e8f2fceed3226a63dff36c8ef18fb497662dde8c135133c46670996c7a1
   languageName: node
   linkType: hard
 
