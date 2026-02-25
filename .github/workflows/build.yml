@@ -1,0 +1,75 @@
+name: Build Extension
+
+on:
+  workflow_dispatch:
+    inputs:
+      release:
+        description: 'Create pre-release'
+        required: false
+        default: 'false'
+        type: boolean
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+      
+      - name: Install dependencies
+        run: yarn install
+      
+      - name: Build Chrome extension
+        run: yarn build
+      
+      - name: Package Chrome extension
+        run: |
+          rm -f chrome-extension.zip
+          zip -r chrome-extension.zip extension/*
+      
+      - name: Build Firefox extension
+        run: yarn build:ff
+      
+      - name: Package Firefox extension
+        run: |
+          rm -f firefox-extension.zip
+          zip -r firefox-extension.zip extension/*
+      
+      - name: Upload Chrome artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: chrome-extension
+          path: chrome-extension.zip
+      
+      - name: Upload Firefox artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: firefox-extension
+          path: firefox-extension.zip
+      
+      - name: Create pre-release
+        if: github.event.inputs.release == 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ github.run_number }}
+          name: Build ${{ github.run_number }}
+          draft: false
+          prerelease: true
+          files:
+            - chrome-extension.zip
+            - firefox-extension.zip
+          body: |
+            ## Automated Build ${{ github.run_number }}
+            
+            - Build targets: Chrome, Firefox
+            - Build date: ${{ github.event.head_commit.timestamp }}
+            - Commit: ${{ github.sha }}

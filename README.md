@@ -1,79 +1,61 @@
 # Tusk
 
-> A modern, clean keepass browser extension built with Vue.js and kdbxweb. Rebooted from perfectapi/CKP
+> 一个现代、干净的 KeePass 浏览器扩展，使用 Vue.js 和 kdbxweb 构建。从 perfectapi/CKP 重启开发。
 
 ![Tusk](https://user-images.githubusercontent.com/25948390/45255427-a466f300-b386-11e8-9321-931934faafb4.png 'Tusk Logo')
 
-## 🧟 Back from the dead 🧟
+## 🧟 死而复生 🧟
 
-[Read the release notes](https://github.com/subdavis/Tusk/releases/tag/v2024.8.2) and stay tuned for more updates!
+[阅读发布说明](https://github.com/subdavis/Tusk/releases/tag/v2024.8.2)，并随时关注更多更新！
 
-## Installation
+## 安装
 
 **Firefox:** https://addons.mozilla.org/en-GB/firefox/addon/keepass-tusk/
 
 **Chrome:** https://chrome.google.com/webstore/detail/fmhmiaejopepamlcjkncpgpdjichnecm
 
-## User Guide
+## 用户指南
 
-This section provides how-to instructions for various features of Tusk.
+本节提供了 Tusk 各种功能的使用说明。
 
-- [WebDAV Support](https://github.com/subdavis/Tusk/wiki/WebDAV-Support) - Support for WebDAV file servers.
-- [Custom Fields](https://github.com/subdavis/Tusk/wiki/Custom-Fields) - list of custom fields that Tusk supports.
-- [Warnings and Errors](https://github.com/subdavis/Tusk/wiki/Warnings-and-Errors) - An explanation of the messages you may encounter.
+- [WebDAV 支持](https://github.com/subdavis/Tusk/wiki/WebDAV-Support) - 支持 WebDAV 文件服务器。
+- [自定义字段](https://github.com/subdavis/Tusk/wiki/Custom-Fields) - Tusk 支持的自定义字段列表。
+- [警告和错误](https://github.com/subdavis/Tusk/wiki/Warnings-and-Errors) - 您可能遇到的消息的解释。
 
-#### How it works: Implementation Details
+#### 工作原理：实现细节
 
-This section provides in-depth information about how tusk works under the hood. We aim to provide better transparency and give users peace-of-mind. Tusk may not be perfect, but it's better than proprietary black-box applications that hide design flaws from the community.
+本节提供了 Tusk 内部工作原理的深入信息。我们旨在提供更好的透明度，让用户安心。Tusk 可能并不完美，但它比隐藏设计缺陷的专有黑盒应用程序要好。
 
-- [Credential Cache Memory](https://github.com/subdavis/Tusk/wiki/Credential-Cache-Memory) - How Tusk can optionally keep your master password cached.
-- [Sensitive Data](https://github.com/subdavis/Tusk/wiki/Sensitive-Data) - How Tusk handles sensitive data like KeePass databases and keyfiles.
+- [凭证缓存内存](https://github.com/subdavis/Tusk/wiki/Credential-Cache-Memory) - Tusk 如何选择性地缓存您的主密码。
+- [敏感数据](https://github.com/subdavis/Tusk/wiki/Sensitive-Data) - Tusk 如何处理敏感数据，如 KeePass 数据库和密钥文件。
 
-## Build Setup
+## 构建设置
 
-Tusk requires:
+Tusk 需要：
 
 - `node`
 - `yarn`
 
 ```bash
-# install dependencies
+# 安装依赖
 yarn install
 
-# build for production with minification
+# 构建生产版本（带压缩）
 yarn build
 yarn pack:zip
 
-# Hot reload
+# 热重载
 yarn dev
 ```
 
-## Running tests
+## 运行测试
 
-To run tests, first build them with `yarn build-tests` or `yarn watch-tests` then open `tests/test.html` in a browser.
+要运行测试，首先使用 `yarn build-tests` 或 `yarn watch-tests` 构建它们，然后在浏览器中打开 `tests/test.html`。
 
-## Browser Permissions
+## 浏览器权限
 
-> Tusk requires cross-origin permissions in order to inject credentials and query the storage backends on the user's behalf.
+> Tusk 需要跨域权限，以便代表用户注入凭证和查询存储后端。
 
-In chrome, these permissions requests are **always** prompted to the user upon first use.
+在 Chrome 中，这些权限请求在**首次使用时总是**会提示用户。
 
-Because of Firefox's implementation of `browser.permissions`, it was necessary to request all permissions at install time to avoid code rot. A deeper explanation of the firefox permissions can be found [on stackoverflow](https://stackoverflow.com/questions/47723297/firefox-extension-api-permissions-request-may-only-be-called-from-a-user-input)
-
-## FAQ
-
-> Why is it called Tusk?!
-
-I originally wanted to call it _Elephant_, as in _An elephant never forgets._ I tried this name on a couple of friends and they were unimpressed. I wanted to find a name that was more concise but keep the elephant imagery. Ergo, tusk.
-
-> What happened to CKPX?
-
-This is it! CKPX has been rebranded as Tusk to mark its Firefox release. The C in CKPX stood for 'Chrome'.
-
-> How can I support Tusk?
-
-If you ❤️ Tusk, please consider leaving a positive review on [the Firefox Add-on store](https://addons.mozilla.org/en-GB/firefox/addon/keepass-tusk/) or [the Chrome webstore](https://chrome.google.com/webstore/detail/fmhmiaejopepamlcjkncpgpdjichnecm) - I'll be eternally grateful.
-
-> Who made that awesome logo?
-
-A super cool artist and graphic designer named [Gabriel Garcia](https://github.com/ggabogarcia)! Thanks for our logo!
+由于 Firefox 对 `browser.permissions` 的实现，为了避免代码腐烂，有必要在安装时请求所有权限。有关 Firefox 权限的更深入解释，请查看 [Stack Overflow](https://stackoverflow.com/questions/47723297/firefox-extension-api-permissions-request-may-only-be-called-from-a-user-input)
