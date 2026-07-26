@@ -195,7 +195,6 @@ function unlock(passwordKey?: KdbxCredentialsJSON) {
       console.error(err);
       generalMessages.error = err.message || 'invalid keyfile or KDBX file';
       busy.value = false;
-      throw err;
     });
 }
 

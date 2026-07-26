@@ -34,7 +34,7 @@ export interface WebdavFileManagerType extends FileManager {
   isLoggedIn(): Promise<boolean>;
   listDatabases(): Promise<WebdavDBInfo[]>;
   searchServer(serverId: string): Promise<void>;
-  addServer(url: string, username: string, password: string): Promise<ServerInfo | string>;
+  addServer(url: string, username: string, password: string): Promise<string>;
   removeServer(serverId: string): Promise<void>;
   listServers(): Promise<ServerInfo[]>;
 }
@@ -157,7 +157,8 @@ class WebdavFileManagerImpl implements WebdavFileManagerType {
       }));
   }
 
-  async addServer(url: string, username: string, password: string): Promise<ServerInfo | string> {
+  /** Returns the serverId of the added (or already-existing, matching) server. */
+  async addServer(url: string, username: string, password: string): Promise<string> {
     await client({ url, username, password }).getDirectoryContents('/');
     // success!
     const serverInfo: Partial<ServerInfo> = { url, username, password };
@@ -175,7 +176,7 @@ class WebdavFileManagerImpl implements WebdavFileManagerType {
     serverInfo.serverId = newId;
     serverList.push(serverInfo as ServerInfo);
     await this.settings.getSetWebdavServerList(serverList);
-    return serverInfo as ServerInfo;
+    return newId;
   }
 
   /** alias for settings.getSetWebdavServerList */

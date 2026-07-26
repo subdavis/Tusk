@@ -26,9 +26,15 @@ export class SecureCacheMemory {
 
     port.onMessage.addListener((serializedSavedState) => {
       // called from the background when we get a response, i.e. some saved state.
-      const savedState = this.protectedMemory.hydrate(serializedSavedState);
       const notifier = this.awaiting.shift();
-      notifier?.(savedState); // notify others
+      try {
+        notifier?.(this.protectedMemory.hydrate(serializedSavedState));
+      } catch (err) {
+        // corrupted/unparseable cache entry - treat it as a miss rather than
+        // leaving the caller's get() promise pending forever.
+        console.error('Failed to hydrate cached value', err);
+        notifier?.(undefined);
+      }
     });
     port.onDisconnect.addListener(() => {
       // Nothing to do here yet...

@@ -35,9 +35,9 @@ function addServer() {
     .then(() => {
       props.providerManager
         .addServer(webdav.url, webdav.username, webdav.password)
-        .then((serverInfo) => {
+        .then((serverId) => {
           return updateServerList().then(() => {
-            scan((serverInfo as ServerInfo).serverId);
+            scan(serverId);
           });
         })
         .catch((err) => {
