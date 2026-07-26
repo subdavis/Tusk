@@ -50,7 +50,11 @@ yarn dev
 
 ## Running tests
 
-To run tests, first build them with `yarn build-tests` or `yarn watch-tests` then open `tests/test.html` in a browser.
+```bash
+yarn test
+```
+
+Tests are run with [Vitest](https://vitest.dev/), colocated with the source as `*.spec.ts` files.
 
 ## Browser Permissions
 

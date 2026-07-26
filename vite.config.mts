@@ -78,7 +78,9 @@ export default defineConfig(({ command }) => ({
     },
   },
   test: {
+    root: r('.'),
     globals: true,
     environment: 'happy-dom',
+    setupFiles: [r('vitest.setup.ts')],
   },
 }));
