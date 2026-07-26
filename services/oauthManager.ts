@@ -12,6 +12,21 @@ export interface OauthFileManager extends FileManager {
   getToken(): Promise<string | undefined>;
 }
 
+/**
+ * Parses the `#access_token=...&...` implicit-grant hash fragment OneDrive and pCloud
+ * both redirect back with into a plain object, decoding each value.
+ */
+export function parseImplicitGrantHash(url: string): Record<string, string> | null {
+  const hashMatch = /#(.+)$/.exec(url);
+  if (!hashMatch) {
+    return null;
+  }
+  const hash = hashMatch[1];
+  return JSON.parse('{"' + hash.replace(/&/g, '","').replace(/=/g, '":"') + '"}', (key, value) =>
+    key === '' ? value : decodeURIComponent(value)
+  );
+}
+
 async function ensureOriginPermissions(origins: string[]): Promise<boolean> {
   if (await hasOriginPermission(origins)) return true;
   try {

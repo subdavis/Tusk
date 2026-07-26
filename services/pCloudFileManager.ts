@@ -1,5 +1,9 @@
 import axios, { type AxiosResponse } from 'axios';
-import { createOauthFileManager, type OauthFileManager } from './oauthManager';
+import {
+  createOauthFileManager,
+  parseImplicitGrantHash,
+  type OauthFileManager,
+} from './oauthManager';
 import type { Settings } from './settings';
 import type { DBInfo, OauthProviderConfig } from './types';
 
@@ -93,19 +97,7 @@ export function PCloudFileManager(settings: Settings): OauthFileManager {
     },
 
     handleAuthRedirectURI(redirectUrl, randomState, resolve, reject) {
-      function parseAuthInfoFromUrl(url: string): Record<string, string> | null {
-        const hashMatch = /#(.+)$/.exec(url);
-        if (!hashMatch) {
-          return null;
-        }
-        const hash = hashMatch[1];
-        return JSON.parse(
-          '{"' + hash.replace(/&/g, '","').replace(/=/g, '":"') + '"}',
-          (key, value) => (key === '' ? value : decodeURIComponent(value))
-        );
-      }
-
-      const authInfo = parseAuthInfoFromUrl(redirectUrl);
+      const authInfo = parseImplicitGrantHash(redirectUrl);
       if (authInfo === null) {
         reject(new Error('Failed to extract authentication information from redirect url'));
       } else {

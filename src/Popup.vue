@@ -12,6 +12,7 @@
 import { provide } from 'vue';
 import { createAppServices, AppServicesKey } from '@/composables/useAppServices';
 import { useRouter, RouterKey } from '@/composables/useRouter';
+import { useUnlockedStateClipboard } from '@/composables/useUnlockedStateClipboard';
 import Unlock from '@/components/Unlock.vue';
 import Startup from '@/components/Startup.vue';
 import FilePicker from '@/components/FilePicker.vue';
@@ -20,6 +21,10 @@ import SvgDefs from '@/components/SvgDefs.vue';
 
 const services = createAppServices();
 provide(AppServicesKey, services);
+// Registered once here (not in Unlock/EntryDetails) since it needs to stay active for
+// the whole popup session - copying from EntryDetails must keep working even though
+// Unlock.vue has already unmounted by the time that route is showing.
+useUnlockedStateClipboard(services.unlockedState);
 
 const router = useRouter([
   { path: '/' },
