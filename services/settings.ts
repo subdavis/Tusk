@@ -34,7 +34,10 @@ async function keyGetSetter<T>(
 }
 
 export class Settings {
-  constructor(private secureCache: SecureCacheMemory) {}
+  // Optional: only cacheMasterPassword/getCurrentDatabaseUsage need it. The background
+  // page constructs a Settings without one (it never calls either of those methods, and
+  // a SecureCacheMemory there would open a nonsensical port to itself).
+  constructor(private secureCache?: SecureCacheMemory) {}
 
   /** upgrade old settings. Called on install. */
   async upgrade() {
@@ -128,6 +131,7 @@ export class Settings {
   }
 
   async cacheMasterPassword(passwordKey: KdbxCredentialsJSON, args: { forgetTime: number }) {
+    if (!this.secureCache) throw new Error('cacheMasterPassword requires a secureCache');
     const key = await this.getCurrentMasterPasswordCacheKey();
     if (key === null) return;
     await this.secureCache.save(key, passwordKey);
@@ -185,6 +189,7 @@ export class Settings {
    * UI by hiding the irrelevant options and remembering the keyfile
    */
   async getCurrentDatabaseUsage(): Promise<DatabaseUsage> {
+    if (!this.secureCache) throw new Error('getCurrentDatabaseUsage requires a secureCache');
     const info = await this.getCurrentDatabaseChoice();
     if (info === null) return {};
     const usages = await this.getSetDatabaseUsages();
