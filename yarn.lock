@@ -1764,7 +1764,6 @@ __metadata:
     typescript: "npm:5.9.3"
     typescript-eslint: "npm:^8.65.0"
     vite: "npm:^6.4.3"
-    vite-plugin-wasm: "npm:^3.3.0"
     vitest: "npm:^4.1.10"
     vue: "npm:3"
     vue-eslint-parser: "npm:^10.1.1"
@@ -5272,15 +5271,6 @@ __metadata:
   version: 1.0.2
   resolution: "util-deprecate@npm:1.0.2"
   checksum: 10c0/41a5bdd214df2f6c3ecf8622745e4a366c4adced864bc3c833739791aeeeb1838119af7daed4ba36428114b5c67dcda034a79c882e97e43c03e66a4dd7389942
-  languageName: node
-  linkType: hard
-
-"vite-plugin-wasm@npm:^3.3.0":
-  version: 3.3.0
-  resolution: "vite-plugin-wasm@npm:3.3.0"
-  peerDependencies:
-    vite: ^2 || ^3 || ^4 || ^5
-  checksum: 10c0/382ba2f2ffef31dde717ad43a69427bc930a6e2ec453d17b700ef7937b48996893a61657fdee3122654e027b1933341548493b35e6469520a8d4ae6c522d1ee2
   languageName: node
   linkType: hard
 

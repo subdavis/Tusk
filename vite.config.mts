@@ -2,7 +2,6 @@ import path, { dirname, relative } from 'node:path';
 import type { UserConfig } from 'vite';
 import { defineConfig } from 'vite';
 import Vue from '@vitejs/plugin-vue';
-import wasm from 'vite-plugin-wasm';
 
 import { isDev, isLocal, port, r } from './scripts/utils';
 import packageJson from './package.json';
@@ -23,7 +22,6 @@ export const sharedConfig: UserConfig = {
   },
   plugins: [
     Vue(),
-    wasm(),
     // rewrite assets to use relative path
     {
       name: 'assets-rewrite',

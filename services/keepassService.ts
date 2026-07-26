@@ -6,6 +6,7 @@ import * as Case from 'case';
 import * as kdbxweb from 'kdbxweb';
 // @ts-expect-error argon2-browser ships no types
 import argon2 from 'argon2-browser/dist/argon2-bundled.min.js';
+import argon2SimdWasmUrl from 'argon2-browser/dist/argon2-simd.wasm?url';
 import { getValidTokens, parseUrl } from '@/lib/utils';
 import type { KeepassHeader } from './keepassHeader';
 import type { KeepassReference } from './keepassReference';
@@ -13,9 +14,23 @@ import type { PasswordFileStoreRegistry } from './passwordFileStore';
 import type { KeyFile, Settings } from './settings';
 import type { DecryptedDatabase, Entry, KdbxCredentialsJSON, ProtectedValueJSON } from './types';
 
+// argon2-bundled.min.js embeds the scalar argon2.wasm. Hand it the SIMD build instead:
+// identical import/export ABI, ~2x faster. wasm SIMD has shipped since Chrome 91 / Firefox 89
+// and the manifest already requires Chrome 102+. There is no asm.js fallback in
+// argon2-browser - if wasm fails to instantiate, hashing throws, it does not silently
+// degrade to JS.
+(globalThis as { loadArgon2WasmBinary?: () => Promise<Uint8Array> }).loadArgon2WasmBinary = () =>
+  fetch(argon2SimdWasmUrl)
+    .then((res) => res.arrayBuffer())
+    .then((buf) => new Uint8Array(buf));
+
 kdbxweb.CryptoEngine.setArgon2Impl(
   async (password, salt, memory, iterations, length, parallelism, type, version) => {
-    console.log('Using argon2 implementation', version);
+    // argon2-browser hardcodes version 0x13 and ignores the version we pass. kdbxweb accepts
+    // 0x10 too, and that would silently derive the wrong key and surface as "invalid password".
+    if (version !== 0x13) {
+      throw new Error(`Unsupported argon2 version 0x${version.toString(16)}`);
+    }
     const result = await argon2.hash({
       pass: new Uint8Array(password),
       salt: new Uint8Array(salt),
