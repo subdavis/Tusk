@@ -1,132 +1,130 @@
-<script>
+<script setup lang="ts">
+import { inject, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { AppServicesKey } from '@/composables/useAppServices';
 import EntryListItem from '@/components/EntryListItem.vue';
 import Messenger from '@/components/Messenger.vue';
+import type { Entry } from '$services/types';
 
-export default {
-  components: {
-    EntryListItem,
-    Messenger,
-  },
-  props: {
-    settings: Object,
-    messages: Object,
-    unlockedState: Object,
-  },
-  data() {
-    return {
-      searchTerm: '',
-      filteredEntries: this.unlockedState.cacheGet('allEntries'),
-      priorityEntries: this.unlockedState.cacheGet('priorityEntries'),
-      allEntries: this.unlockedState.cacheGet('allEntries'),
-      hotkeyNavEnabled: false,
-      allMessages: this.messages,
-      activeEntry: null,
-      activeEntryIndex: 0,
-      keyHandler: (evt) => {
-        switch (evt.keyCode) {
-          case 67: // C
-          case 66: // B
-            if (evt.ctrlKey || evt.metaKey) {
-              if (evt.keyCode === 67) {
-                this.unlockedState.copyPassword(this.activeEntry);
-              } else if (evt.keyCode === 66) {
-                this.unlockedState.copyUsername(this.activeEntry);
-              }
-            }
-            break;
-          case 9: // TAB
-            const modifier = !evt.shiftKey ? 1 : -1;
-            this.setActive(this.activeEntryIndex + modifier);
-            evt.preventDefault();
-            break;
-          case 40: // DOWN arrow
-            this.setActive(this.activeEntryIndex + 1);
-            evt.preventDefault();
-            break;
-          case 38: // UP arrow
-            this.setActive(this.activeEntryIndex - 1);
-            evt.preventDefault();
-            break;
-          case 13: // ENTER
-            if (this.activeEntry !== null) this.unlockedState.autofill(this.activeEntry);
-            break;
+type FilterableEntry = Entry & { view_is_active?: boolean; filterKey?: string };
+
+const props = defineProps<{
+  messages: { warn?: string; error?: string; success?: string };
+}>();
+
+const { settings, unlockedState } = inject(AppServicesKey)!;
+
+const searchbox = ref<HTMLInputElement>();
+
+const searchTerm = ref('');
+const allEntries = ref<FilterableEntry[]>(unlockedState.cacheGet('allEntries') ?? []);
+const filteredEntries = ref<FilterableEntry[]>(unlockedState.cacheGet('allEntries') ?? []);
+const priorityEntries = ref<FilterableEntry[]>(unlockedState.cacheGet('priorityEntries') ?? []);
+const hotkeyNavEnabled = ref(false);
+const allMessages = ref(props.messages);
+const activeEntry = ref<FilterableEntry | null>(null);
+const activeEntryIndex = ref(0);
+
+function collectFilters(data: unknown, collector: string[]): void {
+  if (data === null || data === undefined) return;
+  if (data instanceof ArrayBuffer || data instanceof Uint8Array) return;
+  else if (typeof data === 'string') collector.push(data.toLocaleLowerCase());
+  else if (Array.isArray(data)) data.forEach((item) => collectFilters(item, collector));
+  else if (typeof data === 'object')
+    for (const prop in data) collectFilters((data as Record<string, unknown>)[prop], collector);
+}
+
+function createEntryFilters(entries: FilterableEntry[]) {
+  entries.forEach((entry) => {
+    const filters: string[] = [];
+    collectFilters(entry, filters);
+    entry.filterKey = filters.join(' ');
+  });
+}
+
+function setActive(index: number) {
+  if (!hotkeyNavEnabled.value) return;
+  // Unset the current active entry
+  if (activeEntry.value !== null) {
+    activeEntry.value.view_is_active = false;
+  }
+  let activeList: FilterableEntry[];
+  if (filteredEntries.value.length > 0 && searchTerm.value.length > 0)
+    activeList = filteredEntries.value;
+  else if (priorityEntries.value.length > 0) activeList = priorityEntries.value;
+  else return; // Neither list has entries
+  if (index < 0) index = activeList.length + index;
+  index = index % activeList.length;
+  activeEntry.value = activeList[index];
+  activeEntry.value.view_is_active = true;
+  activeEntryIndex.value = index;
+}
+
+function keyHandler(evt: KeyboardEvent) {
+  switch (evt.keyCode) {
+    case 67: // C
+    case 66: // B
+      if (evt.ctrlKey || evt.metaKey) {
+        if (evt.keyCode === 67 && activeEntry.value) {
+          unlockedState.copyPassword(activeEntry.value);
+        } else if (evt.keyCode === 66 && activeEntry.value) {
+          unlockedState.copyUsername(activeEntry.value);
         }
-      },
-    };
-  },
-  watch: {
-    searchTerm(val) {
-      this.unlockedState.cacheSet('searchFilter', val); // Causes cache refresh
-      if (val.length) {
-        this.filteredEntries = this.allEntries.filter((entry) => {
-          let result = entry.filterKey.indexOf(val.toLocaleLowerCase());
-          return result > -1;
-        });
       }
-      // Regardless of result, reset the active entry.
-      this.setActive(0);
-    },
-  },
-  mounted() {
-    // Autofocus searchbox
-    this.$nextTick(function () {
-      this.$refs.searchbox.focus();
+      break;
+    case 9: {
+      // TAB
+      const modifier = !evt.shiftKey ? 1 : -1;
+      setActive(activeEntryIndex.value + modifier);
+      evt.preventDefault();
+      break;
+    }
+    case 40: // DOWN arrow
+      setActive(activeEntryIndex.value + 1);
+      evt.preventDefault();
+      break;
+    case 38: // UP arrow
+      setActive(activeEntryIndex.value - 1);
+      evt.preventDefault();
+      break;
+    case 13: // ENTER
+      if (activeEntry.value !== null) unlockedState.autofill(activeEntry.value);
+      break;
+  }
+}
+
+watch(searchTerm, (val) => {
+  unlockedState.cacheSet('searchFilter', val); // Causes cache refresh
+  if (val.length) {
+    filteredEntries.value = allEntries.value.filter((entry) => {
+      return (entry.filterKey ?? '').indexOf(val.toLocaleLowerCase()) > -1;
     });
-    this.createEntryFilters(this.allEntries);
-    // Restore the search term if needed
-    let st = this.unlockedState.cache.searchFilter;
-    if (st !== undefined) this.searchTerm = st;
-    let um = this.unlockedState.cacheGet('unlockedMessages');
-    if (um !== undefined) this.allMessages = um;
-    this.settings.getSetHotkeyNavEnabled().then((enabled) => {
-      this.hotkeyNavEnabled = enabled;
-      if (enabled) {
-        // Initialize the active entry
-        this.setActive(0);
-        // Listen for key events.
-        window.addEventListener('keydown', this.keyHandler);
-      }
-    });
-  },
-  beforeUnmount() {
-    window.removeEventListener('keydown', this.keyHandler);
-  },
-  methods: {
-    collectFilters(data, collector) {
-      if (data === null || data === undefined) return data;
-      if (data.constructor == ArrayBuffer || data.constructor == Uint8Array) return null;
-      else if (typeof data === 'string') collector.push(data.toLocaleLowerCase());
-      else if (data.constructor == Array)
-        for (var i = 0; i < data.length; i++) this.collectFilters(data[i], collector);
-      else for (var prop in data) this.collectFilters(data[prop], collector);
-    },
-    createEntryFilters(entries) {
-      entries.forEach((entry) => {
-        var filters = new Array();
-        this.collectFilters(entry, filters);
-        entry.filterKey = filters.join(' ');
-      });
-    },
-    setActive(index) {
-      if (!this.hotkeyNavEnabled) return;
-      // Unset the current active entry
-      if (this.activeEntry !== null) {
-        this.$set(this.activeEntry, 'view_is_active', false);
-      }
-      let activeList;
-      if (this.filteredEntries.length > 0 && this.searchTerm.length > 0)
-        activeList = this.filteredEntries;
-      else if (this.priorityEntries.length > 0)
-        activeList = this.priorityEntries; // Neither list has entries
-      else return;
-      if (index < 0) index = activeList.length + index;
-      index = index % activeList.length;
-      this.activeEntry = activeList[index];
-      this.$set(this.activeEntry, 'view_is_active', true);
-      this.activeEntryIndex = index;
-    },
-  },
-};
+  }
+  // Regardless of result, reset the active entry.
+  setActive(0);
+});
+
+onMounted(async () => {
+  // Autofocus searchbox
+  searchbox.value?.focus();
+  createEntryFilters(allEntries.value);
+  // Restore the search term if needed
+  const st = unlockedState.cache.searchFilter as string | undefined;
+  if (st !== undefined) searchTerm.value = st;
+  const um = unlockedState.cacheGet<typeof props.messages>('unlockedMessages');
+  if (um !== undefined) allMessages.value = um;
+  const enabled = await settings.getSetHotkeyNavEnabled();
+  hotkeyNavEnabled.value = enabled;
+  if (enabled) {
+    // Initialize the active entry
+    setActive(0);
+    // Listen for key events.
+    window.addEventListener('keydown', keyHandler);
+  }
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('keydown', keyHandler);
+});
 </script>
 
 <template>
@@ -143,20 +141,10 @@ export default {
     <messenger :messages="allMessages" />
     <div class="entries">
       <div v-if="priorityEntries && searchTerm.length == 0">
-        <entry-list-item
-          v-for="entry in priorityEntries"
-          :key="entry.id"
-          :entry="entry"
-          :unlocked-state="unlockedState"
-        />
+        <entry-list-item v-for="entry in priorityEntries" :key="entry.id" :entry="entry" />
       </div>
       <div v-if="filteredEntries && searchTerm.length > 0">
-        <entry-list-item
-          v-for="entry in filteredEntries"
-          :key="entry.id"
-          :entry="entry"
-          :unlocked-state="unlockedState"
-        />
+        <entry-list-item v-for="entry in filteredEntries" :key="entry.id" :entry="entry" />
       </div>
     </div>
   </div>

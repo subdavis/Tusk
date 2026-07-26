@@ -29,6 +29,10 @@ export interface DirInfo {
 export type DirMap = Record<string, DirInfo[]>;
 
 export interface WebdavFileManagerType extends FileManager {
+  login(): Promise<unknown>;
+  logout(): Promise<unknown>;
+  isLoggedIn(): Promise<boolean>;
+  listDatabases(): Promise<WebdavDBInfo[]>;
   searchServer(serverId: string): Promise<void>;
   addServer(url: string, username: string, password: string): Promise<ServerInfo | string>;
   removeServer(serverId: string): Promise<void>;

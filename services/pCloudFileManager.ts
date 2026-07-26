@@ -1,7 +1,7 @@
 import axios, { type AxiosResponse } from 'axios';
-import { createOauthFileManager } from './oauthManager';
+import { createOauthFileManager, type OauthFileManager } from './oauthManager';
 import type { Settings } from './settings';
-import type { DBInfo, FileManager, OauthProviderConfig } from './types';
+import type { DBInfo, OauthProviderConfig } from './types';
 
 const accessTokenType = 'pcloud';
 
@@ -25,7 +25,7 @@ function walk(files: PCloudFile[], contents: PCloudFile[], path: string): PCloud
   return files;
 }
 
-export function PCloudFileManager(settings: Settings): FileManager {
+export function PCloudFileManager(settings: Settings): OauthFileManager {
   const oauth: OauthProviderConfig = {
     key: accessTokenType,
     accessTokenType,

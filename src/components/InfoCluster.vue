@@ -1,10 +1,8 @@
-<script>
-export default {
-  props: {
-    messages: Object,
-    isUnlocked: Boolean,
-  },
-};
+<script setup lang="ts">
+defineProps<{
+  messages?: Record<string, string>;
+  isUnlocked?: boolean;
+}>();
 </script>
 
 <template>

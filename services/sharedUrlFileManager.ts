@@ -7,6 +7,9 @@ export interface SharedUrlDBInfo extends DBInfo {
 }
 
 export interface SharedUrlFileManagerType extends FileManager {
+  login(): Promise<unknown>;
+  logout(): Promise<unknown>;
+  isLoggedIn(): Promise<boolean>;
   addUrl(url: SharedUrlDBInfo): Promise<void>;
   removeUrl(url: SharedUrlDBInfo): Promise<void>;
   getUrls(): Promise<SharedUrlDBInfo[]>;

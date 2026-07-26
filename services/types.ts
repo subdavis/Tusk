@@ -57,6 +57,11 @@ export interface ProtectedValueJSON {
   value: number[];
 }
 
+export interface KdbxCredentialsJSON {
+  passwordHash: ProtectedValueJSON | null;
+  keyFileHash: ProtectedValueJSON | null;
+}
+
 /**
  * KDBX entries are a bag of dynamic fields (arbitrary custom fields become arbitrary
  * camelCased keys, tracked via `keys`) - modeled honestly rather than forced into a

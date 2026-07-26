@@ -3,17 +3,17 @@ import browser from 'webextension-polyfill';
 import { toRaw } from 'vue';
 import { Links } from './links';
 import type { SecureCacheMemory } from './secureCacheMemory';
-import type { DatabaseChoice, DBInfo, FileManager } from './types';
+import type { DatabaseChoice, DBInfo, FileManager, KdbxCredentialsJSON } from './types';
 
 const links = new Links();
 
-interface KeyFile {
+export interface KeyFile {
   name: string;
   encodedKey: string;
 }
 
 interface DatabaseUsage {
-  passwordKey?: string;
+  passwordKey?: KdbxCredentialsJSON;
   [key: string]: unknown;
 }
 
@@ -127,10 +127,10 @@ export class Settings {
     return null;
   }
 
-  async cacheMasterPassword(pw: string, args: { forgetTime: number }) {
+  async cacheMasterPassword(passwordKey: KdbxCredentialsJSON, args: { forgetTime: number }) {
     const key = await this.getCurrentMasterPasswordCacheKey();
     if (key === null) return;
-    await this.secureCache.save(key, pw);
+    await this.secureCache.save(key, passwordKey);
     return this.setForgetTime(key, args.forgetTime);
   }
 
@@ -190,7 +190,7 @@ export class Settings {
     const usages = await this.getSetDatabaseUsages();
     const key = info.passwordFile.title + '__' + info.providerKey;
     const usage: DatabaseUsage = usages[key] || {};
-    usage.passwordKey = await this.secureCache.get(key + '.password');
+    usage.passwordKey = await this.secureCache.get<KdbxCredentialsJSON>(key + '.password');
     return usage;
   }
 

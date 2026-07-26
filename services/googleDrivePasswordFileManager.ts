@@ -1,8 +1,8 @@
 import axios, { type AxiosResponse } from 'axios';
 import { urlencode } from '@/lib/utils';
-import { createOauthFileManager } from './oauthManager';
+import { createOauthFileManager, type OauthFileManager } from './oauthManager';
 import type { Settings } from './settings';
-import type { DBInfo, FileManager, OauthProviderConfig } from './types';
+import type { DBInfo, OauthProviderConfig } from './types';
 
 const accessTokenType = 'gdrive';
 
@@ -84,7 +84,7 @@ function shouldUseChromeAuth(): boolean {
   }
 }
 
-export function GoogleDrivePasswordFileManager(settings: Settings): FileManager {
+export function GoogleDrivePasswordFileManager(settings: Settings): OauthFileManager {
   const oauth: OauthProviderConfig = {
     key: accessTokenType,
     accessTokenType,

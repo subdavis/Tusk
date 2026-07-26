@@ -1,49 +1,54 @@
-<script>
-export default {
-  props: {
-    settings: Object,
-    providers: Array,
-  },
-  data() {
-    return {
-      provider: {},
-      done: false,
-      fail: false,
-    };
-  },
-  mounted() {
-    let provider_key = this.$router.getRoute().provider;
-    this.providers.forEach((p) => {
-      if (p.key === provider_key) this.provider = p;
+<script setup lang="ts">
+import { inject, onMounted, ref } from 'vue';
+import { AppServicesKey } from '@/composables/useAppServices';
+import { RouterKey } from '@/composables/useRouter';
+import type { OauthFileManager } from '$services/oauthManager';
+
+const services = inject(AppServicesKey)!;
+const router = inject(RouterKey)!;
+
+const providers: OauthFileManager[] = [
+  services.dropboxFileManager,
+  services.googleDrivePasswordFileManager,
+  services.oneDriveFileManager,
+  services.pCloudFileManager,
+];
+
+const provider = ref<OauthFileManager>();
+const done = ref(false);
+const fail = ref(false);
+
+onMounted(() => {
+  const providerKey = router.getRoute()?.params.provider;
+  provider.value = providers.find((p) => p.key === providerKey);
+});
+
+function launchAuth() {
+  provider.value
+    ?.login()
+    .then(() => {
+      done.value = true;
+    })
+    .catch(() => {
+      fail.value = true;
     });
-  },
-  methods: {
-    launchAuth() {
-      this.provider
-        .login()
-        .then((nil) => {
-          this.done = true;
-        })
-        .catch((err) => {
-          this.fail = true;
-        });
-    },
-  },
-};
+}
 </script>
 
 <template>
   <div>
     <div class="box-bar roomy">
-      <h4>Reauthorize {{ provider.title }}</h4>
+      <h4>Reauthorize {{ provider?.title }}</h4>
       <p>
-        The authorization token for {{ provider.title }} has expired and Tusk was unable to refresh
+        The authorization token for {{ provider?.title }} has expired and Tusk was unable to refresh
         it. Please reauthorize below to continue to use Tusk with your database from
-        {{ provider.title }}.
+        {{ provider?.title }}.
       </p>
     </div>
     <div class="box-bar roomy lighter">
-      <a class="waves-effect waves-light btn" @click="launchAuth">Authorize {{ provider.title }}</a>
+      <a class="waves-effect waves-light btn" @click="launchAuth"
+        >Authorize {{ provider?.title }}</a
+      >
     </div>
     <div v-if="done" class="box-bar roomy plain">
       <h4><i class="fa fa-check" aria-hidden="true" /> Success</h4>

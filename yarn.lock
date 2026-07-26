@@ -1563,19 +1563,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vue/compat@npm:^3.5.13":
-  version: 3.5.13
-  resolution: "@vue/compat@npm:3.5.13"
-  dependencies:
-    "@babel/parser": "npm:^7.25.3"
-    estree-walker: "npm:^2.0.2"
-    source-map-js: "npm:^1.2.0"
-  peerDependencies:
-    vue: 3.5.13
-  checksum: 10c0/6478912c3cf1ee933ef7ad64d619b564d537a8c3491259ec848412365d2de93054f058e8e411ec9564b2758990323e39918d15baa8021ea4709496e4183d720f
-  languageName: node
-  linkType: hard
-
 "@vue/compiler-core@npm:3.5.13":
   version: 3.5.13
   resolution: "@vue/compiler-core@npm:3.5.13"
@@ -1754,7 +1741,6 @@ __metadata:
     "@types/fs-extra": "npm:^11.0.4"
     "@types/webextension-polyfill": "npm:^0.10.7"
     "@vitejs/plugin-vue": "npm:^5.2.3"
-    "@vue/compat": "npm:^3.5.13"
     "@vue/test-utils": "npm:^2.4.11"
     argon2-browser: "npm:^1.18.0"
     axios: "npm:^1.18.0"

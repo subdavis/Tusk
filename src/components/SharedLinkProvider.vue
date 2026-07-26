@@ -2,123 +2,113 @@
 	SharedLinkProvider:
 	Simple http provider that can also handle Dropbox Shared Links
 -->
-<script>
-import { ChromePromiseApi } from '@/lib/chrome-api-promise.js';
-import { parseUrl } from '@/lib/utils.js';
+<script setup lang="ts">
+import { inject, onMounted, reactive, ref } from 'vue';
+import browser from 'webextension-polyfill';
+import { parseUrl } from '@/lib/utils';
+import { AppServicesKey } from '@/composables/useAppServices';
 import GenericProviderUi from '@/components/GenericProviderUi.vue';
-const chromePromise = ChromePromiseApi();
+import type { SharedUrlDBInfo, SharedUrlFileManagerType } from '$services/sharedUrlFileManager';
 
-export default {
-  components: {
-    GenericProviderUi,
-  },
-  props: {
-    providerManager: Object,
-    settings: Object,
-  },
-  data() {
-    return {
-      busy: false,
-      currentUrl: '',
-      currentUrlTitle: '',
-      links: [],
-      loggedIn: false,
-      messages: {
-        error: '',
-      },
-    };
-  },
-  mounted() {
-    this.providerManager.isLoggedIn().then((loggedIn) => {
-      this.loggedIn = loggedIn;
+const props = defineProps<{
+  providerManager: SharedUrlFileManagerType;
+}>();
+
+const { settings } = inject(AppServicesKey)!;
+
+const busy = ref(false);
+const currentUrl = ref('');
+const currentUrlTitle = ref('');
+const links = ref<SharedUrlDBInfo[]>([]);
+const loggedIn = ref(false);
+const messages = reactive({ error: '' });
+
+onMounted(() => {
+  props.providerManager.isLoggedIn().then((isLoggedIn) => {
+    loggedIn.value = isLoggedIn;
+  });
+  updateLinks();
+});
+
+function toggleLogin() {
+  if (loggedIn.value) {
+    settings.disableDatabaseProvider(props.providerManager);
+    props.providerManager.logout().then(() => {
+      loggedIn.value = false;
     });
-    this.updateLinks();
-  },
-  methods: {
-    toggleLogin() {
-      if (this.loggedIn) {
-        this.settings.disableDatabaseProvider(this.providerManager);
-        this.providerManager.logout().then(() => {
-          this.loggedIn = false;
-        });
-      } else {
-        this.providerManager.login().then(() => {
-          this.loggedIn = true;
-        });
-      }
-    },
-    updateLinks() {
-      return this.providerManager.getUrls().then((links) => {
-        this.links = links;
-      });
-    },
-    removeLink(index) {
-      if (index !== undefined && index >= 0) {
-        this.providerManager.removeUrl(this.links[index]).then(() => this.updateLinks());
-      }
-    },
-    addLink() {
-      if (!this.currentUrl || !this.currentUrlTitle) {
-        this.messages.error = 'Link or Title Missing';
-        return;
-      }
+  } else {
+    props.providerManager.login().then(() => {
+      loggedIn.value = true;
+    });
+  }
+}
 
-      let parsed = parseUrl(this.currentUrl);
-      if (!parsed.host || parsed.host === window.location.host) {
-        this.messages.error = 'Link URL is not valid.';
-        return;
-      }
-      if (parsed.pathname.charAt(parsed.pathname.length - 1) === '/') {
-        this.messages.error =
-          'URL must include file path. (eg. http://example.com is invalid, but http://example.com/file.ckp is valid.)';
-        return;
-      }
+function updateLinks() {
+  return props.providerManager.getUrls().then((urls) => {
+    links.value = urls;
+  });
+}
 
-      let direct_link;
-      if (parsed.host === 'drive.google.com') {
-        // Expected URL Structure is https://drive.google.com/file/d/FILE_ID/view?usp=sharing
-        let id = parsed.pathname.split('/')[3];
-        if (!id || !parsed.pathname.startsWith('/file/d/')) {
-          this.messages.error =
-            'Invalid Google Drive Shared Link. Expected format: https://drive.google.com/file/d/FILE_ID';
-          return;
-        }
-        // direct_link = "https://drive.google.com/uc?export=download&id=" + id;
-        this.messages.error =
-          'Google Drive Shared Links are no longer supported. Please use the Google Drive provider.';
-        return;
-      } else if (parsed.host.endsWith('.dropbox.com')) {
-        direct_link = parsed.href.replace('dl=0', 'dl=1');
-      } else {
-        direct_link = parsed.href;
-      }
+function removeLink(index?: number) {
+  if (index !== undefined && index >= 0) {
+    props.providerManager.removeUrl(links.value[index]).then(() => updateLinks());
+  }
+}
 
-      // go ahead and request permissions.  There isn't a good way to ask from the popup screen...
-      this.messages.error = '';
-      this.busy = true;
-      chromePromise.permissions
-        .request({
-          origins: [direct_link], //FLAGHERE TODO
-        })
-        .then(() =>
-          this.providerManager.addUrl({
-            direct_link: direct_link,
-            title: this.currentUrlTitle,
-          })
-        )
-        .then(() => this.updateLinks())
-        .then(() => {
-          // on accepted
-          this.busy = false;
-        })
-        .catch((reason) => {
-          // on rejected
-          this.busy = false;
-          this.messages.error = reason.message;
-        });
-    },
-  },
-};
+function addLink() {
+  if (!currentUrl.value || !currentUrlTitle.value) {
+    messages.error = 'Link or Title Missing';
+    return;
+  }
+
+  const parsed = parseUrl(currentUrl.value);
+  if (!parsed || !parsed.host || parsed.host === window.location.host) {
+    messages.error = 'Link URL is not valid.';
+    return;
+  }
+  if (parsed.pathname.charAt(parsed.pathname.length - 1) === '/') {
+    messages.error =
+      'URL must include file path. (eg. http://example.com is invalid, but http://example.com/file.ckp is valid.)';
+    return;
+  }
+
+  let directLink: string;
+  if (parsed.host === 'drive.google.com') {
+    // Expected URL Structure is https://drive.google.com/file/d/FILE_ID/view?usp=sharing
+    const id = parsed.pathname.split('/')[3];
+    if (!id || !parsed.pathname.startsWith('/file/d/')) {
+      messages.error =
+        'Invalid Google Drive Shared Link. Expected format: https://drive.google.com/file/d/FILE_ID';
+      return;
+    }
+    messages.error =
+      'Google Drive Shared Links are no longer supported. Please use the Google Drive provider.';
+    return;
+  } else if (parsed.host.endsWith('.dropbox.com')) {
+    directLink = parsed.href.replace('dl=0', 'dl=1');
+  } else {
+    directLink = parsed.href;
+  }
+
+  // go ahead and request permissions.  There isn't a good way to ask from the popup screen...
+  messages.error = '';
+  busy.value = true;
+  browser.permissions
+    .request({ origins: [directLink] })
+    .then(() =>
+      props.providerManager.addUrl({ direct_link: directLink, title: currentUrlTitle.value })
+    )
+    .then(() => updateLinks())
+    .then(() => {
+      // on accepted
+      busy.value = false;
+    })
+    .catch((reason) => {
+      // on rejected
+      busy.value = false;
+      messages.error = reason.message;
+    });
+}
 </script>
 
 <template>

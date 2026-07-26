@@ -35,8 +35,8 @@ function toArrayBuffer(data: ArrayBuffer | Uint8Array): ArrayBuffer {
  * Prep data for serializing by converting ArrayBuffer/Uint8Array properties to base64
  * strings. Also makes a deep copy, so what is returned is not the original.
  */
-function prepData(data: Serializable): Serializable {
-  if (data === null || data === undefined || typeof data !== 'object') return data;
+function prepData(data: unknown): Serializable {
+  if (data === null || data === undefined || typeof data !== 'object') return data as Serializable;
 
   if (data instanceof ArrayBuffer || data instanceof Uint8Array) {
     return randomString + Base64.encode(toArrayBuffer(data));
@@ -44,8 +44,8 @@ function prepData(data: Serializable): Serializable {
     return data.map((item) => prepData(item));
   } else {
     const newObject: Record<string, Serializable> = {};
-    for (const prop in data) {
-      newObject[prop] = prepData(data[prop]);
+    for (const prop in data as Record<string, unknown>) {
+      newObject[prop] = prepData((data as Record<string, unknown>)[prop]);
     }
     return newObject;
   }
@@ -106,7 +106,7 @@ export class ProtectedMemory {
     return dePrepData(JSON.parse(decoded)) as T;
   }
 
-  async setData<T extends Serializable>(key: string, data: T): Promise<void> {
+  async setData(key: string, data: unknown): Promise<void> {
     console.log('Set cache for ' + key);
     const preppedData = prepData(data);
     const dataBytes = new TextEncoder().encode(JSON.stringify(preppedData));
@@ -126,7 +126,7 @@ export class ProtectedMemory {
   }
 
   /** not encrypted */
-  serialize(data: Serializable): string {
+  serialize(data: unknown): string {
     const preppedData = prepData(data);
     const dataBytes = new TextEncoder().encode(JSON.stringify(preppedData));
     return Base64.encode(dataBytes.buffer);

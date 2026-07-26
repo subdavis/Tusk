@@ -11,7 +11,6 @@ export const sharedConfig: UserConfig = {
   root: r('src'),
   resolve: {
     alias: {
-      vue: '@vue/compat',
       '@': `${r('src')}/`,
       $services: `${r('services')}/`,
       '@materialize': path.resolve(__dirname, 'node_modules/@materializecss/materialize/sass'),
@@ -23,15 +22,7 @@ export const sharedConfig: UserConfig = {
     __NAME__: JSON.stringify(packageJson.name),
   },
   plugins: [
-    Vue({
-      template: {
-        compilerOptions: {
-          compatConfig: {
-            MODE: 2,
-          },
-        },
-      },
-    }),
+    Vue(),
     wasm(),
     // rewrite assets to use relative path
     {

@@ -6,6 +6,9 @@ import type { Settings } from './settings';
 import type { DBInfo, FileManager, OauthProviderConfig } from './types';
 
 export interface OauthFileManager extends FileManager {
+  login(): Promise<unknown>;
+  logout(): Promise<unknown>;
+  isLoggedIn(): Promise<boolean>;
   getToken(): Promise<string | undefined>;
 }
 

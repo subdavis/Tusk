@@ -1,7 +1,7 @@
 import axios, { type AxiosResponse } from 'axios';
-import { createOauthFileManager } from './oauthManager';
+import { createOauthFileManager, type OauthFileManager } from './oauthManager';
 import type { Settings } from './settings';
-import type { DBInfo, FileManager, OauthProviderConfig } from './types';
+import type { DBInfo, OauthProviderConfig } from './types';
 
 const accessTokenType = 'dropbox';
 
@@ -12,7 +12,7 @@ function httpHeaderSafeJson(v: unknown): string {
   });
 }
 
-export function DropboxFileManager(settings: Settings): FileManager {
+export function DropboxFileManager(settings: Settings): OauthFileManager {
   const oauth: OauthProviderConfig = {
     key: accessTokenType,
     accessTokenType,

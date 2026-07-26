@@ -1,8 +1,8 @@
 import axios, { type AxiosResponse } from 'axios';
 import browser from 'webextension-polyfill';
-import { createOauthFileManager } from './oauthManager';
+import { createOauthFileManager, type OauthFileManager } from './oauthManager';
 import type { Settings } from './settings';
-import type { DBInfo, FileManager, OauthProviderConfig } from './types';
+import type { DBInfo, OauthProviderConfig } from './types';
 
 const accessTokenType = 'onedrive';
 
@@ -36,7 +36,7 @@ function transformFile(file: OneDriveFile): DBInfo {
   };
 }
 
-export function OneDriveFileManager(settings: Settings): FileManager {
+export function OneDriveFileManager(settings: Settings): OauthFileManager {
   const oauth: OauthProviderConfig = {
     key: accessTokenType,
     accessTokenType,

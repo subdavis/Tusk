@@ -8,6 +8,10 @@ export interface LocalDBInfo extends DBInfo {
 }
 
 export interface LocalFileManager extends FileManager {
+  login(): Promise<unknown>;
+  logout(): Promise<unknown>;
+  isLoggedIn(): Promise<boolean>;
+  listDatabases(): Promise<LocalDBInfo[]>;
   saveDatabase(db: LocalDBInfo): Promise<void>;
   deleteDatabase(db: LocalDBInfo): Promise<void>;
 }

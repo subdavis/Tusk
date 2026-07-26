@@ -1,62 +1,27 @@
-<script>
+<script setup lang="ts">
+import { inject, ref } from 'vue';
+import { AppServicesKey } from '@/composables/useAppServices';
 import OauthProvider from '@/components/OauthProvider.vue';
 import SharedLinkProvider from '@/components/SharedLinkProvider.vue';
 import LocalPasswordFileProvider from '@/components/LocalPasswordFileProvider.vue';
 import WebdavProvider from '@/components/WebdavProvider.vue';
-import VirtualRouter from '@/lib/virtual-router.js';
 import GooglePicker from '@/components/GooglePicker.vue';
-export default {
-  components: {
-    OauthProvider,
-    GooglePicker,
-    SharedLinkProvider,
-    LocalPasswordFileProvider,
-    WebdavProvider,
-  },
-  props: {
-    dropboxFileManager: Object,
-    googleDriveManager: Object,
-    localFileManager: Object,
-    onedriveManager: Object,
-    pCloudFileManager: Object,
-    sampleManager: Object,
-    webdavManager: Object,
-    sharedUrlManager: Object,
-    settings: Object,
-  },
-  data() {
-    return {
-      show: {
-        help: {
-          visible: false,
-        },
-        newUser: {
-          visible: false,
-        },
-        none: {
-          visible: true,
-        },
-      },
-      tabRouter: new VirtualRouter(),
-    };
-  },
-  mounted() {
-    this.tabRouter.registerRoutes([
-      {
-        route: '/help/me/choose',
-        var: this.show.help,
-      },
-      {
-        route: '/new/user',
-        var: this.show.newUser,
-      },
-      {
-        route: '/',
-        var: this.show.none,
-      }, // Use this to hide others, since no id=none element exists.
-    ]);
-  },
-};
+
+const {
+  dropboxFileManager,
+  googleDrivePasswordFileManager: googleDriveManager,
+  localChromePasswordFileManager: localFileManager,
+  oneDriveFileManager: onedriveManager,
+  // pCloud is temporarily disabled below - re-enable by destructuring pCloudFileManager
+  sampleDatabaseFileManager: sampleManager,
+  webdavFileManager: webdavManager,
+  sharedUrlFileManager: sharedUrlManager,
+} = inject(AppServicesKey)!;
+
+// small tab toggle local to this page - not a real route, just show/hide two help panels.
+const helpTab = ref<'help' | 'newUser' | null>(null);
+
+const googleOauthProvider = ref<InstanceType<typeof OauthProvider>>();
 </script>
 
 <template>
@@ -73,14 +38,12 @@ export default {
         or <a href="https://github.com/subdavis/Tusk/issues">open an issue</a>.
       </p>
 
-      <a class="waves-effect waves-light btn mr-10" @click="tabRouter.route('/help/me/choose')"
-        >Help me choose</a
-      >
-      <a class="waves-effect waves-light btn" @click="tabRouter.route('/new/user')"
+      <a class="waves-effect waves-light btn mr-10" @click="helpTab = 'help'">Help me choose</a>
+      <a class="waves-effect waves-light btn" @click="helpTab = 'newUser'"
         >I don't have a KeePass Database</a
       >
 
-      <p v-show="show.help.visible" id="/help/me/choose">
+      <p v-show="helpTab === 'help'" id="/help/me/choose">
         If you're unsure which to pick, I recommend
         <b>Dropbox</b>. It is easy to use and widely supported by other Keepass apps, such as
         <a
@@ -93,7 +56,7 @@ export default {
         provider below.
       </p>
 
-      <p v-show="show.newUser.visible" id="/new/user">
+      <p v-show="helpTab === 'newUser'" id="/new/user">
         If you've never used keepass before, you will need to create a new keepass database before
         enabling the providers below. You can do this by downloading a desktop keepass application
         like
@@ -103,16 +66,19 @@ export default {
         <a href="http://drive.google.com">Google Drive</a> and come back here when you're done.
       </p>
     </div>
-    <oauth-provider :provider-manager="sampleManager" :settings="settings" />
-    <oauth-provider :provider-manager="dropboxFileManager" :settings="settings" />
-    <oauth-provider :provider-manager="googleDriveManager" :settings="settings">
-      <google-picker v-bind="{ googleDriveManager, settings }" />
+    <oauth-provider :provider-manager="sampleManager" />
+    <oauth-provider :provider-manager="dropboxFileManager" />
+    <oauth-provider ref="googleOauthProvider" :provider-manager="googleDriveManager">
+      <google-picker
+        :google-drive-manager="googleDriveManager"
+        @picked="googleOauthProvider?.populate()"
+      />
     </oauth-provider>
-    <oauth-provider :provider-manager="onedriveManager" :settings="settings" />
-    <!-- <oauth-provider :provider-manager="pCloudFileManager" :settings="settings"></oauth-provider> -->
-    <shared-link-provider :provider-manager="sharedUrlManager" :settings="settings" />
-    <webdav-provider :provider-manager="webdavManager" :settings="settings" />
-    <local-password-file-provider :provider-manager="localFileManager" :settings="settings" />
+    <oauth-provider :provider-manager="onedriveManager" />
+    <!-- <oauth-provider :provider-manager="pCloudFileManager"></oauth-provider> -->
+    <shared-link-provider :provider-manager="sharedUrlManager" />
+    <webdav-provider :provider-manager="webdavManager" />
+    <local-password-file-provider :provider-manager="localFileManager" />
   </div>
 </template>
 

@@ -1,327 +1,276 @@
-<script>
-import { parseUrl, getValidTokens } from '@/lib/utils.js';
-
-import InfoCluster from '@/components/InfoCluster.vue';
+<script setup lang="ts">
+import { computed, inject, nextTick, onMounted, reactive, ref, watch } from 'vue';
+import browser from 'webextension-polyfill';
+import { getValidTokens, parseUrl } from '@/lib/utils';
+import { AppServicesKey } from '@/composables/useAppServices';
+import { RouterKey } from '@/composables/useRouter';
 import EntryList from '@/components/EntryList.vue';
 import Spinner from 'vue-simple-spinner';
 import Messenger from '@/components/Messenger.vue';
-import { defineComponent } from 'vue';
+import type { KeyFile } from '$services/settings';
+import type { Entry, KdbxCredentialsJSON } from '$services/types';
 
-export default defineComponent({
-  components: {
-    InfoCluster,
-    EntryList,
-    Spinner,
-    Messenger,
-  },
-  props: {
-    /* Service dependeicies */
-    unlockedState: Object,
-    secureCache: Object,
-    settings: Object,
-    keepassService: Object,
-    links: Object,
-  },
-  data() {
-    return {
-      /* UI state data */
-      unlockedMessages: {
-        warn: '',
-        error: '',
-      },
-      generalMessages: {
-        warn: '',
-        error: '',
-        success: '',
-      },
-      busy: false,
-      isUnlocked: false,
-      masterPassword: '',
-      isMasterPasswordInputVisible: false,
-      keyFiles: [], // list of all available
-      selectedKeyFile: undefined, // chosen keyfile object
-      rememberPeriod: 0, // in minutes. default: do not remember
-      rememberPeriodText: '',
-      databaseFileName: '',
-      keyFilePicker: false,
-      appVersion: chrome.runtime.getManifest().version,
-      slider_options: [
-        {
-          time: 0,
-          text: 'Do not remember',
-        },
-        {
-          time: 30,
-          text: 'Remember for 30 min.',
-        },
-        {
-          time: 120,
-          text: 'Remember for 2 hours.',
-        },
-        {
-          time: 240,
-          text: 'Remember for 4 hours.',
-        },
-        {
-          time: 480,
-          text: 'Remember for 8 hours.',
-        },
-        {
-          time: 1440,
-          text: 'Remember for 24 hours.',
-        },
-        {
-          time: -1,
-          text: 'Until browser exits.',
-        },
-      ],
-      slider_int: 0,
-    };
-  },
-  computed: {
-    rememberPassword: function () {
-      return this.rememberPeriod !== 0;
-    },
-    selectedKeyFileName: function () {
-      if (this.selectedKeyFile !== undefined) return this.selectedKeyFile.name;
-      return 'No keyfile selected.  (click to change)';
-    },
-  },
-  watch: {
-    unlockedMessages: {
-      handler(newval) {
-        this.unlockedState.cacheSet('unlockedMessages', newval);
-      },
-      deep: true,
-    },
-  },
-  async mounted() {
-    // modify unlockedState internal state
-    await this.unlockedState.getTabDetails();
+const { unlockedState, secureCache, settings, keepassService, links } = inject(AppServicesKey)!;
+const router = inject(RouterKey)!;
 
-    if (!this.isUnlocked) {
-      let try_autounlock = () => {
-        this.busy = true;
-        this.settings
-          .getKeyFiles()
-          .then((keyFiles) => {
-            this.keyFiles = keyFiles;
-            return this.settings.getSetDefaultRememberPeriod();
-          })
-          .then((rememberPeriod) => {
-            this.setRememberPeriod(rememberPeriod);
-            return this.settings.getCurrentDatabaseUsage();
-          })
-          .then((usage) => {
-            // tweak UI based on what we know about the db file
-            this.hidePassword = usage.requiresPassword === false;
-            this.hideKeyFile = usage.requiresKeyfile === false;
-            this.rememberedPassword = usage.passwordKey !== undefined;
-            this.setRememberPeriod(usage.rememberPeriod);
+/* UI state data */
+const unlockedMessages = reactive({ warn: '', error: '' });
+const generalMessages = reactive({ warn: '', error: '', success: '' });
+const busy = ref(false);
+const isUnlocked = ref(false);
+const masterPassword = ref('');
+const isMasterPasswordInputVisible = ref(false);
+const keyFiles = ref<KeyFile[]>([]); // list of all available
+const selectedKeyFile = ref<KeyFile>(); // chosen keyfile object
+const rememberPeriod = ref(0); // in minutes. default: do not remember
+const rememberPeriodText = ref('');
+const databaseFileName = ref('');
+const keyFilePicker = ref(false);
+const appVersion = browser.runtime.getManifest().version;
 
-            if (usage.passwordKey !== undefined && usage.requiresKeyfile === false) {
-              this.unlock(usage.passwordKey); // Autologin if no keyfile
-            } else if (usage.keyFileName !== undefined) {
-              let matches = this.keyFiles.filter((kf) => {
-                return kf.name === usage.keyFileName;
-              });
-              if (matches.length > 0) {
-                this.selectedKeyFile = matches[0];
-                if (this.hidePassword === true || usage.passwordKey !== undefined)
-                  this.unlock(usage.passwordKey);
-              }
-            }
-          });
-      };
+const sliderOptions = [
+  { time: 0, text: 'Do not remember' },
+  { time: 30, text: 'Remember for 30 min.' },
+  { time: 120, text: 'Remember for 2 hours.' },
+  { time: 240, text: 'Remember for 4 hours.' },
+  { time: 480, text: 'Remember for 8 hours.' },
+  { time: 1440, text: 'Remember for 24 hours.' },
+  { time: -1, text: 'Until browser exits.' },
+];
+const sliderInt = ref(0);
 
-      let focus = () => {
-        this.$nextTick(() => {
-          let mp = this.$refs.masterPassword;
-          if (mp !== undefined) mp.focus();
-        });
-      };
+const masterPasswordInput = ref<HTMLInputElement>();
 
-      this.busy = true;
-      try {
-        let entries = await this.secureCache.get('secureCache.entries');
-        if (entries !== undefined && entries.length > 0) {
-          this.showResults(entries, true);
-        } else {
-          try_autounlock();
-        }
-      } catch (err) {
-        console.error(err);
-        //this is fine - it just means the cache expired.  Clear the cache to be sure.
-        this.secureCache.clear('secureCache.entries');
-        try_autounlock();
+const selectedKeyFileName = computed(() => {
+  return selectedKeyFile.value !== undefined
+    ? selectedKeyFile.value.name
+    : 'No keyfile selected.  (click to change)';
+});
+
+watch(
+  unlockedMessages,
+  (newval) => {
+    unlockedState.cacheSet('unlockedMessages', newval);
+  },
+  { deep: true }
+);
+
+function setRememberPeriod(timeInt?: number) {
+  /* Args: optional timeInt
+   * if timeInt is given, derive sliderInt
+   * else assume sliderInt is already set.
+   */
+  let sliderOptionIndex: number;
+  if (timeInt !== undefined) {
+    sliderInt.value = sliderOptions.findIndex((opt) => opt.time === timeInt);
+    if (sliderInt.value === -1) sliderInt.value = 0;
+    sliderOptionIndex = sliderInt.value;
+  } else {
+    sliderOptionIndex = Number(sliderInt.value);
+  }
+  if (sliderOptionIndex < sliderOptions.length) {
+    rememberPeriod.value = sliderOptions[sliderOptionIndex].time;
+    rememberPeriodText.value = sliderOptions[sliderOptionIndex].text;
+  }
+}
+
+function closeWindow() {
+  window.close();
+}
+
+function chooseKeyFile(index?: number) {
+  if (index !== undefined && index >= 0) selectedKeyFile.value = keyFiles.value[index];
+  else selectedKeyFile.value = undefined;
+  keyFilePicker.value = false;
+}
+
+function forgetPassword() {
+  settings.getCurrentMasterPasswordCacheKey().then((key) => {
+    if (key !== null) secureCache.clear(key);
+    secureCache.clear('secureCache.entries');
+    unlockedState.clearClipboardState();
+    unlockedState.clearCache(); // new
+    isUnlocked.value = false;
+  });
+}
+
+function showResults(entries: Entry[], fromCache = false) {
+  const getMatchesForThreshold = (threshold: number, entries: Entry[], requireEmptyURL = false) => {
+    return entries.filter(
+      (e) => (e.matchRank ?? 0) >= threshold && (requireEmptyURL ? !e.url : true)
+    );
+  };
+  settings.getSetStrictModeEnabled().then((strictMode) => {
+    const siteUrl = parseUrl(unlockedState.url);
+    if (!siteUrl) return;
+    const title = unlockedState.title;
+    const siteTokens = getValidTokens(siteUrl.hostname + '.' + unlockedState.title);
+    keepassService.rankEntries(entries, siteUrl, title, siteTokens); // in-place
+
+    const allEntries = entries;
+    let priorityEntries = getMatchesForThreshold(100, entries);
+
+    if (priorityEntries.length == 0) {
+      priorityEntries = getMatchesForThreshold(10, entries);
+
+      // in strict mode, good matches are considered partial matches.
+      if (strictMode && priorityEntries.length) {
+        unlockedMessages.warn =
+          'No perfect origin matches, showing ' + priorityEntries.length + ' partial matches.';
       }
-      this.busy = false;
-      focus();
     }
-    if (this.unlockedState.sitePermission) {
-      this.generalMessages.success =
-        'You have previously granted Tusk permission to fill passwords on ' +
-        this.unlockedState.origin;
-    } else {
-      this.generalMessages.warn =
-        'This may be a new site to Tusk. Before filling in a password, double check that this is the correct site.';
+    if (!strictMode && priorityEntries.length == 0) {
+      priorityEntries = getMatchesForThreshold(0.8, entries, true);
     }
-    //set knowlege from the URL
-    this.databaseFileName = decodeURIComponent(this.$router.getRoute().title);
-  },
-  methods: {
-    setRememberPeriod(time_int) {
-      /* Args: optional time_int
-       * if time_int is given, derive slider_int
-       * else assume slider_int is alread set.
-       */
-      let slider_option_index;
-      if (time_int !== undefined) {
-        this.slider_int = ((t) => {
-          for (let i = 0; i < this.slider_options.length; i++) {
-            if (this.slider_options[i].time === t) return i;
-          }
-          return 0;
-        })(time_int);
-        slider_option_index = this.slider_int;
-      } else {
-        slider_option_index = parseInt(this.slider_int);
+    if (!strictMode && priorityEntries.length == 0) {
+      priorityEntries = getMatchesForThreshold(0.4, entries);
+
+      if (priorityEntries.length) {
+        unlockedMessages.warn =
+          'No close matches, showing ' + priorityEntries.length + ' partial matches.';
       }
-      if (slider_option_index < this.slider_options.length) {
-        this.rememberPeriod = this.slider_options[slider_option_index].time;
-        this.rememberPeriodText = this.slider_options[slider_option_index].text;
-      }
-    },
-    closeWindow(event) {
-      window.close();
-    },
-    chooseKeyFile(index) {
-      if (index !== undefined)
-        if (index >= 0) this.selectedKeyFile = this.keyFiles[index];
-        else this.selectedKeyFile = undefined;
-      this.keyFilePicker = false;
-    },
-    chooseAnotherFile() {
-      this.unlockedState.clearBackgroundState();
-      this.secureCache.clear('secureCache.entries');
-      this.$router.route('/choose');
-    },
-    forgetPassword() {
-      this.settings.getCurrentMasterPasswordCacheKey().then((key) => {
-        if (key !== null) this.secureCache.clear(key);
-        this.secureCache.clear('secureCache.entries');
-        this.unlockedState.clearClipboardState();
-        this.unlockedState.clearCache(); // new
-        this.isUnlocked = false;
-      });
-    },
-    showResults(entries, fromCache) {
-      let getMatchesForThreshold = (threshold, entries, requireEmptyURL = false) => {
-        return entries.filter((e) => e.matchRank >= threshold && (requireEmptyURL ? !e.URL : true));
-      };
-      this.settings.getSetStrictModeEnabled().then((strictMode) => {
-        let siteUrl = parseUrl(this.unlockedState.url);
-        let title = this.unlockedState.title;
-        let siteTokens = getValidTokens(siteUrl.hostname + '.' + this.unlockedState.title);
-        this.keepassService.rankEntries(entries, siteUrl, title, siteTokens); // in-place
+    }
+    if (priorityEntries.length == 0) {
+      unlockedMessages.warn = 'No matches found for this site.';
+    }
 
-        let allEntries = entries;
-        let priorityEntries = getMatchesForThreshold(100, entries);
+    // Cache in memory
+    unlockedState.cacheSet('allEntries', allEntries);
+    unlockedState.cacheSet('priorityEntries', priorityEntries);
 
-        if (priorityEntries.length == 0) {
-          priorityEntries = getMatchesForThreshold(10, entries);
+    // save longer term (in encrypted storage)
+    if (!fromCache) {
+      // Don't bother saving if we're just reading from the cache.
+      secureCache.save('secureCache.entries', entries);
+    }
+    busy.value = false;
+    isUnlocked.value = true;
+  });
+}
 
-          // in strict mode, good matches are considered partial matches.
-          if (strictMode && priorityEntries.length) {
-            this.unlockedMessages['warn'] =
-              'No perfect origin matches, showing ' + priorityEntries.length + ' partial matches.';
-          }
-        }
-        if (!strictMode && priorityEntries.length == 0) {
-          priorityEntries = getMatchesForThreshold(0.8, entries, true);
-        }
-        if (!strictMode && priorityEntries.length == 0) {
-          priorityEntries = getMatchesForThreshold(0.4, entries);
+function unlock(passwordKey?: KdbxCredentialsJSON) {
+  busy.value = true;
+  generalMessages.error = '';
+  const bufferPromise = keepassService.getChosenDatabaseFile();
+  const passwordKeyPromise: Promise<KdbxCredentialsJSON> =
+    passwordKey === undefined
+      ? keepassService.getMasterKey(bufferPromise, masterPassword.value, selectedKeyFile.value)
+      : Promise.resolve(passwordKey);
 
-          if (priorityEntries.length) {
-            this.unlockedMessages.warn =
-              'No close matches, showing ' + priorityEntries.length + ' partial matches.';
-          }
-        }
-        if (priorityEntries.length == 0) {
-          this.unlockedMessages.warn = 'No matches found for this site.';
-        }
-
-        // Cache in memory
-        this.unlockedState.cacheSet('allEntries', allEntries);
-        this.unlockedState.cacheSet('priorityEntries', priorityEntries);
-
-        //save longer term (in encrypted storage)
-        if (!fromCache) {
-          // Don't bother saving if we're just reading from the cache.
-          this.secureCache.save('secureCache.entries', entries);
-        }
-        this.busy = false;
-        this.isUnlocked = true;
-      });
-    },
-    clickUnlock(event) {
-      event.preventDefault();
-      this.unlock();
-    },
-    unlock(passwordKey) {
-      this.busy = true;
-      this.generalMessages.error = '';
-      let passwordKeyPromise;
-      let bufferPromise = this.keepassService.getChosenDatabaseFile();
-      if (passwordKey === undefined)
-        passwordKeyPromise = this.keepassService.getMasterKey(
-          bufferPromise,
-          this.masterPassword,
-          this.selectedKeyFile
-        );
-      else passwordKeyPromise = Promise.resolve(passwordKey);
-
-      let keyFileName = this.selectedKeyFile !== undefined ? this.selectedKeyFile.name : undefined;
-      passwordKeyPromise
-        .then((passwordKey) => {
-          return this.keepassService
-            .getDecryptedData(bufferPromise, passwordKey)
-            .then((decryptedData) => {
-              let entries = decryptedData.entries;
-              let version = decryptedData.version;
-              let dbUsage = {
-                requiresPassword: passwordKey.passwordHash === null ? false : true,
-                requiresKeyfile: passwordKey.keyFileHash === null ? false : true,
-                passwordKey: undefined,
-                version: version,
-                keyFileName: keyFileName,
-                rememberPeriod: this.rememberPeriod,
-              };
-              if (this.rememberPeriod !== 0) {
-                let check_time = 60000 * this.rememberPeriod; // milliseconds / min
-                // Save the password in memory independently.
-                this.settings.cacheMasterPassword(passwordKey, {
-                  forgetTime: check_time > 0 ? Date.now() + check_time : check_time,
-                });
-              } else {
-                this.settings.getCurrentMasterPasswordCacheKey().then(this.secureCache.clear);
-              }
-              this.settings.saveCurrentDatabaseUsage(dbUsage);
-              this.settings.getSetDefaultRememberPeriod(this.rememberPeriod);
-              this.showResults(entries);
-              this.busy = false;
-              this.masterPassword = '';
+  const keyFileName = selectedKeyFile.value !== undefined ? selectedKeyFile.value.name : undefined;
+  passwordKeyPromise
+    .then((resolvedPasswordKey) => {
+      return keepassService
+        .getDecryptedData(bufferPromise, resolvedPasswordKey)
+        .then((decryptedData) => {
+          const entries = decryptedData.entries;
+          const version = decryptedData.version;
+          const dbUsage = {
+            requiresPassword: resolvedPasswordKey.passwordHash !== null,
+            requiresKeyfile: resolvedPasswordKey.keyFileHash !== null,
+            passwordKey: undefined as KdbxCredentialsJSON | undefined,
+            version,
+            keyFileName,
+            rememberPeriod: rememberPeriod.value,
+          };
+          if (rememberPeriod.value !== 0) {
+            const checkTime = 60000 * rememberPeriod.value; // milliseconds / min
+            // Save the password in memory independently.
+            settings.cacheMasterPassword(resolvedPasswordKey, {
+              forgetTime: checkTime > 0 ? Date.now() + checkTime : checkTime,
             });
-        })
-        .catch((err) => {
-          console.error(err);
-          this.generalMessages['error'] = err.message || 'invalid keyfile or KDBX file';
-          this.busy = false;
-          throw err;
+          } else {
+            settings.getCurrentMasterPasswordCacheKey().then((key) => {
+              if (key) secureCache.clear(key);
+            });
+          }
+          settings.saveCurrentDatabaseUsage(dbUsage);
+          settings.getSetDefaultRememberPeriod(rememberPeriod.value);
+          showResults(entries);
+          busy.value = false;
+          masterPassword.value = '';
         });
-    },
-  },
+    })
+    .catch((err) => {
+      console.error(err);
+      generalMessages.error = err.message || 'invalid keyfile or KDBX file';
+      busy.value = false;
+      throw err;
+    });
+}
+
+function clickUnlock(event: Event) {
+  event.preventDefault();
+  unlock();
+}
+
+onMounted(async () => {
+  // modify unlockedState internal state
+  await unlockedState.getTabDetails();
+
+  if (!isUnlocked.value) {
+    const tryAutounlock = () => {
+      busy.value = true;
+      settings
+        .getKeyFiles()
+        .then((kf) => {
+          keyFiles.value = kf;
+          return settings.getSetDefaultRememberPeriod();
+        })
+        .then((period) => {
+          setRememberPeriod(period);
+          return settings.getCurrentDatabaseUsage();
+        })
+        .then((usage) => {
+          // tweak UI based on what we know about the db file
+          setRememberPeriod(usage.rememberPeriod as number | undefined);
+
+          const hidePassword = usage.requiresPassword === false;
+          if (usage.passwordKey !== undefined && usage.requiresKeyfile === false) {
+            unlock(usage.passwordKey as KdbxCredentialsJSON); // Autologin if no keyfile
+          } else if (usage.keyFileName !== undefined) {
+            const matches = keyFiles.value.filter((kf) => kf.name === usage.keyFileName);
+            if (matches.length > 0) {
+              selectedKeyFile.value = matches[0];
+              if (hidePassword || usage.passwordKey !== undefined)
+                unlock(usage.passwordKey as KdbxCredentialsJSON);
+            }
+          }
+        });
+    };
+
+    const focus = () => {
+      nextTick(() => {
+        masterPasswordInput.value?.focus();
+      });
+    };
+
+    busy.value = true;
+    try {
+      const entries = await secureCache.get<Entry[]>('secureCache.entries');
+      if (entries !== undefined && entries.length > 0) {
+        showResults(entries, true);
+      } else {
+        tryAutounlock();
+      }
+    } catch (err) {
+      console.error(err);
+      // this is fine - it just means the cache expired.  Clear the cache to be sure.
+      secureCache.clear('secureCache.entries');
+      tryAutounlock();
+    }
+    busy.value = false;
+    focus();
+  }
+  if (unlockedState.sitePermission) {
+    generalMessages.success =
+      'You have previously granted Tusk permission to fill passwords on ' + unlockedState.origin;
+  } else {
+    generalMessages.warn =
+      'This may be a new site to Tusk. Before filling in a password, double check that this is the correct site.';
+  }
+  // set knowledge from the URL
+  databaseFileName.value = decodeURIComponent(router.getRoute()?.params.title ?? '');
 });
 </script>
 
@@ -333,12 +282,7 @@ export default defineComponent({
     </div>
 
     <!-- Entry List -->
-    <EntryList
-      v-if="!busy && isUnlocked"
-      :messages="unlockedMessages"
-      :unlocked-state="unlockedState"
-      :settings="settings"
-    />
+    <EntryList v-if="!busy && isUnlocked" :messages="unlockedMessages" />
 
     <!-- General Messenger -->
     <messenger v-show="!busy" :messages="generalMessages" />
@@ -351,14 +295,14 @@ export default defineComponent({
       </div>
 
       <form @submit="clickUnlock">
-        <div class="small selectable databaseChoose" @click="$router.route('/choose')">
+        <div class="small selectable databaseChoose" @click="router.navigate('/choose')">
           <b>{{ databaseFileName }}</b> <span class="muted-color">change...</span>
         </div>
 
         <div class="stack-item masterPasswordInput">
           <input
             id="masterPassword"
-            ref="masterPassword"
+            ref="masterPasswordInput"
             v-model="masterPassword"
             :type="isMasterPasswordInputVisible ? 'text' : 'password'"
             placeholder="🔒 master password"
@@ -384,23 +328,22 @@ export default defineComponent({
           </div>
         </div>
 
-        <div v-if="keyFilePicker" class="stack-item keyfile-picker">
-          <transition name="keyfile-picker">
-            <div>
-              <span
-                v-for="(kf, kf_index) in keyFiles"
-                class="selectable"
-                :keyfile-index="kf_index"
-                @click="chooseKeyFile(kf_index)"
-              >
-                <i class="fa fa-file fa-fw" aria-hidden="true" /> {{ kf.name }}
-              </span>
-              <span class="selectable" @click="links.openOptionsKeyfiles">
-                <i class="fa fa-wrench fa-fw" aria-hidden="true" /> Manage Keyfiles</span
-              >
-            </div>
-          </transition>
-        </div>
+        <transition name="keyfile-picker">
+          <div v-if="keyFilePicker" class="stack-item keyfile-picker">
+            <span
+              v-for="(kf, kf_index) in keyFiles"
+              :key="kf.name"
+              class="selectable"
+              :keyfile-index="kf_index"
+              @click="chooseKeyFile(kf_index)"
+            >
+              <i class="fa fa-file fa-fw" aria-hidden="true" /> {{ kf.name }}
+            </span>
+            <span class="selectable" @click="links.openOptionsKeyfiles">
+              <i class="fa fa-wrench fa-fw" aria-hidden="true" /> Manage Keyfiles</span
+            >
+          </div>
+        </transition>
 
         <div class="box-bar small plain remember-period-picker">
           <span>
@@ -409,10 +352,10 @@ export default defineComponent({
             </label>
             <input
               id="rememberPeriodLength"
-              v-model="slider_int"
+              v-model="sliderInt"
               type="range"
               min="0"
-              :max="slider_options.length - 1"
+              :max="sliderOptions.length - 1"
               step="1"
               @input="setRememberPeriod(undefined)"
             />

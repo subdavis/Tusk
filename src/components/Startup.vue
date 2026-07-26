@@ -1,53 +1,40 @@
-<script>
-/* beautify preserve:start */
-import { Links } from '$services/links.js';
+<script setup lang="ts">
+import { inject, onMounted, ref } from 'vue';
 import Spinner from 'vue-simple-spinner';
-/* beautify preserve:end */
-export default {
-  components: {
-    Spinner,
-  },
-  props: {
-    settings: Object,
-    passwordFileStoreRegistry: Object,
-  },
-  data() {
-    return {
-      links: Links(),
-      busy: true,
-    };
-  },
-  mounted: function () {
-    this.settings.getCurrentDatabaseChoice().then((info) => {
-      //use the last chosen database
-      if (info) {
-        this.$router.route(
-          '/unlock/' + info.providerKey + '/' + encodeURIComponent(info.passwordFile.title)
-        );
-      } else {
-        //user has not yet chosen a database.  Lets see if there are any available to choose...
-        var readyPromises = [];
-        this.passwordFileStoreRegistry.listFileManagers('listDatabases').forEach((provider) => {
-          readyPromises.push(provider.listDatabases());
-        });
+import { AppServicesKey } from '@/composables/useAppServices';
+import { RouterKey } from '@/composables/useRouter';
 
-        return Promise.all(readyPromises).then((filesArrays) => {
-          var availableFiles = filesArrays.reduce((prev, curr) => {
-            return prev.concat(curr);
-          });
+const { settings, links, passwordFileStoreRegistry } = inject(AppServicesKey)!;
+const router = inject(RouterKey)!;
 
-          if (availableFiles.length) {
-            //choose one of the files
-            this.$router.route('/choose');
-          } else {
-            //no files available - allow the user to link to the options page
-            this.busy = false;
-          }
-        });
-      }
-    });
-  },
-};
+const busy = ref(true);
+
+onMounted(async () => {
+  const info = await settings.getCurrentDatabaseChoice();
+  // use the last chosen database
+  if (info) {
+    router.navigate(
+      '/unlock/' + info.providerKey + '/' + encodeURIComponent(info.passwordFile.title)
+    );
+    return;
+  }
+
+  // user has not yet chosen a database.  Lets see if there are any available to choose...
+  const readyPromises = passwordFileStoreRegistry
+    .listFileManagers('listDatabases')
+    .map((provider) => provider.listDatabases());
+
+  const filesArrays = await Promise.all(readyPromises);
+  const availableFiles = filesArrays.flat();
+
+  if (availableFiles.length) {
+    // choose one of the files
+    router.navigate('/choose');
+  } else {
+    // no files available - allow the user to link to the options page
+    busy.value = false;
+  }
+});
 </script>
 
 <template>

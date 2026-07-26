@@ -1,5 +1,5 @@
 import browser, { type Runtime } from 'webextension-polyfill';
-import type { ProtectedMemory, Serializable } from './protectedMemory';
+import type { ProtectedMemory } from './protectedMemory';
 
 /**
  * Storage in background page memory.
@@ -54,7 +54,7 @@ export class SecureCacheMemory {
     port.postMessage({ action: 'clear', key });
   }
 
-  async save(key: string, value: Serializable): Promise<void> {
+  async save(key: string, value: unknown): Promise<void> {
     const port = await this.readyPromise;
     const serializedValue = this.protectedMemory.serialize(value);
     port.postMessage({ action: 'save', key, value: serializedValue });

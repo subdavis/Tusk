@@ -2,121 +2,109 @@
 	SharedLinkProvider:
 	Simple http provider that can also handle Dropbox Shared Links
 -->
-<script>
-import * as Base64 from 'base64-arraybuffer';
-import { ChromePromiseApi } from '@/lib/chrome-api-promise.js';
+<script setup lang="ts">
+import { inject, onMounted, reactive, ref } from 'vue';
+import browser from 'webextension-polyfill';
+import { AppServicesKey } from '@/composables/useAppServices';
 import GenericProviderUi from '@/components/GenericProviderUi.vue';
-const chromePromise = ChromePromiseApi();
+import type { ServerInfo, WebdavDBInfo, WebdavFileManagerType } from '$services/webdavFileManager';
 
-export default {
-  components: {
-    GenericProviderUi,
-  },
-  props: {
-    providerManager: Object,
-    settings: Object,
-  },
-  data() {
-    return {
-      busy: false,
-      databases: [],
-      loggedIn: false,
-      messages: {
-        error: '',
-      },
-      webdav: {
-        username: '',
-        url: '',
-        password: '',
-      },
-      serverList: [],
-      serverListMeta: {},
-    };
-  },
-  mounted() {
-    this.providerManager.isLoggedIn().then((loggedIn) => {
-      this.loggedIn = loggedIn;
-      if (loggedIn) this.onLogin();
-    });
-  },
-  methods: {
-    addServer() {
-      chromePromise.permissions
-        .request({
-          origins: [this.webdav.url], //FLAGHERE TODO
-        })
-        .then(() => {
-          this.providerManager
-            .addServer(this.webdav.url, this.webdav.username, this.webdav.password)
-            .then((serverInfo) => {
-              // do somethings
-              return this.updateServerList().then(() => {
-                this.scan(serverInfo.serverId);
-              });
-            })
-            .catch((err) => {
-              console.error(err);
-              this.messages.error = err.toString();
-            });
-        })
-        .catch((err) => {
-          console.error(err);
-          this.messages.error = err.toString();
-        });
-    },
-    setBusy(serverId, busy) {
-      let serverListItem = this.serverList.filter((elem) => {
-        return elem.serverId === serverId;
-      })[0];
-      serverListItem.scanBusy = busy;
-    },
-    scan(serverId) {
-      this.setBusy(serverId, true);
-      return this.providerManager
-        .searchServer(serverId)
-        .then((dirMap) => {
-          this.providerManager.listDatabases().then((databases) => {
-            this.databases = databases;
+const props = defineProps<{
+  providerManager: WebdavFileManagerType;
+}>();
+
+const { settings } = inject(AppServicesKey)!;
+
+const busy = ref(false);
+const databases = ref<WebdavDBInfo[]>([]);
+const loggedIn = ref(false);
+const messages = reactive({ error: '' });
+const webdav = reactive({ username: '', url: '', password: '' });
+const serverList = ref<(ServerInfo & { scanBusy?: boolean })[]>([]);
+
+onMounted(() => {
+  props.providerManager.isLoggedIn().then((isLoggedIn) => {
+    loggedIn.value = isLoggedIn;
+    if (isLoggedIn) onLogin();
+  });
+});
+
+function addServer() {
+  browser.permissions
+    .request({ origins: [webdav.url] })
+    .then(() => {
+      props.providerManager
+        .addServer(webdav.url, webdav.username, webdav.password)
+        .then((serverInfo) => {
+          return updateServerList().then(() => {
+            scan((serverInfo as ServerInfo).serverId);
           });
         })
         .catch((err) => {
-          this.messages.error = err.toString();
-        })
-        .then(() => {
-          // READ: finally.
-          this.setBusy(serverId, false);
+          console.error(err);
+          messages.error = err.toString();
         });
-    },
-    remove(serverId) {
-      return this.providerManager.removeServer(serverId).then(this.updateServerList);
-    },
-    updateServerList() {
-      return this.providerManager.listServers().then((servers) => {
-        this.serverList = servers;
+    })
+    .catch((err) => {
+      console.error(err);
+      messages.error = err.toString();
+    });
+}
+
+function setBusy(serverId: string, isBusy: boolean) {
+  const serverListItem = serverList.value.find((elem) => elem.serverId === serverId);
+  if (serverListItem) serverListItem.scanBusy = isBusy;
+}
+
+function scan(serverId: string) {
+  setBusy(serverId, true);
+  return props.providerManager
+    .searchServer(serverId)
+    .then(() => {
+      props.providerManager.listDatabases().then((dbs) => {
+        databases.value = dbs;
       });
-    },
-    toggleLogin() {
-      if (this.loggedIn) {
-        this.settings.disableDatabaseProvider(this.providerManager);
-        this.providerManager.logout().then(() => {
-          this.loggedIn = false;
-        });
-      } else {
-        this.providerManager.login().then(() => {
-          this.loggedIn = true;
-          this.onLogin();
-        });
-      }
-    },
-    onLogin() {
-      /* Other things to do when a successful login happens... */
-      this.providerManager.listDatabases().then((databases) => {
-        this.databases = databases;
-      });
-      this.updateServerList();
-    },
-  },
-};
+    })
+    .catch((err) => {
+      messages.error = err.toString();
+    })
+    .then(() => {
+      // READ: finally.
+      setBusy(serverId, false);
+    });
+}
+
+function remove(serverId: string) {
+  return props.providerManager.removeServer(serverId).then(updateServerList);
+}
+
+function updateServerList() {
+  return props.providerManager.listServers().then((servers) => {
+    serverList.value = servers;
+  });
+}
+
+function toggleLogin() {
+  if (loggedIn.value) {
+    settings.disableDatabaseProvider(props.providerManager);
+    props.providerManager.logout().then(() => {
+      loggedIn.value = false;
+    });
+  } else {
+    props.providerManager.login().then(() => {
+      loggedIn.value = true;
+      onLogin();
+    });
+  }
+}
+
+function onLogin() {
+  /* Other things to do when a successful login happens... */
+  props.providerManager.listDatabases().then((dbs) => {
+    databases.value = dbs;
+  });
+  updateServerList();
+}
 </script>
 
 <template>
@@ -151,7 +139,7 @@ export default {
           <th>URL</th>
           <th>Actions</th>
         </tr>
-        <tr v-for="(server, index) in serverList">
+        <tr v-for="server in serverList" :key="server.serverId">
           <td>{{ server.username }}</td>
           <td>{{ server.url }}</td>
           <td>

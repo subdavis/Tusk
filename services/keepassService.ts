@@ -10,8 +10,8 @@ import { getValidTokens, parseUrl } from '@/lib/utils';
 import type { KeepassHeader } from './keepassHeader';
 import type { KeepassReference } from './keepassReference';
 import type { PasswordFileStoreRegistry } from './passwordFileStore';
-import type { Settings } from './settings';
-import type { DecryptedDatabase, Entry, ProtectedValueJSON } from './types';
+import type { KeyFile, Settings } from './settings';
+import type { DecryptedDatabase, Entry, KdbxCredentialsJSON, ProtectedValueJSON } from './types';
 
 kdbxweb.CryptoEngine.setArgon2Impl(
   async (password, salt, memory, iterations, length, parallelism, type, version) => {
@@ -29,15 +29,6 @@ kdbxweb.CryptoEngine.setArgon2Impl(
     return (result.hash as Uint8Array).buffer as ArrayBuffer;
   }
 );
-
-interface KeyFileInfo {
-  encodedKey: string;
-}
-
-interface KdbxCredentialsJSON {
-  passwordHash: ProtectedValueJSON | null;
-  keyFileHash: ProtectedValueJSON | null;
-}
 
 function protectedValueToJSON(pv: kdbxweb.ProtectedValue): ProtectedValueJSON {
   return {
@@ -182,7 +173,7 @@ export class KeepassService {
   async getMasterKey(
     bufferPromise: Promise<ArrayBuffer>,
     masterPassword: string | undefined,
-    keyFileInfo: KeyFileInfo | undefined
+    keyFileInfo: KeyFile | undefined
   ): Promise<KdbxCredentialsJSON> {
     let protectedMasterPassword: kdbxweb.ProtectedValue | null;
     if (masterPassword === undefined && keyFileInfo === undefined) {
