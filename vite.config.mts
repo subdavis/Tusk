@@ -59,6 +59,7 @@ export default defineConfig(({ command }) => ({
   publicDir: r('public'),
   server: {
     port,
+    cors: true, // allow chrome-extension:// origins to load dev scripts (Vite 6 default only allows localhost)
     hmr: {
       host: 'localhost',
     },

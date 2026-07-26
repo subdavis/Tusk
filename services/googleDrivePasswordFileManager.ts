@@ -42,7 +42,9 @@ function getFileFromDatabase(
 function chromeAuth(settings: Settings, interactive: boolean): Promise<string> {
   return new Promise((resolve, reject) => {
     chrome.identity.getAuthToken({ interactive }, (result) => {
-      const token = result?.token;
+      // Despite @types/chrome declaring `result` as a GetAuthTokenResult object,
+      // Chrome's actual runtime callback hands back a bare token string.
+      const token = typeof result === 'string' ? result : result?.token;
       if (token) {
         settings.getSetAccessToken(accessTokenType, token).then(() => resolve(token));
       } else {

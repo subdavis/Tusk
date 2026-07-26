@@ -5,7 +5,7 @@ import { getValidTokens, parseUrl } from '@/lib/utils';
 import { AppServicesKey } from '@/composables/useAppServices';
 import { RouterKey } from '@/composables/useRouter';
 import EntryList from '@/components/EntryList.vue';
-import Spinner from 'vue-simple-spinner';
+import Spinner from '@/components/Spinner.vue';
 import Messenger from '@/components/Messenger.vue';
 import type { KeyFile } from '$services/settings';
 import type { Entry, KdbxCredentialsJSON } from '$services/types';

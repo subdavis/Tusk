@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { inject, onMounted, ref } from 'vue';
-import Spinner from 'vue-simple-spinner';
+import Spinner from '@/components/Spinner.vue';
 import { AppServicesKey } from '@/composables/useAppServices';
 import { RouterKey } from '@/composables/useRouter';
 

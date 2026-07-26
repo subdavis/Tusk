@@ -34,7 +34,6 @@
     "json-formatter-js": "^2.2.0",
     "kdbxweb": "^2.1.1",
     "vue": "3",
-    "vue-simple-spinner": "^1.2.10",
     "webdav": "^5.8.0",
     "webextension-polyfill": "^0.12.0"
   },

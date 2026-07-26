@@ -1768,7 +1768,6 @@ __metadata:
     vitest: "npm:^4.1.10"
     vue: "npm:3"
     vue-eslint-parser: "npm:^10.1.1"
-    vue-simple-spinner: "npm:^1.2.10"
     vue-tsc: "npm:^3.3.8"
     webdav: "npm:^5.8.0"
     webextension-polyfill: "npm:^0.12.0"
@@ -5493,13 +5492,6 @@ __metadata:
   peerDependencies:
     eslint: ^8.57.0 || ^9.0.0
   checksum: 10c0/dabf59cbc072df9aae50b8e768fc9e1c53b2c86b4e9813c08775771f77758986e008fe8d10346745a7bf3e46f4e508c1c2c6f5ea2e6b3c4694ff896e42d83197
-  languageName: node
-  linkType: hard
-
-"vue-simple-spinner@npm:^1.2.10":
-  version: 1.2.10
-  resolution: "vue-simple-spinner@npm:1.2.10"
-  checksum: 10c0/a62cf7d0522c040f93d2ef90a01aac8438085484bfaf8db020a7dcd80e4e654d8c7e1f7b14474030812fff3afbe658388c133d81c1c552c4c12c76e149994f9a
   languageName: node
   linkType: hard
 
