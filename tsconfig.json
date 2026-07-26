@@ -9,7 +9,8 @@
     "moduleResolution": "node",
     "paths": {
       "~/*": ["src/*"],
-			"@/*": ["src/*"]
+			"@/*": ["src/*"],
+			"$services/*": ["services/*"]
     },
     "resolveJsonModule": true,
     "types": [
