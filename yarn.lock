@@ -1773,7 +1773,6 @@ __metadata:
     json-formatter-js: "npm:^2.2.0"
     kdbxweb: "npm:^2.1.1"
     npm-run-all2: "npm:^7.0.2"
-    pako: "npm:^1.0.6"
     prettier: "npm:^3.5.3"
     sass: "npm:^1.86.0"
     typescript: "npm:5.9.3"
@@ -4355,13 +4354,6 @@ __metadata:
   version: 1.0.1
   resolution: "package-json-from-dist@npm:1.0.1"
   checksum: 10c0/62ba2785eb655fec084a257af34dbe24292ab74516d6aecef97ef72d4897310bc6898f6c85b5cd22770eaa1ce60d55a0230e150fb6a966e3ecd6c511e23d164b
-  languageName: node
-  linkType: hard
-
-"pako@npm:^1.0.6":
-  version: 1.0.11
-  resolution: "pako@npm:1.0.11"
-  checksum: 10c0/86dd99d8b34c3930345b8bbeb5e1cd8a05f608eeb40967b293f72fe469d0e9c88b783a8777e4cc7dc7c91ce54c5e93d88ff4b4f060e6ff18408fd21030d9ffbe
   languageName: node
   linkType: hard
 

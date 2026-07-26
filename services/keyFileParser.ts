@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Parses a KeePass key file.  Formats. KeePass supports the following key file formats:
  *
@@ -9,43 +7,41 @@
  * Hashed. If a key file does not match any of the formats above, its content is hashed using a cryptographic hash function in order to build a key (typically a 256-bit key with SHA-256). This allows to use arbitrary files as key files.
  */
 
-function KeyFileParser() {
-  var exports = {};
-
-  function hex2arr(hex) {
-    try {
-      var arr = [];
-      for (var i = 0; i < hex.length; i += 2) arr.push(parseInt(hex.substr(i, 2), 16));
-      return arr;
-    } catch (err) {
-      return [];
-    }
+function hex2arr(hex: string): number[] {
+  try {
+    const arr: number[] = [];
+    for (let i = 0; i < hex.length; i += 2) arr.push(parseInt(hex.substr(i, 2), 16));
+    return arr;
+  } catch {
+    return [];
   }
+}
 
-  exports.getKeyFromFile = function (keyFileBytes) {
-    var arr = new Uint8Array(keyFileBytes);
-    if (arr.byteLength == 0) {
-      return Promise.reject(new Error('The key file cannot be empty'));
-    } else if (arr.byteLength == 32) {
-      //file content is the key
-      return Promise.resolve(arr);
-    } else if (arr.byteLength == 64) {
-      //file content may be a hex string of the key
-      var decoder = new TextDecoder();
-      var hexString = decoder.decode(arr);
-      var newArr = hex2arr(hexString);
-      if (newArr.length == 32) {
-        return Promise.resolve(newArr);
+export class KeyFileParser {
+  async getKeyFromFile(keyFileBytes: ArrayBuffer): Promise<ArrayBuffer> {
+    const arr = new Uint8Array(keyFileBytes);
+    if (arr.byteLength === 0) {
+      throw new Error('The key file cannot be empty');
+    } else if (arr.byteLength === 32) {
+      // file content is the key
+      return arr.buffer;
+    } else if (arr.byteLength === 64) {
+      // file content may be a hex string of the key
+      const decoder = new TextDecoder();
+      const hexString = decoder.decode(arr);
+      const newArr = hex2arr(hexString);
+      if (newArr.length === 32) {
+        return Uint8Array.from(newArr).buffer;
       }
     }
 
-    //attempt to parse xml
+    // attempt to parse xml
     try {
-      var decoder = new TextDecoder();
-      var xml = decoder.decode(arr);
-      var parser = new DOMParser();
-      var doc = parser.parseFromString(xml, 'text/xml');
-      var keyNode = doc.evaluate(
+      const decoder = new TextDecoder();
+      const xml = decoder.decode(arr);
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(xml, 'text/xml');
+      const keyNode = doc.evaluate(
         '//KeyFile/Key/Data',
         doc,
         null,
@@ -54,20 +50,12 @@ function KeyFileParser() {
       );
       if (keyNode.singleNodeValue && keyNode.singleNodeValue.textContent) {
         console.log('Key file found in XML');
-        return Promise.resolve(keyFileBytes);
+        return keyFileBytes;
       }
-    } catch (err) {
-      //continue, not valid xml keyfile
+    } catch {
+      // continue, not valid xml keyfile
     }
 
-    var SHA = {
-      name: 'SHA-256',
-    };
-
-    return window.crypto.subtle.digest(SHA, arr);
-  };
-
-  return exports;
+    return window.crypto.subtle.digest({ name: 'SHA-256' }, arr);
+  }
 }
-
-export { KeyFileParser };
