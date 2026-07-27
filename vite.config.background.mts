@@ -24,7 +24,7 @@ export default defineConfig({
 		minify: false,
     sourcemap: isDev ? 'inline' : false,
     lib: {
-      entry: r('background/background.js'),
+      entry: r('background/background.ts'),
       name: packageJson.name,
       formats: ['iife'],
     },

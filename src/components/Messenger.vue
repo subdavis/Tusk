@@ -3,12 +3,10 @@
 
   Displays given messages for warning, error, and success
  -->
-<script>
-export default {
-  props: {
-    messages: Object,
-  },
-};
+<script setup lang="ts">
+defineProps<{
+  messages: { warn?: string; error?: string; success?: string };
+}>();
 </script>
 
 <template>

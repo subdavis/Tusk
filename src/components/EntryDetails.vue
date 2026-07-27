@@ -1,119 +1,126 @@
-<script>
-import { Otp as OTP } from '@/lib/otp.js';
-import { parseUrl } from '@/lib/utils.js';
+<script setup lang="ts">
+import { inject, onBeforeUnmount, onMounted, ref } from 'vue';
+import { Otp } from '@/lib/otp';
+import { parseUrl } from '@/lib/utils';
+import { AppServicesKey } from '@/composables/useAppServices';
+import { RouterKey } from '@/composables/useRouter';
 import GoBack from '@/components/GoBack.vue';
+import type { Entry, ProtectedValueJSON } from '$services/types';
 
-export default {
-  components: {
-    GoBack,
-  },
-  props: {
-    unlockedState: Object,
-    settings: Object,
-    links: Object,
-  },
-  data() {
-    return {
-      attributes: [],
-      hiddenValue: '••••••••••••',
-      // OTP
-      otp: false,
-      otp_timeleft: 0,
-      otp_loop: undefined,
-      otp_value: '',
-      otp_width: 0,
-    };
-  },
-  beforeUnmount() {
-    clearInterval(this.otp_loop);
-  },
-  mounted() {
-    let entryId = this.$router.getRoute().entryId;
-    this.entry = this.unlockedState.cacheGet('allEntries').filter((entry) => {
-      return entry.id == entryId;
-    })[0];
-    this.attributes = this.entry.keys.map((key) => {
-      // Should NOT be succeptible to XSS
-      let returnMap = {
-        key: key,
-        value: (this.entry[key] || '').replace(/\n/g, '<br>'),
-      };
-      switch (key) {
-        case 'url':
-          let parsed = parseUrl(this.entry[key]);
-          if (parsed !== null) {
-            returnMap['href'] = parsed.href;
-          }
-          break;
-        case 'notes':
-          returnMap['value'] = this.entry[key];
-          break;
-      }
-      return returnMap;
+interface Attribute {
+  key: string;
+  value: string;
+  href?: string;
+  isHidden?: boolean;
+  protected?: boolean;
+  protectedAttr?: ProtectedValueJSON;
+}
+
+const { unlockedState, links } = inject(AppServicesKey)!;
+const router = inject(RouterKey)!;
+
+const hiddenValue = '••••••••••••';
+const attributes = ref<Attribute[]>([]);
+const otp = ref(false);
+const otpValue = ref('');
+const otpWidth = ref('0%');
+let otpLoop: ReturnType<typeof setInterval> | undefined;
+let entry: Entry;
+
+function setupOTP(url: string) {
+  const otpobj = Otp.parseUrl(url);
+  otp.value = true;
+  const doOtp = () => {
+    otpobj.next((_err, code, timeleft) => {
+      otpValue.value = code ?? '';
+      otpWidth.value = Math.floor((timeleft ?? 0) / 300) + '%';
     });
-    for (var protectedKey in this.entry.protectedData) {
-      if (protectedKey === 'otp') {
-        let url = this.unlockedState.getDecryptedAttribute(this.entry, protectedKey);
-        this.setupOTP(url);
-      } else {
-        this.attributes.push({
-          key: protectedKey,
-          value: this.hiddenValue,
-          isHidden: true,
-          protected: true,
-          protectedAttr: this.entry.protectedData[protectedKey],
-        });
-        // some keepass programs (e.g. keepassxc) store TOTP params in
-        // "TOTP Seed" & "TOTP Settings" (tOTPSeed & tOTPSettings) instead of the otp URL
-        // in this case, we also want to display the computed TOTP value
-        if (protectedKey === 'tOTPSeed' && 'tOTPSettings' in this.entry) {
-          let otpSettings = this.entry['tOTPSettings'].split(';');
-          let otpSeed = this.unlockedState.getDecryptedAttribute(this.entry, protectedKey);
-          if (otpSettings.length >= 2) {
-            this.setupOTP(OTP.makeUrl(otpSeed, otpSettings[0], otpSettings[1]));
-          }
+  };
+  otpLoop = setInterval(doOtp, 1000);
+  doOtp();
+}
+
+function exposeAttribute(attr: Attribute) {
+  attr.value = unlockedState.getDecryptedAttribute(entry, attr.key);
+  attr.isHidden = false;
+}
+
+function hideAttribute(attr: Attribute) {
+  attr.value = hiddenValue;
+  attr.isHidden = true;
+}
+
+function toggleAttribute(attr: Attribute) {
+  if (attr.isHidden) exposeAttribute(attr);
+  else hideAttribute(attr);
+}
+
+function autofill(e: MouseEvent) {
+  e.stopPropagation();
+  console.debug('autofill');
+  unlockedState.autofill(entry);
+}
+
+function copy(e: MouseEvent) {
+  e.stopPropagation();
+  console.debug('copy');
+  unlockedState.copyPassword(entry);
+}
+
+onBeforeUnmount(() => clearInterval(otpLoop));
+
+onMounted(() => {
+  const entryId = router.getRoute()?.params.entryId;
+  const found = (unlockedState.cacheGet<Entry[]>('allEntries') ?? []).find((e) => e.id == entryId);
+  if (!found) return;
+  entry = found;
+
+  attributes.value = entry.keys.map((key) => {
+    // Should NOT be susceptible to XSS
+    const attr: Attribute = {
+      key,
+      value: ((entry[key] as string) || '').replace(/\n/g, '<br>'),
+    };
+    switch (key) {
+      case 'url': {
+        const parsed = parseUrl(entry[key] as string);
+        if (parsed !== null) {
+          attr.href = parsed.href;
+        }
+        break;
+      }
+      case 'notes':
+        attr.value = entry[key] as string;
+        break;
+    }
+    return attr;
+  });
+
+  for (const protectedKey in entry.protectedData) {
+    if (protectedKey === 'otp') {
+      const url = unlockedState.getDecryptedAttribute(entry, protectedKey);
+      setupOTP(url);
+    } else {
+      attributes.value.push({
+        key: protectedKey,
+        value: hiddenValue,
+        isHidden: true,
+        protected: true,
+        protectedAttr: entry.protectedData[protectedKey],
+      });
+      // some keepass programs (e.g. keepassxc) store TOTP params in
+      // "TOTP Seed" & "TOTP Settings" (tOTPSeed & tOTPSettings) instead of the otp URL
+      // in this case, we also want to display the computed TOTP value
+      if (protectedKey === 'tOTPSeed' && 'tOTPSettings' in entry) {
+        const otpSettings = (entry['tOTPSettings'] as string).split(';');
+        const otpSeed = unlockedState.getDecryptedAttribute(entry, protectedKey);
+        if (otpSettings.length >= 2) {
+          setupOTP(Otp.makeUrl(otpSeed, otpSettings[0], otpSettings[1]));
         }
       }
     }
-  },
-  methods: {
-    exposeAttribute(attr) {
-      attr.value = this.unlockedState.getDecryptedAttribute(this.entry, attr.key);
-      attr.isHidden = false;
-    },
-    hideAttribute(attr) {
-      attr.value = this.hiddenValue;
-      attr.isHidden = true;
-    },
-    toggleAttribute(attr) {
-      if (attr.isHidden) this.exposeAttribute(attr);
-      else this.hideAttribute(attr);
-    },
-    setupOTP(url) {
-      let otpobj = OTP.parseUrl(url);
-      this.otp = true;
-      let do_otp = () => {
-        otpobj.next((_, code, timeleft) => {
-          this.otp_value = code;
-          this.otp_timeleft = (timeleft / 1000) | 0;
-          this.otp_width = Math.floor(timeleft / 300) + '%';
-        });
-      };
-      this.otp_loop = setInterval(do_otp, 1000);
-      do_otp();
-    },
-    autofill(e) {
-      e.stopPropagation();
-      console.debug('autofill');
-      this.unlockedState.autofill(this.entry);
-    },
-    copy(e) {
-      e.stopPropagation();
-      console.debug('copy');
-      this.unlockedState.copyPassword(this.entry);
-    },
-  },
-};
+  }
+});
 </script>
 
 <template>
@@ -123,13 +130,13 @@ export default {
       <div v-if="otp" class="attribute-box">
         <span class="attribute-title">One Time Password</span>
         <br />
-        <span class="attribute-value">{{ otp_value }}</span>
+        <span class="attribute-value">{{ otpValue }}</span>
         <div class="progress">
           <div
-            :key="otp_value"
+            :key="otpValue"
             class="determinate"
             style="transition: width 1s linear"
-            :style="{ width: otp_width }"
+            :style="{ width: otpWidth }"
           />
         </div>
       </div>
@@ -142,7 +149,7 @@ export default {
           <pre v-if="attr.key === 'notes'" class="attribute-value">{{ attr.value }}</pre>
           <!-- URL -->
           <span v-else-if="attr.key === 'url'" class="attribute-value">
-            <a href="javascript:void(0)" @click="links.open(attr.href)">{{ attr.value }}</a>
+            <a href="javascript:void(0)" @click="links.open(attr.href!)">{{ attr.value }}</a>
           </span>
           <!-- other -->
           <span v-else-if="!attr.protected" class="attribute-value">{{ attr.value }}</span>

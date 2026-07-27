@@ -1,47 +1,51 @@
-<script>
-import { parseUrl } from '@/lib/utils.js';
-export default {
-  props: {
-    entry: Object,
-    unlockedState: Object,
-  },
-  computed: {
-    header: function () {
-      if (this.entry.title.length > 0) return this.entry.title;
-      return this.entry.url;
-    },
-  },
-  watch: {
-    // When the element becomes active, scroll it into view.
-    'entry.view_is_active': function (val) {
-      if (val)
-        this.$el.scrollIntoView({
-          block: 'end',
-          inline: 'nearest',
-          behavior: 'smooth',
-        });
-    },
-  },
-  methods: {
-    details(e) {
-      this.$router.route('/entry-details/' + this.entry.id);
-    },
-    autofill(e) {
-      e.stopPropagation();
-      console.debug('autofill');
-      this.unlockedState.autofill(this.entry);
-    },
-    copy(e) {
-      e.stopPropagation();
-      console.debug('copy');
-      this.unlockedState.copyPassword(this.entry);
-    },
-  },
-};
+<script setup lang="ts">
+import { computed, inject, ref, watch } from 'vue';
+import { AppServicesKey } from '@/composables/useAppServices';
+import { RouterKey } from '@/composables/useRouter';
+import type { Entry } from '$services/types';
+
+const props = defineProps<{
+  entry: Entry & { view_is_active?: boolean };
+}>();
+
+const { unlockedState } = inject(AppServicesKey)!;
+const router = inject(RouterKey)!;
+
+const el = ref<HTMLElement>();
+
+const header = computed(() => {
+  const title = props.entry.title as string;
+  return title && title.length > 0 ? title : (props.entry.url as string);
+});
+
+// When the element becomes active, scroll it into view.
+watch(
+  () => props.entry.view_is_active,
+  (val) => {
+    if (val) el.value?.scrollIntoView({ block: 'end', inline: 'nearest', behavior: 'smooth' });
+  }
+);
+
+function details() {
+  router.navigate('/entry-details/' + props.entry.id);
+}
+
+function autofill(e: MouseEvent) {
+  e.stopPropagation();
+  console.debug('autofill');
+  unlockedState.autofill(props.entry);
+}
+
+function copy(e: MouseEvent) {
+  e.stopPropagation();
+  console.debug('copy');
+  unlockedState.copyPassword(props.entry);
+}
 </script>
 
 <template>
   <div
+    ref="el"
     class="entry-list-item selectable between flair"
     :class="{ active: entry.view_is_active }"
     @click="details"
