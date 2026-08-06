@@ -151,6 +151,7 @@ export default {
             <span
               v-if="attr.key !== 'notes'"
               class="attribute-value protected"
+              tabindex="0"
               @click="toggleAttribute(attr)"
             >
               <i
