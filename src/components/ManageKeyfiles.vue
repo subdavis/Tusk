@@ -1,56 +1,56 @@
-<script>
-export default {
-  props: {
-    settings: Object,
-    keyFileParser: Object,
-  },
-  data() {
-    return {
-      keyFiles: [],
-      errorMessage: '',
-    };
-  },
-  mounted() {
-    this.loadKeyFiles();
-  },
-  methods: {
-    loadKeyFiles() {
-      this.settings.getKeyFiles().then((keyFiles) => {
-        this.keyFiles = keyFiles;
-      });
-    },
-    removeKeyFile(index) {
-      if (index >= 0 && index < this.keyFiles.length) {
-        let kf = this.keyFiles[index];
-        this.settings.deleteKeyFile(kf.name).then((nil) => {
-          this.loadKeyFiles();
+<script setup lang="ts">
+import { inject, onMounted, ref } from 'vue';
+import { AppServicesKey } from '@/composables/useAppServices';
+
+const { settings, keyFileParser } = inject(AppServicesKey)!;
+
+interface KeyFile {
+  name: string;
+  encodedKey: string;
+}
+
+const keyFiles = ref<KeyFile[]>([]);
+const errorMessage = ref('');
+
+function loadKeyFiles() {
+  settings.getKeyFiles().then((kf) => {
+    keyFiles.value = kf;
+  });
+}
+
+function removeKeyFile(index: number) {
+  if (index >= 0 && index < keyFiles.value.length) {
+    const kf = keyFiles.value[index];
+    settings.deleteKeyFile(kf.name).then(() => {
+      loadKeyFiles();
+    });
+  }
+}
+
+function selectFileInput() {
+  document.getElementById('file')?.click();
+}
+
+function handleAdd(event: Event) {
+  const files = (event.target as HTMLInputElement).files;
+  errorMessage.value = '';
+  for (const fp of Array.from(files ?? [])) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      keyFileParser
+        .getKeyFromFile(e.target?.result as ArrayBuffer)
+        .then((key) => {
+          settings.addKeyFile(fp.name, key).then(loadKeyFiles);
+        })
+        .catch((err) => {
+          errorMessage.value = err.message;
         });
-      }
-    },
-    selectFileInput() {
-      document.getElementById('file').click();
-    },
-    handleAdd(event) {
-      let files = event.target.files;
-      this.errorMessage = '';
-      for (var i = 0; i < files.length; i++) {
-        let reader = new FileReader();
-        let fp = files[i];
-        reader.onload = (e) => {
-          this.keyFileParser
-            .getKeyFromFile(e.target.result)
-            .then((key) => {
-              this.settings.addKeyFile(fp.name, key).then(this.loadKeyFiles);
-            })
-            .catch((err) => {
-              this.errorMessage = err.message;
-            });
-        };
-        reader.readAsArrayBuffer(fp);
-      }
-    },
-  },
-};
+    };
+    reader.readAsArrayBuffer(fp);
+  }
+}
+
+onMounted(loadKeyFiles);
 </script>
 
 <template>
@@ -76,7 +76,11 @@ export default {
         {{ errorMessage }}
       </p>
     </div>
-    <div v-for="(file, file_index) in keyFiles" class="box-bar roomy small lighter">
+    <div
+      v-for="(file, file_index) in keyFiles"
+      :key="file.name"
+      class="box-bar roomy small lighter"
+    >
       <span
         >{{ file.name }}
         <i

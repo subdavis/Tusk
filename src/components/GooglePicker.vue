@@ -1,51 +1,38 @@
-<script>
-import { ChromePromiseApi } from '@/lib/chrome-api-promise.js';
-import { manifest } from 'webextension-polyfill';
-const chromePromise = ChromePromiseApi();
+<script setup lang="ts">
+import { onMounted, ref } from 'vue';
+import browser from 'webextension-polyfill';
+import type { OauthFileManager } from '$services/oauthManager';
 
-export default {
-  props: {
-    settings: Object,
-    googleDriveManager: Object,
-  },
-  data() {
-    return {
-      pickerOpen: false,
-    };
-  },
-  mounted() {
-    window.addEventListener(
-      'message',
-      (event) => {
-        if (event.data.m === 'pickerResult') {
-          console.info('Picker result', event);
-          this.$parent.populate();
-          this.pickerOpen = false;
-        }
-      },
-      false
-    );
-  },
-  methods: {
-    showPicker() {
-      this.pickerOpen = true;
-      chromePromise.runtime.getManifest().then((manifest) => {
-        const APP_ID = manifest.static_data[this.googleDriveManager.key].client_id;
-        this.googleDriveManager.getToken().then((accessToken) => {
-          const iframe = document.getElementById('pickerFrame').contentWindow;
-          iframe.postMessage(
-            {
-              m: 'showPicker',
-              accessToken: accessToken,
-              appId: APP_ID,
-            },
-            '*'
-          );
-        });
-      });
-    },
-  },
-};
+const props = defineProps<{
+  googleDriveManager: OauthFileManager;
+}>();
+
+const emit = defineEmits<{
+  picked: [];
+}>();
+
+const pickerOpen = ref(false);
+
+onMounted(() => {
+  window.addEventListener('message', (event) => {
+    if (event.data.m === 'pickerResult') {
+      console.info('Picker result', event);
+      emit('picked');
+      pickerOpen.value = false;
+    }
+  });
+});
+
+async function showPicker() {
+  pickerOpen.value = true;
+  const manifest = browser.runtime.getManifest() as unknown as {
+    static_data: Record<string, { client_id: string }>;
+  };
+  const appId = manifest.static_data[props.googleDriveManager.key].client_id;
+  const accessToken = await props.googleDriveManager.getToken();
+  const iframe = (document.getElementById('pickerFrame') as HTMLIFrameElement).contentWindow;
+  iframe?.postMessage({ m: 'showPicker', accessToken, appId }, '*');
+}
 </script>
 
 <template>

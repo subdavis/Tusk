@@ -1,7 +1,8 @@
-<script>
-export default {
-  props: {},
-};
+<script setup lang="ts">
+import { inject } from 'vue';
+import { RouterKey } from '@/composables/useRouter';
+
+const router = inject(RouterKey)!;
 </script>
 
 <template>
@@ -20,7 +21,7 @@ export default {
         providers below.
       </p>
 
-      <a class="waves-effect waves-light btn" @click="$router.route('/manage/databases')"
+      <a class="waves-effect waves-light btn" @click="router.navigate('/manage/databases')"
         >1. Cloud Storage Setup</a
       >
 
@@ -29,7 +30,7 @@ export default {
         password to provide even better security, or even used instead of one.
       </p>
 
-      <a class="waves-effect waves-light btn" @click="$router.route('/manage/keyfiles')"
+      <a class="waves-effect waves-light btn" @click="router.navigate('/manage/keyfiles')"
         >2. Keyfile Setup (optional)</a
       >
 

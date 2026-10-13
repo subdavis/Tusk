@@ -3,110 +3,90 @@
 	Simple http provider that can also handle Dropbox Shared Links
 -->
 
-<script>
+<script setup lang="ts">
+import { inject, onMounted, reactive, ref } from 'vue';
 import * as Base64 from 'base64-arraybuffer';
+import { AppServicesKey } from '@/composables/useAppServices';
 import GenericProviderUi from '@/components/GenericProviderUi.vue';
+import type { LocalDBInfo, LocalFileManager } from '$services/localChromePasswordFileManager';
 
-export default {
-  components: {
-    GenericProviderUi,
-  },
-  props: {
-    providerManager: Object,
-    settings: Object,
-  },
-  data() {
-    return {
-      busy: false,
-      currentUrl: '',
-      currentUrlTitle: '',
-      databases: [],
-      loggedIn: false,
-      messages: {
-        error: '',
-      },
-    };
-  },
-  mounted() {
-    this.providerManager.isLoggedIn().then((loggedIn) => {
-      this.loggedIn = loggedIn;
+const props = defineProps<{
+  providerManager: LocalFileManager;
+}>();
+
+const { settings } = inject(AppServicesKey)!;
+
+const busy = ref(false);
+const databases = ref<LocalDBInfo[]>([]);
+const loggedIn = ref(false);
+const messages = reactive({ error: '' });
+
+onMounted(() => {
+  props.providerManager.isLoggedIn().then((isLoggedIn) => {
+    loggedIn.value = isLoggedIn;
+  });
+  props.providerManager.listDatabases().then((dbs) => {
+    databases.value = dbs;
+  });
+});
+
+function toggleLogin(e: MouseEvent) {
+  if (loggedIn.value) {
+    settings.disableDatabaseProvider(props.providerManager);
+    props.providerManager.logout().then(() => {
+      loggedIn.value = false;
     });
-    this.providerManager.listDatabases().then((databases) => {
-      if (databases !== false) this.databases = databases;
+  } else {
+    props.providerManager.login().then(() => {
+      loggedIn.value = true;
     });
-  },
-  methods: {
-    toggleLogin(e) {
-      if (this.loggedIn) {
-        this.settings.disableDatabaseProvider(this.providerManager);
-        this.providerManager.logout().then(() => {
-          this.loggedIn = false;
-        });
+    e.preventDefault();
+  }
+}
+
+function selectFile() {
+  document.getElementById('file-selector')?.click();
+}
+
+function removePasswordFile(index: number) {
+  if (index >= databases.value.length || index < 0) return; // not a valid index...
+  const fi = databases.value[index];
+  props.providerManager
+    .deleteDatabase(fi)
+    .then(() => props.providerManager.listDatabases())
+    .then((files) => {
+      databases.value = files;
+    });
+}
+
+function handleAdd(event: Event) {
+  const files = (event.target as HTMLInputElement).files;
+  messages.error = '';
+  for (const fp of Array.from(files ?? [])) {
+    const reader = new FileReader();
+    reader.readAsArrayBuffer(fp);
+    reader.onload = (e) => {
+      if (fp.name.indexOf('.kdbx') < 0 || fp.size < 70) {
+        messages.error += fp.name + ' is not a valid KeePass v2+ file. ';
+        return;
+      }
+
+      const fi: LocalDBInfo = {
+        title: fp.name,
+        data: Base64.encode(e.target?.result as ArrayBuffer),
+      };
+
+      const existingIndex = databases.value.findIndex((existing) => existing.title === fi.title);
+      if (existingIndex === -1) {
+        databases.value.push(fi);
       } else {
-        this.providerManager.login().then(() => {
-          this.loggedIn = true;
-        });
-        e.preventDefault();
+        databases.value[existingIndex] = fi;
       }
-    },
-    selectFile(event) {
-      document.getElementById('file-selector').click();
-    },
-    removePasswordFile(index) {
-      if (index >= this.databases.length || index < 0) return; // not a valid index...
-      let fi = this.databases[index];
-      this.providerManager
-        .deleteDatabase(fi)
-        .then(this.providerManager.listDatabases)
-        .then((files) => {
-          this.databases = files;
-        });
-    },
-    handleAdd(event) {
-      let files = event.target.files;
-      this.messages.error = '';
-      for (var i = 0; i < files.length; i++) {
-        let reader = new FileReader();
-        let fp = files[i];
-        reader.readAsArrayBuffer(fp);
-        reader.onload = (e) => {
-          if (fp.name.indexOf('.kdbx') < 0 || fp.size < 70) {
-            this.messages.error += fp.name + ' is not a valid KeePass v2+ file. ';
-            return;
-          }
 
-          var fi = {
-            title: fp.name,
-            lastModified: fp.lastModified,
-            lastModifiedDate: fp.lastModifiedDate,
-            size: fp.size,
-            type: fp.type,
-            data: Base64.encode(e.target.result),
-          };
-
-          var existingIndex = null;
-          this.databases.forEach(function (existingFile, index) {
-            if (existingFile.title == fi.title) existingIndex = index;
-          });
-
-          if (existingIndex == null) {
-            //add
-            this.databases.push(fi);
-          } else {
-            //replace
-            this.databases[existingIndex] = fi;
-          }
-
-          return this.providerManager.saveDatabase({
-            title: fi.title,
-            data: fi.data,
-            lastModified: fi.lastModified,
-          });
-        }; // end onload
-      }
-    },
-  },
-};
+      props.providerManager.saveDatabase(fi);
+    };
+  }
+}
 </script>
 
 <template>

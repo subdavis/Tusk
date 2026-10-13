@@ -9,90 +9,79 @@
 		 */
 	If new providers are added, prefer that they are oauth providers.
 -->
-<script>
+<script setup lang="ts">
+import { inject, onMounted, reactive, ref } from 'vue';
+import { AppServicesKey } from '@/composables/useAppServices';
 import GenericProviderUi from '@/components/GenericProviderUi.vue';
+import type { DBInfo, FileManager } from '$services/types';
 
-export default {
-  components: {
-    GenericProviderUi,
-  },
-  props: {
-    providerManager: Object,
-    settings: Object,
-  },
-  data() {
-    return {
-      busy: false,
-      databases: [],
-      loggedIn: false,
-      messages: {
-        error: '',
-      },
-    };
-  },
-  mounted() {
-    this.populate();
-  },
-  methods: {
-    populate() {
-      // TODO: deal with the race condition here....
-      this.busy = true;
-      this.messages.error = '';
-      this.providerManager
-        .listDatabases()
-        .then((databases) => {
-          this.databases = databases;
-          this.providerManager.isLoggedIn().then((loggedIn) => {
-            this.loggedIn = loggedIn;
-            this.busy = false;
-          });
-        })
-        .catch((err) => {
-          console.error(
-            'Error while connecting to database backend for',
-            this.providerManager.title
-          );
-          this.messages.error = err.toString();
-          this.databases = [];
-          console.error(err);
-          this.busy = false;
-        });
-    },
-    toggleLogin(event) {
-      //v-bind:id="'toggleButton'+providerManager.key"j
-      // this.providerManager.logout()
-      // this.settings.disableDatabaseProvider(this.providerManager)
-      if (!this.busy) {
-        if (this.loggedIn) {
-          this.providerManager
-            .logout()
-            .then((nil) => {
-              // if logout works, attempt to unset the currentDatabaseChoice.
-              this.settings.disableDatabaseProvider(this.providerManager);
-              this.populate();
-            })
-            .catch((err) => {
-              this.settings.disableDatabaseProvider(this.providerManager);
-              this.messages.error = err.toString();
-            });
-        } else {
-          this.providerManager
-            .login()
-            .then((nil) => {
-              this.populate();
-            })
-            .catch((err) => {
-              this.loggedIn = false;
-              this.messages.error = err.toString();
-            });
-        }
-      } else {
-        // wait for state to settle...
-        console.error('Wait for toggle state to settle before changing enable/disable');
-      }
-    },
-  },
-};
+const props = defineProps<{
+  providerManager: FileManager;
+}>();
+
+const { settings } = inject(AppServicesKey)!;
+
+const busy = ref(false);
+const databases = ref<DBInfo[]>([]);
+const loggedIn = ref(false);
+const messages = reactive({ error: '' });
+
+function populate() {
+  // TODO: deal with the race condition here....
+  busy.value = true;
+  messages.error = '';
+  props.providerManager
+    .listDatabases()
+    .then((dbs) => {
+      databases.value = dbs;
+      return props.providerManager.isLoggedIn?.().then((isLoggedIn) => {
+        loggedIn.value = !!isLoggedIn;
+        busy.value = false;
+      });
+    })
+    .catch((err) => {
+      console.error('Error while connecting to database backend for', props.providerManager.title);
+      messages.error = err.toString();
+      databases.value = [];
+      console.error(err);
+      busy.value = false;
+    });
+}
+
+function toggleLogin() {
+  if (busy.value) {
+    // wait for state to settle...
+    console.error('Wait for toggle state to settle before changing enable/disable');
+    return;
+  }
+  if (loggedIn.value) {
+    props.providerManager
+      .logout?.()
+      .then(() => {
+        // if logout works, attempt to unset the currentDatabaseChoice.
+        settings.disableDatabaseProvider(props.providerManager);
+        populate();
+      })
+      .catch((err) => {
+        settings.disableDatabaseProvider(props.providerManager);
+        messages.error = err.toString();
+      });
+  } else {
+    props.providerManager
+      .login?.()
+      .then(() => {
+        populate();
+      })
+      .catch((err) => {
+        loggedIn.value = false;
+        messages.error = err.toString();
+      });
+  }
+}
+
+onMounted(populate);
+
+defineExpose({ populate });
 </script>
 
 <template>

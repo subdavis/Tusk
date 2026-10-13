@@ -1,16 +1,16 @@
-<script>
-export default {
-  props: {
-    providerManager: Object,
-    busy: Boolean,
-    databases: Array,
-    error: String,
-    loggedIn: Boolean,
-    toggleLogin: Function,
-    removeable: Boolean,
-    removeFunction: Function,
-  },
-};
+<script setup lang="ts">
+import type { DBInfo, FileManager } from '$services/types';
+
+defineProps<{
+  providerManager: FileManager;
+  busy: boolean;
+  databases: DBInfo[];
+  error: string;
+  loggedIn: boolean;
+  toggleLogin: (event: MouseEvent) => void;
+  removeable: boolean;
+  removeFunction?: (index: number) => void;
+}>();
 </script>
 
 <template>
@@ -35,13 +35,18 @@ export default {
       </div>
     </div>
     <div style="display: flex; flex-wrap: wrap">
-      <span v-for="(db, index) in databases" class="chip" style="margin-bottom: 5px">
+      <span
+        v-for="(db, index) in databases"
+        :key="db.title"
+        class="chip"
+        style="margin-bottom: 5px"
+      >
         {{ db.title }}
         <i
           v-if="removeable"
           class="fa fa-times-circle selectable"
           aria-hidden="true"
-          @click="removeFunction(index)"
+          @click="removeFunction?.(index)"
         />
       </span>
     </div>

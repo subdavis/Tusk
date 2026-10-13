@@ -1,61 +1,47 @@
-<script>
-import GoBack from '@/components/GoBack.vue';
+<script setup lang="ts">
+import { inject, onMounted, ref } from 'vue';
+import { AppServicesKey } from '@/composables/useAppServices';
+import { RouterKey } from '@/composables/useRouter';
+import type { DBInfo, FileManager } from '$services/types';
 
-export default {
-  components: {
-    GoBack,
-  },
-  props: {
-    passwordFileStoreRegistry: Object,
-    settings: Object,
-    links: Object,
-  },
-  data() {
-    return {
-      databases: [],
-    };
-  },
-  mounted() {
-    this.passwordFileStoreRegistry.listFileManagers('listDatabases').forEach((provider) => {
-      provider
-        .listDatabases()
-        .then((databases) => {
-          if (databases && databases.length) {
-            databases.forEach((database) => {
-              database.provider = provider;
-            });
-            this.databases = this.databases.concat(databases);
-          }
-        })
-        .catch((err) => {
-          this.settings.handleProviderError(err, provider);
-          console.error('Error when trying to listDatabases');
-          console.error(err);
-        });
-    });
-  },
-  methods: {
-    selectDatabase(i) {
-      if (i !== undefined) {
-        let database = this.databases[i];
-        let info = database.provider.getDatabaseChoiceData(database);
-        this.settings.saveCurrentDatabaseChoice(info, database.provider).then((nil) => {
-          this.$router.route(
-            '/unlock/' + database.provider.key + '/' + encodeURIComponent(database.title)
-          );
-        });
-      } else {
-        // TODO
-      }
-    },
-  },
-};
+const { passwordFileStoreRegistry, settings, links } = inject(AppServicesKey)!;
+const router = inject(RouterKey)!;
+
+const databases = ref<(DBInfo & { provider: FileManager })[]>([]);
+
+onMounted(() => {
+  passwordFileStoreRegistry.listFileManagers('listDatabases').forEach((provider) => {
+    provider
+      .listDatabases()
+      .then((dbs) => {
+        if (dbs && dbs.length) {
+          const withProvider = dbs.map((db) => ({ ...db, provider }));
+          databases.value = databases.value.concat(withProvider);
+        }
+      })
+      .catch((err) => {
+        settings.handleProviderError(err, provider);
+        console.error('Error when trying to listDatabases');
+        console.error(err);
+      });
+  });
+});
+
+function selectDatabase(i?: number) {
+  if (i === undefined) return; // TODO
+  const database = databases.value[i];
+  const info = database.provider.getDatabaseChoiceData(database);
+  settings.saveCurrentDatabaseChoice(info, database.provider).then(() => {
+    router.navigate('/unlock/' + database.provider.key + '/' + encodeURIComponent(database.title));
+  });
+}
 </script>
 
 <template>
   <div>
     <div
       v-for="(db, index) in databases"
+      :key="db.provider.key + db.title"
       class="box-bar small selectable flair chooseFile"
       @click="selectDatabase(index)"
     >

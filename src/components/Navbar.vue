@@ -3,23 +3,24 @@
   requires a lib/VirtualRouter, and the routes object used to initialize the virtualrouter.
   Active tab changes automatically based on visible route.
 -->
-<script>
-export default {
-  props: {
-    routes: Array,
-    initialTab: String,
-  },
-};
+<script setup lang="ts">
+import { inject } from 'vue';
+import { RouterKey } from '@/composables/useRouter';
+
+const router = inject(RouterKey)!;
 </script>
 
 <template>
   <nav class="nav-extended">
     <div class="nav-content">
       <ul class="tabs tabs-transparent">
-        <!-- set class like /advanced-active-listener so the router can set -->
-        <template v-for="route in routes" :key="route.name">
-          <li v-if="!route.hidden_from_navbar" class="tab" :class="{ active: route.var.visible }">
-            <a @click="$router.route(route.route)">{{ route.name }}</a>
+        <template v-for="route in router.routes" :key="route.name">
+          <li
+            v-if="!route.hiddenFromNavbar"
+            class="tab"
+            :class="{ active: router.isActive(route.path) }"
+          >
+            <a @click="router.navigate(route.path)">{{ route.name }}</a>
           </li>
         </template>
       </ul>

@@ -2,7 +2,6 @@ import path, { dirname, relative } from 'node:path';
 import type { UserConfig } from 'vite';
 import { defineConfig } from 'vite';
 import Vue from '@vitejs/plugin-vue';
-import wasm from 'vite-plugin-wasm';
 
 import { isDev, isLocal, port, r } from './scripts/utils';
 import packageJson from './package.json';
@@ -11,7 +10,6 @@ export const sharedConfig: UserConfig = {
   root: r('src'),
   resolve: {
     alias: {
-      vue: '@vue/compat',
       '@': `${r('src')}/`,
       $services: `${r('services')}/`,
       '@materialize': path.resolve(__dirname, 'node_modules/@materializecss/materialize/sass'),
@@ -23,16 +21,7 @@ export const sharedConfig: UserConfig = {
     __NAME__: JSON.stringify(packageJson.name),
   },
   plugins: [
-    Vue({
-      template: {
-        compilerOptions: {
-          compatConfig: {
-            MODE: 2,
-          },
-        },
-      },
-    }),
-    wasm(),
+    Vue(),
     // rewrite assets to use relative path
     {
       name: 'assets-rewrite',
@@ -68,6 +57,7 @@ export default defineConfig(({ command }) => ({
   publicDir: r('public'),
   server: {
     port,
+    cors: true, // allow chrome-extension:// origins to load dev scripts (Vite 6 default only allows localhost)
     hmr: {
       host: 'localhost',
     },
@@ -87,7 +77,9 @@ export default defineConfig(({ command }) => ({
     },
   },
   test: {
+    root: r('.'),
     globals: true,
-    environment: 'jsdom',
+    environment: 'happy-dom',
+    setupFiles: [r('vitest.setup.ts')],
   },
 }));

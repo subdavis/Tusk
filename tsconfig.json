@@ -9,11 +9,13 @@
     "moduleResolution": "node",
     "paths": {
       "~/*": ["src/*"],
-			"@/*": ["src/*"]
+			"@/*": ["src/*"],
+			"$services/*": ["services/*"]
     },
     "resolveJsonModule": true,
     "types": [
-      "vite/client"
+      "vite/client",
+      "chrome"
     ],
     "strict": true,
     "noUnusedLocals": true,
