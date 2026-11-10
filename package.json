@@ -3,7 +3,7 @@
   "description": "A modern keepass extension",
   "version": "2.0.0",
   "type": "module",
-  "author": "Brandon Davis <brandon@subdavis.com>",
+  "author": "Brandon Davis <git@subdavis.com>",
   "license": "MIT",
   "private": true,
   "scripts": {
